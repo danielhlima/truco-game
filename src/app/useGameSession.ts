@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { CAMPAIGN_STAGES } from "../career/campaign/campaignData"
 import {
   applyCampaignLoss,
@@ -42,11 +42,17 @@ import {
   getMatchEndMessage,
   getNextRaiseValueFromPendingTruco,
   getPendingBetText,
+  getSpeechBetLabel,
+  getSpeechBubbleForTransition,
   getStatusMessage,
   getTrucoMessageForTransition,
+  type SpeechBubbleState,
 } from "./gameSessionHelpers"
 
 export function useGameSession() {
+  const AUTO_STEP_DELAY_MS = 820
+  const NEXT_HAND_DELAY_MS = 1180
+  const BUBBLE_DURATION_MS = 1500
   const [variant, setVariant] = useState<GameVariant>("MINEIRO")
   const [playerProfile, setPlayerProfile] = useState<PlayerProfile>(loadPlayerProfile)
   const [handState, setHandState] = useState<HandState | null>(null)
@@ -54,6 +60,8 @@ export function useGameSession() {
   const [logs, setLogs] = useState("")
   const [eventMessage, setEventMessage] = useState("")
   const [trucoMessage, setTrucoMessage] = useState(DEFAULT_TRUCO_MESSAGE)
+  const [speechBubble, setSpeechBubble] = useState<SpeechBubbleState | null>(null)
+  const speechBubbleTimeoutRef = useRef<number | null>(null)
 
   const currentCampaignStage =
     getCurrentCampaignStage(playerProfile, CAMPAIGN_STAGES) ?? CAMPAIGN_STAGES[0]
@@ -108,7 +116,7 @@ export function useGameSession() {
     !!handState &&
     !handState.finished &&
     handState.truco.phase === "awaiting-response" &&
-    handState.truco.awaitingResponseFromTeam === "A"
+    handState.truco.awaitingResponseFromPlayerId === 1
 
   const canRequestTruco =
     !!handState &&
@@ -129,15 +137,6 @@ export function useGameSession() {
     handState.table.length < 4 &&
     handState.truco.phase === "idle"
 
-  const nextStepDisabled =
-    !handState ||
-    !!matchState?.finished ||
-    canHumanRespondToTruco ||
-    (!handState.finished &&
-      handState.currentPlayerId === 1 &&
-      handState.table.length < 4 &&
-      handState.truco.phase === "idle")
-
   const statusMessage = getStatusMessage(handState)
   const currentTurnLabel = getCurrentTurnLabel(handState)
   const handScoreLabel = handState
@@ -148,23 +147,47 @@ export function useGameSession() {
     : "Nós 0 x 0 Eles"
   const campaignSummary = buildCampaignSummary(CAMPAIGN_STAGES)
 
-  function syncLogs() {
+  const syncLogs = useCallback(() => {
     setLogs(getLogsAsText())
-  }
+  }, [])
 
-  function applyHandState(
+  const showSpeechBubble = useCallback((nextSpeechBubble: SpeechBubbleState | null) => {
+    if (speechBubbleTimeoutRef.current) {
+      window.clearTimeout(speechBubbleTimeoutRef.current)
+      speechBubbleTimeoutRef.current = null
+    }
+
+    setSpeechBubble(nextSpeechBubble)
+
+    if (!nextSpeechBubble) {
+      return
+    }
+
+    speechBubbleTimeoutRef.current = window.setTimeout(() => {
+      setSpeechBubble((current) =>
+        current === nextSpeechBubble ? null : current
+      )
+      speechBubbleTimeoutRef.current = null
+    }, BUBBLE_DURATION_MS)
+  }, [BUBBLE_DURATION_MS])
+
+  const applyHandState = useCallback((
     nextState: HandState,
     explicitMessages?: {
       eventMessage?: string
       trucoMessage?: string
+      speechBubble?: SpeechBubbleState | null
     }
-  ) {
+  ) => {
     const nextEventMessage =
       explicitMessages?.eventMessage ?? getEventMessageForTransition(handState, nextState)
     const nextTrucoMessage =
       explicitMessages?.trucoMessage ?? getTrucoMessageForTransition(handState, nextState)
+    const nextSpeechBubble =
+      explicitMessages?.speechBubble ?? getSpeechBubbleForTransition(handState, nextState)
 
     setHandState(nextState)
+    showSpeechBubble(nextSpeechBubble)
 
     if (nextEventMessage) {
       setEventMessage(nextEventMessage)
@@ -205,7 +228,7 @@ export function useGameSession() {
     }
 
     syncLogs()
-  }
+  }, [handState, matchState, playerProfile, showSpeechBubble, syncLogs])
 
   function handleStartHand() {
     if (!currentCampaignVenue) return
@@ -233,29 +256,8 @@ export function useGameSession() {
     setMatchState(null)
     setEventMessage("Campanha reiniciada do zero.")
     setTrucoMessage("Tudo pronto para voltar ao primeiro boteco.")
+    showSpeechBubble(null)
     syncLogs()
-  }
-
-  function handleNextStep() {
-    if (!handState) return
-    if (matchState?.finished) return
-
-    if (handState.finished) {
-      if (!matchState) return
-
-      const nextStartingPlayerId = matchState.startingPlayerId
-      const nextHandNumber = matchState.handNumber
-      const nextState = createHandState(activeVariant, nextStartingPlayerId)
-
-      applyHandState(nextState, {
-        eventMessage: `Mão ${nextHandNumber} iniciada.`,
-        trucoMessage: DEFAULT_TRUCO_MESSAGE,
-      })
-      return
-    }
-
-    const nextState = stepHand(handState)
-    applyHandState(nextState)
   }
 
   function handlePlayCard(card: Card) {
@@ -284,6 +286,9 @@ export function useGameSession() {
       trucoMessage: requestedBet
         ? `Nosso time pediu ${getBetCallLabel(requestedBet)}. Aguardando resposta deles.`
         : "Nosso time pediu aumento. Aguardando resposta deles.",
+      speechBubble: requestedBet
+        ? { playerId: 1, text: getSpeechBetLabel(requestedBet) }
+        : null,
     })
   }
 
@@ -295,6 +300,7 @@ export function useGameSession() {
     applyHandState(nextState, {
       eventMessage: `Você aceitou ${getBetCallLabel(acceptedBet)}.`,
       trucoMessage: getAcceptedBetMessage(acceptedBet),
+      speechBubble: { playerId: 1, text: "DESCE!" },
     })
   }
 
@@ -305,6 +311,7 @@ export function useGameSession() {
     applyHandState(nextState, {
       eventMessage: `Você correu de ${getPendingBetText(handState)}.`,
       trucoMessage: `Nosso time correu de ${getPendingBetText(handState)}.`,
+      speechBubble: { playerId: 1, text: "TÔ FORA!" },
     })
   }
 
@@ -321,8 +328,56 @@ export function useGameSession() {
       trucoMessage: requestedValue
         ? `Nosso time pediu ${getBetCallLabelFromNumber(requestedValue)}. Aguardando resposta deles.`
         : "Nosso time pediu aumento. Aguardando resposta deles.",
+      speechBubble: requestedValue
+        ? { playerId: 1, text: getSpeechBetLabel(requestedValue) }
+        : { playerId: 1, text: "DESCE!" },
     })
   }
+
+  useEffect(() => {
+    if (!handState || !matchState || matchState.finished) {
+      return
+    }
+
+    if (canHumanRespondToTruco || canPlayHumanCard) {
+      return
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      if (handState.finished) {
+        const nextStartingPlayerId = matchState.startingPlayerId
+        const nextHandNumber = matchState.handNumber
+        const nextState = createHandState(activeVariant, nextStartingPlayerId)
+
+        applyHandState(nextState, {
+          eventMessage: `Mão ${nextHandNumber} iniciada.`,
+          trucoMessage: DEFAULT_TRUCO_MESSAGE,
+          speechBubble: null,
+        })
+        return
+      }
+
+      const nextState = stepHand(handState)
+      applyHandState(nextState)
+    }, handState.finished ? NEXT_HAND_DELAY_MS : AUTO_STEP_DELAY_MS)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [
+    activeVariant,
+    applyHandState,
+    canHumanRespondToTruco,
+    canPlayHumanCard,
+    handState,
+    matchState,
+  ])
+
+  useEffect(() => {
+    return () => {
+      if (speechBubbleTimeoutRef.current) {
+        window.clearTimeout(speechBubbleTimeoutRef.current)
+      }
+    }
+  }, [])
 
   async function handleCopyLogs() {
     try {
@@ -349,7 +404,6 @@ export function useGameSession() {
     handState,
     handleAcceptTruco,
     handleCopyLogs,
-    handleNextStep,
     handlePlayCard,
     handleRaiseTruco,
     handleRequestTruco,
@@ -360,7 +414,6 @@ export function useGameSession() {
     logs,
     matchScoreLabel,
     matchState,
-    nextStepDisabled,
     player1,
     player2,
     player3,
@@ -368,6 +421,7 @@ export function useGameSession() {
     playerProfile,
     setVariant,
     statusMessage,
+    speechBubble,
     tableByPlayer,
     trucoMessage,
     variant,

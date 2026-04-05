@@ -1,5 +1,6 @@
 import { logEvent } from "../utils/logger"
 import type { HandState, TeamId } from "./handState"
+import { getTargetPlayerForTruco } from "./trucoTarget"
 import { getBetCallLabel, getNextBet } from "./truco"
 import { getTeam } from "./teams"
 
@@ -43,6 +44,7 @@ export function requestTruco(state: HandState, playerId: number): HandState {
 
   const requestedByTeam = requestingTeam
   const awaitingResponseFromTeam = getOpposingTeam(requestedByTeam)
+  const awaitingResponseFromPlayerId = getTargetPlayerForTruco(state, playerId)
   const callLabel = getBetCallLabel(proposedBet)
 
   logEvent(`Jogador ${playerId} pediu ${callLabel}.`)
@@ -56,8 +58,10 @@ export function requestTruco(state: HandState, playerId: number): HandState {
       phase: "awaiting-response",
       requestedByPlayerId: playerId,
       requestedByTeam,
+      awaitingResponseFromPlayerId,
       awaitingResponseFromTeam,
       proposedBet,
+      promptKind: "request",
     },
   }
 }

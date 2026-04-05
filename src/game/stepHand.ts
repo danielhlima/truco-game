@@ -15,35 +15,32 @@ export function stepHand(state: HandState): HandState {
 
   if (state.truco.phase === "awaiting-response") {
     const awaitingTeam = state.truco.awaitingResponseFromTeam
+    const awaitingPlayerId = state.truco.awaitingResponseFromPlayerId
     const proposedBet = state.truco.proposedBet
 
-    if (!awaitingTeam || !proposedBet) {
+    if (!awaitingTeam || !awaitingPlayerId || !proposedBet) {
       return state
     }
 
-    if (awaitingTeam === "A") {
+    if (awaitingPlayerId === 1) {
       return state
     }
 
     const ruleSet = getRuleSet(state.variant)
+    const awaitingPlayer = state.players.find((player) => player.id === awaitingPlayerId)
 
-    const shouldAccept = state.players
-      .filter((player) => getTeam(player.id) === awaitingTeam)
-      .some(
-        (player) =>
-          respondToRaise(ruleSet, player.hand, proposedBet, state.vira) ===
-          "accept"
-      )
+    if (!awaitingPlayer) {
+      return state
+    }
+
+    const shouldAccept =
+      respondToRaise(ruleSet, awaitingPlayer.hand, proposedBet, state.vira) === "accept"
 
     const canRaise = getNextBet(proposedBet) !== null
     const shouldReRaise =
       shouldAccept &&
       canRaise &&
-      state.players
-        .filter((player) => getTeam(player.id) === awaitingTeam)
-        .some((player) =>
-          shouldRaiseBet(ruleSet, player.hand, proposedBet, state.vira)
-        )
+      shouldRaiseBet(ruleSet, awaitingPlayer.hand, proposedBet, state.vira)
 
     if (shouldReRaise) {
       return respondToTruco(state, "raise")

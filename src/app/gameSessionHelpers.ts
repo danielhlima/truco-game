@@ -5,9 +5,15 @@ import {
 import type { CampaignStage } from "../career/campaign/types"
 import type { Card } from "../game/card"
 import type { HandState, TeamId } from "../game/handState"
+import { getNextPlayerClockwise as getClockwisePlayerId } from "../game/trucoTarget"
 import { getBetCallLabel, getBetLabel, getNextBet } from "../game/truco"
 
 export const DEFAULT_TRUCO_MESSAGE = "Nenhum pedido de truco nesta mão."
+
+export interface SpeechBubbleState {
+  playerId: number
+  text: string
+}
 
 export function formatCard(card: Card): string {
   return `${card.rank} de ${card.suit}`
@@ -17,11 +23,7 @@ export function getCurrentTurnLabel(handState: HandState | null): string {
   if (!handState) return "—"
 
   if (handState.truco.phase === "awaiting-response") {
-    if (handState.truco.awaitingResponseFromTeam === "A") {
-      return "Você / nosso time"
-    }
-
-    return "Time adversário"
+    return getPlayerLabel(getTrucoTargetPlayerId(handState))
   }
 
   switch (handState.currentPlayerId) {
@@ -54,11 +56,11 @@ export function getStatusMessage(handState: HandState | null): string {
   }
 
   if (handState.truco.phase === "awaiting-response") {
-    if (handState.truco.awaitingResponseFromTeam === "A") {
+    if (getTrucoTargetPlayerId(handState) === 1) {
       return `O time adversário pediu ${getPendingBetText(handState)}. Responda.`
     }
 
-    return "O jogo está pausado aguardando resposta do time adversário."
+    return `Aguardando resposta de ${getPlayerLabel(getTrucoTargetPlayerId(handState)).toLowerCase()}.`
   }
 
   if (handState.table.length === 4) {
@@ -198,6 +200,94 @@ export function getTrucoMessageForTransition(
   return null
 }
 
+export function getSpeechBubbleForTransition(
+  previousState: HandState | null,
+  nextState: HandState
+): SpeechBubbleState | null {
+  if (!previousState) {
+    return null
+  }
+
+  if (
+    previousState.truco.phase === "idle" &&
+    nextState.truco.phase === "awaiting-response" &&
+    nextState.truco.requestedByPlayerId &&
+    nextState.truco.proposedBet
+  ) {
+    return {
+      playerId: nextState.truco.requestedByPlayerId,
+      text: getSpeechBetLabel(nextState.truco.proposedBet),
+    }
+  }
+
+  if (
+    previousState.truco.phase === "awaiting-response" &&
+    previousState.truco.requestedByPlayerId
+  ) {
+    const responderPlayerId = getTrucoTargetPlayerId(previousState)
+
+    if (nextState.finished) {
+      return {
+        playerId: responderPlayerId,
+        text: "TÔ FORA!",
+      }
+    }
+
+    if (
+      nextState.truco.phase === "awaiting-response" &&
+      previousState.truco.proposedBet &&
+      nextState.truco.proposedBet &&
+      nextState.truco.proposedBet > previousState.truco.proposedBet
+    ) {
+      return {
+        playerId: responderPlayerId,
+        text: getSpeechBetLabel(nextState.truco.proposedBet),
+      }
+    }
+
+    if (
+      nextState.truco.phase === "idle" &&
+      previousState.truco.proposedBet &&
+      nextState.currentBet >= previousState.truco.proposedBet
+    ) {
+      return {
+        playerId: responderPlayerId,
+        text: previousState.truco.promptKind === "raise" ? "TOMA!" : "DESCE!",
+      }
+    }
+  }
+
+  return null
+}
+
+export function getSpeechBetLabel(bet: number): string {
+  switch (bet) {
+    case 3:
+      return "TRUCO!"
+    case 6:
+      return "SEIS!"
+    case 9:
+      return "NOVE!"
+    case 12:
+      return "DOZE!"
+    default:
+      return "TRUCO!"
+  }
+}
+
+export function getNextPlayerClockwise(playerId: number): number {
+  return getClockwisePlayerId(playerId)
+}
+
+export function getTrucoTargetPlayerId(handState: HandState): number {
+  if (handState.truco.awaitingResponseFromPlayerId) {
+    return handState.truco.awaitingResponseFromPlayerId
+  }
+
+  const requesterPlayerId = handState.truco.requestedByPlayerId
+  return requesterPlayerId ? getNextPlayerClockwise(requesterPlayerId) : handState.currentPlayerId
+}
+
 export function getSuitSymbol(suit: Card["suit"]): string {
   switch (suit) {
     case "copas":
@@ -245,7 +335,7 @@ export function getTrucoStatusLabel(handState: HandState | null): string {
   if (!handState) return "Sem mão ativa"
   if (handState.finished) return "Mão encerrada"
   if (handState.truco.phase === "awaiting-response") {
-    if (handState.truco.awaitingResponseFromTeam === "A") {
+    if (getTrucoTargetPlayerId(handState) === 1) {
       return "Sua resposta"
     }
 
@@ -257,7 +347,7 @@ export function getTrucoStatusLabel(handState: HandState | null): string {
 export function canHumanRaiseInResponse(handState: HandState | null): boolean {
   if (!handState) return false
   if (handState.truco.phase !== "awaiting-response") return false
-  if (handState.truco.awaitingResponseFromTeam !== "A") return false
+  if (getTrucoTargetPlayerId(handState) !== 1) return false
 
   return getNextRaiseValueFromPendingTruco(handState) !== null
 }
@@ -315,7 +405,7 @@ export function getTrucoAwaitingLabel(handState: HandState | null): string {
   }
 
   if (handState.truco.awaitingResponseFromTeam === "A") {
-    return "Nossa resposta"
+    return getTrucoTargetPlayerId(handState) === 1 ? "Sua resposta" : "Parceira"
   }
 
   if (handState.truco.awaitingResponseFromTeam === "B") {
@@ -323,6 +413,21 @@ export function getTrucoAwaitingLabel(handState: HandState | null): string {
   }
 
   return "—"
+}
+
+export function getPlayerLabel(playerId: number): string {
+  switch (playerId) {
+    case 1:
+      return "Você"
+    case 2:
+      return "Adversário esquerdo"
+    case 3:
+      return "Parceira"
+    case 4:
+      return "Adversário direito"
+    default:
+      return `Jogador ${playerId}`
+  }
 }
 
 export function getTrucoProposedBetLabel(handState: HandState | null): string {

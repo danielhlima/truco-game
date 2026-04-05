@@ -3,14 +3,16 @@ import type { CSSProperties } from "react"
 import * as THREE from "three"
 import tableTopGhibliishUrl from "../assets/boteco/table-top-ghibliish.png"
 import tableTopRustCleanUrl from "../assets/boteco/table-top-rust-clean.png"
+import type { SpeechBubbleState } from "../app/gameSessionHelpers"
 import type { TableSceneModel } from "./tableSceneModel"
 
 interface GameTableSceneProps {
   model: TableSceneModel
+  speechBubble?: SpeechBubbleState | null
   style?: CSSProperties
 }
 
-export function GameTableScene({ model, style }: GameTableSceneProps) {
+export function GameTableScene({ model, speechBubble, style }: GameTableSceneProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
   const sceneRef = useRef<THREE.Scene | null>(null)
@@ -443,6 +445,13 @@ export function GameTableScene({ model, style }: GameTableSceneProps) {
             scale={card.stage === "from" ? 1 : 0.86}
           />
         ))}
+
+        {speechBubble ? (
+          <SpeechBubbleOverlay
+            playerId={speechBubble.playerId}
+            text={speechBubble.text}
+          />
+        ) : null}
       </div>
     </div>
   )
@@ -688,4 +697,67 @@ function getSuitSymbol(suit: string): string {
     default:
       return "?"
   }
+}
+
+function getSpeechBubbleOverlayPosition(playerId: number): { left: string; top: string } {
+  switch (playerId) {
+    case 3:
+      return { left: "50%", top: "11%" }
+    case 2:
+      return { left: "16%", top: "40%" }
+    case 4:
+      return { left: "84%", top: "40%" }
+    default:
+      return { left: "50%", top: "74%" }
+  }
+}
+
+function SpeechBubbleOverlay({
+  playerId,
+  text,
+}: {
+  playerId: number
+  text: string
+}) {
+  const { left, top } = getSpeechBubbleOverlayPosition(playerId)
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left,
+        top,
+        transform: "translate(-50%, -50%)",
+        padding: "10px 14px",
+        borderRadius: "18px",
+        background: "#fffdf5",
+        border: "2px solid rgba(68, 64, 60, 0.82)",
+        color: "#1f2937",
+        fontSize: "18px",
+        fontWeight: 900,
+        letterSpacing: "0.04em",
+        boxShadow: "0 12px 22px rgba(0,0,0,0.22)",
+        whiteSpace: "nowrap",
+        animation: "speech-pop 180ms ease-out",
+      }}
+    >
+      {text}
+
+      <div
+        style={{
+          position: "absolute",
+          width: "14px",
+          height: "14px",
+          background: "#fffdf5",
+          borderRight: "2px solid rgba(68, 64, 60, 0.82)",
+          borderBottom: "2px solid rgba(68, 64, 60, 0.82)",
+          transform: "translateX(-50%) rotate(45deg)",
+          left: playerId === 2 ? "18%" : playerId === 4 ? "82%" : "50%",
+          bottom: playerId === 3 ? "-8px" : playerId === 1 ? "-8px" : "calc(50% - 7px)",
+          top: playerId === 2 || playerId === 4 ? "calc(50% - 7px)" : undefined,
+          right: playerId === 4 ? "-8px" : undefined,
+        }}
+      />
+    </div>
+  )
 }

@@ -15,12 +15,12 @@ import {
   getBetBadgeLabel,
   getCampaignTierLabel,
   getManilhaLabel,
-  getNextStepButtonLabel,
   getRaiseResponseButtonLabel,
   getRequestBetButtonLabel,
   getStartMatchButtonLabel,
   getStateLabel,
   getSuitSymbol,
+  type SpeechBubbleState,
   getTrucoAwaitingLabel,
   getTrucoProposedBetLabel,
   getTrucoRequestedByLabel,
@@ -33,28 +33,20 @@ type StyleMap = Record<string, React.CSSProperties>
 interface ControlsPanelProps {
   activeVariant: GameVariant
   campaignCompleted: boolean
-  nextStepDisabled: boolean
-  handState: HandState | null
-  matchFinished: boolean
   variantSelectionDisabled: boolean
   currentCampaignVenue: CampaignVenue | null
   onChangeVariant: (variant: GameVariant) => void
   onStart: () => void
-  onNextStep: () => void
   styles: StyleMap
 }
 
 export function ControlsPanel({
   activeVariant,
   campaignCompleted,
-  nextStepDisabled,
-  handState,
-  matchFinished,
   variantSelectionDisabled,
   currentCampaignVenue,
   onChangeVariant,
   onStart,
-  onNextStep,
   styles,
 }: ControlsPanelProps) {
   return (
@@ -89,17 +81,6 @@ export function ControlsPanel({
         >
           {getStartMatchButtonLabel(currentCampaignVenue, campaignCompleted)}
         </button>
-
-        <button
-          style={{
-            ...styles.secondaryButton,
-            ...(nextStepDisabled ? styles.disabledButton : {}),
-          }}
-          onClick={onNextStep}
-          disabled={nextStepDisabled}
-        >
-          {getNextStepButtonLabel(handState, matchFinished)}
-        </button>
       </div>
 
       <div style={styles.helpBox}>
@@ -109,7 +90,7 @@ export function ControlsPanel({
           <br />
           2. Quando for sua vez, clique em uma carta.
           <br />
-          3. Para pedir o próximo lance, use o botão na área de ações.
+          3. As IAs jogam automaticamente, e os balões mostram o que está acontecendo.
           <br />
           4. Se a IA pedir truco, seis, nove ou doze, responda com <strong>Aceitar</strong> ou <strong>Correr</strong>.
         </p>
@@ -354,6 +335,7 @@ interface TableSectionProps {
   handScoreLabel: string
   currentTurnLabel: string
   statusMessage: string
+  speechBubble: SpeechBubbleState | null
   tableByPlayer: Record<number, Card | undefined>
   lastPlayedPlayerId: number | null
   player1: Player | null
@@ -377,6 +359,7 @@ export function TableSection({
   handScoreLabel,
   currentTurnLabel,
   statusMessage,
+  speechBubble,
   tableByPlayer,
   lastPlayedPlayerId,
   player1,
@@ -404,7 +387,7 @@ export function TableSection({
         <div style={styles.gameViewport}>
           <div style={styles.gameMainColumn}>
             <div style={styles.tableSurface}>
-              <GameTableScene model={tableSceneModel} />
+              <GameTableScene model={tableSceneModel} speechBubble={speechBubble} />
             </div>
 
             <div style={styles.playerCardsBlock}>

@@ -16,10 +16,18 @@ export function respondToTruco(
   }
 
   const requestedByTeam = state.truco.requestedByTeam
+  const requestedByPlayerId = state.truco.requestedByPlayerId
+  const awaitingResponseFromPlayerId = state.truco.awaitingResponseFromPlayerId
   const awaitingResponseFromTeam = state.truco.awaitingResponseFromTeam
   const proposedBet = state.truco.proposedBet
 
-  if (!requestedByTeam || !awaitingResponseFromTeam || !proposedBet) {
+  if (
+    !requestedByTeam ||
+    !requestedByPlayerId ||
+    !awaitingResponseFromPlayerId ||
+    !awaitingResponseFromTeam ||
+    !proposedBet
+  ) {
     throw new Error("Estado de truco inválido")
   }
 
@@ -54,10 +62,12 @@ export function respondToTruco(
       currentBet: proposedBet,
       truco: {
         phase: "awaiting-response",
-        requestedByPlayerId: undefined,
+        requestedByPlayerId: awaitingResponseFromPlayerId,
         requestedByTeam: awaitingResponseFromTeam,
+        awaitingResponseFromPlayerId: requestedByPlayerId,
         awaitingResponseFromTeam: requestedByTeam,
         proposedBet: nextBet,
+        promptKind: "raise",
         nextRaiseByTeam: state.truco.nextRaiseByTeam,
       },
     }
@@ -73,6 +83,8 @@ export function respondToTruco(
     winner: requestedByTeam,
     truco: {
       phase: "idle",
+      awaitingResponseFromPlayerId: undefined,
+      promptKind: undefined,
       nextRaiseByTeam: undefined,
     },
   }

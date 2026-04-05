@@ -7,13 +7,16 @@ import type { GameVariant } from "./variant"
 export type TeamId = "A" | "B"
 
 export type TrucoPhase = "idle" | "awaiting-response"
+export type TrucoPromptKind = "request" | "raise"
 
 export interface TrucoState {
   phase: TrucoPhase
   requestedByPlayerId?: number
   requestedByTeam?: TeamId
+  awaitingResponseFromPlayerId?: number
   awaitingResponseFromTeam?: TeamId
   proposedBet?: BetValue
+  promptKind?: TrucoPromptKind
   nextRaiseByTeam?: TeamId
 }
 

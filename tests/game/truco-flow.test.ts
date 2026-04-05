@@ -12,6 +12,7 @@ test("requestTruco cria um pedido inicial valendo 3", () => {
 
   assert.equal(nextState.truco.phase, "awaiting-response")
   assert.equal(nextState.truco.requestedByTeam, "A")
+  assert.equal(nextState.truco.awaitingResponseFromPlayerId, 2)
   assert.equal(nextState.truco.awaitingResponseFromTeam, "B")
   assert.equal(nextState.truco.proposedBet, 3)
 })
@@ -45,7 +46,9 @@ test("respondToTruco com raise aceita o valor atual e propõe o próximo", () =>
 
   assert.equal(nextState.currentBet, 3)
   assert.equal(nextState.truco.phase, "awaiting-response")
+  assert.equal(nextState.truco.requestedByPlayerId, 2)
   assert.equal(nextState.truco.requestedByTeam, "B")
+  assert.equal(nextState.truco.awaitingResponseFromPlayerId, 1)
   assert.equal(nextState.truco.awaitingResponseFromTeam, "A")
   assert.equal(nextState.truco.proposedBet, 6)
 })
@@ -57,6 +60,7 @@ test("stepHand permite que a IA aceite e peça aumento quando a mão for forte",
       phase: "awaiting-response",
       requestedByPlayerId: 1,
       requestedByTeam: "A",
+      awaitingResponseFromPlayerId: 2,
       awaitingResponseFromTeam: "B",
       proposedBet: 3,
     },
@@ -66,7 +70,9 @@ test("stepHand permite que a IA aceite e peça aumento quando a mão for forte",
 
   assert.equal(nextState.currentBet, 3)
   assert.equal(nextState.truco.phase, "awaiting-response")
+  assert.equal(nextState.truco.requestedByPlayerId, 2)
   assert.equal(nextState.truco.requestedByTeam, "B")
+  assert.equal(nextState.truco.awaitingResponseFromPlayerId, 1)
   assert.equal(nextState.truco.awaitingResponseFromTeam, "A")
   assert.equal(nextState.truco.proposedBet, 6)
 })

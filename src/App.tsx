@@ -24,7 +24,6 @@ function App() {
     handState,
     handleAcceptTruco,
     handleCopyLogs,
-    handleNextStep,
     handlePlayCard,
     handleRaiseTruco,
     handleRequestTruco,
@@ -35,10 +34,10 @@ function App() {
     logs,
     matchScoreLabel,
     matchState,
-    nextStepDisabled,
     player1,
     playerProfile,
     setVariant,
+    speechBubble,
     statusMessage,
     tableByPlayer,
     trucoMessage,
@@ -61,14 +60,10 @@ function App() {
           <ControlsPanel
             activeVariant={activeVariant}
             campaignCompleted={campaignCompleted}
-            nextStepDisabled={nextStepDisabled}
-            handState={handState}
-            matchFinished={!!matchState?.finished}
             variantSelectionDisabled={variantSelectionDisabled}
             currentCampaignVenue={currentCampaignVenue}
             onChangeVariant={setVariant}
             onStart={handleStartHand}
-            onNextStep={handleNextStep}
             styles={styles}
           />
 
@@ -94,6 +89,7 @@ function App() {
           handScoreLabel={handScoreLabel}
           currentTurnLabel={currentTurnLabel}
           statusMessage={statusMessage}
+          speechBubble={speechBubble}
           tableByPlayer={tableByPlayer}
           lastPlayedPlayerId={lastPlayedPlayerId}
           player1={player1}
