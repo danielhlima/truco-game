@@ -6,6 +6,8 @@ import type { Player } from "../game/gameState"
 import type { GameVariant } from "../game/variant"
 import { CAMPAIGN_STAGES } from "../career/campaign/campaignData"
 import { STORE_PRODUCTS, UNLOCKABLE_ITEMS } from "../economy/catalog"
+import { GameTableScene } from "../three/GameTableScene"
+import { buildTableSceneModel } from "../three/tableSceneModel"
 import type { PlayerProfile } from "../profile/playerProfile"
 import {
   canHumanRaiseInResponse,
@@ -14,7 +16,6 @@ import {
   getCampaignTierLabel,
   getManilhaLabel,
   getNextStepButtonLabel,
-  getPendingBetText,
   getRaiseResponseButtonLabel,
   getRequestBetButtonLabel,
   getStartMatchButtonLabel,
@@ -348,12 +349,14 @@ export function CampaignPanel({
 interface TableSectionProps {
   handState: HandState | null
   matchState: { handNumber: number; finished: boolean; winner?: "A" | "B" } | null
+  currentCampaignVenue: CampaignVenue | null
+  matchScoreLabel: string
+  handScoreLabel: string
+  currentTurnLabel: string
+  statusMessage: string
   tableByPlayer: Record<number, Card | undefined>
   lastPlayedPlayerId: number | null
   player1: Player | null
-  player2: Player | null
-  player3: Player | null
-  player4: Player | null
   canRequestTruco: boolean
   canHumanRespondToTruco: boolean
   canPlayHumanCard: boolean
@@ -369,12 +372,14 @@ interface TableSectionProps {
 export function TableSection({
   handState,
   matchState,
+  currentCampaignVenue,
+  matchScoreLabel,
+  handScoreLabel,
+  currentTurnLabel,
+  statusMessage,
   tableByPlayer,
   lastPlayedPlayerId,
   player1,
-  player2,
-  player3,
-  player4,
   canRequestTruco,
   canHumanRespondToTruco,
   canPlayHumanCard,
@@ -386,152 +391,107 @@ export function TableSection({
   onPlayCard,
   styles,
 }: TableSectionProps) {
+  const tableSceneModel = buildTableSceneModel(
+    handState,
+    tableByPlayer,
+    lastPlayedPlayerId,
+    currentCampaignVenue
+  )
+
   return (
     <section style={styles.tablePanel}>
-      <div style={styles.tablePanelHeader}>
-        <div>
-          <div style={styles.tableTitle}>Mesa</div>
-          <div style={styles.tableSubtitle}>
-            Visão de cima · cartas da vaza atual no centro
-          </div>
-        </div>
+      <div style={styles.tableHudSurface}>
+        <div style={styles.gameViewport}>
+          <div style={styles.gameMainColumn}>
+            <div style={styles.tableSurface}>
+              <GameTableScene model={tableSceneModel} />
+            </div>
 
-        <div style={styles.roundPill}>
-          {handState?.finished
-            ? matchState?.finished && matchState.winner
-              ? `Partida encerrada · ${getWinnerLabel(matchState.winner)}`
-              : `Mão encerrada · ${getWinnerLabel(handState.winner)}`
-            : handState
-            ? `Mão ${matchState?.handNumber ?? 1} · Rodada ${handState.roundNumber}`
-            : "Aguardando início"}
+            <div style={styles.playerCardsBlock}>
+              <HumanCardsPanel
+                handState={handState}
+                player1={player1}
+                canPlayHumanCard={canPlayHumanCard}
+                onPlayCard={onPlayCard}
+                styles={styles}
+              />
+            </div>
+          </div>
+
+          <div style={styles.gameSidebarColumn}>
+            <div style={styles.tableHudSidebar}>
+              <div style={styles.tableHudScoreRow}>
+                <span>Partida</span>
+                <span>{`${matchScoreLabel.split(" x ")[0]} | ${matchScoreLabel.split(" x ")[1]}`}</span>
+              </div>
+
+              <div style={styles.tableHudStats}>
+                <div style={styles.tableHudStatLine}>
+                  <span>Mão</span>
+                  <strong>{matchState?.handNumber ?? 1}</strong>
+                </div>
+                <div style={styles.tableHudStatLine}>
+                  <span>Vaza</span>
+                  <strong>{handScoreLabel}</strong>
+                </div>
+                <div style={styles.tableHudStatLine}>
+                  <span>Valendo</span>
+                  <strong>{handState ? getBetBadgeLabel(handState.currentBet) : getBetBadgeLabel(1)}</strong>
+                </div>
+                <div style={styles.tableHudStatLine}>
+                  <span>Vez</span>
+                  <strong>{currentTurnLabel}</strong>
+                </div>
+              </div>
+
+              <div style={styles.tableHudVenue}>
+                <div style={styles.tableHudVenueTitle}>
+                  {currentCampaignVenue?.name ?? "Mesa de treino"}
+                </div>
+                <div style={styles.tableHudVenueText}>
+                  {currentCampaignVenue
+                    ? `${currentCampaignVenue.districtLabel} · Partida ${matchState?.handNumber ?? 1}`
+                    : "Sem local"}
+                </div>
+              </div>
+
+              <div style={styles.tableHudMessage}>
+                {handState?.finished
+                  ? matchState?.finished && matchState.winner
+                    ? `Partida encerrada · ${getWinnerLabel(matchState.winner)}`
+                    : `Mão encerrada · ${getWinnerLabel(handState.winner)}`
+                  : statusMessage}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div style={styles.board}>
-        <div style={styles.topSeat}>
-          <PlayerSeat
-            name="Parceira (Jogador 3)"
-            detail={`Cartas: ${player3?.hand.length ?? 0}`}
-            active={handState?.currentPlayerId === 3}
-            team="Nós"
-            styles={styles}
-          />
-        </div>
-
-        <div style={styles.middleSeatsRow}>
-          <div style={styles.sideSeat}>
-            <PlayerSeat
-              name="Adversário Esq. (Jogador 2)"
-              detail={`Cartas: ${player2?.hand.length ?? 0}`}
-              active={handState?.currentPlayerId === 2}
-              team="Eles"
-              styles={styles}
-            />
-          </div>
-
-          <div style={styles.tableSurface}>
-            <div style={styles.tableCenterArea}>
-              <TableCardSlot
-                label="Topo"
-                playerId={3}
-                card={tableByPlayer[3]}
-                highlight={lastPlayedPlayerId === 3}
-                styles={styles}
-              />
-
-              <div style={styles.tableMiddleRow}>
-                <TableCardSlot
-                  label="Esquerda"
-                  playerId={2}
-                  card={tableByPlayer[2]}
-                  highlight={lastPlayedPlayerId === 2}
-                  styles={styles}
-                />
-
-                <div style={styles.tableCenterBadge}>
-                  <div style={styles.tableCenterBadgeTop}>TRUCO</div>
-                  <div style={styles.tableCenterBadgeBottom}>
-                    {handState ? getBetBadgeLabel(handState.currentBet) : getBetBadgeLabel(1)}
-                  </div>
-                </div>
-
-                <TableCardSlot
-                  label="Direita"
-                  playerId={4}
-                  card={tableByPlayer[4]}
-                  highlight={lastPlayedPlayerId === 4}
-                  styles={styles}
-                />
-              </div>
-
-              <TableCardSlot
-                label="Baixo"
-                playerId={1}
-                card={tableByPlayer[1]}
-                highlight={lastPlayedPlayerId === 1}
-                styles={styles}
-              />
+      <div style={styles.actionArea}>
+        <div style={styles.actionAreaHeader}>
+          <div>
+            <div style={styles.actionAreaTitle}>Ações da mão</div>
+            <div style={styles.actionAreaSubtitle}>
+              Controles detalhados ficam fora da tela do celular
             </div>
           </div>
 
-          <div style={styles.sideSeat}>
-            <PlayerSeat
-              name="Adversário Dir. (Jogador 4)"
-              detail={`Cartas: ${player4?.hand.length ?? 0}`}
-              active={handState?.currentPlayerId === 4}
-              team="Eles"
-              styles={styles}
-            />
+          <div style={styles.betBadge}>
+            {handState ? getBetBadgeLabel(handState.currentBet) : getBetBadgeLabel(1)}
           </div>
         </div>
 
-        <div style={styles.bottomSeatBlock}>
-          <PlayerSeat
-            name="Você (Jogador 1)"
-            detail={`Cartas: ${player1?.hand.length ?? 0}`}
-            active={handState?.currentPlayerId === 1}
-            team="Nós"
-            isHuman
-            styles={styles}
-          />
-
-          <div style={styles.actionArea}>
-            <div style={styles.actionAreaHeader}>
-              <div>
-                <div style={styles.actionAreaTitle}>Ações da mão</div>
-                <div style={styles.actionAreaSubtitle}>
-                  Truco integrado para pedido da IA e resposta humana
-                </div>
-              </div>
-
-              <div style={styles.betBadge}>
-                {handState ? getBetBadgeLabel(handState.currentBet) : getBetBadgeLabel(1)}
-              </div>
-            </div>
-
-            <TrucoPanel
-              handState={handState}
-              trucoMessage={trucoMessage}
-              canRequestTruco={canRequestTruco}
-              canHumanRespondToTruco={canHumanRespondToTruco}
-              onRequestTruco={onRequestTruco}
-              onAcceptTruco={onAcceptTruco}
-              onRaiseTruco={onRaiseTruco}
-              onRunFromTruco={onRunFromTruco}
-              styles={styles}
-            />
-
-            <HandPanel
-              handState={handState}
-              matchState={matchState}
-              player1={player1}
-              canHumanRespondToTruco={canHumanRespondToTruco}
-              canPlayHumanCard={canPlayHumanCard}
-              onPlayCard={onPlayCard}
-              styles={styles}
-            />
-          </div>
-        </div>
+        <TrucoPanel
+          handState={handState}
+          trucoMessage={trucoMessage}
+          canRequestTruco={canRequestTruco}
+          canHumanRespondToTruco={canHumanRespondToTruco}
+          onRequestTruco={onRequestTruco}
+          onAcceptTruco={onAcceptTruco}
+          onRaiseTruco={onRaiseTruco}
+          onRunFromTruco={onRunFromTruco}
+          styles={styles}
+        />
       </div>
     </section>
   )
@@ -678,98 +638,62 @@ function TrucoPanel({
   )
 }
 
-function HandPanel({
+function HumanCardsPanel({
   handState,
-  matchState,
   player1,
-  canHumanRespondToTruco,
   canPlayHumanCard,
   onPlayCard,
   styles,
 }: {
   handState: HandState | null
-  matchState: { finished: boolean } | null
   player1: Player | null
-  canHumanRespondToTruco: boolean
   canPlayHumanCard: boolean
   onPlayCard: (card: Card) => void
   styles: StyleMap
 }) {
   return (
-    <div style={styles.handPanel}>
-      <div style={styles.handTitle}>Sua mão</div>
+    <div style={styles.mobileHandPanel}>
+      <div style={styles.mobileHandHeader}>
+        <div style={styles.mobileHandTitle}>Suas cartas</div>
+        <div style={styles.mobileHandMeta}>
+          {handState && handState.currentPlayerId === 1 && !handState.finished
+            ? "Sua vez"
+            : "Aguardando"}
+        </div>
+      </div>
 
       {!player1 || player1.hand.length === 0 ? (
         <div style={styles.emptyHandBox}>Você não tem mais cartas.</div>
       ) : (
-        <div style={styles.handRow}>
+        <div style={styles.mobileHandRow}>
           {player1.hand.map((card, index) => (
             <button
               key={`${card.rank}-${card.suit}-${index}`}
               style={{
-                ...styles.cardButton,
-                ...(canPlayHumanCard
-                  ? styles.cardButtonActive
-                  : styles.cardButtonDisabled),
+                ...styles.mobileCardButton,
+                ...(canPlayHumanCard ? styles.cardButtonActive : styles.cardButtonDisabled),
               }}
               onClick={() => onPlayCard(card)}
               disabled={!canPlayHumanCard}
               title={formatCard(card)}
             >
-              <div style={styles.cardCornerTop}>
-                <div style={styles.cardRank}>{card.rank}</div>
-                <div style={styles.cardSuit}>{getSuitSymbol(card.suit)}</div>
+              <div style={styles.mobileCardCornerTop}>
+                <div style={styles.mobileCardRank}>{card.rank}</div>
+                <div style={styles.mobileCardSuit}>{getSuitSymbol(card.suit)}</div>
               </div>
-
-              <div style={styles.cardCenterSuit}>{getSuitSymbol(card.suit)}</div>
-
-              <div style={styles.cardCornerBottom}>
-                <div style={styles.cardRank}>{card.rank}</div>
-                <div style={styles.cardSuit}>{getSuitSymbol(card.suit)}</div>
+              <div style={styles.mobileCardCenterSuit}>{getSuitSymbol(card.suit)}</div>
+              <div style={styles.mobileCardCornerBottom}>
+                <div style={styles.mobileCardRank}>{card.rank}</div>
+                <div style={styles.mobileCardSuit}>{getSuitSymbol(card.suit)}</div>
               </div>
             </button>
           ))}
         </div>
       )}
-
-      <div style={styles.actionHintBox}>
-        {handState && handState.finished && matchState?.finished ? (
-          <span>
-            A partida terminou. Clique em <strong>Iniciar partida</strong> para jogar novamente.
-          </span>
-        ) : handState && handState.finished ? (
-          <span>
-            A mão terminou. Clique em{" "}
-            <strong>{getNextStepButtonLabel(handState, !!matchState?.finished)}</strong>{" "}
-            para seguir.
-          </span>
-        ) : handState && canHumanRespondToTruco ? (
-          <span>
-            O time adversário pediu {getPendingBetText(handState)}. Escolha entre{" "}
-            <strong>Aceitar</strong> ou <strong>Correr</strong>.
-          </span>
-        ) : handState && handState.truco.phase === "awaiting-response" ? (
-          <span>
-            O pedido de {getPendingBetText(handState)} está aguardando resposta da IA.
-            Clique em <strong>{getNextStepButtonLabel(handState)}</strong>.
-          </span>
-        ) : handState && !handState.finished && handState.table.length === 4 ? (
-          <span>
-            A vaza está completa. Clique em <strong>{getNextStepButtonLabel(handState)}</strong>.
-          </span>
-        ) : handState && handState.currentPlayerId !== 1 && !handState.finished ? (
-          <span>
-            Agora é a vez da IA. Clique em <strong>{getNextStepButtonLabel(handState)}</strong>.
-          </span>
-        ) : handState && handState.currentPlayerId === 1 && !handState.finished ? (
-          <span>É sua vez. Escolha uma carta ou peça o próximo lance.</span>
-        ) : (
-          <span>Inicie uma partida para começar.</span>
-        )}
-      </div>
     </div>
   )
 }
+
 
 function InfoBox({
   label,
@@ -784,85 +708,6 @@ function InfoBox({
     <div style={styles.infoBox}>
       <div style={styles.infoBoxLabel}>{label}</div>
       <div style={styles.infoBoxValue}>{value}</div>
-    </div>
-  )
-}
-
-function PlayerSeat({
-  name,
-  detail,
-  team,
-  active,
-  isHuman,
-  styles,
-}: {
-  name: string
-  detail: string
-  team: "Nós" | "Eles"
-  active?: boolean
-  isHuman?: boolean
-  styles: StyleMap
-}) {
-  return (
-    <div
-      style={{
-        ...styles.playerSeat,
-        ...(active ? styles.playerSeatActive : {}),
-        ...(isHuman ? styles.playerSeatHuman : {}),
-      }}
-    >
-      <div style={styles.playerSeatTopRow}>
-        <div style={styles.playerSeatName}>{name}</div>
-        <div
-          style={{
-            ...styles.teamBadge,
-            ...(team === "Nós" ? styles.teamBadgeUs : styles.teamBadgeThem),
-          }}
-        >
-          {team}
-        </div>
-      </div>
-
-      <div style={styles.playerSeatDetail}>{detail}</div>
-
-      {active ? <div style={styles.turnIndicator}>É a vez deste jogador</div> : null}
-    </div>
-  )
-}
-
-function TableCardSlot({
-  label,
-  playerId,
-  card,
-  highlight,
-  styles,
-}: {
-  label: string
-  playerId: number
-  card?: Card
-  highlight?: boolean
-  styles: StyleMap
-}) {
-  return (
-    <div
-      style={{
-        ...styles.tableCardSlot,
-        ...(highlight ? styles.tableCardSlotHighlight : {}),
-      }}
-    >
-      <div style={styles.tableCardSlotHeader}>
-        {label} · J{playerId}
-      </div>
-
-      {card ? (
-        <div style={styles.tableCardFace}>
-          <div style={styles.tableCardRank}>{card.rank}</div>
-          <div style={styles.tableCardSuit}>{getSuitSymbol(card.suit)}</div>
-          <div style={styles.tableCardText}>{card.suit}</div>
-        </div>
-      ) : (
-        <div style={styles.tableCardEmpty}>Aguardando carta</div>
-      )}
     </div>
   )
 }

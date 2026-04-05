@@ -37,9 +37,6 @@ function App() {
     matchState,
     nextStepDisabled,
     player1,
-    player2,
-    player3,
-    player4,
     playerProfile,
     setVariant,
     statusMessage,
@@ -89,26 +86,17 @@ function App() {
           />
         </section>
 
-        <CampaignPanel
-          campaignCompleted={campaignCompleted}
-          currentCampaignStage={currentCampaignStage}
-          currentCampaignVenue={currentCampaignVenue}
-          currentVenueWins={currentVenueWins}
-          campaignSummary={campaignSummary}
-          playerProfile={playerProfile}
-          onResetCampaign={handleResetCampaign}
-          styles={styles}
-        />
-
         <TableSection
           handState={handState}
           matchState={matchState}
+          currentCampaignVenue={currentCampaignVenue}
+          matchScoreLabel={matchScoreLabel}
+          handScoreLabel={handScoreLabel}
+          currentTurnLabel={currentTurnLabel}
+          statusMessage={statusMessage}
           tableByPlayer={tableByPlayer}
           lastPlayedPlayerId={lastPlayedPlayerId}
           player1={player1}
-          player2={player2}
-          player3={player3}
-          player4={player4}
           canRequestTruco={canRequestTruco}
           canHumanRespondToTruco={canHumanRespondToTruco}
           canPlayHumanCard={canPlayHumanCard}
@@ -118,6 +106,17 @@ function App() {
           onRaiseTruco={handleRaiseTruco}
           onRunFromTruco={handleRunFromTruco}
           onPlayCard={handlePlayCard}
+          styles={styles}
+        />
+
+        <CampaignPanel
+          campaignCompleted={campaignCompleted}
+          currentCampaignStage={currentCampaignStage}
+          currentCampaignVenue={currentCampaignVenue}
+          currentVenueWins={currentVenueWins}
+          campaignSummary={campaignSummary}
+          playerProfile={playerProfile}
+          onResetCampaign={handleResetCampaign}
           styles={styles}
         />
 
@@ -497,6 +496,35 @@ const styles: Record<string, React.CSSProperties> = {
     boxShadow: "0 10px 24px rgba(15, 23, 42, 0.06)",
     marginBottom: "16px",
   },
+  gameHudLayout: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "14px",
+  },
+  tableHudSurface: {
+    background: "#163823",
+    borderRadius: "26px",
+    padding: "16px",
+    border: "4px solid #0f3d24",
+    boxShadow: "inset 0 0 0 2px rgba(255,255,255,0.08)",
+  },
+  gameViewport: {
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr) 300px",
+    gap: "16px",
+    alignItems: "stretch",
+  },
+  gameMainColumn: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "14px",
+    minWidth: 0,
+  },
+  gameSidebarColumn: {
+    display: "flex",
+    flexDirection: "column",
+    minWidth: 0,
+  },
   tablePanelHeader: {
     display: "flex",
     justifyContent: "space-between",
@@ -533,8 +561,8 @@ const styles: Record<string, React.CSSProperties> = {
   },
   middleSeatsRow: {
     display: "grid",
-    gridTemplateColumns: "260px 1fr 260px",
-    gap: "18px",
+    gridTemplateColumns: "minmax(0, 1fr) 280px",
+    gap: "16px",
     alignItems: "stretch",
   },
   sideSeat: {
@@ -543,10 +571,10 @@ const styles: Record<string, React.CSSProperties> = {
   },
   playerSeat: {
     width: "100%",
-    borderRadius: "16px",
-    padding: "14px",
-    background: "#f8fafc",
-    border: "1px solid #d5dce6",
+    borderRadius: "14px",
+    padding: "10px 12px",
+    background: "rgba(248,250,252,0.92)",
+    border: "1px solid rgba(213,220,230,0.7)",
     boxSizing: "border-box",
   },
   playerSeatActive: {
@@ -565,12 +593,12 @@ const styles: Record<string, React.CSSProperties> = {
   },
   playerSeatName: {
     fontWeight: 700,
-    fontSize: "17px",
+    fontSize: "14px",
   },
   playerSeatDetail: {
     color: "#475569",
-    fontSize: "14px",
-    marginBottom: "8px",
+    fontSize: "12px",
+    marginBottom: "6px",
   },
   turnIndicator: {
     fontSize: "13px",
@@ -594,11 +622,75 @@ const styles: Record<string, React.CSSProperties> = {
   tableSurface: {
     background: "radial-gradient(circle at center, #1f7a4c 0%, #14532d 100%)",
     borderRadius: "24px",
-    minHeight: "420px",
-    padding: "24px",
+    aspectRatio: "1 / 1",
+    minHeight: "360px",
+    maxHeight: "58vh",
+    padding: "12px",
     boxSizing: "border-box",
-    border: "4px solid #0f3d24",
-    boxShadow: "inset 0 0 0 2px rgba(255,255,255,0.08)",
+    width: "100%",
+  },
+  playerCardsBlock: {
+    borderRadius: "18px",
+    background: "rgba(255,255,255,0.96)",
+    padding: "12px",
+  },
+  tableHudSidebar: {
+    height: "100%",
+    borderRadius: "20px",
+    background: "rgba(9, 18, 12, 0.54)",
+    border: "1px solid rgba(255,255,255,0.08)",
+    padding: "16px",
+    boxSizing: "border-box",
+    display: "flex",
+    flexDirection: "column",
+    gap: "14px",
+    color: "#f8fafc",
+  },
+  tableHudScoreRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: "12px",
+    fontSize: "15px",
+    fontWeight: 800,
+    flexWrap: "wrap",
+  },
+  tableHudStats: {
+    borderRadius: "14px",
+    background: "rgba(255,255,255,0.06)",
+    padding: "10px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+  },
+  tableHudStatLine: {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: "12px",
+    fontSize: "13px",
+    alignItems: "center",
+  },
+  tableHudVenue: {
+    borderRadius: "14px",
+    background: "rgba(255,255,255,0.06)",
+    padding: "12px",
+  },
+  tableHudVenueTitle: {
+    fontSize: "16px",
+    fontWeight: 800,
+    marginBottom: "4px",
+  },
+  tableHudVenueText: {
+    fontSize: "12px",
+    color: "rgba(248,250,252,0.82)",
+  },
+  tableHudMessage: {
+    borderRadius: "14px",
+    background: "rgba(255,255,255,0.08)",
+    padding: "12px",
+    fontSize: "12px",
+    lineHeight: 1.4,
+    color: "#fff7ed",
+    minHeight: "48px",
   },
   tableCenterArea: {
     width: "100%",
@@ -698,6 +790,78 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     flexDirection: "column",
     gap: "14px",
+    borderRadius: "20px",
+    background: "rgba(255,255,255,0.94)",
+    padding: "14px",
+    marginTop: "14px",
+  },
+  mobileHandPanel: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
+  },
+  mobileHandHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "12px",
+  },
+  mobileHandTitle: {
+    fontSize: "16px",
+    fontWeight: 800,
+    color: "#0f172a",
+  },
+  mobileHandMeta: {
+    fontSize: "12px",
+    fontWeight: 700,
+    color: "#475569",
+  },
+  mobileHandRow: {
+    display: "flex",
+    gap: "10px",
+    flexWrap: "nowrap",
+    alignItems: "center",
+  },
+  mobileCardButton: {
+    width: "72px",
+    minWidth: "72px",
+    minHeight: "106px",
+    borderRadius: "12px",
+    background: "#fffef9",
+    border: "1px solid #d9c7a8",
+    boxShadow: "0 4px 10px rgba(15,23,42,0.12)",
+    padding: "8px",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    cursor: "pointer",
+  },
+  mobileCardCornerTop: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    lineHeight: 1,
+  },
+  mobileCardCornerBottom: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-end",
+    lineHeight: 1,
+    transform: "rotate(180deg)",
+  },
+  mobileCardRank: {
+    fontSize: "22px",
+    fontWeight: 800,
+    lineHeight: 1,
+  },
+  mobileCardSuit: {
+    fontSize: "18px",
+    lineHeight: 1,
+  },
+  mobileCardCenterSuit: {
+    fontSize: "28px",
+    lineHeight: 1,
+    alignSelf: "center",
   },
   actionAreaHeader: {
     display: "flex",
