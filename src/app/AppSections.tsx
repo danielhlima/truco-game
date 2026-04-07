@@ -9,6 +9,7 @@ import { STORE_PRODUCTS, UNLOCKABLE_ITEMS } from "../economy/catalog"
 import { GameTableScene } from "../three/GameTableScene"
 import { buildTableSceneModel } from "../three/tableSceneModel"
 import type { PlayerProfile } from "../profile/playerProfile"
+import type { PartnerAdvice } from "../ai/trucoDecision"
 import {
   canHumanRaiseInResponse,
   formatCard,
@@ -21,10 +22,6 @@ import {
   getStateLabel,
   getSuitSymbol,
   type SpeechBubbleState,
-  getTrucoAwaitingLabel,
-  getTrucoProposedBetLabel,
-  getTrucoRequestedByLabel,
-  getTrucoStatusLabel,
   getWinnerLabel,
 } from "./gameSessionHelpers"
 
@@ -142,13 +139,17 @@ export function HandStatusPanel({
         />
         <InfoBox label="Manilha" value={getManilhaLabel(handState)} styles={styles} />
         <InfoBox
-          label="Rodada"
-          value={handState ? String(handState.roundNumber) : "—"}
+          label="Rodada atual"
+          value={String(matchHandNumber)}
           styles={styles}
         />
-        <InfoBox label="Mão" value={String(matchHandNumber)} styles={styles} />
+        <InfoBox
+          label="Mão"
+          value={handState ? `${handState.roundNumber}ª` : "—"}
+          styles={styles}
+        />
         <InfoBox label="Placar partida" value={matchScoreLabel} styles={styles} />
-        <InfoBox label="Vazas" value={handScoreLabel} styles={styles} />
+        <InfoBox label="Placar das vazas" value={handScoreLabel} styles={styles} />
         <InfoBox label="Vez" value={currentTurnLabel} styles={styles} />
         <InfoBox
           label="Valendo"
@@ -328,6 +329,8 @@ export function CampaignPanel({
 }
 
 interface TableSectionProps {
+  activeVariant: GameVariant
+  campaignCompleted: boolean
   handState: HandState | null
   matchState: { handNumber: number; finished: boolean; winner?: "A" | "B" } | null
   currentCampaignVenue: CampaignVenue | null
@@ -340,11 +343,16 @@ interface TableSectionProps {
   lastPlayedPlayerId: number | null
   player1: Player | null
   canRequestTruco: boolean
+  canHumanAdvisePartner: boolean
   canHumanRespondToTruco: boolean
   canPlayHumanCard: boolean
   trucoMessage: string
+  variantSelectionDisabled: boolean
+  onChangeVariant: (variant: GameVariant) => void
+  onStart: () => void
   onRequestTruco: () => void
   onAcceptTruco: () => void
+  onAdvisePartner: (advice: PartnerAdvice) => void
   onRaiseTruco: () => void
   onRunFromTruco: () => void
   onPlayCard: (card: Card) => void
@@ -352,6 +360,8 @@ interface TableSectionProps {
 }
 
 export function TableSection({
+  activeVariant,
+  campaignCompleted,
   handState,
   matchState,
   currentCampaignVenue,
@@ -364,11 +374,16 @@ export function TableSection({
   lastPlayedPlayerId,
   player1,
   canRequestTruco,
+  canHumanAdvisePartner,
   canHumanRespondToTruco,
   canPlayHumanCard,
   trucoMessage,
+  variantSelectionDisabled,
+  onChangeVariant,
+  onStart,
   onRequestTruco,
   onAcceptTruco,
+  onAdvisePartner,
   onRaiseTruco,
   onRunFromTruco,
   onPlayCard,
@@ -380,103 +395,240 @@ export function TableSection({
     lastPlayedPlayerId,
     currentCampaignVenue
   )
+  const isMenuMode = !handState
 
   return (
     <section style={styles.tablePanel}>
       <div style={styles.tableHudSurface}>
         <div style={styles.gameViewport}>
-          <div style={styles.gameMainColumn}>
-            <div style={styles.tableSurface}>
-              <GameTableScene model={tableSceneModel} speechBubble={speechBubble} />
-            </div>
-
-            <div style={styles.playerCardsBlock}>
-              <HumanCardsPanel
-                handState={handState}
-                player1={player1}
-                canPlayHumanCard={canPlayHumanCard}
-                onPlayCard={onPlayCard}
-                styles={styles}
-              />
-            </div>
-          </div>
-
-          <div style={styles.gameSidebarColumn}>
-            <div style={styles.tableHudSidebar}>
-              <div style={styles.tableHudScoreRow}>
-                <span>Partida</span>
-                <span>{`${matchScoreLabel.split(" x ")[0]} | ${matchScoreLabel.split(" x ")[1]}`}</span>
-              </div>
-
-              <div style={styles.tableHudStats}>
-                <div style={styles.tableHudStatLine}>
-                  <span>Mão</span>
-                  <strong>{matchState?.handNumber ?? 1}</strong>
+          {isMenuMode ? (
+            <GameStartScreen
+              activeVariant={activeVariant}
+              campaignCompleted={campaignCompleted}
+              currentCampaignVenue={currentCampaignVenue}
+              onChangeVariant={onChangeVariant}
+              onStart={onStart}
+              styles={styles}
+              variantSelectionDisabled={variantSelectionDisabled}
+            />
+          ) : (
+            <>
+              <div style={styles.gameMainColumn}>
+                <div style={styles.tableSurface}>
+                  <GameTableScene model={tableSceneModel} speechBubble={speechBubble} />
                 </div>
-                <div style={styles.tableHudStatLine}>
-                  <span>Vaza</span>
-                  <strong>{handScoreLabel}</strong>
-                </div>
-                <div style={styles.tableHudStatLine}>
-                  <span>Valendo</span>
-                  <strong>{handState ? getBetBadgeLabel(handState.currentBet) : getBetBadgeLabel(1)}</strong>
-                </div>
-                <div style={styles.tableHudStatLine}>
-                  <span>Vez</span>
-                  <strong>{currentTurnLabel}</strong>
+
+                <div style={styles.playerCardsBlock}>
+                  <HumanCardsPanel
+                    handState={handState}
+                    player1={player1}
+                    canPlayHumanCard={canPlayHumanCard}
+                    onPlayCard={onPlayCard}
+                    styles={styles}
+                  />
                 </div>
               </div>
 
-              <div style={styles.tableHudVenue}>
-                <div style={styles.tableHudVenueTitle}>
-                  {currentCampaignVenue?.name ?? "Mesa de treino"}
-                </div>
-                <div style={styles.tableHudVenueText}>
-                  {currentCampaignVenue
-                    ? `${currentCampaignVenue.districtLabel} · Partida ${matchState?.handNumber ?? 1}`
-                    : "Sem local"}
-                </div>
-              </div>
+              <div style={styles.gameSidebarColumn}>
+                <div style={styles.tableHudSidebar}>
+                  <div style={styles.tableHudScoreRow}>
+                    <span>Partida</span>
+                    <span>{`${matchScoreLabel.split(" x ")[0]} | ${matchScoreLabel.split(" x ")[1]}`}</span>
+                  </div>
 
-              <div style={styles.tableHudMessage}>
-                {handState?.finished
-                  ? matchState?.finished && matchState.winner
-                    ? `Partida encerrada · ${getWinnerLabel(matchState.winner)}`
-                    : `Mão encerrada · ${getWinnerLabel(handState.winner)}`
-                  : statusMessage}
+                  <div style={styles.tableHudStats}>
+                    <div style={styles.tableHudStatLine}>
+                      <span>Rodada atual</span>
+                      <strong>{matchState?.handNumber ?? 1}</strong>
+                    </div>
+                    <div style={styles.tableHudStatLine}>
+                      <span>Mão</span>
+                      <strong>{handState ? `${handState.roundNumber}ª` : "—"}</strong>
+                    </div>
+                    <div style={styles.tableHudStatLine}>
+                      <span>Placar das vazas</span>
+                      <strong>{handScoreLabel}</strong>
+                    </div>
+                    <div style={styles.tableHudStatLine}>
+                      <span>Valendo</span>
+                      <strong>{handState ? getBetBadgeLabel(handState.currentBet) : getBetBadgeLabel(1)}</strong>
+                    </div>
+                    <div style={styles.tableHudStatLine}>
+                      <span>Vez</span>
+                      <strong>{currentTurnLabel}</strong>
+                    </div>
+                  </div>
+
+                  <div style={styles.tableHudVenue}>
+                    <div style={styles.tableHudVenueTitle}>
+                      {currentCampaignVenue?.name ?? "Mesa de treino"}
+                    </div>
+                    <div style={styles.tableHudVenueText}>
+                      {currentCampaignVenue
+                        ? `${currentCampaignVenue.districtLabel} · Mão ${matchState?.handNumber ?? 1}`
+                        : "Sem local"}
+                    </div>
+                  </div>
+
+                  <div style={styles.tableHudMessage}>
+                    {handState?.finished
+                      ? matchState?.finished && matchState.winner
+                        ? `Partida encerrada · ${getWinnerLabel(matchState.winner)}`
+                        : `Mão encerrada · ${getWinnerLabel(handState.winner)}`
+                      : statusMessage}
+                  </div>
+
+                  <div style={styles.inGameActionsCard}>
+                    <div style={styles.inGameActionsTitle}>
+                      {canHumanAdvisePartner ? "Dica pra parceira" : "Ações"}
+                    </div>
+                    {canHumanAdvisePartner ? (
+                      <div style={styles.inGameActionsGrid}>
+                        <button
+                          style={styles.trucoSecondaryButton}
+                          onClick={() => onAdvisePartner("BORA!")}
+                        >
+                          BORA!
+                        </button>
+                        <button
+                          style={styles.trucoSecondaryButton}
+                          onClick={() => onAdvisePartner("CÊ QUE SABE!")}
+                        >
+                          CÊ QUE SABE!
+                        </button>
+                        <button
+                          style={styles.trucoSecondaryButton}
+                          onClick={() => onAdvisePartner("MELHOR CORRER!")}
+                        >
+                          MELHOR CORRER!
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <div style={styles.inGameActionsRow}>
+                          <button
+                            style={{
+                              ...styles.trucoPrimaryButton,
+                              ...(!canRequestTruco ? styles.disabledButton : {}),
+                            }}
+                            onClick={onRequestTruco}
+                            disabled={!canRequestTruco}
+                          >
+                            {getRequestBetButtonLabel(handState)}
+                          </button>
+                        </div>
+                        <div style={styles.inGameActionsGrid}>
+                          <button
+                            style={{
+                              ...styles.trucoSecondaryButton,
+                              ...(!canHumanRespondToTruco ? styles.disabledButton : {}),
+                            }}
+                            onClick={onAcceptTruco}
+                            disabled={!canHumanRespondToTruco}
+                          >
+                            Aceitar
+                          </button>
+                          <button
+                            style={{
+                              ...styles.trucoSecondaryButton,
+                              ...(!canHumanRespondToTruco || !canHumanRaiseInResponse(handState)
+                                ? styles.disabledButton
+                                : {}),
+                            }}
+                            onClick={onRaiseTruco}
+                            disabled={!canHumanRespondToTruco || !canHumanRaiseInResponse(handState)}
+                          >
+                            {getRaiseResponseButtonLabel(handState)}
+                          </button>
+                          <button
+                            style={{
+                              ...styles.trucoSecondaryButton,
+                              ...(!canHumanRespondToTruco ? styles.disabledButton : {}),
+                            }}
+                            onClick={onRunFromTruco}
+                            disabled={!canHumanRespondToTruco}
+                          >
+                            Correr
+                          </button>
+                        </div>
+                      </>
+                    )}
+                    <div style={styles.inGameActionsHint}>{trucoMessage}</div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
-      </div>
-
-      <div style={styles.actionArea}>
-        <div style={styles.actionAreaHeader}>
-          <div>
-            <div style={styles.actionAreaTitle}>Ações da mão</div>
-            <div style={styles.actionAreaSubtitle}>
-              Controles detalhados ficam fora da tela do celular
-            </div>
-          </div>
-
-          <div style={styles.betBadge}>
-            {handState ? getBetBadgeLabel(handState.currentBet) : getBetBadgeLabel(1)}
-          </div>
-        </div>
-
-        <TrucoPanel
-          handState={handState}
-          trucoMessage={trucoMessage}
-          canRequestTruco={canRequestTruco}
-          canHumanRespondToTruco={canHumanRespondToTruco}
-          onRequestTruco={onRequestTruco}
-          onAcceptTruco={onAcceptTruco}
-          onRaiseTruco={onRaiseTruco}
-          onRunFromTruco={onRunFromTruco}
-          styles={styles}
-        />
       </div>
     </section>
+  )
+}
+
+function GameStartScreen({
+  activeVariant,
+  campaignCompleted,
+  currentCampaignVenue,
+  onChangeVariant,
+  onStart,
+  styles,
+  variantSelectionDisabled,
+}: {
+  activeVariant: GameVariant
+  campaignCompleted: boolean
+  currentCampaignVenue: CampaignVenue | null
+  onChangeVariant: (variant: GameVariant) => void
+  onStart: () => void
+  styles: StyleMap
+  variantSelectionDisabled: boolean
+}) {
+  return (
+    <div style={styles.gameStartScreen}>
+      <div style={styles.gameStartCard}>
+        <div style={styles.gameStartEyebrow}>Entrada</div>
+        <h2 style={styles.gameStartTitle}>Escolha a variante</h2>
+        <div style={styles.gameStartVenue}>
+          {currentCampaignVenue?.name ?? "Campanha concluída"}
+        </div>
+        <div style={styles.gameStartVenueMeta}>
+          {currentCampaignVenue?.districtLabel ?? "Reinicie a campanha para jogar novamente"}
+        </div>
+
+        <div style={styles.gameStartOptions}>
+          <button
+            style={{
+              ...styles.gameStartOption,
+              ...(activeVariant === "MINEIRO" ? styles.gameStartOptionActive : {}),
+            }}
+            onClick={() => onChangeVariant("MINEIRO")}
+            disabled={variantSelectionDisabled}
+          >
+            Truco Mineiro
+          </button>
+          <button
+            style={{
+              ...styles.gameStartOption,
+              ...(activeVariant === "PAULISTA" ? styles.gameStartOptionActive : {}),
+            }}
+            onClick={() => onChangeVariant("PAULISTA")}
+            disabled={variantSelectionDisabled}
+          >
+            Truco Paulista
+          </button>
+        </div>
+
+        <button
+          style={{
+            ...styles.primaryButton,
+            ...(!currentCampaignVenue ? styles.disabledButton : {}),
+          }}
+          onClick={onStart}
+          disabled={!currentCampaignVenue}
+        >
+          {getStartMatchButtonLabel(currentCampaignVenue, campaignCompleted)}
+        </button>
+      </div>
+    </div>
   )
 }
 
@@ -505,119 +657,6 @@ export function LogsPanel({ logs, onCopyLogs, styles }: LogsPanelProps) {
 
       <textarea readOnly value={logs} style={styles.logsArea} />
     </section>
-  )
-}
-
-function TrucoPanel({
-  handState,
-  trucoMessage,
-  canRequestTruco,
-  canHumanRespondToTruco,
-  onRequestTruco,
-  onAcceptTruco,
-  onRaiseTruco,
-  onRunFromTruco,
-  styles,
-}: {
-  handState: HandState | null
-  trucoMessage: string
-  canRequestTruco: boolean
-  canHumanRespondToTruco: boolean
-  onRequestTruco: () => void
-  onAcceptTruco: () => void
-  onRaiseTruco: () => void
-  onRunFromTruco: () => void
-  styles: StyleMap
-}) {
-  return (
-    <div style={styles.trucoPanel}>
-      <div style={styles.trucoPanelHeader}>
-        <div style={styles.trucoPanelTitle}>Truco</div>
-        <div style={styles.trucoPanelStatus}>{getTrucoStatusLabel(handState)}</div>
-      </div>
-
-      <div style={styles.trucoPanelBody}>
-        <div style={styles.trucoMessageBox}>
-          <div style={styles.trucoMessageLabel}>Estado atual</div>
-          <div style={styles.trucoMessageText}>{trucoMessage}</div>
-        </div>
-
-        <div style={styles.trucoDetailsGrid}>
-          <div style={styles.trucoDetailCard}>
-            <div style={styles.trucoDetailLabel}>Pediu</div>
-            <div style={styles.trucoDetailValue}>
-              {getTrucoRequestedByLabel(handState)}
-            </div>
-          </div>
-
-          <div style={styles.trucoDetailCard}>
-            <div style={styles.trucoDetailLabel}>Aguardando</div>
-            <div style={styles.trucoDetailValue}>
-              {getTrucoAwaitingLabel(handState)}
-            </div>
-          </div>
-
-          <div style={styles.trucoDetailCard}>
-            <div style={styles.trucoDetailLabel}>Próximo valor</div>
-            <div style={styles.trucoDetailValue}>
-              {getTrucoProposedBetLabel(handState)}
-            </div>
-          </div>
-        </div>
-
-        <div style={styles.trucoActionsRow}>
-          <button
-            style={{
-              ...styles.trucoPrimaryButton,
-              ...(!canRequestTruco ? styles.disabledButton : {}),
-            }}
-            onClick={onRequestTruco}
-            disabled={!canRequestTruco}
-          >
-            {getRequestBetButtonLabel(handState)}
-          </button>
-
-          <button
-            style={{
-              ...styles.trucoSecondaryButton,
-              ...(!canHumanRespondToTruco ? styles.disabledButton : {}),
-            }}
-            onClick={onAcceptTruco}
-            disabled={!canHumanRespondToTruco}
-          >
-            Aceitar
-          </button>
-
-          <button
-            style={{
-              ...styles.trucoSecondaryButton,
-              ...(!canHumanRespondToTruco || !canHumanRaiseInResponse(handState)
-                ? styles.disabledButton
-                : {}),
-            }}
-            onClick={onRaiseTruco}
-            disabled={!canHumanRespondToTruco || !canHumanRaiseInResponse(handState)}
-          >
-            {getRaiseResponseButtonLabel(handState)}
-          </button>
-
-          <button
-            style={{
-              ...styles.trucoSecondaryButton,
-              ...(!canHumanRespondToTruco ? styles.disabledButton : {}),
-            }}
-            onClick={onRunFromTruco}
-            disabled={!canHumanRespondToTruco}
-          >
-            Correr
-          </button>
-        </div>
-
-        <div style={styles.trucoHintBox}>
-          Agora a IA pode pedir truco. Quando isso acontecer, responda por aqui.
-        </div>
-      </div>
-    </div>
   )
 }
 

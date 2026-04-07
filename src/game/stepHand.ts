@@ -1,11 +1,10 @@
-import { respondToRaise, shouldRaiseBet } from "../ai/trucoDecision"
+import { getTeamTrucoDecision, shouldRaiseBet } from "../ai/trucoDecision"
 import { getRuleSet } from "./getRuleSet"
 import type { HandState } from "./handState"
 import { playAiTurn } from "./playAiTurn"
 import { requestTruco } from "./requestTruco"
 import { resolveTrick } from "./resolveTrick"
 import { respondToTruco } from "./respondToTruco"
-import { getNextBet } from "./truco"
 import { getTeam } from "./teams"
 
 export function stepHand(state: HandState): HandState {
@@ -22,31 +21,24 @@ export function stepHand(state: HandState): HandState {
       return state
     }
 
-    if (awaitingPlayerId === 1) {
+    if (awaitingTeam === "A" && awaitingPlayerId === 1) {
       return state
     }
 
     const ruleSet = getRuleSet(state.variant)
-    const awaitingPlayer = state.players.find((player) => player.id === awaitingPlayerId)
+    const awaitingPlayers = state.players.filter((player) => getTeam(player.id) === awaitingTeam)
+    const decision = getTeamTrucoDecision(
+      ruleSet,
+      awaitingPlayers.map((player) => player.hand),
+      proposedBet,
+      state.vira
+    )
 
-    if (!awaitingPlayer) {
-      return state
-    }
-
-    const shouldAccept =
-      respondToRaise(ruleSet, awaitingPlayer.hand, proposedBet, state.vira) === "accept"
-
-    const canRaise = getNextBet(proposedBet) !== null
-    const shouldReRaise =
-      shouldAccept &&
-      canRaise &&
-      shouldRaiseBet(ruleSet, awaitingPlayer.hand, proposedBet, state.vira)
-
-    if (shouldReRaise) {
+    if (decision === "raise") {
       return respondToTruco(state, "raise")
     }
 
-    return respondToTruco(state, shouldAccept ? "accept" : "run")
+    return respondToTruco(state, decision === "accept" ? "accept" : "run")
   }
 
   if (state.table.length === 4) {

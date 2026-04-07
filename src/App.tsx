@@ -1,7 +1,6 @@
 import { useGameSession } from "./app/useGameSession"
 import {
   CampaignPanel,
-  ControlsPanel,
   HandStatusPanel,
   LogsPanel,
   TableSection,
@@ -10,6 +9,7 @@ import {
 function App() {
   const {
     activeVariant,
+    canHumanAdvisePartner,
     canHumanRespondToTruco,
     canPlayHumanCard,
     canRequestTruco,
@@ -23,6 +23,7 @@ function App() {
     handScoreLabel,
     handState,
     handleAcceptTruco,
+    handlePartnerAdvice,
     handleCopyLogs,
     handlePlayCard,
     handleRaiseTruco,
@@ -56,32 +57,9 @@ function App() {
           </div>
         </header>
 
-        <section style={styles.topGrid}>
-          <ControlsPanel
-            activeVariant={activeVariant}
-            campaignCompleted={campaignCompleted}
-            variantSelectionDisabled={variantSelectionDisabled}
-            currentCampaignVenue={currentCampaignVenue}
-            onChangeVariant={setVariant}
-            onStart={handleStartHand}
-            styles={styles}
-          />
-
-          <HandStatusPanel
-            activeVariant={activeVariant}
-            currentCampaignVenue={currentCampaignVenue}
-            handState={handState}
-            matchHandNumber={matchState?.handNumber ?? 1}
-            matchScoreLabel={matchScoreLabel}
-            handScoreLabel={handScoreLabel}
-            currentTurnLabel={currentTurnLabel}
-            statusMessage={statusMessage}
-            eventMessage={eventMessage}
-            styles={styles}
-          />
-        </section>
-
         <TableSection
+          activeVariant={activeVariant}
+          campaignCompleted={campaignCompleted}
           handState={handState}
           matchState={matchState}
           currentCampaignVenue={currentCampaignVenue}
@@ -94,14 +72,32 @@ function App() {
           lastPlayedPlayerId={lastPlayedPlayerId}
           player1={player1}
           canRequestTruco={canRequestTruco}
+          canHumanAdvisePartner={canHumanAdvisePartner}
           canHumanRespondToTruco={canHumanRespondToTruco}
           canPlayHumanCard={canPlayHumanCard}
           trucoMessage={trucoMessage}
+          variantSelectionDisabled={variantSelectionDisabled}
+          onChangeVariant={setVariant}
+          onStart={handleStartHand}
           onRequestTruco={handleRequestTruco}
           onAcceptTruco={handleAcceptTruco}
+          onAdvisePartner={handlePartnerAdvice}
           onRaiseTruco={handleRaiseTruco}
           onRunFromTruco={handleRunFromTruco}
           onPlayCard={handlePlayCard}
+          styles={styles}
+        />
+
+        <HandStatusPanel
+          activeVariant={activeVariant}
+          currentCampaignVenue={currentCampaignVenue}
+          handState={handState}
+          matchHandNumber={matchState?.handNumber ?? 1}
+          matchScoreLabel={matchScoreLabel}
+          handScoreLabel={handScoreLabel}
+          currentTurnLabel={currentTurnLabel}
+          statusMessage={statusMessage}
+          eventMessage={eventMessage}
           styles={styles}
         />
 

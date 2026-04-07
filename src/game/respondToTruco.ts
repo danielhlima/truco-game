@@ -20,6 +20,10 @@ export function respondToTruco(
   const awaitingResponseFromPlayerId = state.truco.awaitingResponseFromPlayerId
   const awaitingResponseFromTeam = state.truco.awaitingResponseFromTeam
   const proposedBet = state.truco.proposedBet
+  const initialRequestedByPlayerId =
+    state.truco.initialRequestedByPlayerId ?? requestedByPlayerId
+  const initialRequestedByTeam =
+    state.truco.initialRequestedByTeam ?? requestedByTeam
 
   if (
     !requestedByTeam ||
@@ -40,6 +44,8 @@ export function respondToTruco(
       currentBet: proposedBet,
       truco: {
         phase: "idle",
+        initialRequestedByPlayerId,
+        initialRequestedByTeam,
         nextRaiseByTeam: awaitingResponseFromTeam,
       },
     }
@@ -64,6 +70,10 @@ export function respondToTruco(
         phase: "awaiting-response",
         requestedByPlayerId: awaitingResponseFromPlayerId,
         requestedByTeam: awaitingResponseFromTeam,
+        initialRequestedByPlayerId,
+        initialRequestedByTeam,
+        // Truco escalates only between who asked and who answered.
+        // Partners can advise, but they do not become the formal responder.
         awaitingResponseFromPlayerId: requestedByPlayerId,
         awaitingResponseFromTeam: requestedByTeam,
         proposedBet: nextBet,
@@ -83,6 +93,8 @@ export function respondToTruco(
     winner: requestedByTeam,
     truco: {
       phase: "idle",
+      initialRequestedByPlayerId,
+      initialRequestedByTeam,
       awaitingResponseFromPlayerId: undefined,
       promptKind: undefined,
       nextRaiseByTeam: undefined,

@@ -77,6 +77,65 @@ test("stepHand permite que a IA aceite e peça aumento quando a mão for forte",
   assert.equal(nextState.truco.proposedBet, 6)
 })
 
+test("contra-aumento mantém a resposta com quem fez o pedido anterior", () => {
+  const initialState = requestTruco(
+    createHandStateFixture({
+      currentPlayerId: 3,
+    }),
+    3
+  )
+
+  assert.equal(initialState.truco.requestedByPlayerId, 3)
+  assert.equal(initialState.truco.awaitingResponseFromPlayerId, 4)
+
+  const afterRaise = respondToTruco(initialState, "raise")
+
+  assert.equal(afterRaise.truco.requestedByPlayerId, 4)
+  assert.equal(afterRaise.truco.awaitingResponseFromPlayerId, 3)
+  assert.equal(afterRaise.truco.awaitingResponseFromTeam, "A")
+  assert.equal(afterRaise.truco.proposedBet, 6)
+})
+
+test("quando nosso time aumenta, a resposta volta para o adversário que pediu", () => {
+  const state = requestTruco(
+    createHandStateFixture({
+      currentPlayerId: 2,
+    }),
+    2
+  )
+
+  assert.equal(state.truco.requestedByPlayerId, 2)
+  assert.equal(state.truco.awaitingResponseFromPlayerId, 3)
+
+  const afterRaise = respondToTruco(state, "raise")
+
+  assert.equal(afterRaise.truco.requestedByPlayerId, 3)
+  assert.equal(afterRaise.truco.awaitingResponseFromPlayerId, 2)
+  assert.equal(afterRaise.truco.awaitingResponseFromTeam, "B")
+  assert.equal(afterRaise.truco.proposedBet, 6)
+})
+
+test("stepHand resolve automaticamente contra-aumento quando a parceira foi quem pediu", () => {
+  const state = createHandStateFixture({
+    truco: {
+      phase: "awaiting-response",
+      requestedByPlayerId: 4,
+      requestedByTeam: "B",
+      awaitingResponseFromPlayerId: 3,
+      awaitingResponseFromTeam: "A",
+      proposedBet: 6,
+      promptKind: "raise",
+    },
+  })
+
+  const nextState = stepHand(state)
+
+  assert.notEqual(nextState, state)
+  assert.equal(nextState.finished, false)
+  assert.equal(nextState.truco.awaitingResponseFromTeam, "B")
+  assert.equal(nextState.truco.awaitingResponseFromPlayerId, 4)
+})
+
 test("escalada completa permite sequência de truco até doze", () => {
   const initialState = requestTruco(createHandStateFixture(), 1)
 

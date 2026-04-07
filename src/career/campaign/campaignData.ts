@@ -28,7 +28,7 @@ export const CAMPAIGN_STAGES: CampaignStage[] = [
         id: "esquina-do-paulista",
         name: "Esquina do Paulista",
         districtLabel: "Rua 18",
-        visualTheme: "boteco-raiz",
+        visualTheme: "boteco-raiz-claro",
         atmosphere: "Mesas de metal, copos batendo e barulho de dominó.",
         matchesToClear: 4,
         variant: "PAULISTA",

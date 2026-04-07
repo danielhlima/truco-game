@@ -1,4 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import {
+  getTeamPartnerAdvice,
+  getTeamTrucoDecision,
+  type PartnerAdvice,
+} from "../ai/trucoDecision"
 import { CAMPAIGN_STAGES } from "../career/campaign/campaignData"
 import {
   applyCampaignLoss,
@@ -29,7 +34,7 @@ import {
 } from "../platform/storage/profileStorage"
 import { createInitialPlayerProfile } from "../profile/playerProfile"
 import type { PlayerProfile } from "../profile/playerProfile"
-import { clearLogs, getLogsAsText } from "../utils/logger"
+import { clearLogs, getLogsAsText, logEvent } from "../utils/logger"
 import {
   DEFAULT_TRUCO_MESSAGE,
   formatCard,
@@ -39,6 +44,7 @@ import {
   getCampaignWinMessage,
   getCurrentTurnLabel,
   getEventMessageForTransition,
+  getFollowUpSpeechBubbleForTransition,
   getMatchEndMessage,
   getNextRaiseValueFromPendingTruco,
   getPendingBetText,
@@ -46,8 +52,10 @@ import {
   getSpeechBubbleForTransition,
   getStatusMessage,
   getTrucoMessageForTransition,
+  getPlayerLabel,
   type SpeechBubbleState,
 } from "./gameSessionHelpers"
+import { getRuleSet } from "../game/getRuleSet"
 
 export function useGameSession() {
   const AUTO_STEP_DELAY_MS = 820
@@ -61,7 +69,15 @@ export function useGameSession() {
   const [eventMessage, setEventMessage] = useState("")
   const [trucoMessage, setTrucoMessage] = useState(DEFAULT_TRUCO_MESSAGE)
   const [speechBubble, setSpeechBubble] = useState<SpeechBubbleState | null>(null)
+  const [shownPartnerAdviceKey, setShownPartnerAdviceKey] = useState<string | null>(null)
+  const [shownPartnerConsultKey, setShownPartnerConsultKey] = useState<string | null>(null)
   const speechBubbleTimeoutRef = useRef<number | null>(null)
+  const followUpSpeechTimeoutRef = useRef<number | null>(null)
+  const partnerAdviceTimeoutRef = useRef<number | null>(null)
+  const partnerConsultTimeoutRef = useRef<number | null>(null)
+  const partnerConsultResolutionTimeoutRef = useRef<number | null>(null)
+  const lastPartnerAdviceKeyRef = useRef<string | null>(null)
+  const lastPartnerConsultKeyRef = useRef<string | null>(null)
 
   const currentCampaignStage =
     getCurrentCampaignStage(playerProfile, CAMPAIGN_STAGES) ?? CAMPAIGN_STAGES[0]
@@ -112,11 +128,68 @@ export function useGameSession() {
     return handState.table[handState.table.length - 1].playerId
   }, [handState])
 
+  const partnerAdviceKey = useMemo(() => {
+    if (
+      !handState ||
+      handState.finished ||
+      handState.truco.phase !== "awaiting-response" ||
+      handState.truco.awaitingResponseFromTeam !== "A" ||
+      handState.truco.awaitingResponseFromPlayerId !== 1 ||
+      handState.truco.promptKind !== "request" ||
+      handState.truco.requestedByTeam !== "B" ||
+      !handState.truco.proposedBet
+    ) {
+      return null
+    }
+
+    return [
+      handState.roundNumber,
+      handState.truco.requestedByPlayerId ?? 0,
+      handState.truco.proposedBet,
+      handState.truco.promptKind ?? "request",
+    ].join(":")
+  }, [handState])
+
+  const partnerConsultKey = useMemo(() => {
+    if (
+      !handState ||
+      handState.finished ||
+      handState.truco.phase !== "awaiting-response" ||
+      handState.truco.awaitingResponseFromTeam !== "A" ||
+      handState.truco.awaitingResponseFromPlayerId !== 3 ||
+      handState.truco.promptKind !== "request" ||
+      handState.truco.requestedByTeam !== "B" ||
+      !handState.truco.proposedBet
+    ) {
+      return null
+    }
+
+    return [
+      handState.roundNumber,
+      handState.truco.requestedByPlayerId ?? 0,
+      handState.truco.proposedBet,
+      handState.truco.promptKind ?? "request",
+      "consult",
+    ].join(":")
+  }, [handState])
+
   const canHumanRespondToTruco =
     !!handState &&
     !handState.finished &&
     handState.truco.phase === "awaiting-response" &&
-    handState.truco.awaitingResponseFromPlayerId === 1
+    handState.truco.awaitingResponseFromTeam === "A" &&
+    handState.truco.awaitingResponseFromPlayerId === 1 &&
+    (!partnerAdviceKey || shownPartnerAdviceKey === partnerAdviceKey)
+
+  const canHumanAdvisePartner =
+    !!handState &&
+    !handState.finished &&
+    handState.truco.phase === "awaiting-response" &&
+    handState.truco.awaitingResponseFromTeam === "A" &&
+    handState.truco.awaitingResponseFromPlayerId === 3 &&
+    handState.truco.promptKind === "request" &&
+    handState.truco.requestedByTeam === "B" &&
+    (!partnerConsultKey || shownPartnerConsultKey === partnerConsultKey)
 
   const canRequestTruco =
     !!handState &&
@@ -156,12 +229,18 @@ export function useGameSession() {
       window.clearTimeout(speechBubbleTimeoutRef.current)
       speechBubbleTimeoutRef.current = null
     }
+    if (followUpSpeechTimeoutRef.current) {
+      window.clearTimeout(followUpSpeechTimeoutRef.current)
+      followUpSpeechTimeoutRef.current = null
+    }
 
     setSpeechBubble(nextSpeechBubble)
 
     if (!nextSpeechBubble) {
       return
     }
+
+    logEvent(`Balão ${getPlayerLabel(nextSpeechBubble.playerId)}: ${nextSpeechBubble.text}`)
 
     speechBubbleTimeoutRef.current = window.setTimeout(() => {
       setSpeechBubble((current) =>
@@ -177,17 +256,46 @@ export function useGameSession() {
       eventMessage?: string
       trucoMessage?: string
       speechBubble?: SpeechBubbleState | null
+      followUpSpeechBubble?: SpeechBubbleState | null
     }
   ) => {
+    const hasExplicitSpeechBubble =
+      !!explicitMessages && Object.prototype.hasOwnProperty.call(explicitMessages, "speechBubble")
+    const hasExplicitFollowUpSpeechBubble =
+      !!explicitMessages &&
+      Object.prototype.hasOwnProperty.call(explicitMessages, "followUpSpeechBubble")
+
     const nextEventMessage =
       explicitMessages?.eventMessage ?? getEventMessageForTransition(handState, nextState)
     const nextTrucoMessage =
       explicitMessages?.trucoMessage ?? getTrucoMessageForTransition(handState, nextState)
     const nextSpeechBubble =
-      explicitMessages?.speechBubble ?? getSpeechBubbleForTransition(handState, nextState)
+      hasExplicitSpeechBubble
+        ? explicitMessages?.speechBubble ?? null
+        : getSpeechBubbleForTransition(handState, nextState)
+    const nextFollowUpSpeechBubble =
+      hasExplicitFollowUpSpeechBubble
+        ? explicitMessages?.followUpSpeechBubble ?? null
+        : getFollowUpSpeechBubbleForTransition(handState, nextState)
 
     setHandState(nextState)
     showSpeechBubble(nextSpeechBubble)
+
+    if (nextSpeechBubble && nextFollowUpSpeechBubble) {
+      followUpSpeechTimeoutRef.current = window.setTimeout(() => {
+        setSpeechBubble(nextFollowUpSpeechBubble)
+        logEvent(
+          `Balão ${getPlayerLabel(nextFollowUpSpeechBubble.playerId)}: ${nextFollowUpSpeechBubble.text}`
+        )
+        speechBubbleTimeoutRef.current = window.setTimeout(() => {
+          setSpeechBubble((current) =>
+            current === nextFollowUpSpeechBubble ? null : current
+          )
+          speechBubbleTimeoutRef.current = null
+        }, BUBBLE_DURATION_MS)
+        followUpSpeechTimeoutRef.current = null
+      }, BUBBLE_DURATION_MS + 120)
+    }
 
     if (nextEventMessage) {
       setEventMessage(nextEventMessage)
@@ -257,6 +365,7 @@ export function useGameSession() {
     setEventMessage("Campanha reiniciada do zero.")
     setTrucoMessage("Tudo pronto para voltar ao primeiro boteco.")
     showSpeechBubble(null)
+    setShownPartnerAdviceKey(null)
     syncLogs()
   }
 
@@ -300,7 +409,6 @@ export function useGameSession() {
     applyHandState(nextState, {
       eventMessage: `Você aceitou ${getBetCallLabel(acceptedBet)}.`,
       trucoMessage: getAcceptedBetMessage(acceptedBet),
-      speechBubble: { playerId: 1, text: "DESCE!" },
     })
   }
 
@@ -334,12 +442,71 @@ export function useGameSession() {
     })
   }
 
+  function handlePartnerAdvice(advice: PartnerAdvice) {
+    if (!handState || !canHumanAdvisePartner || !player1 || !player3) return
+
+    showSpeechBubble({ playerId: 1, text: advice })
+    setShownPartnerConsultKey(partnerConsultKey)
+
+    partnerConsultResolutionTimeoutRef.current = window.setTimeout(() => {
+      const ruleSet = getRuleSet(handState.variant)
+      const fallbackDecision = getTeamTrucoDecision(
+        ruleSet,
+        [player1.hand, player3.hand],
+        handState.truco.proposedBet!,
+        handState.vira
+      )
+
+      const decision =
+        advice === "MELHOR CORRER!"
+          ? "run"
+          : advice === "BORA!"
+            ? "accept"
+            : fallbackDecision
+
+      const nextState = respondToTruco(handState, decision)
+
+      if (decision === "run") {
+        applyHandState(nextState, {
+          eventMessage: `A parceira correu de ${getPendingBetText(handState)}.`,
+          trucoMessage: `Nosso time correu de ${getPendingBetText(handState)}.`,
+          speechBubble: null,
+        })
+        partnerConsultResolutionTimeoutRef.current = null
+        return
+      }
+
+      if (decision === "raise") {
+        const requestedValue = nextState.truco.proposedBet
+        applyHandState(nextState, {
+          eventMessage: requestedValue
+            ? `A parceira aceitou e pediu ${getBetCallLabelFromNumber(requestedValue)}.`
+            : "A parceira aceitou e pediu aumento.",
+          trucoMessage: requestedValue
+            ? `Nosso time pediu ${getBetCallLabelFromNumber(requestedValue)}. Aguardando resposta deles.`
+            : "Nosso time pediu aumento. Aguardando resposta deles.",
+          speechBubble: null,
+        })
+        partnerConsultResolutionTimeoutRef.current = null
+        return
+      }
+
+      const acceptedBet = nextState.currentBet
+      applyHandState(nextState, {
+        eventMessage: `A parceira aceitou ${getBetCallLabel(acceptedBet)}.`,
+        trucoMessage: getAcceptedBetMessage(acceptedBet),
+        speechBubble: null,
+      })
+      partnerConsultResolutionTimeoutRef.current = null
+    }, BUBBLE_DURATION_MS + 120)
+  }
+
   useEffect(() => {
     if (!handState || !matchState || matchState.finished) {
       return
     }
 
-    if (canHumanRespondToTruco || canPlayHumanCard) {
+    if (canHumanRespondToTruco || canHumanAdvisePartner || canPlayHumanCard) {
       return
     }
 
@@ -365,6 +532,7 @@ export function useGameSession() {
   }, [
     activeVariant,
     applyHandState,
+    canHumanAdvisePartner,
     canHumanRespondToTruco,
     canPlayHumanCard,
     handState,
@@ -376,8 +544,97 @@ export function useGameSession() {
       if (speechBubbleTimeoutRef.current) {
         window.clearTimeout(speechBubbleTimeoutRef.current)
       }
+      if (followUpSpeechTimeoutRef.current) {
+        window.clearTimeout(followUpSpeechTimeoutRef.current)
+      }
+      if (partnerAdviceTimeoutRef.current) {
+        window.clearTimeout(partnerAdviceTimeoutRef.current)
+      }
+      if (partnerConsultTimeoutRef.current) {
+        window.clearTimeout(partnerConsultTimeoutRef.current)
+      }
+      if (partnerConsultResolutionTimeoutRef.current) {
+        window.clearTimeout(partnerConsultResolutionTimeoutRef.current)
+      }
     }
   }, [])
+
+  useEffect(() => {
+    if (!partnerAdviceKey || !handState) {
+      lastPartnerAdviceKeyRef.current = null
+      if (partnerAdviceTimeoutRef.current) {
+        window.clearTimeout(partnerAdviceTimeoutRef.current)
+        partnerAdviceTimeoutRef.current = null
+      }
+      return
+    }
+
+    const adviceKey = partnerAdviceKey
+
+    if (lastPartnerAdviceKeyRef.current === adviceKey) {
+      return
+    }
+
+    lastPartnerAdviceKeyRef.current = adviceKey
+
+    const partnerAdvice = getTeamPartnerAdvice(
+      getRuleSet(handState.variant),
+      [player1?.hand ?? [], player3?.hand ?? []],
+      handState.truco.proposedBet!,
+      handState.vira
+    )
+
+    partnerAdviceTimeoutRef.current = window.setTimeout(() => {
+      showSpeechBubble({
+        playerId: 3,
+        text: partnerAdvice,
+      })
+      setShownPartnerAdviceKey(adviceKey)
+      partnerAdviceTimeoutRef.current = null
+    }, BUBBLE_DURATION_MS + 120)
+
+    return () => {
+      if (partnerAdviceTimeoutRef.current) {
+        window.clearTimeout(partnerAdviceTimeoutRef.current)
+        partnerAdviceTimeoutRef.current = null
+      }
+    }
+  }, [BUBBLE_DURATION_MS, handState, partnerAdviceKey, player1, player3, showSpeechBubble])
+
+  useEffect(() => {
+    if (!partnerConsultKey) {
+      lastPartnerConsultKeyRef.current = null
+      if (partnerConsultTimeoutRef.current) {
+        window.clearTimeout(partnerConsultTimeoutRef.current)
+        partnerConsultTimeoutRef.current = null
+      }
+      return
+    }
+
+    const consultKey = partnerConsultKey
+
+    if (lastPartnerConsultKeyRef.current === consultKey) {
+      return
+    }
+
+    lastPartnerConsultKeyRef.current = consultKey
+
+    partnerConsultTimeoutRef.current = window.setTimeout(() => {
+      showSpeechBubble({
+        playerId: 3,
+        text: "E AÍ, PARCEIRO?",
+      })
+      setShownPartnerConsultKey(consultKey)
+      partnerConsultTimeoutRef.current = null
+    }, BUBBLE_DURATION_MS + 120)
+
+    return () => {
+      if (partnerConsultTimeoutRef.current) {
+        window.clearTimeout(partnerConsultTimeoutRef.current)
+        partnerConsultTimeoutRef.current = null
+      }
+    }
+  }, [BUBBLE_DURATION_MS, partnerConsultKey, showSpeechBubble])
 
   async function handleCopyLogs() {
     try {
@@ -391,6 +648,7 @@ export function useGameSession() {
   return {
     activeVariant,
     canHumanRespondToTruco,
+    canHumanAdvisePartner,
     canPlayHumanCard,
     canRequestTruco,
     campaignCompleted,
@@ -405,6 +663,7 @@ export function useGameSession() {
     handleAcceptTruco,
     handleCopyLogs,
     handlePlayCard,
+    handlePartnerAdvice,
     handleRaiseTruco,
     handleRequestTruco,
     handleResetCampaign,

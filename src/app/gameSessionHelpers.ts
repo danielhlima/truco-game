@@ -224,7 +224,10 @@ export function getSpeechBubbleForTransition(
     previousState.truco.phase === "awaiting-response" &&
     previousState.truco.requestedByPlayerId
   ) {
-    const responderPlayerId = getTrucoTargetPlayerId(previousState)
+    const responderPlayerId = getTrucoSpeechResponderPlayerId(previousState)
+    const initialRequesterPlayerId =
+      previousState.truco.initialRequestedByPlayerId ??
+      previousState.truco.requestedByPlayerId
 
     if (nextState.finished) {
       return {
@@ -250,10 +253,54 @@ export function getSpeechBubbleForTransition(
       previousState.truco.proposedBet &&
       nextState.currentBet >= previousState.truco.proposedBet
     ) {
+      if (responderPlayerId === initialRequesterPlayerId) {
+        return {
+          playerId: initialRequesterPlayerId,
+          text: "TOMA!",
+        }
+      }
+
       return {
         playerId: responderPlayerId,
-        text: previousState.truco.promptKind === "raise" ? "TOMA!" : "DESCE!",
+        text: "DESCE!",
       }
+    }
+  }
+
+  return null
+}
+
+function getTrucoSpeechResponderPlayerId(handState: HandState): number {
+  return getTrucoTargetPlayerId(handState)
+}
+
+export function getFollowUpSpeechBubbleForTransition(
+  previousState: HandState | null,
+  nextState: HandState
+): SpeechBubbleState | null {
+  if (!previousState) {
+    return null
+  }
+
+  if (
+    previousState.truco.phase === "awaiting-response" &&
+    nextState.truco.phase === "idle" &&
+    !nextState.finished &&
+    previousState.truco.proposedBet &&
+    nextState.currentBet >= previousState.truco.proposedBet
+  ) {
+    const initialRequesterPlayerId =
+      previousState.truco.initialRequestedByPlayerId ??
+      previousState.truco.requestedByPlayerId
+    const responderPlayerId = getTrucoSpeechResponderPlayerId(previousState)
+
+    if (!initialRequesterPlayerId || responderPlayerId === initialRequesterPlayerId) {
+      return null
+    }
+
+    return {
+      playerId: initialRequesterPlayerId,
+      text: "TOMA!",
     }
   }
 

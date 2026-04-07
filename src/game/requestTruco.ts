@@ -58,6 +58,8 @@ export function requestTruco(state: HandState, playerId: number): HandState {
       phase: "awaiting-response",
       requestedByPlayerId: playerId,
       requestedByTeam,
+      initialRequestedByPlayerId: playerId,
+      initialRequestedByTeam: requestedByTeam,
       awaitingResponseFromPlayerId,
       awaitingResponseFromTeam,
       proposedBet,

@@ -13,6 +13,8 @@ export interface TrucoState {
   phase: TrucoPhase
   requestedByPlayerId?: number
   requestedByTeam?: TeamId
+  initialRequestedByPlayerId?: number
+  initialRequestedByTeam?: TeamId
   awaitingResponseFromPlayerId?: number
   awaitingResponseFromTeam?: TeamId
   proposedBet?: BetValue
