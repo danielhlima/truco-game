@@ -5,6 +5,7 @@ import {
   LogsPanel,
   TableSection,
 } from "./app/AppSections"
+import brickWallBotecoAsset from "./assets/boteco/brick-wall-boteco.png"
 
 function App() {
   const {
@@ -491,7 +492,10 @@ const styles: Record<string, React.CSSProperties> = {
     gap: "14px",
   },
   tableHudSurface: {
-    background: "linear-gradient(180deg, #18120d 0%, #0f0b08 100%)",
+    backgroundImage: `linear-gradient(180deg, rgba(16, 10, 7, 0.42) 0%, rgba(10, 7, 5, 0.5) 100%), url(${brickWallBotecoAsset})`,
+    backgroundSize: "cover, 420px 420px",
+    backgroundPosition: "center, center",
+    backgroundRepeat: "no-repeat, repeat",
     borderRadius: "26px",
     padding: "clamp(10px, 1.4vw, 16px)",
     border: "4px solid #23170f",
