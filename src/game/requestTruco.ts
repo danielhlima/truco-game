@@ -46,6 +46,14 @@ export function requestTruco(state: HandState, playerId: number): HandState {
   const awaitingResponseFromTeam = getOpposingTeam(requestedByTeam)
   const awaitingResponseFromPlayerId = getTargetPlayerForTruco(state, playerId)
   const callLabel = getBetCallLabel(proposedBet)
+  const initialRequestedByPlayerId =
+    state.currentBet > 1
+      ? state.truco.initialRequestedByPlayerId ?? state.truco.requestedByPlayerId ?? playerId
+      : playerId
+  const initialRequestedByTeam =
+    state.currentBet > 1
+      ? state.truco.initialRequestedByTeam ?? state.truco.requestedByTeam ?? requestedByTeam
+      : requestedByTeam
 
   logEvent(`Jogador ${playerId} pediu ${callLabel}.`)
   logEvent("Time que pediu:", requestedByTeam)
@@ -58,8 +66,8 @@ export function requestTruco(state: HandState, playerId: number): HandState {
       phase: "awaiting-response",
       requestedByPlayerId: playerId,
       requestedByTeam,
-      initialRequestedByPlayerId: playerId,
-      initialRequestedByTeam: requestedByTeam,
+      initialRequestedByPlayerId,
+      initialRequestedByTeam,
       awaitingResponseFromPlayerId,
       awaitingResponseFromTeam,
       proposedBet,

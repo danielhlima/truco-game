@@ -69,6 +69,7 @@ export function useGameSession() {
   const [eventMessage, setEventMessage] = useState("")
   const [trucoMessage, setTrucoMessage] = useState(DEFAULT_TRUCO_MESSAGE)
   const [speechBubble, setSpeechBubble] = useState<SpeechBubbleState | null>(null)
+  const [dealAnimationNonce, setDealAnimationNonce] = useState(0)
   const [shownPartnerAdviceKey, setShownPartnerAdviceKey] = useState<string | null>(null)
   const [shownPartnerConsultKey, setShownPartnerConsultKey] = useState<string | null>(null)
   const speechBubbleTimeoutRef = useRef<number | null>(null)
@@ -78,6 +79,7 @@ export function useGameSession() {
   const partnerConsultResolutionTimeoutRef = useRef<number | null>(null)
   const lastPartnerAdviceKeyRef = useRef<string | null>(null)
   const lastPartnerConsultKeyRef = useRef<string | null>(null)
+  const lastDealAnimationKeyRef = useRef<string | null>(null)
 
   const currentCampaignStage =
     getCurrentCampaignStage(playerProfile, CAMPAIGN_STAGES) ?? CAMPAIGN_STAGES[0]
@@ -510,6 +512,19 @@ export function useGameSession() {
       return
     }
 
+    let dealTriggerTimeoutId: number | null = null
+
+    if (handState.finished) {
+      const dealAnimationKey = `${matchState.handNumber}:${handState.roundNumber}:${handState.winner ?? "none"}`
+
+      if (lastDealAnimationKeyRef.current !== dealAnimationKey) {
+        lastDealAnimationKeyRef.current = dealAnimationKey
+        dealTriggerTimeoutId = window.setTimeout(() => {
+          setDealAnimationNonce((current) => current + 1)
+        }, 0)
+      }
+    }
+
     const timeoutId = window.setTimeout(() => {
       if (handState.finished) {
         const nextStartingPlayerId = matchState.startingPlayerId
@@ -528,7 +543,12 @@ export function useGameSession() {
       applyHandState(nextState)
     }, handState.finished ? NEXT_HAND_DELAY_MS : AUTO_STEP_DELAY_MS)
 
-    return () => window.clearTimeout(timeoutId)
+    return () => {
+      if (dealTriggerTimeoutId) {
+        window.clearTimeout(dealTriggerTimeoutId)
+      }
+      window.clearTimeout(timeoutId)
+    }
   }, [
     activeVariant,
     applyHandState,
@@ -657,6 +677,7 @@ export function useGameSession() {
     currentCampaignVenue,
     currentTurnLabel,
     currentVenueWins,
+    dealAnimationNonce,
     eventMessage,
     handScoreLabel,
     handState,

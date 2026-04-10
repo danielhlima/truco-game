@@ -9,10 +9,16 @@ import type { TableSceneModel } from "./tableSceneModel"
 interface GameTableSceneProps {
   model: TableSceneModel
   speechBubble?: SpeechBubbleState | null
+  dealAnimationNonce?: number
   style?: CSSProperties
 }
 
-export function GameTableScene({ model, speechBubble, style }: GameTableSceneProps) {
+export function GameTableScene({
+  model,
+  speechBubble,
+  dealAnimationNonce,
+  style,
+}: GameTableSceneProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
   const sceneRef = useRef<THREE.Scene | null>(null)
@@ -45,6 +51,8 @@ export function GameTableScene({ model, speechBubble, style }: GameTableScenePro
   const tableScale = illustratedTableScale ?? 1
   const [animatingCards, setAnimatingCards] = useState<AnimatedCard[]>([])
   const [clearingCards, setClearingCards] = useState<ClearingCard[]>([])
+  const [dealingCards, setDealingCards] = useState<DealingCard[]>([])
+  const [isDealing, setIsDealing] = useState(false)
   const previousCardsRef = useRef<Record<number, string | null>>({})
   const animationTimeoutsRef = useRef<number[]>([])
 
@@ -330,6 +338,78 @@ export function GameTableScene({ model, speechBubble, style }: GameTableScenePro
     }
   }, [model.slots])
 
+  useEffect(() => {
+    if (!dealAnimationNonce) {
+      return
+    }
+
+    const dealTimeouts: number[] = []
+    const order = [3, 4, 1, 2]
+    const cardsToDeal = order.flatMap((playerId) =>
+      Array.from({ length: 3 }, (_, index) => ({ playerId, index }))
+    )
+
+    const resetId = window.setTimeout(() => {
+      previousCardsRef.current = {}
+      setAnimatingCards([])
+      setClearingCards([])
+      setDealingCards([])
+      setIsDealing(true)
+    }, 0)
+    dealTimeouts.push(resetId)
+
+    cardsToDeal.forEach(({ playerId, index }, sequenceIndex) => {
+      const key = `deal-${dealAnimationNonce}-${playerId}-${index}`
+      const from = { left: "50%", top: "50%", rotation: 0 }
+      const to = getHandOverlayPosition(playerId, index)
+      const delay = sequenceIndex * 78
+
+      const initId = window.setTimeout(() => {
+        setDealingCards((current) => [
+          ...current.filter((item) => item.key !== key),
+          {
+            key,
+            from,
+            to,
+            stage: "from",
+          },
+        ])
+      }, delay)
+
+      const startId = window.setTimeout(() => {
+        setDealingCards((current) =>
+          current.map((item) =>
+            item.key === key
+              ? {
+                  ...item,
+                  stage: "to",
+                }
+              : item
+          )
+        )
+      }, delay + 24)
+
+      const endId = window.setTimeout(() => {
+        setDealingCards((current) => current.filter((item) => item.key !== key))
+      }, delay + 420)
+
+      dealTimeouts.push(initId, startId, endId)
+    })
+
+    const finishId = window.setTimeout(() => {
+      setIsDealing(false)
+    }, cardsToDeal.length * 78 + 460)
+    dealTimeouts.push(finishId)
+
+    return () => {
+      for (const timeoutId of dealTimeouts) {
+        window.clearTimeout(timeoutId)
+      }
+      setDealingCards([])
+      setIsDealing(false)
+    }
+  }, [dealAnimationNonce])
+
   return (
     <div style={{ position: "relative", width: "100%", height: "100%", ...style }}>
       <div
@@ -380,7 +460,32 @@ export function GameTableScene({ model, speechBubble, style }: GameTableScenePro
           pointerEvents: "none",
         }}
       >
-        {overlaySlots.map((slot) =>
+        {model.centerDeck.show ? (
+          <>
+            <CodeCard
+              left="50%"
+              top="50.6%"
+              rotation={90}
+              rank={model.centerDeck.vira?.rank}
+              suit={model.centerDeck.vira?.suit}
+              suitSymbol={model.centerDeck.vira?.suitSymbol}
+              scale={0.82}
+            />
+            {[2, 1, 0].map((layer) => (
+              <CodeCard
+                key={`center-deck-${layer}`}
+                left={`calc(50% + ${layer * 0.45}px)`}
+                top={`calc(50% - ${layer * 0.55}px)`}
+                rotation={0}
+                scale={0.8}
+                faceDown
+                opacity={0.98 - layer * 0.08}
+              />
+            ))}
+          </>
+        ) : null}
+
+        {!isDealing && overlaySlots.map((slot) =>
           Array.from({ length: Math.min(slot.handCount, 3) }, (_, index) => {
             const stackPosition = getHandOverlayPosition(slot.playerId, index)
 
@@ -397,7 +502,7 @@ export function GameTableScene({ model, speechBubble, style }: GameTableScenePro
           })
         )}
 
-        {overlaySlots
+        {!isDealing && overlaySlots
           .filter((slot) => {
             if (!slot.card) return false
 
@@ -443,6 +548,19 @@ export function GameTableScene({ model, speechBubble, style }: GameTableScenePro
             suitSymbol={card.suitSymbol}
             opacity={card.stage === "from" ? 1 : 0}
             scale={card.stage === "from" ? 1 : 0.86}
+          />
+        ))}
+
+        {dealingCards.map((card) => (
+          <CodeCard
+            key={card.key}
+            left={card.stage === "from" ? card.from.left : card.to.left}
+            top={card.stage === "from" ? card.from.top : card.to.top}
+            rotation={card.stage === "from" ? card.from.rotation : card.to.rotation}
+            transition="left 360ms cubic-bezier(0.22, 0.9, 0.24, 1), top 360ms cubic-bezier(0.22, 0.9, 0.24, 1), transform 360ms cubic-bezier(0.22, 0.9, 0.24, 1), opacity 360ms cubic-bezier(0.22, 0.9, 0.24, 1)"
+            faceDown
+            opacity={card.stage === "from" ? 0.92 : 1}
+            scale={0.84}
           />
         ))}
 
@@ -570,6 +688,21 @@ interface ClearingCard {
   from: {
     left: string
     top: string
+  }
+  to: {
+    left: string
+    top: string
+    rotation: number
+  }
+  stage: "from" | "to"
+}
+
+interface DealingCard {
+  key: string
+  from: {
+    left: string
+    top: string
+    rotation: number
   }
   to: {
     left: string

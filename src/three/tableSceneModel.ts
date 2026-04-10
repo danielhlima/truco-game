@@ -24,6 +24,14 @@ export interface TableSceneModel {
   venueLabel: string
   atmosphere: string
   theme: TableTheme
+  centerDeck: {
+    show: boolean
+    vira?: {
+      rank: string
+      suit: string
+      suitSymbol: string
+    }
+  }
   slots: TableSceneSlot[]
 }
 
@@ -46,6 +54,16 @@ export function buildTableSceneModel(
     venueLabel: venue?.name ?? "Mesa de Treino",
     atmosphere: venue?.atmosphere ?? "Protótipo inicial da futura mesa 3D.",
     theme: getTableTheme(venue?.visualTheme),
+    centerDeck: {
+      show: handState?.variant === "PAULISTA",
+      vira: handState?.variant === "PAULISTA" && handState.vira
+        ? {
+            rank: handState.vira.rank,
+            suit: handState.vira.suit,
+            suitSymbol: getSuitSymbol(handState.vira.suit),
+          }
+        : undefined,
+    },
     slots: slotLayout.map((slot) => {
       const card = tableByPlayer[slot.playerId]
       const player = handState?.players.find((item) => item.id === slot.playerId)

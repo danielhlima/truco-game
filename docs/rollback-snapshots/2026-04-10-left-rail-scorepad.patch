@@ -1,0 +1,1493 @@
+diff --git a/src/App.tsx b/src/App.tsx
+index 2fa76c7..5faff30 100644
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -19,6 +19,7 @@ function App() {
+     currentCampaignVenue,
+     currentTurnLabel,
+     currentVenueWins,
++    dealAnimationNonce,
+     eventMessage,
+     handScoreLabel,
+     handState,
+@@ -41,7 +42,6 @@ function App() {
+     speechBubble,
+     statusMessage,
+     tableByPlayer,
+-    trucoMessage,
+     variantSelectionDisabled,
+   } = useGameSession()
+ 
+@@ -63,10 +63,7 @@ function App() {
+           handState={handState}
+           matchState={matchState}
+           currentCampaignVenue={currentCampaignVenue}
+-          matchScoreLabel={matchScoreLabel}
+-          handScoreLabel={handScoreLabel}
+-          currentTurnLabel={currentTurnLabel}
+-          statusMessage={statusMessage}
++          dealAnimationNonce={dealAnimationNonce}
+           speechBubble={speechBubble}
+           tableByPlayer={tableByPlayer}
+           lastPlayedPlayerId={lastPlayedPlayerId}
+@@ -75,7 +72,6 @@ function App() {
+           canHumanAdvisePartner={canHumanAdvisePartner}
+           canHumanRespondToTruco={canHumanRespondToTruco}
+           canPlayHumanCard={canPlayHumanCard}
+-          trucoMessage={trucoMessage}
+           variantSelectionDisabled={variantSelectionDisabled}
+           onChangeVariant={setVariant}
+           onStart={handleStartHand}
+@@ -378,7 +374,8 @@ const styles: Record<string, React.CSSProperties> = {
+     fontWeight: 700,
+   },
+   disabledButton: {
+-    opacity: 0.5,
++    opacity: 0.72,
++    filter: "saturate(0.82)",
+     cursor: "not-allowed",
+   },
+   helpBox: {
+@@ -494,28 +491,272 @@ const styles: Record<string, React.CSSProperties> = {
+     gap: "14px",
+   },
+   tableHudSurface: {
+-    background: "#163823",
++    background: "linear-gradient(180deg, #18120d 0%, #0f0b08 100%)",
+     borderRadius: "26px",
+-    padding: "16px",
+-    border: "4px solid #0f3d24",
+-    boxShadow: "inset 0 0 0 2px rgba(255,255,255,0.08)",
++    padding: "clamp(10px, 1.4vw, 16px)",
++    border: "4px solid #23170f",
++    boxShadow: "inset 0 0 0 2px rgba(255,255,255,0.05)",
++    display: "flex",
++    justifyContent: "center",
++    alignItems: "center",
++    overflow: "hidden",
++  },
++  gameViewportFrame: {
++    width: "min(100%, calc((100vh - 240px) * 2.16))",
++    maxWidth: "100%",
++    aspectRatio: "19.5 / 9",
++    minHeight: "min(420px, 68vh)",
++    maxHeight: "76vh",
++    margin: "0 auto",
++    display: "flex",
++    overflow: "hidden",
++    borderRadius: "22px",
+   },
+   gameViewport: {
+     display: "grid",
+-    gridTemplateColumns: "minmax(0, 1fr) 300px",
+-    gap: "16px",
++    gridTemplateColumns:
++      "clamp(108px, 14.2%, 168px) minmax(0, 1fr) clamp(132px, 17.5%, 196px)",
++    gap: "clamp(6px, 0.75vw, 10px)",
+     alignItems: "stretch",
++    width: "100%",
++    height: "100%",
++    minHeight: 0,
++  },
++  gameLeftRail: {
++    display: "flex",
++    flexDirection: "column",
++    gap: "clamp(5px, 0.55vw, 7px)",
++    minWidth: 0,
++    justifyContent: "space-between",
+   },
+   gameMainColumn: {
+     display: "flex",
+     flexDirection: "column",
+-    gap: "14px",
++    gap: "clamp(6px, 0.7vw, 8px)",
+     minWidth: 0,
++    minHeight: 0,
++    justifyContent: "space-between",
+   },
+   gameSidebarColumn: {
+     display: "flex",
+     flexDirection: "column",
+     minWidth: 0,
++    minHeight: 0,
++  },
++  scenePanel: {
++    borderRadius: "22px",
++    background: "linear-gradient(180deg, rgba(81,57,39,0.98) 0%, rgba(47,31,21,0.98) 100%)",
++    border: "1px solid rgba(255,255,255,0.06)",
++    padding: "clamp(7px, 0.62vw, 9px)",
++    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04), 0 10px 22px rgba(0,0,0,0.18)",
++    color: "#f7ede1",
++  },
++  scenePanelTitle: {
++    fontSize: "clamp(9px, 0.74vw, 11px)",
++    fontWeight: 800,
++    textTransform: "uppercase",
++    letterSpacing: "0.09em",
++    color: "#d9c6aa",
++    marginBottom: "6px",
++    textAlign: "center",
++  },
++  rosterGrid: {
++    display: "grid",
++    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
++    gap: "clamp(5px, 0.45vw, 7px)",
++  },
++  rosterCard: {
++    borderRadius: "16px",
++    background: "linear-gradient(180deg, rgba(52,35,25,0.92) 0%, rgba(33,22,15,0.9) 100%)",
++    border: "1px solid rgba(255,255,255,0.06)",
++    padding: "clamp(6px, 0.5vw, 7px) clamp(5px, 0.42vw, 7px)",
++    display: "flex",
++    flexDirection: "column",
++    gap: "4px",
++    alignItems: "center",
++    justifyContent: "center",
++    minHeight: "clamp(74px, 7.2vw, 92px)",
++    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
++  },
++  rosterCardHuman: {
++    border: "1px solid rgba(244, 211, 94, 0.65)",
++    boxShadow: "0 0 0 1px rgba(244, 211, 94, 0.15), inset 0 1px 0 rgba(255,255,255,0.03)",
++  },
++  rosterAvatar: {
++    width: "clamp(28px, 2.2vw, 34px)",
++    height: "clamp(28px, 2.2vw, 34px)",
++    borderRadius: "12px",
++    background: "linear-gradient(180deg, #8a745d 0%, #4a392c 100%)",
++    display: "flex",
++    alignItems: "center",
++    justifyContent: "center",
++    fontSize: "clamp(12px, 1vw, 15px)",
++    fontWeight: 800,
++    color: "#fff7ed",
++    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)",
++  },
++  rosterName: {
++    fontSize: "clamp(8px, 0.74vw, 10px)",
++    fontWeight: 800,
++    color: "#fff7ed",
++    textAlign: "center",
++    lineHeight: 1.2,
++  },
++  scorePadCard: {
++    display: "flex",
++    minWidth: 0,
++    borderRadius: "26px",
++    background:
++      "linear-gradient(180deg, rgba(84,58,39,0.98) 0%, rgba(41,28,20,0.98) 100%)",
++    border: "1px solid rgba(255,255,255,0.06)",
++    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04), 0 14px 24px rgba(0,0,0,0.22)",
++    padding: "clamp(8px, 0.72vw, 10px)",
++    alignItems: "flex-start",
++    justifyContent: "center",
++    overflow: "hidden",
++  },
++  scorePadCardSurface: {
++    width: "100%",
++    borderRadius: "20px",
++    backgroundSize: "cover",
++    backgroundPosition: "center",
++    backgroundRepeat: "no-repeat",
++    border: "1px solid rgba(126, 82, 43, 0.28)",
++    color: "#2f241b",
++    display: "flex",
++    flexDirection: "column",
++    padding: "clamp(10px, 0.9vw, 12px)",
++    boxSizing: "border-box",
++    alignSelf: "flex-start",
++    marginTop: 0,
++    position: "relative",
++    overflow: "hidden",
++    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.36)",
++  },
++  scorePadNotebookRings: {
++    display: "flex",
++    justifyContent: "center",
++    marginBottom: "clamp(6px, 0.55vw, 8px)",
++    position: "relative",
++    zIndex: 1,
++  },
++  scorePadNotebookRingsImage: {
++    display: "block",
++    width: "84%",
++    maxWidth: "128px",
++    height: "auto",
++    objectFit: "contain",
++    filter: "drop-shadow(0 3px 4px rgba(0,0,0,0.14))",
++  },
++  scorePadPaper: {
++    borderRadius: "16px",
++    border: "1px solid rgba(143, 102, 56, 0.18)",
++    padding: "clamp(12px, 1vw, 14px) clamp(10px, 0.9vw, 12px) clamp(11px, 0.92vw, 13px)",
++    display: "flex",
++    flexDirection: "column",
++    gap: "clamp(8px, 0.7vw, 10px)",
++    minHeight: "100%",
++    position: "relative",
++    zIndex: 1,
++    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.46)",
++    backgroundSize: "cover",
++    backgroundPosition: "center",
++    backgroundRepeat: "no-repeat",
++  },
++  scorePadTitleRow: {
++    display: "flex",
++    alignItems: "flex-start",
++    justifyContent: "space-between",
++    gap: "8px",
++  },
++  scorePadEyebrow: {
++    fontSize: "clamp(7px, 0.62vw, 8px)",
++    fontWeight: 800,
++    textTransform: "uppercase",
++    letterSpacing: "0.14em",
++    color: "rgba(88, 58, 33, 0.72)",
++    marginBottom: "2px",
++  },
++  scorePadTitle: {
++    fontSize: "clamp(12px, 1.02vw, 14px)",
++    fontWeight: 800,
++    textAlign: "left",
++    letterSpacing: "0.02em",
++    marginTop: 0,
++    position: "relative",
++    zIndex: 1,
++  },
++  scorePadHandBadge: {
++    borderRadius: "999px",
++    padding: "clamp(5px, 0.42vw, 6px) clamp(8px, 0.72vw, 10px)",
++    background: "rgba(74, 48, 25, 0.1)",
++    border: "1px solid rgba(112, 75, 40, 0.18)",
++    fontSize: "clamp(8px, 0.7vw, 9px)",
++    fontWeight: 900,
++    letterSpacing: "0.08em",
++    color: "#5e3d23",
++    whiteSpace: "nowrap",
++  },
++  scorePadScoreGrid: {
++    display: "grid",
++    gridTemplateColumns: "minmax(0, 1fr) 1px minmax(0, 1fr)",
++    gap: "clamp(8px, 0.7vw, 10px)",
++    alignItems: "stretch",
++  },
++  scorePadTeamColumn: {
++    display: "flex",
++    flexDirection: "column",
++    alignItems: "center",
++    gap: "clamp(4px, 0.35vw, 5px)",
++    minWidth: 0,
++  },
++  scorePadTeamLabel: {
++    fontSize: "clamp(8px, 0.72vw, 9px)",
++    fontWeight: 800,
++    textTransform: "uppercase",
++    letterSpacing: "0.08em",
++    color: "rgba(88, 58, 33, 0.82)",
++  },
++  scorePadTeamValue: {
++    fontSize: "clamp(26px, 2.1vw, 32px)",
++    lineHeight: 1,
++    fontWeight: 800,
++    textAlign: "center",
++  },
++  scorePadDivider: {
++    width: "1px",
++    alignSelf: "stretch",
++    background: "linear-gradient(180deg, rgba(120,82,45,0) 0%, rgba(120,82,45,0.3) 24%, rgba(120,82,45,0.32) 76%, rgba(120,82,45,0) 100%)",
++  },
++  scorePadTallyRow: {
++    display: "grid",
++    gridTemplateColumns: "repeat(6, minmax(0, 1fr))",
++    gap: "3px",
++    width: "100%",
++  },
++  scorePadTallyMark: {
++    height: "clamp(5px, 0.44vw, 6px)",
++    borderRadius: "999px",
++    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.2)",
++  },
++  scorePadMetaStack: {
++    display: "flex",
++    flexDirection: "column",
++    gap: "clamp(6px, 0.55vw, 8px)",
++    marginTop: "auto",
++    paddingTop: "clamp(8px, 0.7vw, 10px)",
++    position: "relative",
++    zIndex: 1,
++    borderTop: "1px solid rgba(126, 82, 43, 0.18)",
++  },
++  scorePadMetaRow: {
++    display: "flex",
++    justifyContent: "space-between",
++    gap: "6px",
++    fontSize: "clamp(8px, 0.72vw, 9px)",
++    alignItems: "center",
++    color: "#513824",
++    lineHeight: 1.15,
+   },
+   tablePanelHeader: {
+     display: "flex",
+@@ -612,31 +853,46 @@ const styles: Record<string, React.CSSProperties> = {
+     color: "#991b1b",
+   },
+   tableSurface: {
+-    background: "radial-gradient(circle at center, #1f7a4c 0%, #14532d 100%)",
+-    borderRadius: "24px",
++    background: "linear-gradient(180deg, rgba(0,0,0,0.12) 0%, rgba(255,255,255,0.02) 100%)",
++    borderRadius: "28px",
+     aspectRatio: "1 / 1",
+-    minHeight: "360px",
+-    maxHeight: "58vh",
+-    padding: "12px",
++    minHeight: 0,
++    height: "100%",
++    maxHeight: "100%",
++    padding: "clamp(6px, 0.8vw, 10px)",
+     boxSizing: "border-box",
+-    width: "100%",
++    width: "auto",
++    maxWidth: "100%",
++    border: "1px solid rgba(255,255,255,0.08)",
++    alignSelf: "center",
++  },
++  tableSurfaceWrap: {
++    flex: 1,
++    minHeight: 0,
++    display: "flex",
++    alignItems: "center",
++    justifyContent: "center",
+   },
+   playerCardsBlock: {
+     borderRadius: "18px",
+-    background: "rgba(255,255,255,0.96)",
+-    padding: "12px",
++    background: "linear-gradient(180deg, rgba(41,27,17,0.96) 0%, rgba(22,15,10,0.96) 100%)",
++    padding: "clamp(6px, 0.6vw, 8px)",
++    border: "1px solid rgba(255,255,255,0.06)",
++    flexShrink: 0,
+   },
+   tableHudSidebar: {
+     height: "100%",
+     borderRadius: "20px",
+-    background: "rgba(9, 18, 12, 0.54)",
++    background: "linear-gradient(180deg, #4b311f 0%, #2d1b11 100%)",
+     border: "1px solid rgba(255,255,255,0.08)",
+-    padding: "16px",
++    padding: "clamp(8px, 0.7vw, 10px) clamp(8px, 0.78vw, 10px)",
+     boxSizing: "border-box",
+     display: "flex",
+     flexDirection: "column",
+-    gap: "14px",
++    gap: "clamp(6px, 0.55vw, 8px)",
+     color: "#f8fafc",
++    justifyContent: "flex-start",
++    minHeight: 0,
+   },
+   tableHudScoreRow: {
+     display: "flex",
+@@ -648,41 +904,119 @@ const styles: Record<string, React.CSSProperties> = {
+   },
+   tableHudStats: {
+     borderRadius: "14px",
+-    background: "rgba(255,255,255,0.06)",
+-    padding: "10px",
++    background: "linear-gradient(180deg, rgba(109,72,48,0.78) 0%, rgba(57,36,24,0.84) 100%)",
++    border: "1px solid rgba(255,255,255,0.08)",
++    padding: "clamp(9px, 0.76vw, 11px) clamp(12px, 1vw, 14px)",
+     display: "flex",
+     flexDirection: "column",
+-    gap: "8px",
++    justifyContent: "center",
++    gap: "clamp(10px, 0.8vw, 12px)",
++    width: "92%",
++    alignSelf: "center",
++    marginTop: "clamp(2px, 0.2vw, 4px)",
++    minHeight: "clamp(118px, 12vw, 148px)",
+   },
+   tableHudStatLine: {
+     display: "flex",
+     justifyContent: "space-between",
+-    gap: "12px",
+-    fontSize: "13px",
++    gap: "10px",
++    fontSize: "clamp(9px, 0.82vw, 10px)",
++    alignItems: "baseline",
++    color: "#f8f2e8",
++    textShadow: "0 1px 2px rgba(0,0,0,0.7)",
++    lineHeight: 1.2,
++  },
++  tableHudStatLabel: {
++    color: "rgba(255,244,228,0.88)",
++    fontSize: "clamp(8px, 0.72vw, 9px)",
++    fontWeight: 700,
++    letterSpacing: "0.01em",
++    textShadow: "0 1px 2px rgba(0,0,0,0.58)",
++    flex: "0 0 34%",
++  },
++  tableHudStatValue: {
++    color: "#fffaf2",
++    fontSize: "clamp(10px, 0.94vw, 11px)",
++    fontWeight: 800,
++    textAlign: "right",
++    marginLeft: "auto",
++    textShadow: "0 1px 2px rgba(0,0,0,0.82)",
++    flex: 1,
++  },
++  tableHudStatLineCentered: {
++    display: "flex",
++    flexDirection: "column",
+     alignItems: "center",
++    justifyContent: "center",
++    gap: "clamp(5px, 0.4vw, 6px)",
++    textAlign: "center",
++    lineHeight: 1.2,
++  },
++  tableHudStatLabelCentered: {
++    color: "rgba(255,244,228,0.9)",
++    fontSize: "clamp(8px, 0.72vw, 9px)",
++    fontWeight: 700,
++    letterSpacing: "0.01em",
++    textShadow: "0 1px 2px rgba(0,0,0,0.58)",
++  },
++  tableHudStatValueCentered: {
++    color: "#fffaf2",
++    fontSize: "clamp(11px, 1.02vw, 13px)",
++    fontWeight: 800,
++    textAlign: "center",
++    textShadow: "0 1px 2px rgba(0,0,0,0.82)",
+   },
+   tableHudVenue: {
+     borderRadius: "14px",
+-    background: "rgba(255,255,255,0.06)",
+-    padding: "12px",
++    background: "rgba(0,0,0,0.18)",
++    padding: "clamp(6px, 0.6vw, 8px)",
+   },
+   tableHudVenueTitle: {
+-    fontSize: "16px",
++    fontSize: "clamp(10px, 0.82vw, 12px)",
+     fontWeight: 800,
+     marginBottom: "4px",
+   },
+   tableHudVenueText: {
+-    fontSize: "12px",
+-    color: "rgba(248,250,252,0.82)",
++    fontSize: "clamp(8px, 0.72vw, 10px)",
++    color: "rgba(248,250,252,0.86)",
++    lineHeight: 1.45,
+   },
+   tableHudMessage: {
+     borderRadius: "14px",
+-    background: "rgba(255,255,255,0.08)",
+-    padding: "12px",
+-    fontSize: "12px",
++    background: "rgba(0,0,0,0.18)",
++    padding: "clamp(6px, 0.6vw, 8px)",
++    fontSize: "clamp(8px, 0.72vw, 10px)",
+     lineHeight: 1.4,
+     color: "#fff7ed",
+-    minHeight: "48px",
++    minHeight: "clamp(26px, 2.3vw, 32px)",
++  },
++  actionDisplayCard: {
++    borderRadius: "16px",
++    background: "linear-gradient(180deg, #f3e7cf 0%, #dec49c 100%)",
++    border: "1px solid #b18553",
++    padding: "clamp(4px, 0.42vw, 6px) clamp(8px, 0.72vw, 9px)",
++    color: "#2f241b",
++    boxShadow: "0 8px 18px rgba(0,0,0,0.18)",
++    width: "96%",
++    alignSelf: "center",
++    minHeight: "clamp(64px, 5.9vw, 82px)",
++    display: "flex",
++    flexDirection: "column",
++    justifyContent: "center",
++  },
++  actionDisplayLabel: {
++    fontSize: "clamp(7px, 0.58vw, 8px)",
++    fontWeight: 800,
++    textTransform: "uppercase",
++    letterSpacing: "0.08em",
++    marginBottom: "2px",
++    textAlign: "center",
++  },
++  actionDisplayValue: {
++    fontSize: "clamp(10px, 0.92vw, 14px)",
++    fontWeight: 900,
++    lineHeight: 1.1,
++    textAlign: "center",
+   },
+   tableCenterArea: {
+     width: "100%",
+@@ -790,7 +1124,7 @@ const styles: Record<string, React.CSSProperties> = {
+   mobileHandPanel: {
+     display: "flex",
+     flexDirection: "column",
+-    gap: "10px",
++    gap: "6px",
+   },
+   mobileHandHeader: {
+     display: "flex",
+@@ -799,30 +1133,69 @@ const styles: Record<string, React.CSSProperties> = {
+     gap: "12px",
+   },
+   mobileHandTitle: {
+-    fontSize: "16px",
++    fontSize: "clamp(10px, 0.82vw, 12px)",
+     fontWeight: 800,
+-    color: "#0f172a",
++    color: "#fff7ed",
+   },
+   mobileHandMeta: {
+-    fontSize: "12px",
++    fontSize: "clamp(8px, 0.65vw, 9px)",
+     fontWeight: 700,
+-    color: "#475569",
++    color: "#d6c7b2",
+   },
+   mobileHandRow: {
+     display: "flex",
+-    gap: "10px",
++    gap: "clamp(4px, 0.35vw, 6px)",
+     flexWrap: "nowrap",
+     alignItems: "center",
++    justifyContent: "center",
+   },
+-  mobileCardButton: {
+-    width: "72px",
+-    minWidth: "72px",
+-    minHeight: "106px",
++  inGameActionsCard: {
++    borderRadius: "16px",
++    background: "rgba(0,0,0,0.18)",
++    border: "1px solid rgba(255,255,255,0.08)",
++    padding: "clamp(2px, 0.2vw, 4px)",
++    display: "flex",
++    flexDirection: "column",
++    gap: "clamp(4px, 0.4vw, 6px)",
++    width: "96%",
++    alignSelf: "center",
++    marginTop: "auto",
++    transform: "translateY(-36%)",
++  },
++  inGameActionsTitle: {
++    fontSize: "clamp(9px, 0.75vw, 11px)",
++    fontWeight: 800,
++    color: "#f8fafc",
++    textAlign: "center",
++  },
++  inGameActionsRow: {
++    display: "flex",
++    flexDirection: "column",
++    gap: "clamp(3px, 0.24vw, 4px)",
++  },
++  inGameActionsGrid: {
++    display: "grid",
++    gridTemplateColumns: "1fr",
++    gap: "clamp(3px, 0.24vw, 4px)",
++  },
++  inGameActionsHint: {
+     borderRadius: "12px",
++    background: "rgba(255,255,255,0.08)",
++    border: "1px solid rgba(255,255,255,0.08)",
++    color: "#fff7ed",
++    padding: "clamp(6px, 0.55vw, 7px)",
++    fontSize: "clamp(8px, 0.72vw, 9px)",
++    lineHeight: 1.45,
++  },
++  mobileCardButton: {
++    width: "clamp(40px, 3.6vw, 50px)",
++    minWidth: "clamp(40px, 3.6vw, 50px)",
++    minHeight: "clamp(58px, 5.2vw, 72px)",
++    borderRadius: "8px",
+     background: "#fffef9",
+     border: "1px solid #d9c7a8",
+     boxShadow: "0 4px 10px rgba(15,23,42,0.12)",
+-    padding: "8px",
++    padding: "clamp(3px, 0.28vw, 4px)",
+     display: "flex",
+     flexDirection: "column",
+     justifyContent: "space-between",
+@@ -842,16 +1215,16 @@ const styles: Record<string, React.CSSProperties> = {
+     transform: "rotate(180deg)",
+   },
+   mobileCardRank: {
+-    fontSize: "22px",
++    fontSize: "clamp(11px, 0.9vw, 13px)",
+     fontWeight: 800,
+     lineHeight: 1,
+   },
+   mobileCardSuit: {
+-    fontSize: "18px",
++    fontSize: "clamp(9px, 0.78vw, 11px)",
+     lineHeight: 1,
+   },
+   mobileCardCenterSuit: {
+-    fontSize: "28px",
++    fontSize: "clamp(12px, 1.05vw, 15px)",
+     lineHeight: 1,
+     alignSelf: "center",
+   },
+@@ -962,24 +1335,36 @@ const styles: Record<string, React.CSSProperties> = {
+     flexWrap: "wrap",
+   },
+   trucoPrimaryButton: {
+-    padding: "12px 18px",
++    padding: "clamp(4px, 0.38vw, 6px) clamp(10px, 0.85vw, 12px)",
+     borderRadius: "12px",
+     border: "none",
+     background: "#c2410c",
+     color: "#fff",
+     cursor: "pointer",
+-    fontSize: "15px",
+-    fontWeight: 700,
++    fontSize: "clamp(9px, 0.82vw, 11px)",
++    fontWeight: 800,
++    minHeight: "clamp(28px, 2.3vw, 32px)",
++    lineHeight: 1.05,
++    textShadow: "0 1px 2px rgba(0,0,0,0.72)",
++    display: "flex",
++    alignItems: "center",
++    justifyContent: "center",
+   },
+   trucoSecondaryButton: {
+-    padding: "12px 18px",
++    padding: "clamp(4px, 0.38vw, 6px) clamp(10px, 0.85vw, 12px)",
+     borderRadius: "12px",
+     border: "1px solid #fdba74",
+     background: "#fff",
+     color: "#9a3412",
+     cursor: "pointer",
+-    fontSize: "15px",
+-    fontWeight: 700,
++    fontSize: "clamp(9px, 0.82vw, 11px)",
++    fontWeight: 800,
++    minHeight: "clamp(28px, 2.3vw, 32px)",
++    lineHeight: 1.05,
++    textShadow: "0 1px 2px rgba(0,0,0,0.72)",
++    display: "flex",
++    alignItems: "center",
++    justifyContent: "center",
+   },
+   trucoHintBox: {
+     borderRadius: "12px",
+@@ -1069,6 +1454,69 @@ const styles: Record<string, React.CSSProperties> = {
+     color: "#334155",
+     fontSize: "15px",
+   },
++  gameStartScreen: {
++    width: "100%",
++    height: "100%",
++    display: "flex",
++    alignItems: "center",
++    justifyContent: "center",
++    padding: "clamp(14px, 1.4vw, 24px)",
++    boxSizing: "border-box",
++  },
++  gameStartCard: {
++    width: "min(100%, 460px)",
++    borderRadius: "22px",
++    background: "linear-gradient(180deg, rgba(58,42,31,0.95) 0%, rgba(28,20,14,0.95) 100%)",
++    border: "1px solid rgba(255,255,255,0.08)",
++    padding: "clamp(18px, 2vw, 28px)",
++    display: "flex",
++    flexDirection: "column",
++    gap: "clamp(10px, 1.1vw, 14px)",
++    color: "#fff7ed",
++    boxShadow: "0 18px 34px rgba(0,0,0,0.28)",
++  },
++  gameStartEyebrow: {
++    fontSize: "clamp(11px, 0.95vw, 13px)",
++    fontWeight: 800,
++    textTransform: "uppercase",
++    letterSpacing: "0.08em",
++    color: "#d8c3a5",
++  },
++  gameStartTitle: {
++    margin: 0,
++    fontSize: "clamp(26px, 2.4vw, 34px)",
++    lineHeight: 1.05,
++  },
++  gameStartVenue: {
++    fontSize: "clamp(18px, 1.6vw, 22px)",
++    fontWeight: 800,
++  },
++  gameStartVenueMeta: {
++    fontSize: "clamp(12px, 1vw, 14px)",
++    color: "#d8c3a5",
++    lineHeight: 1.45,
++  },
++  gameStartOptions: {
++    display: "grid",
++    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
++    gap: "clamp(10px, 1vw, 12px)",
++    margin: "6px 0 10px 0",
++  },
++  gameStartOption: {
++    borderRadius: "16px",
++    border: "1px solid rgba(255,255,255,0.12)",
++    background: "rgba(255,255,255,0.06)",
++    color: "#fff7ed",
++    padding: "clamp(12px, 1.15vw, 16px)",
++    fontSize: "clamp(13px, 1.05vw, 15px)",
++    fontWeight: 700,
++    cursor: "pointer",
++  },
++  gameStartOptionActive: {
++    background: "linear-gradient(180deg, #f3e7cf 0%, #dec49c 100%)",
++    color: "#2f241b",
++    border: "1px solid #b18553",
++  },
+   logsCard: {
+     background: "#ffffff",
+     border: "1px solid #d8dee6",
+diff --git a/src/app/AppSections.tsx b/src/app/AppSections.tsx
+index 53c1d44..0359925 100644
+--- a/src/app/AppSections.tsx
++++ b/src/app/AppSections.tsx
+@@ -3,11 +3,19 @@ import type { CampaignStage, CampaignVenue } from "../career/campaign/types"
+ import type { Card } from "../game/card"
+ import type { HandState } from "../game/handState"
+ import type { Player } from "../game/gameState"
++import type { MatchState } from "../game/matchState"
+ import type { GameVariant } from "../game/variant"
+ import { CAMPAIGN_STAGES } from "../career/campaign/campaignData"
+ import { STORE_PRODUCTS, UNLOCKABLE_ITEMS } from "../economy/catalog"
+ import { GameTableScene } from "../three/GameTableScene"
+ import { buildTableSceneModel } from "../three/tableSceneModel"
++import notebookRingsStripAsset from "../assets/ui-left/notebook-rings-strip.png"
++import scorePadNotebookAsset from "../assets/ui-left/scorepad-notebook-clean.png"
++import scorePadSheetAsset from "../assets/ui-left/scorepad-sheet-v2.png"
++import actionButtonAsset from "../assets/ui-right/action-button-solid.png"
++import leatherPanelAsset from "../assets/ui-right/leather-panel-left-tight.png"
++import statsPanelWoodAsset from "../assets/ui-right/stats-panel-wood-main.png"
++import valuePlaqueAsset from "../assets/ui-right/value-plaque-solid.png"
+ import type { PlayerProfile } from "../profile/playerProfile"
+ import type { PartnerAdvice } from "../ai/trucoDecision"
+ import {
+@@ -20,9 +28,10 @@ import {
+   getRequestBetButtonLabel,
+   getStartMatchButtonLabel,
+   getStateLabel,
++  getSuitColor,
+   getSuitSymbol,
++  getPlayerLabel,
+   type SpeechBubbleState,
+-  getWinnerLabel,
+ } from "./gameSessionHelpers"
+ 
+ type StyleMap = Record<string, React.CSSProperties>
+@@ -139,12 +148,12 @@ export function HandStatusPanel({
+         />
+         <InfoBox label="Manilha" value={getManilhaLabel(handState)} styles={styles} />
+         <InfoBox
+-          label="Rodada atual"
++          label="Rodada"
+           value={String(matchHandNumber)}
+           styles={styles}
+         />
+         <InfoBox
+-          label="Mão"
++          label="Vaza"
+           value={handState ? `${handState.roundNumber}ª` : "—"}
+           styles={styles}
+         />
+@@ -332,12 +341,9 @@ interface TableSectionProps {
+   activeVariant: GameVariant
+   campaignCompleted: boolean
+   handState: HandState | null
+-  matchState: { handNumber: number; finished: boolean; winner?: "A" | "B" } | null
++  matchState: MatchState | null
+   currentCampaignVenue: CampaignVenue | null
+-  matchScoreLabel: string
+-  handScoreLabel: string
+-  currentTurnLabel: string
+-  statusMessage: string
++  dealAnimationNonce: number
+   speechBubble: SpeechBubbleState | null
+   tableByPlayer: Record<number, Card | undefined>
+   lastPlayedPlayerId: number | null
+@@ -346,7 +352,6 @@ interface TableSectionProps {
+   canHumanAdvisePartner: boolean
+   canHumanRespondToTruco: boolean
+   canPlayHumanCard: boolean
+-  trucoMessage: string
+   variantSelectionDisabled: boolean
+   onChangeVariant: (variant: GameVariant) => void
+   onStart: () => void
+@@ -365,10 +370,7 @@ export function TableSection({
+   handState,
+   matchState,
+   currentCampaignVenue,
+-  matchScoreLabel,
+-  handScoreLabel,
+-  currentTurnLabel,
+-  statusMessage,
++  dealAnimationNonce,
+   speechBubble,
+   tableByPlayer,
+   lastPlayedPlayerId,
+@@ -377,7 +379,6 @@ export function TableSection({
+   canHumanAdvisePartner,
+   canHumanRespondToTruco,
+   canPlayHumanCard,
+-  trucoMessage,
+   variantSelectionDisabled,
+   onChangeVariant,
+   onStart,
+@@ -396,175 +397,369 @@ export function TableSection({
+     currentCampaignVenue
+   )
+   const isMenuMode = !handState
++  const rosterPlayers = handState?.players ?? [
++    { id: 2, hand: [] },
++    { id: 3, hand: [] },
++    { id: 4, hand: [] },
++    { id: 1, hand: [] },
++  ]
+ 
+   return (
+     <section style={styles.tablePanel}>
+       <div style={styles.tableHudSurface}>
+-        <div style={styles.gameViewport}>
+-          {isMenuMode ? (
+-            <GameStartScreen
+-              activeVariant={activeVariant}
+-              campaignCompleted={campaignCompleted}
+-              currentCampaignVenue={currentCampaignVenue}
+-              onChangeVariant={onChangeVariant}
+-              onStart={onStart}
+-              styles={styles}
+-              variantSelectionDisabled={variantSelectionDisabled}
+-            />
+-          ) : (
+-            <>
+-              <div style={styles.gameMainColumn}>
+-                <div style={styles.tableSurface}>
+-                  <GameTableScene model={tableSceneModel} speechBubble={speechBubble} />
+-                </div>
++        <div style={styles.gameViewportFrame}>
++          <div style={styles.gameViewport}>
++            {isMenuMode ? (
++              <GameStartScreen
++                activeVariant={activeVariant}
++                campaignCompleted={campaignCompleted}
++                currentCampaignVenue={currentCampaignVenue}
++                onChangeVariant={onChangeVariant}
++                onStart={onStart}
++                styles={styles}
++                variantSelectionDisabled={variantSelectionDisabled}
++              />
++            ) : (
++              <>
++                <div style={styles.gameLeftRail}>
++                  <div style={styles.scenePanel}>
++                    <div style={styles.scenePanelTitle}>Mesa</div>
++                    <div style={styles.rosterGrid}>
++                      {rosterPlayers.map((player) => (
++                        <div
++                          key={player.id}
++                          style={{
++                            ...styles.rosterCard,
++                            ...(player.id === 1 ? styles.rosterCardHuman : {}),
++                          }}
++                        >
++                          <div style={styles.rosterAvatar}>
++                            {getPlayerLabel(player.id).slice(0, 1)}
++                          </div>
++                          <div style={styles.rosterName}>{getPlayerLabel(player.id)}</div>
++                        </div>
++                      ))}
++                    </div>
++                  </div>
+ 
+-                <div style={styles.playerCardsBlock}>
+-                  <HumanCardsPanel
+-                    handState={handState}
+-                    player1={player1}
+-                    canPlayHumanCard={canPlayHumanCard}
+-                    onPlayCard={onPlayCard}
+-                    styles={styles}
+-                  />
+-                </div>
+-              </div>
++                  <div style={styles.scorePadCard}>
++                    <div
++                      style={{
++                        ...styles.scorePadCardSurface,
++                        backgroundImage: `linear-gradient(180deg, rgba(255,249,238,0.86) 0%, rgba(241,225,193,0.92) 100%), url(${scorePadNotebookAsset})`,
++                      }}
++                    >
++                      <div style={styles.scorePadNotebookRings}>
++                        <img
++                          src={notebookRingsStripAsset}
++                          alt=""
++                          aria-hidden="true"
++                          style={styles.scorePadNotebookRingsImage}
++                        />
++                      </div>
++                      <div
++                        style={{
++                          ...styles.scorePadPaper,
++                          backgroundImage: `linear-gradient(180deg, rgba(255,247,232,0.92) 0%, rgba(240,223,189,0.9) 100%), url(${scorePadSheetAsset})`,
++                        }}
++                      >
++                        <div style={styles.scorePadTitleRow}>
++                          <div>
++                            <div style={styles.scorePadEyebrow}>Partida</div>
++                            <div style={styles.scorePadTitle}>Score Pad</div>
++                          </div>
++                          <div style={styles.scorePadHandBadge}>
++                            {handState ? getBetBadgeLabel(handState.currentBet) : getBetBadgeLabel(1)}
++                          </div>
++                        </div>
+ 
+-              <div style={styles.gameSidebarColumn}>
+-                <div style={styles.tableHudSidebar}>
+-                  <div style={styles.tableHudScoreRow}>
+-                    <span>Partida</span>
+-                    <span>{`${matchScoreLabel.split(" x ")[0]} | ${matchScoreLabel.split(" x ")[1]}`}</span>
+-                  </div>
++                        <div style={styles.scorePadScoreGrid}>
++                          <TeamScoreColumn
++                            label="Nós"
++                            score={matchState?.score.A ?? 0}
++                            tallyColor="#325f4a"
++                            styles={styles}
++                          />
++                          <div style={styles.scorePadDivider} />
++                          <TeamScoreColumn
++                            label="Eles"
++                            score={matchState?.score.B ?? 0}
++                            tallyColor="#7a3f2a"
++                            styles={styles}
++                          />
++                        </div>
+ 
+-                  <div style={styles.tableHudStats}>
+-                    <div style={styles.tableHudStatLine}>
+-                      <span>Rodada atual</span>
+-                      <strong>{matchState?.handNumber ?? 1}</strong>
+-                    </div>
+-                    <div style={styles.tableHudStatLine}>
+-                      <span>Mão</span>
+-                      <strong>{handState ? `${handState.roundNumber}ª` : "—"}</strong>
+-                    </div>
+-                    <div style={styles.tableHudStatLine}>
+-                      <span>Placar das vazas</span>
+-                      <strong>{handScoreLabel}</strong>
+-                    </div>
+-                    <div style={styles.tableHudStatLine}>
+-                      <span>Valendo</span>
+-                      <strong>{handState ? getBetBadgeLabel(handState.currentBet) : getBetBadgeLabel(1)}</strong>
+-                    </div>
+-                    <div style={styles.tableHudStatLine}>
+-                      <span>Vez</span>
+-                      <strong>{currentTurnLabel}</strong>
++                        <div style={styles.scorePadMetaStack}>
++                          <div style={styles.scorePadMetaRow}>
++                            <span>Rodada</span>
++                            <strong>{matchState?.handNumber ?? 1}</strong>
++                          </div>
++                          <div style={styles.scorePadMetaRow}>
++                            <span>Vaza</span>
++                            <strong>{handState ? `${handState.roundNumber}ª` : "—"}</strong>
++                          </div>
++                          <div style={styles.scorePadMetaRow}>
++                            <span>Parcial</span>
++                            <strong>{`Nós ${handState?.score.A ?? 0} x ${handState?.score.B ?? 0} Eles`}</strong>
++                          </div>
++                        </div>
++                      </div>
+                     </div>
+                   </div>
++                </div>
+ 
+-                  <div style={styles.tableHudVenue}>
+-                    <div style={styles.tableHudVenueTitle}>
+-                      {currentCampaignVenue?.name ?? "Mesa de treino"}
+-                    </div>
+-                    <div style={styles.tableHudVenueText}>
+-                      {currentCampaignVenue
+-                        ? `${currentCampaignVenue.districtLabel} · Mão ${matchState?.handNumber ?? 1}`
+-                        : "Sem local"}
++                <div style={styles.gameMainColumn}>
++                  <div style={styles.tableSurfaceWrap}>
++                    <div style={styles.tableSurface}>
++                      <GameTableScene
++                        model={tableSceneModel}
++                        speechBubble={speechBubble}
++                        dealAnimationNonce={dealAnimationNonce}
++                      />
+                     </div>
+                   </div>
+ 
+-                  <div style={styles.tableHudMessage}>
+-                    {handState?.finished
+-                      ? matchState?.finished && matchState.winner
+-                        ? `Partida encerrada · ${getWinnerLabel(matchState.winner)}`
+-                        : `Mão encerrada · ${getWinnerLabel(handState.winner)}`
+-                      : statusMessage}
++                  <div style={styles.playerCardsBlock}>
++                    <HumanCardsPanel
++                      handState={handState}
++                      player1={player1}
++                      canPlayHumanCard={canPlayHumanCard}
++                      onPlayCard={onPlayCard}
++                      styles={styles}
++                    />
+                   </div>
++                </div>
+ 
+-                  <div style={styles.inGameActionsCard}>
+-                    <div style={styles.inGameActionsTitle}>
+-                      {canHumanAdvisePartner ? "Dica pra parceira" : "Ações"}
++                <div style={styles.gameSidebarColumn}>
++                  <div
++                    style={{
++                      ...styles.tableHudSidebar,
++                      backgroundImage: `linear-gradient(180deg, rgba(38,23,15,0.12) 0%, rgba(22,13,9,0.18) 100%), url(${leatherPanelAsset})`,
++                      backgroundSize: "cover, 112% 108%",
++                      backgroundPosition: "center, 48% 50%",
++                      backgroundRepeat: "no-repeat, no-repeat",
++                    }}
++                  >
++                    <div
++                      style={{
++                        ...styles.actionDisplayCard,
++                        backgroundImage: `url(${valuePlaqueAsset})`,
++                        backgroundSize: "cover",
++                        backgroundPosition: "left center",
++                        backgroundRepeat: "no-repeat",
++                        border: "none",
++                        boxShadow: "none",
++                      }}
++                    >
++                      <div style={styles.actionDisplayLabel}>Valendo</div>
++                      <div style={styles.actionDisplayValue}>
++                        {handState ? getBetBadgeLabel(handState.currentBet) : getBetBadgeLabel(1)}
++                      </div>
+                     </div>
+-                    {canHumanAdvisePartner ? (
+-                      <div style={styles.inGameActionsGrid}>
+-                        <button
+-                          style={styles.trucoSecondaryButton}
+-                          onClick={() => onAdvisePartner("BORA!")}
+-                        >
+-                          BORA!
+-                        </button>
+-                        <button
+-                          style={styles.trucoSecondaryButton}
+-                          onClick={() => onAdvisePartner("CÊ QUE SABE!")}
+-                        >
+-                          CÊ QUE SABE!
+-                        </button>
+-                        <button
+-                          style={styles.trucoSecondaryButton}
+-                          onClick={() => onAdvisePartner("MELHOR CORRER!")}
+-                        >
+-                          MELHOR CORRER!
+-                        </button>
++
++                    <div
++                      style={{
++                        ...styles.tableHudStats,
++                        backgroundImage: `linear-gradient(180deg, rgba(28,18,12,0.18) 0%, rgba(14,9,6,0.24) 100%), url(${statsPanelWoodAsset})`,
++                        backgroundSize: "cover, 116% 132%",
++                        backgroundPosition: "center, center",
++                        backgroundRepeat: "no-repeat, no-repeat",
++                        boxShadow:
++                          "0 10px 20px rgba(0,0,0,0.18), inset -6px 0 0 rgba(81,55,36,0.92)",
++                      }}
++                    >
++                      <div style={styles.tableHudStatLineCentered}>
++                        <span style={styles.tableHudStatLabelCentered}>Etapa</span>
++                        <strong style={styles.tableHudStatValueCentered}>
++                          {currentCampaignVenue?.name ?? "Treino"}
++                        </strong>
+                       </div>
+-                    ) : (
+-                      <>
+-                        <div style={styles.inGameActionsRow}>
+-                          <button
+-                            style={{
+-                              ...styles.trucoPrimaryButton,
+-                              ...(!canRequestTruco ? styles.disabledButton : {}),
+-                            }}
+-                            onClick={onRequestTruco}
+-                            disabled={!canRequestTruco}
+-                          >
+-                            {getRequestBetButtonLabel(handState)}
+-                          </button>
+-                        </div>
++                      <div style={styles.tableHudStatLineCentered}>
++                        <span style={styles.tableHudStatLabelCentered}>Bairro</span>
++                        <strong style={styles.tableHudStatValueCentered}>
++                          {currentCampaignVenue?.districtLabel ?? "—"}
++                        </strong>
++                      </div>
++                    </div>
++
++                    <div
++                      style={{
++                        ...styles.inGameActionsCard,
++                        background: "transparent",
++                        border: "none",
++                        padding: 0,
++                      }}
++                    >
++                      {canHumanAdvisePartner ? (
+                         <div style={styles.inGameActionsGrid}>
+                           <button
+                             style={{
+                               ...styles.trucoSecondaryButton,
+-                              ...(!canHumanRespondToTruco ? styles.disabledButton : {}),
++                              backgroundImage: `url(${actionButtonAsset})`,
++                              backgroundSize: "cover",
++                              backgroundPosition: "center",
++                              backgroundRepeat: "no-repeat",
++                              border: "none",
++                              color: "#f7efe0",
++                              boxShadow: "none",
+                             }}
+-                            onClick={onAcceptTruco}
+-                            disabled={!canHumanRespondToTruco}
++                            onClick={() => onAdvisePartner("BORA!")}
+                           >
+-                            Aceitar
++                            BORA!
+                           </button>
+                           <button
+                             style={{
+                               ...styles.trucoSecondaryButton,
+-                              ...(!canHumanRespondToTruco || !canHumanRaiseInResponse(handState)
+-                                ? styles.disabledButton
+-                                : {}),
++                              backgroundImage: `url(${actionButtonAsset})`,
++                              backgroundSize: "cover",
++                              backgroundPosition: "center",
++                              backgroundRepeat: "no-repeat",
++                              border: "none",
++                              color: "#f7efe0",
++                              boxShadow: "none",
+                             }}
+-                            onClick={onRaiseTruco}
+-                            disabled={!canHumanRespondToTruco || !canHumanRaiseInResponse(handState)}
++                            onClick={() => onAdvisePartner("CÊ QUE SABE!")}
+                           >
+-                            {getRaiseResponseButtonLabel(handState)}
++                            CÊ QUE SABE!
+                           </button>
+                           <button
+                             style={{
+                               ...styles.trucoSecondaryButton,
+-                              ...(!canHumanRespondToTruco ? styles.disabledButton : {}),
++                              backgroundImage: `url(${actionButtonAsset})`,
++                              backgroundSize: "cover",
++                              backgroundPosition: "center",
++                              backgroundRepeat: "no-repeat",
++                              border: "none",
++                              color: "#f7efe0",
++                              boxShadow: "none",
+                             }}
+-                            onClick={onRunFromTruco}
+-                            disabled={!canHumanRespondToTruco}
++                            onClick={() => onAdvisePartner("MELHOR CORRER!")}
+                           >
+-                            Correr
++                            MELHOR CORRER!
+                           </button>
+                         </div>
+-                      </>
+-                    )}
+-                    <div style={styles.inGameActionsHint}>{trucoMessage}</div>
++                      ) : (
++                        <>
++                          <div style={styles.inGameActionsRow}>
++                            <button
++                              style={{
++                                ...styles.trucoPrimaryButton,
++                                backgroundImage: `url(${actionButtonAsset})`,
++                                backgroundSize: "cover",
++                                backgroundPosition: "center",
++                                backgroundRepeat: "no-repeat",
++                                border: "none",
++                                color: "#f7efe0",
++                                boxShadow: "none",
++                                ...(!canRequestTruco ? styles.disabledButton : {}),
++                              }}
++                              onClick={onRequestTruco}
++                              disabled={!canRequestTruco}
++                            >
++                              {getRequestBetButtonLabel(handState)}
++                            </button>
++                          </div>
++                          <div style={styles.inGameActionsGrid}>
++                            <button
++                              style={{
++                                ...styles.trucoSecondaryButton,
++                                backgroundImage: `url(${actionButtonAsset})`,
++                                backgroundSize: "cover",
++                                backgroundPosition: "center",
++                                backgroundRepeat: "no-repeat",
++                                border: "none",
++                                color: "#f7efe0",
++                                boxShadow: "none",
++                                ...(!canHumanRespondToTruco ? styles.disabledButton : {}),
++                              }}
++                              onClick={onAcceptTruco}
++                              disabled={!canHumanRespondToTruco}
++                            >
++                              Aceitar
++                            </button>
++                            <button
++                              style={{
++                                ...styles.trucoSecondaryButton,
++                                backgroundImage: `url(${actionButtonAsset})`,
++                                backgroundSize: "cover",
++                                backgroundPosition: "center",
++                                backgroundRepeat: "no-repeat",
++                                border: "none",
++                                color: "#f7efe0",
++                                boxShadow: "none",
++                                ...(!canHumanRespondToTruco || !canHumanRaiseInResponse(handState)
++                                  ? styles.disabledButton
++                                  : {}),
++                              }}
++                              onClick={onRaiseTruco}
++                              disabled={
++                                !canHumanRespondToTruco || !canHumanRaiseInResponse(handState)
++                              }
++                            >
++                              {getRaiseResponseButtonLabel(handState)}
++                            </button>
++                            <button
++                              style={{
++                                ...styles.trucoSecondaryButton,
++                                backgroundImage: `url(${actionButtonAsset})`,
++                                backgroundSize: "cover",
++                                backgroundPosition: "center",
++                                backgroundRepeat: "no-repeat",
++                                border: "none",
++                                color: "#f7efe0",
++                                boxShadow: "none",
++                                ...(!canHumanRespondToTruco ? styles.disabledButton : {}),
++                              }}
++                              onClick={onRunFromTruco}
++                              disabled={!canHumanRespondToTruco}
++                            >
++                              Correr
++                            </button>
++                          </div>
++                        </>
++                      )}
++                    </div>
+                   </div>
+                 </div>
+-              </div>
+-            </>
+-          )}
++              </>
++            )}
++          </div>
+         </div>
+       </div>
+     </section>
+   )
+ }
+ 
++function TeamScoreColumn({
++  label,
++  score,
++  tallyColor,
++  styles,
++}: {
++  label: string
++  score: number
++  tallyColor: string
++  styles: StyleMap
++}) {
++  return (
++    <div style={styles.scorePadTeamColumn}>
++      <div style={styles.scorePadTeamLabel}>{label}</div>
++      <div style={styles.scorePadTeamValue}>{score}</div>
++      <div style={styles.scorePadTallyRow}>
++        {Array.from({ length: 12 }, (_, index) => (
++          <span
++            key={`${label}-${index}`}
++            style={{
++              ...styles.scorePadTallyMark,
++              background: index < score ? tallyColor : "rgba(110, 75, 45, 0.16)",
++            }}
++          />
++        ))}
++      </div>
++    </div>
++  )
++}
++
+ function GameStartScreen({
+   activeVariant,
+   campaignCompleted,
+@@ -700,13 +895,23 @@ function HumanCardsPanel({
+               title={formatCard(card)}
+             >
+               <div style={styles.mobileCardCornerTop}>
+-                <div style={styles.mobileCardRank}>{card.rank}</div>
+-                <div style={styles.mobileCardSuit}>{getSuitSymbol(card.suit)}</div>
++                <div style={{ ...styles.mobileCardRank, color: getSuitColor(card.suit) }}>
++                  {card.rank}
++                </div>
++                <div style={{ ...styles.mobileCardSuit, color: getSuitColor(card.suit) }}>
++                  {getSuitSymbol(card.suit)}
++                </div>
++              </div>
++              <div style={{ ...styles.mobileCardCenterSuit, color: getSuitColor(card.suit) }}>
++                {getSuitSymbol(card.suit)}
+               </div>
+-              <div style={styles.mobileCardCenterSuit}>{getSuitSymbol(card.suit)}</div>
+               <div style={styles.mobileCardCornerBottom}>
+-                <div style={styles.mobileCardRank}>{card.rank}</div>
+-                <div style={styles.mobileCardSuit}>{getSuitSymbol(card.suit)}</div>
++                <div style={{ ...styles.mobileCardRank, color: getSuitColor(card.suit) }}>
++                  {card.rank}
++                </div>
++                <div style={{ ...styles.mobileCardSuit, color: getSuitColor(card.suit) }}>
++                  {getSuitSymbol(card.suit)}
++                </div>
+               </div>
+             </button>
+           ))}
+diff --git a/src/app/gameSessionHelpers.ts b/src/app/gameSessionHelpers.ts
+index 5d9c295..1d610dc 100644
+--- a/src/app/gameSessionHelpers.ts
++++ b/src/app/gameSessionHelpers.ts
+@@ -15,6 +15,11 @@ export interface SpeechBubbleState {
+   text: string
+ }
+ 
++interface TrucoAcceptSpeechSequence {
++  primary: SpeechBubbleState
++  followUp?: SpeechBubbleState
++}
++
+ export function formatCard(card: Card): string {
+   return `${card.rank} de ${card.suit}`
+ }
+@@ -147,7 +152,7 @@ export function getEventMessageForTransition(
+   }
+ 
+   if (nextState.roundNumber > previousState.roundNumber) {
+-    return `Começou a rodada ${nextState.roundNumber}.`
++    return `Começou a vaza ${nextState.roundNumber}.`
+   }
+ 
+   if (previousState.table.length === 4 && nextState.table.length === 0) {
+@@ -225,9 +230,6 @@ export function getSpeechBubbleForTransition(
+     previousState.truco.requestedByPlayerId
+   ) {
+     const responderPlayerId = getTrucoSpeechResponderPlayerId(previousState)
+-    const initialRequesterPlayerId =
+-      previousState.truco.initialRequestedByPlayerId ??
+-      previousState.truco.requestedByPlayerId
+ 
+     if (nextState.finished) {
+       return {
+@@ -253,17 +255,7 @@ export function getSpeechBubbleForTransition(
+       previousState.truco.proposedBet &&
+       nextState.currentBet >= previousState.truco.proposedBet
+     ) {
+-      if (responderPlayerId === initialRequesterPlayerId) {
+-        return {
+-          playerId: initialRequesterPlayerId,
+-          text: "TOMA!",
+-        }
+-      }
+-
+-      return {
+-        playerId: responderPlayerId,
+-        text: "DESCE!",
+-      }
++      return getTrucoAcceptSpeechSequence(previousState)?.primary ?? null
+     }
+   }
+ 
+@@ -274,6 +266,45 @@ function getTrucoSpeechResponderPlayerId(handState: HandState): number {
+   return getTrucoTargetPlayerId(handState)
+ }
+ 
++function getInitialTrucoRequesterPlayerId(handState: HandState): number | null {
++  return (
++    handState.truco.initialRequestedByPlayerId ??
++    handState.truco.requestedByPlayerId ??
++    null
++  )
++}
++
++function getTrucoAcceptSpeechSequence(
++  handState: HandState
++): TrucoAcceptSpeechSequence | null {
++  const responderPlayerId = getTrucoSpeechResponderPlayerId(handState)
++  const initialRequesterPlayerId = getInitialTrucoRequesterPlayerId(handState)
++
++  if (!initialRequesterPlayerId) {
++    return null
++  }
++
++  if (responderPlayerId === initialRequesterPlayerId) {
++    return {
++      primary: {
++        playerId: initialRequesterPlayerId,
++        text: "TOMA!",
++      },
++    }
++  }
++
++  return {
++    primary: {
++      playerId: responderPlayerId,
++      text: "DESCE!",
++    },
++    followUp: {
++      playerId: initialRequesterPlayerId,
++      text: "TOMA!",
++    },
++  }
++}
++
+ export function getFollowUpSpeechBubbleForTransition(
+   previousState: HandState | null,
+   nextState: HandState
+@@ -289,19 +320,7 @@ export function getFollowUpSpeechBubbleForTransition(
+     previousState.truco.proposedBet &&
+     nextState.currentBet >= previousState.truco.proposedBet
+   ) {
+-    const initialRequesterPlayerId =
+-      previousState.truco.initialRequestedByPlayerId ??
+-      previousState.truco.requestedByPlayerId
+-    const responderPlayerId = getTrucoSpeechResponderPlayerId(previousState)
+-
+-    if (!initialRequesterPlayerId || responderPlayerId === initialRequesterPlayerId) {
+-      return null
+-    }
+-
+-    return {
+-      playerId: initialRequesterPlayerId,
+-      text: "TOMA!",
+-    }
++    return getTrucoAcceptSpeechSequence(previousState)?.followUp ?? null
+   }
+ 
+   return null
+@@ -350,6 +369,10 @@ export function getSuitSymbol(suit: Card["suit"]): string {
+   }
+ }
+ 
++export function getSuitColor(suit: Card["suit"]): string {
++  return suit === "copas" || suit === "ouros" ? "#b91c1c" : "#1f2937"
++}
++
+ export function getManilhaLabel(handState: HandState | null): string {
+   if (!handState) return "—"
+   if (handState.variant === "MINEIRO") return "Fixa"

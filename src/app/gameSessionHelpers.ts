@@ -15,6 +15,11 @@ export interface SpeechBubbleState {
   text: string
 }
 
+interface TrucoAcceptSpeechSequence {
+  primary: SpeechBubbleState
+  followUp?: SpeechBubbleState
+}
+
 export function formatCard(card: Card): string {
   return `${card.rank} de ${card.suit}`
 }
@@ -225,9 +230,6 @@ export function getSpeechBubbleForTransition(
     previousState.truco.requestedByPlayerId
   ) {
     const responderPlayerId = getTrucoSpeechResponderPlayerId(previousState)
-    const initialRequesterPlayerId =
-      previousState.truco.initialRequestedByPlayerId ??
-      previousState.truco.requestedByPlayerId
 
     if (nextState.finished) {
       return {
@@ -253,17 +255,7 @@ export function getSpeechBubbleForTransition(
       previousState.truco.proposedBet &&
       nextState.currentBet >= previousState.truco.proposedBet
     ) {
-      if (responderPlayerId === initialRequesterPlayerId) {
-        return {
-          playerId: initialRequesterPlayerId,
-          text: "TOMA!",
-        }
-      }
-
-      return {
-        playerId: responderPlayerId,
-        text: "DESCE!",
-      }
+      return getTrucoAcceptSpeechSequence(previousState)?.primary ?? null
     }
   }
 
@@ -272,6 +264,45 @@ export function getSpeechBubbleForTransition(
 
 function getTrucoSpeechResponderPlayerId(handState: HandState): number {
   return getTrucoTargetPlayerId(handState)
+}
+
+function getInitialTrucoRequesterPlayerId(handState: HandState): number | null {
+  return (
+    handState.truco.initialRequestedByPlayerId ??
+    handState.truco.requestedByPlayerId ??
+    null
+  )
+}
+
+function getTrucoAcceptSpeechSequence(
+  handState: HandState
+): TrucoAcceptSpeechSequence | null {
+  const responderPlayerId = getTrucoSpeechResponderPlayerId(handState)
+  const initialRequesterPlayerId = getInitialTrucoRequesterPlayerId(handState)
+
+  if (!initialRequesterPlayerId) {
+    return null
+  }
+
+  if (responderPlayerId === initialRequesterPlayerId) {
+    return {
+      primary: {
+        playerId: initialRequesterPlayerId,
+        text: "TOMA!",
+      },
+    }
+  }
+
+  return {
+    primary: {
+      playerId: responderPlayerId,
+      text: "DESCE!",
+    },
+    followUp: {
+      playerId: initialRequesterPlayerId,
+      text: "TOMA!",
+    },
+  }
 }
 
 export function getFollowUpSpeechBubbleForTransition(
@@ -289,19 +320,7 @@ export function getFollowUpSpeechBubbleForTransition(
     previousState.truco.proposedBet &&
     nextState.currentBet >= previousState.truco.proposedBet
   ) {
-    const initialRequesterPlayerId =
-      previousState.truco.initialRequestedByPlayerId ??
-      previousState.truco.requestedByPlayerId
-    const responderPlayerId = getTrucoSpeechResponderPlayerId(previousState)
-
-    if (!initialRequesterPlayerId || responderPlayerId === initialRequesterPlayerId) {
-      return null
-    }
-
-    return {
-      playerId: initialRequesterPlayerId,
-      text: "TOMA!",
-    }
+    return getTrucoAcceptSpeechSequence(previousState)?.followUp ?? null
   }
 
   return null
@@ -348,6 +367,10 @@ export function getSuitSymbol(suit: Card["suit"]): string {
     default:
       return "?"
   }
+}
+
+export function getSuitColor(suit: Card["suit"]): string {
+  return suit === "copas" || suit === "ouros" ? "#b91c1c" : "#1f2937"
 }
 
 export function getManilhaLabel(handState: HandState | null): string {
