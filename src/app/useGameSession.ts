@@ -13,6 +13,7 @@ import {
   isCampaignCompleted,
 } from "../career/campaign/progression"
 import { buildCampaignSummary } from "../career/campaign/summary"
+import type { CampaignStage, CampaignVenue } from "../career/campaign/types"
 import { createHandState } from "../game/createHandState"
 import type { Card } from "../game/card"
 import type { HandState } from "../game/handState"
@@ -57,6 +58,13 @@ import {
 } from "./gameSessionHelpers"
 import { getRuleSet } from "../game/getRuleSet"
 
+const DEBUG_MODE = true
+
+interface DebugVenueOption {
+  id: string
+  label: string
+}
+
 export function useGameSession() {
   const AUTO_STEP_DELAY_MS = 820
   const NEXT_HAND_DELAY_MS = 1180
@@ -72,6 +80,8 @@ export function useGameSession() {
   const [dealAnimationNonce, setDealAnimationNonce] = useState(0)
   const [shownPartnerAdviceKey, setShownPartnerAdviceKey] = useState<string | null>(null)
   const [shownPartnerConsultKey, setShownPartnerConsultKey] = useState<string | null>(null)
+  const [debugVenueId, setDebugVenueId] = useState("")
+  const [sessionDebugVenueId, setSessionDebugVenueId] = useState<string | null>(null)
   const speechBubbleTimeoutRef = useRef<number | null>(null)
   const followUpSpeechTimeoutRef = useRef<number | null>(null)
   const partnerAdviceTimeoutRef = useRef<number | null>(null)
@@ -81,10 +91,45 @@ export function useGameSession() {
   const lastPartnerConsultKeyRef = useRef<string | null>(null)
   const lastDealAnimationKeyRef = useRef<string | null>(null)
 
-  const currentCampaignStage =
+  const actualCampaignStage =
     getCurrentCampaignStage(playerProfile, CAMPAIGN_STAGES) ?? CAMPAIGN_STAGES[0]
-  const currentCampaignVenue = getCurrentCampaignVenue(playerProfile, CAMPAIGN_STAGES)
+  const actualCampaignVenue = getCurrentCampaignVenue(playerProfile, CAMPAIGN_STAGES)
   const campaignCompleted = isCampaignCompleted(playerProfile, CAMPAIGN_STAGES)
+  const debugVenueLookup = useMemo(() => {
+    const lookup = new Map<
+      string,
+      {
+        stage: CampaignStage
+        venue: CampaignVenue
+      }
+    >()
+
+    CAMPAIGN_STAGES.forEach((stage) => {
+      stage.venues.forEach((venue) => {
+        lookup.set(venue.id, { stage, venue })
+      })
+    })
+
+    return lookup
+  }, [])
+  const debugVenueOptions = useMemo<DebugVenueOption[]>(() => {
+    return CAMPAIGN_STAGES.flatMap((stage) =>
+      stage.venues.map((venue) => ({
+        id: venue.id,
+        label: `${stage.name} · ${venue.name}`,
+      }))
+    )
+  }, [])
+  const selectedDebugVenue = debugVenueId ? debugVenueLookup.get(debugVenueId)?.venue ?? null : null
+  const selectedDebugStage = debugVenueId ? debugVenueLookup.get(debugVenueId)?.stage ?? null : null
+  const sessionDebugVenue = sessionDebugVenueId
+    ? debugVenueLookup.get(sessionDebugVenueId)?.venue ?? null
+    : null
+  const sessionDebugStage = sessionDebugVenueId
+    ? debugVenueLookup.get(sessionDebugVenueId)?.stage ?? null
+    : null
+  const currentCampaignVenue = sessionDebugVenue ?? selectedDebugVenue ?? actualCampaignVenue
+  const currentCampaignStage = sessionDebugStage ?? selectedDebugStage ?? actualCampaignStage
   const activeVariant = handState?.variant ?? variant
   const currentVenueWins = currentCampaignVenue
     ? playerProfile.campaign.venueWinsById[currentCampaignVenue.id] ?? 0
@@ -319,7 +364,15 @@ export function useGameSession() {
       if (nextMatchState?.finished) {
         const finalScore = nextMatchState.score
 
-        if (nextState.winner === "A") {
+        if (sessionDebugVenueId) {
+          const debugVenueName = sessionDebugVenue?.name ?? currentCampaignVenue?.name ?? "local de debug"
+          setEventMessage(
+            nextState.winner === "A"
+              ? `Vitória no modo debug em ${debugVenueName}.`
+              : `Derrota no modo debug em ${debugVenueName}.`
+          )
+          setTrucoMessage("Partida de teste finalizada. O progresso da campanha não foi alterado.")
+        } else if (nextState.winner === "A") {
           const resolution = applyCampaignWin(playerProfile, CAMPAIGN_STAGES)
           setPlayerProfile(resolution.profile)
           setEventMessage(getCampaignWinMessage(finalScore, resolution))
@@ -338,7 +391,16 @@ export function useGameSession() {
     }
 
     syncLogs()
-  }, [handState, matchState, playerProfile, showSpeechBubble, syncLogs])
+  }, [
+    currentCampaignVenue,
+    handState,
+    matchState,
+    playerProfile,
+    sessionDebugVenue,
+    sessionDebugVenueId,
+    showSpeechBubble,
+    syncLogs,
+  ])
 
   function handleStartHand() {
     if (!currentCampaignVenue) return
@@ -350,6 +412,7 @@ export function useGameSession() {
 
     setVariant(activeVariant)
     setMatchState(createMatchState(activeVariant, firstPlayerId))
+    setSessionDebugVenueId(DEBUG_MODE && debugVenueId ? debugVenueId : null)
 
     applyHandState(state, {
       eventMessage: `Partida iniciada em ${currentCampaignVenue.name}.`,
@@ -364,6 +427,7 @@ export function useGameSession() {
     setVariant("MINEIRO")
     setHandState(null)
     setMatchState(null)
+    setSessionDebugVenueId(null)
     setEventMessage("Campanha reiniciada do zero.")
     setTrucoMessage("Tudo pronto para voltar ao primeiro boteco.")
     showSpeechBubble(null)
@@ -677,6 +741,9 @@ export function useGameSession() {
     currentCampaignVenue,
     currentTurnLabel,
     currentVenueWins,
+    debugModeEnabled: DEBUG_MODE,
+    debugVenueId,
+    debugVenueOptions,
     dealAnimationNonce,
     eventMessage,
     handScoreLabel,
@@ -700,6 +767,7 @@ export function useGameSession() {
     player4,
     playerProfile,
     setVariant,
+    setDebugVenueId,
     statusMessage,
     speechBubble,
     tableByPlayer,

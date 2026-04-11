@@ -25,7 +25,7 @@ test("a campanha começa no primeiro boteco da rua", () => {
   const venue = getCurrentCampaignVenue(profile, CAMPAIGN_STAGES)
 
   assert.equal(stage?.id, "rua-periferia")
-  assert.equal(venue?.id, "bar-do-negao")
+  assert.equal(venue?.id, "bar-do-ze-catinga")
 })
 
 test("vitórias parciais contam para o local, mas não o concluem antes da meta", () => {
@@ -34,10 +34,10 @@ test("vitórias parciais contam para o local, mas não o concluem antes da meta"
   profile = applyCampaignWin(profile, CAMPAIGN_STAGES).profile
   profile = applyCampaignWin(profile, CAMPAIGN_STAGES).profile
 
-  assert.equal(profile.campaign.venueWinsById["bar-do-negao"], 2)
+  assert.equal(profile.campaign.venueWinsById["bar-do-ze-catinga"], 2)
   assert.deepEqual(profile.campaign.clearedVenueIds, [])
   assert.equal(profile.currencies.coins, 0)
-  assert.equal(getCurrentCampaignVenue(profile, CAMPAIGN_STAGES)?.id, "bar-do-negao")
+  assert.equal(getCurrentCampaignVenue(profile, CAMPAIGN_STAGES)?.id, "bar-do-ze-catinga")
 })
 
 test("ao concluir um local, a campanha libera o próximo e aplica a recompensa do local", () => {
@@ -47,10 +47,10 @@ test("ao concluir um local, a campanha libera o próximo e aplica a recompensa d
   profile = applyCampaignWin(profile, CAMPAIGN_STAGES).profile
   const resolution = applyCampaignWin(profile, CAMPAIGN_STAGES)
 
-  assert.equal(resolution.clearedVenue?.id, "bar-do-negao")
+  assert.equal(resolution.clearedVenue?.id, "bar-do-ze-catinga")
   assert.equal(resolution.profile.currencies.coins, 40)
-  assert.ok(resolution.profile.campaign.clearedVenueIds.includes("bar-do-negao"))
-  assert.equal(getCurrentCampaignVenue(resolution.profile, CAMPAIGN_STAGES)?.id, "esquina-do-paulista")
+  assert.ok(resolution.profile.campaign.clearedVenueIds.includes("bar-do-ze-catinga"))
+  assert.equal(getCurrentCampaignVenue(resolution.profile, CAMPAIGN_STAGES)?.id, "bar-maneco-banguela")
 })
 
 test("ao concluir todos os locais da etapa, a próxima etapa é liberada com recompensa de etapa", () => {
@@ -78,7 +78,7 @@ test("derrota na campanha conta no perfil, mas não avança o local", () => {
 
   assert.equal(resolution.profile.campaign.losses, 1)
   assert.equal(resolution.profile.campaign.currentStageId, "rua-periferia")
-  assert.equal(resolution.currentVenue?.id, "bar-do-negao")
+  assert.equal(resolution.currentVenue?.id, "bar-do-ze-catinga")
 })
 
 test("criar perfil inicial sempre devolve campanha zerada", () => {
@@ -110,14 +110,14 @@ test("storage salva, carrega e reseta o perfil da campanha", () => {
   try {
     const profile = createInitialPlayerProfile()
     profile.campaign.wins = 7
-    profile.campaign.venueWinsById["bar-do-negao"] = 2
+    profile.campaign.venueWinsById["bar-do-ze-catinga"] = 2
     profile.currencies.coins = 123
 
     savePlayerProfile(profile)
 
     const loadedProfile = loadPlayerProfile()
     assert.equal(loadedProfile.campaign.wins, 7)
-    assert.equal(loadedProfile.campaign.venueWinsById["bar-do-negao"], 2)
+    assert.equal(loadedProfile.campaign.venueWinsById["bar-do-ze-catinga"], 2)
     assert.equal(loadedProfile.currencies.coins, 123)
 
     resetPlayerProfileStorage()

@@ -20,6 +20,9 @@ function App() {
     currentCampaignVenue,
     currentTurnLabel,
     currentVenueWins,
+    debugModeEnabled,
+    debugVenueId,
+    debugVenueOptions,
     dealAnimationNonce,
     eventMessage,
     handScoreLabel,
@@ -40,6 +43,7 @@ function App() {
     player1,
     playerProfile,
     setVariant,
+    setDebugVenueId,
     speechBubble,
     statusMessage,
     tableByPlayer,
@@ -64,6 +68,9 @@ function App() {
           handState={handState}
           matchState={matchState}
           currentCampaignVenue={currentCampaignVenue}
+          debugModeEnabled={debugModeEnabled}
+          debugVenueId={debugVenueId}
+          debugVenueOptions={debugVenueOptions}
           dealAnimationNonce={dealAnimationNonce}
           speechBubble={speechBubble}
           tableByPlayer={tableByPlayer}
@@ -75,6 +82,8 @@ function App() {
           canPlayHumanCard={canPlayHumanCard}
           variantSelectionDisabled={variantSelectionDisabled}
           onChangeVariant={setVariant}
+          onChangeDebugVenue={setDebugVenueId}
+          onResetCampaign={handleResetCampaign}
           onStart={handleStartHand}
           onRequestTruco={handleRequestTruco}
           onAcceptTruco={handleAcceptTruco}
@@ -549,10 +558,10 @@ const styles: Record<string, React.CSSProperties> = {
   },
   scenePanel: {
     borderRadius: "22px",
-    background: "linear-gradient(180deg, rgba(81,57,39,0.98) 0%, rgba(47,31,21,0.98) 100%)",
-    border: "1px solid rgba(255,255,255,0.06)",
+    background: "transparent",
+    border: "1px solid rgba(255,255,255,0.03)",
     padding: "clamp(7px, 0.62vw, 9px)",
-    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04), 0 10px 22px rgba(0,0,0,0.18)",
+    boxShadow: "none",
     color: "#f7ede1",
   },
   scenePanelTitle: {
@@ -620,9 +629,9 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     minWidth: 0,
     borderRadius: "20px",
-    background: "linear-gradient(180deg, rgba(72,49,33,0.98) 0%, rgba(42,28,19,0.98) 100%)",
-    border: "1px solid rgba(255,255,255,0.06)",
-    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04), 0 10px 20px rgba(0,0,0,0.18)",
+    background: "transparent",
+    border: "1px solid rgba(255,255,255,0.03)",
+    boxShadow: "none",
     padding: "clamp(8px, 0.72vw, 10px)",
     alignItems: "flex-start",
     justifyContent: "center",
@@ -866,9 +875,9 @@ const styles: Record<string, React.CSSProperties> = {
   },
   playerCardsBlock: {
     borderRadius: "18px",
-    background: "linear-gradient(180deg, rgba(41,27,17,0.96) 0%, rgba(22,15,10,0.96) 100%)",
+    background: "transparent",
     padding: "clamp(8px, 0.72vw, 10px) clamp(10px, 0.9vw, 12px) clamp(12px, 1vw, 14px)",
-    border: "1px solid rgba(255,255,255,0.06)",
+    border: "1px solid rgba(255,255,255,0.03)",
     flexShrink: 0,
     minHeight: "clamp(112px, 10.2vw, 136px)",
     overflow: "visible",
@@ -1454,9 +1463,10 @@ const styles: Record<string, React.CSSProperties> = {
     height: "100%",
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-between",
     padding: "clamp(14px, 1.4vw, 24px)",
     boxSizing: "border-box",
+    gap: "clamp(16px, 2vw, 28px)",
   },
   gameStartCard: {
     width: "min(100%, 460px)",
@@ -1491,6 +1501,38 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#d8c3a5",
     lineHeight: 1.45,
   },
+  gameStartDebugPanel: {
+    borderRadius: "16px",
+    background: "rgba(0, 0, 0, 0.16)",
+    border: "1px solid rgba(255,255,255,0.08)",
+    padding: "12px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+  },
+  gameStartDebugLabel: {
+    fontSize: "12px",
+    fontWeight: 800,
+    textTransform: "uppercase",
+    letterSpacing: "0.06em",
+    color: "#f3e7cf",
+  },
+  gameStartDebugSelect: {
+    width: "100%",
+    borderRadius: "12px",
+    border: "1px solid rgba(244, 226, 190, 0.22)",
+    background: "rgba(255,255,255,0.08)",
+    color: "#fff7ed",
+    padding: "10px 12px",
+    fontSize: "14px",
+    fontWeight: 700,
+    boxSizing: "border-box",
+  },
+  gameStartDebugHint: {
+    fontSize: "12px",
+    lineHeight: 1.45,
+    color: "#d8c3a5",
+  },
   gameStartOptions: {
     display: "grid",
     gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
@@ -1511,6 +1553,41 @@ const styles: Record<string, React.CSSProperties> = {
     background: "linear-gradient(180deg, #f3e7cf 0%, #dec49c 100%)",
     color: "#2f241b",
     border: "1px solid #b18553",
+  },
+  gameStartResetButton: {
+    borderRadius: "18px",
+    border: "1px solid rgba(244, 226, 190, 0.4)",
+    background: "linear-gradient(180deg, rgba(86,58,39,0.94) 0%, rgba(49,33,22,0.94) 100%)",
+    color: "#fff7ed",
+    padding: "clamp(14px, 1.3vw, 18px) clamp(18px, 1.7vw, 24px)",
+    fontSize: "clamp(16px, 1.4vw, 20px)",
+    fontWeight: 800,
+    boxShadow: "0 16px 28px rgba(0,0,0,0.24)",
+    cursor: "pointer",
+    alignSelf: "center",
+    minWidth: "clamp(220px, 24vw, 300px)",
+  },
+  gameStartLaunchButton: {
+    borderRadius: "18px",
+    border: "1px solid rgba(15, 23, 42, 0.22)",
+    background: "linear-gradient(180deg, #17213d 0%, #0f172a 100%)",
+    color: "#fff7ed",
+    padding: "clamp(14px, 1.3vw, 18px) clamp(18px, 1.7vw, 24px)",
+    fontSize: "clamp(18px, 1.55vw, 22px)",
+    fontWeight: 900,
+    boxShadow: "0 16px 28px rgba(0,0,0,0.24)",
+    cursor: "pointer",
+    alignSelf: "center",
+    minWidth: "clamp(220px, 24vw, 300px)",
+  },
+  gameStartActionsStack: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "clamp(10px, 1vw, 14px)",
+    alignSelf: "center",
+  },
+  gameStartResetButtonCentered: {
+    margin: "0 auto",
   },
   logsCard: {
     background: "#ffffff",

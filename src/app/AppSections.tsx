@@ -352,6 +352,9 @@ interface TableSectionProps {
   handState: HandState | null
   matchState: MatchState | null
   currentCampaignVenue: CampaignVenue | null
+  debugModeEnabled: boolean
+  debugVenueId: string
+  debugVenueOptions: Array<{ id: string; label: string }>
   dealAnimationNonce: number
   speechBubble: SpeechBubbleState | null
   tableByPlayer: Record<number, Card | undefined>
@@ -363,6 +366,8 @@ interface TableSectionProps {
   canPlayHumanCard: boolean
   variantSelectionDisabled: boolean
   onChangeVariant: (variant: GameVariant) => void
+  onChangeDebugVenue: (venueId: string) => void
+  onResetCampaign: () => void
   onStart: () => void
   onRequestTruco: () => void
   onAcceptTruco: () => void
@@ -379,6 +384,9 @@ export function TableSection({
   handState,
   matchState,
   currentCampaignVenue,
+  debugModeEnabled,
+  debugVenueId,
+  debugVenueOptions,
   dealAnimationNonce,
   speechBubble,
   tableByPlayer,
@@ -390,6 +398,8 @@ export function TableSection({
   canPlayHumanCard,
   variantSelectionDisabled,
   onChangeVariant,
+  onChangeDebugVenue,
+  onResetCampaign,
   onStart,
   onRequestTruco,
   onAcceptTruco,
@@ -423,7 +433,12 @@ export function TableSection({
                 activeVariant={activeVariant}
                 campaignCompleted={campaignCompleted}
                 currentCampaignVenue={currentCampaignVenue}
+                debugModeEnabled={debugModeEnabled}
+                debugVenueId={debugVenueId}
+                debugVenueOptions={debugVenueOptions}
                 onChangeVariant={onChangeVariant}
+                onChangeDebugVenue={onChangeDebugVenue}
+                onResetCampaign={onResetCampaign}
                 onStart={onStart}
                 styles={styles}
                 variantSelectionDisabled={variantSelectionDisabled}
@@ -569,7 +584,7 @@ export function TableSection({
                         </strong>
                       </div>
                       <div style={styles.tableHudStatLineCentered}>
-                        <span style={styles.tableHudStatLabelCentered}>Bairro</span>
+                        <span style={styles.tableHudStatLabelCentered}>Endereço</span>
                         <strong style={styles.tableHudStatValueCentered}>
                           {currentCampaignVenue?.districtLabel ?? "—"}
                         </strong>
@@ -728,7 +743,12 @@ function GameStartScreen({
   activeVariant,
   campaignCompleted,
   currentCampaignVenue,
+  debugModeEnabled,
+  debugVenueId,
+  debugVenueOptions,
   onChangeVariant,
+  onChangeDebugVenue,
+  onResetCampaign,
   onStart,
   styles,
   variantSelectionDisabled,
@@ -736,7 +756,12 @@ function GameStartScreen({
   activeVariant: GameVariant
   campaignCompleted: boolean
   currentCampaignVenue: CampaignVenue | null
+  debugModeEnabled: boolean
+  debugVenueId: string
+  debugVenueOptions: Array<{ id: string; label: string }>
   onChangeVariant: (variant: GameVariant) => void
+  onChangeDebugVenue: (venueId: string) => void
+  onResetCampaign: () => void
   onStart: () => void
   styles: StyleMap
   variantSelectionDisabled: boolean
@@ -752,6 +777,27 @@ function GameStartScreen({
         <div style={styles.gameStartVenueMeta}>
           {currentCampaignVenue?.districtLabel ?? "Reinicie a campanha para jogar novamente"}
         </div>
+
+        {debugModeEnabled ? (
+          <div style={styles.gameStartDebugPanel}>
+            <div style={styles.gameStartDebugLabel}>Debug de bar</div>
+            <select
+              value={debugVenueId}
+              onChange={(e) => onChangeDebugVenue(e.target.value)}
+              style={styles.gameStartDebugSelect}
+            >
+              <option value="">Fluxo normal da campanha</option>
+              {debugVenueOptions.map((venue) => (
+                <option key={venue.id} value={venue.id}>
+                  {venue.label}
+                </option>
+              ))}
+            </select>
+            <div style={styles.gameStartDebugHint}>
+              Escolha um bar aqui para testar direto, sem depender do progresso salvo.
+            </div>
+          </div>
+        ) : null}
 
         <div style={styles.gameStartOptions}>
           <button
@@ -785,6 +831,30 @@ function GameStartScreen({
           disabled={!currentCampaignVenue}
         >
           {getStartMatchButtonLabel(currentCampaignVenue, campaignCompleted)}
+        </button>
+      </div>
+
+      <div style={styles.gameStartActionsStack}>
+        <button
+          style={{
+            ...styles.gameStartLaunchButton,
+            ...(!currentCampaignVenue ? styles.disabledButton : {}),
+            ...(currentCampaignVenue ? {} : styles.gameStartResetButtonCentered),
+          }}
+          onClick={onStart}
+          disabled={!currentCampaignVenue}
+        >
+          {getStartMatchButtonLabel(currentCampaignVenue, campaignCompleted)}
+        </button>
+
+        <button
+          style={{
+            ...styles.gameStartResetButton,
+            ...(currentCampaignVenue ? {} : styles.gameStartResetButtonCentered),
+          }}
+          onClick={onResetCampaign}
+        >
+          Resetar progresso
         </button>
       </div>
     </div>

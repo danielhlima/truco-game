@@ -6,7 +6,7 @@ import type { CampaignStage } from "../career/campaign/types"
 import type { Card } from "../game/card"
 import type { HandState, TeamId } from "../game/handState"
 import { getNextPlayerClockwise as getClockwisePlayerId } from "../game/trucoTarget"
-import { getBetCallLabel, getBetLabel, getNextBet } from "../game/truco"
+import { getBetCallLabel, getNextBet } from "../game/truco"
 
 export const DEFAULT_TRUCO_MESSAGE = "Nenhum pedido de truco nesta mão."
 
@@ -279,12 +279,23 @@ function getTrucoAcceptSpeechSequence(
 ): TrucoAcceptSpeechSequence | null {
   const responderPlayerId = getTrucoSpeechResponderPlayerId(handState)
   const initialRequesterPlayerId = getInitialTrucoRequesterPlayerId(handState)
+  const isInitialRequestAcceptance =
+    handState.truco.promptKind === "request" && handState.truco.proposedBet === 3
 
   if (!initialRequesterPlayerId) {
     return null
   }
 
   if (responderPlayerId === initialRequesterPlayerId) {
+    return {
+      primary: {
+        playerId: initialRequesterPlayerId,
+        text: "TOMA!",
+      },
+    }
+  }
+
+  if (!isInitialRequestAcceptance) {
     return {
       primary: {
         playerId: initialRequesterPlayerId,
@@ -546,7 +557,7 @@ export function getBetCallLabelFromNumber(value: number): string {
 }
 
 export function getBetBadgeLabel(bet: 1 | 3 | 6 | 9 | 12): string {
-  return `Valendo ${bet} (${capitalizeBetLabel(getBetLabel(bet))})`
+  return `${bet} ${bet === 1 ? "tento" : "tentos"}`
 }
 
 export function capitalizeBetLabel(label: string): string {

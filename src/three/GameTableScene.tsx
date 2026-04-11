@@ -2,7 +2,9 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import type { CSSProperties } from "react"
 import * as THREE from "three"
 import tableTopGhibliishUrl from "../assets/boteco/table-top-ghibliish.png"
-import tableTopRustCleanUrl from "../assets/boteco/table-top-rust-clean.png"
+import tableTopManecoWoodUrl from "../assets/boteco/table-top-maneco-wood.png"
+import tableTopSteelPatioUrl from "../assets/boteco/table-top-steel-patio.png"
+import tableTopWoodStreetUrl from "../assets/boteco/table-top-wood-street.png"
 import type { SpeechBubbleState } from "../app/gameSessionHelpers"
 import type { TableSceneModel } from "./tableSceneModel"
 
@@ -40,15 +42,26 @@ export function GameTableScene({
     backgroundColor,
     badgeColor,
     illustratedTableAsset,
+    illustratedTableOffsetX,
+    illustratedTableOffsetY,
     illustratedTableScale,
     railColor,
     tableColor,
     tableKind,
   } = model.theme
   const usesIllustratedTable = tableKind === "steel"
+  const usesSteelPatioTable = illustratedTableAsset === "steel-patio"
   const illustratedTableUrl =
-    illustratedTableAsset === "rust-clean" ? tableTopRustCleanUrl : tableTopGhibliishUrl
+    illustratedTableAsset === "maneco-wood"
+      ? tableTopManecoWoodUrl
+      : illustratedTableAsset === "wood-street"
+        ? tableTopWoodStreetUrl
+        : illustratedTableAsset === "steel-patio"
+          ? tableTopSteelPatioUrl
+          : tableTopGhibliishUrl
   const tableScale = illustratedTableScale ?? 1
+  const tableOffsetX = illustratedTableOffsetX ?? 0
+  const tableOffsetY = illustratedTableOffsetY ?? 0
   const [animatingCards, setAnimatingCards] = useState<AnimatedCard[]>([])
   const [clearingCards, setClearingCards] = useState<ClearingCard[]>([])
   const [dealingCards, setDealingCards] = useState<DealingCard[]>([])
@@ -419,7 +432,9 @@ export function GameTableScene({
           borderRadius: "20px",
           overflow: "hidden",
           background: usesIllustratedTable
-            ? "#d1d5db"
+            ? usesSteelPatioTable
+              ? "#3b2a1f"
+              : "#d1d5db"
             : backgroundColor,
         }}
       >
@@ -430,11 +445,16 @@ export function GameTableScene({
             aria-hidden
             style={{
               position: "absolute",
-              inset: `${(1 - tableScale) * -50}%`,
-              width: `${tableScale * 100}%`,
-              height: `${tableScale * 100}%`,
+              inset: 0,
+              width: "100%",
+              height: "100%",
               objectFit: "cover",
-              filter: "drop-shadow(0 18px 26px rgba(0,0,0,0.34))",
+              objectPosition: "center",
+              transformOrigin: "center center",
+              transform: `translate(${tableOffsetX}%, ${tableOffsetY}%) scale(${tableScale})`,
+              filter: usesSteelPatioTable
+                ? "none"
+                : "drop-shadow(0 18px 26px rgba(0,0,0,0.34))",
             }}
           />
         ) : (

@@ -186,13 +186,10 @@ test("aceite de nove após seis posterior gera TOMA para quem falou truco origin
   const followUp = getFollowUpSpeechBubbleForTransition(previousState, nextState)
 
   assert.deepEqual(primary, {
-    playerId: 3,
-    text: "DESCE!",
-  })
-  assert.deepEqual(followUp, {
     playerId: 2,
     text: "TOMA!",
   })
+  assert.equal(followUp, null)
 })
 
 test("aceite de doze após truco iniciado pelo jogador 4 usa TOMA do jogador 4", () => {
