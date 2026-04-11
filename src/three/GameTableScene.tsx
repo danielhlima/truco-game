@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import type { CSSProperties } from "react"
 import * as THREE from "three"
+import cardFaceAgedPaperUrl from "../assets/cards/card-face-aged-paper.png"
+import cardBackAgedPhotoUrl from "../assets/cards/card-back-aged-photo.png"
 import tableTopGhibliishUrl from "../assets/boteco/table-top-ghibliish.png"
 import tableTopManecoWoodUrl from "../assets/boteco/table-top-maneco-wood.png"
 import tableTopSteelPatioUrl from "../assets/boteco/table-top-steel-patio.png"
 import tableTopWoodStreetUrl from "../assets/boteco/table-top-wood-street.png"
+import tableTopZeCatingaPhotoUrl from "../assets/boteco/table-top-ze-catinga-photo.png"
 import type { SpeechBubbleState } from "../app/gameSessionHelpers"
 import type { TableSceneModel } from "./tableSceneModel"
 
@@ -52,7 +55,9 @@ export function GameTableScene({
   const usesIllustratedTable = tableKind === "steel"
   const usesSteelPatioTable = illustratedTableAsset === "steel-patio"
   const illustratedTableUrl =
-    illustratedTableAsset === "maneco-wood"
+    illustratedTableAsset === "ze-catinga-photo"
+      ? tableTopZeCatingaPhotoUrl
+      : illustratedTableAsset === "maneco-wood"
       ? tableTopManecoWoodUrl
       : illustratedTableAsset === "wood-street"
         ? tableTopWoodStreetUrl
@@ -290,7 +295,7 @@ export function GameTableScene({
 
         const clearEndId = window.setTimeout(() => {
           setClearingCards((current) => current.filter((item) => item.key !== clearingKey))
-        }, 240)
+        }, 480)
 
         animationTimeoutsRef.current.push(clearInitId, clearStartId, clearEndId)
         continue
@@ -301,7 +306,7 @@ export function GameTableScene({
       }
 
       const card = slot.card
-      const from = getHandOverlayPosition(slot.playerId, 1)
+      const from = getPlayAnimationOrigin(slot.playerId)
       const to = getPlayedCardOverlayPosition(slot.playerId)
       const animationKey = `${slot.playerId}-${nextKey}`
 
@@ -330,15 +335,28 @@ export function GameTableScene({
                   stage: "to",
                 }
               : item
-          )
+            )
         )
       }, 24)
 
-      const endId = window.setTimeout(() => {
-        setAnimatingCards((current) => current.filter((item) => item.key !== animationKey))
+      const settleId = window.setTimeout(() => {
+        setAnimatingCards((current) =>
+          current.map((item) =>
+            item.key === animationKey
+              ? {
+                  ...item,
+                  stage: "settle",
+                }
+              : item
+          )
+        )
       }, 360)
 
-      animationTimeoutsRef.current.push(initId, startId, endId)
+      const endId = window.setTimeout(() => {
+        setAnimatingCards((current) => current.filter((item) => item.key !== animationKey))
+      }, 420)
+
+      animationTimeoutsRef.current.push(initId, startId, settleId, endId)
     }
 
     previousCardsRef.current = nextPreviousCards
@@ -374,7 +392,7 @@ export function GameTableScene({
     cardsToDeal.forEach(({ playerId, index }, sequenceIndex) => {
       const key = `deal-${dealAnimationNonce}-${playerId}-${index}`
       const from = { left: "50%", top: "50%", rotation: 0 }
-      const to = getHandOverlayPosition(playerId, index)
+      const to = getDealAnimationTargetPosition(playerId, index)
       const delay = sequenceIndex * 78
 
       const initId = window.setTimeout(() => {
@@ -404,14 +422,14 @@ export function GameTableScene({
 
       const endId = window.setTimeout(() => {
         setDealingCards((current) => current.filter((item) => item.key !== key))
-      }, delay + 420)
+      }, delay + 840)
 
       dealTimeouts.push(initId, startId, endId)
     })
 
     const finishId = window.setTimeout(() => {
       setIsDealing(false)
-    }, cardsToDeal.length * 78 + 460)
+    }, cardsToDeal.length * 78 + 900)
     dealTimeouts.push(finishId)
 
     return () => {
@@ -480,54 +498,14 @@ export function GameTableScene({
           pointerEvents: "none",
         }}
       >
-        {model.centerDeck.show ? (
-          <>
-            <CodeCard
-              left="50%"
-              top="50.6%"
-              rotation={90}
-              rank={model.centerDeck.vira?.rank}
-              suit={model.centerDeck.vira?.suit}
-              suitSymbol={model.centerDeck.vira?.suitSymbol}
-              scale={0.82}
-            />
-            {[2, 1, 0].map((layer) => (
-              <CodeCard
-                key={`center-deck-${layer}`}
-                left={`calc(50% + ${layer * 0.45}px)`}
-                top={`calc(50% - ${layer * 0.55}px)`}
-                rotation={0}
-                scale={0.8}
-                faceDown
-                opacity={0.98 - layer * 0.08}
-              />
-            ))}
-          </>
-        ) : null}
-
-        {!isDealing && overlaySlots.map((slot) =>
-          Array.from({ length: Math.min(slot.handCount, 3) }, (_, index) => {
-            const stackPosition = getHandOverlayPosition(slot.playerId, index)
-
-            return (
-              <CodeCard
-                key={`hand-${slot.playerId}-${index}`}
-                left={stackPosition.left}
-                top={stackPosition.top}
-                rotation={stackPosition.rotation}
-                scale={0.88}
-                faceDown
-              />
-            )
-          })
-        )}
-
         {!isDealing && overlaySlots
           .filter((slot) => {
             if (!slot.card) return false
 
             const currentKey = `${slot.playerId}-${slot.card.rank}-${slot.card.suit}`
-            return !animatingCards.some((item) => item.key === currentKey)
+            return !animatingCards.some(
+              (item) => item.key === currentKey && item.stage !== "settle"
+            )
           })
           .map((slot) => (
             <CodeCard
@@ -562,7 +540,7 @@ export function GameTableScene({
             left={card.stage === "from" ? card.from.left : card.to.left}
             top={card.stage === "from" ? card.from.top : card.to.top}
             rotation={card.stage === "from" ? 0 : card.to.rotation}
-            transition="left 220ms cubic-bezier(0.4, 0, 0.2, 1), top 220ms cubic-bezier(0.4, 0, 0.2, 1), transform 220ms cubic-bezier(0.4, 0, 0.2, 1), opacity 220ms cubic-bezier(0.4, 0, 0.2, 1)"
+            transition="left 440ms cubic-bezier(0.4, 0, 0.2, 1), top 440ms cubic-bezier(0.4, 0, 0.2, 1), transform 440ms cubic-bezier(0.4, 0, 0.2, 1), opacity 440ms cubic-bezier(0.4, 0, 0.2, 1)"
             rank={card.rank}
             suit={card.suit}
             suitSymbol={card.suitSymbol}
@@ -577,7 +555,7 @@ export function GameTableScene({
             left={card.stage === "from" ? card.from.left : card.to.left}
             top={card.stage === "from" ? card.from.top : card.to.top}
             rotation={card.stage === "from" ? card.from.rotation : card.to.rotation}
-            transition="left 360ms cubic-bezier(0.22, 0.9, 0.24, 1), top 360ms cubic-bezier(0.22, 0.9, 0.24, 1), transform 360ms cubic-bezier(0.22, 0.9, 0.24, 1), opacity 360ms cubic-bezier(0.22, 0.9, 0.24, 1)"
+            transition="left 720ms cubic-bezier(0.22, 0.9, 0.24, 1), top 720ms cubic-bezier(0.22, 0.9, 0.24, 1), transform 720ms cubic-bezier(0.22, 0.9, 0.24, 1), opacity 720ms cubic-bezier(0.22, 0.9, 0.24, 1)"
             faceDown
             opacity={card.stage === "from" ? 0.92 : 1}
             scale={0.84}
@@ -593,24 +571,6 @@ export function GameTableScene({
       </div>
     </div>
   )
-}
-
-function getHandLayout(playerId: number): {
-  x: number
-  y: number
-  rotation: number
-  axis: "x" | "y"
-} {
-  switch (playerId) {
-    case 3:
-      return { x: 0, y: 1.72, rotation: Math.PI, axis: "x" }
-    case 2:
-      return { x: -2.18, y: 0, rotation: Math.PI / 2, axis: "y" }
-    case 4:
-      return { x: 2.18, y: 0, rotation: -Math.PI / 2, axis: "y" }
-    default:
-      return { x: 0, y: -1.72, rotation: 0, axis: "x" }
-  }
 }
 
 function getPlayedCardPosition(playerId: number): { x: number; y: number } {
@@ -638,47 +598,50 @@ function getPlayedCardOverlayPosition(playerId: number): { left: string; top: st
 function getClearingCardOverlayPosition(
   playerId: number
 ): { left: string; top: string; rotation: number } {
-  const direction = (() => {
-    switch (playerId) {
-      case 3:
-        return { x: 0, y: -0.18, rotation: -8 }
-      case 2:
-        return { x: 0.18, y: 0, rotation: 8 }
-      case 4:
-        return { x: -0.18, y: 0, rotation: -8 }
-      default:
-        return { x: 0, y: 0.18, rotation: 8 }
-    }
-  })()
-
-  const position = getPlayedCardPosition(playerId)
-
-  return {
-    left: `${((position.x + direction.x + 2.8) / 5.6) * 100}%`,
-    top: `${((2 - (position.y + direction.y)) / 4) * 100}%`,
-    rotation: direction.rotation,
+  switch (playerId) {
+    case 3:
+      return { left: "50%", top: "-18%", rotation: -18 }
+    case 2:
+      return { left: "-18%", top: "50%", rotation: 18 }
+    case 4:
+      return { left: "118%", top: "50%", rotation: -18 }
+    default:
+      return { left: "50%", top: "118%", rotation: 18 }
   }
 }
 
-function getHandOverlayPosition(
+function getDealAnimationTargetPosition(
   playerId: number,
   index: number
 ): { left: string; top: string; rotation: number } {
-  const layout = getHandLayout(playerId)
-  const spread = index * 0.55
+  const spread = index * 6
 
-  if (layout.axis === "x") {
-    return {
-      left: `${((layout.x + spread / 10 + 2.8) / 5.6) * 100}%`,
-      top: `${((2 - layout.y) / 4) * 100}%`,
-      rotation: (layout.rotation * 180) / Math.PI,
-    }
+  switch (playerId) {
+    case 3:
+      return { left: `${44 + spread}%`, top: "-18%", rotation: 180 }
+    case 2:
+      return { left: "-18%", top: `${44 + spread}%`, rotation: 90 }
+    case 4:
+      return { left: "118%", top: `${44 + spread}%`, rotation: -90 }
+    default:
+      return { left: `${44 + spread}%`, top: "118%", rotation: 0 }
   }
+}
 
-  return {
-    left: `${((layout.x + 2.8) / 5.6) * 100}%`,
-    top: `${((2 - (layout.y + spread / 10)) / 4) * 100}%`,
-    rotation: (layout.rotation * 180) / Math.PI,
+function getPlayAnimationOrigin(playerId: number): {
+  left: string
+  top: string
+  rotation: number
+} {
+  switch (playerId) {
+    case 3:
+      return { left: "50%", top: "-10%", rotation: 180 }
+    case 2:
+      return { left: "-10%", top: "50%", rotation: 90 }
+    case 4:
+      return { left: "110%", top: "50%", rotation: -90 }
+    default:
+      return { left: "50%", top: "110%", rotation: 0 }
   }
 }
 
@@ -697,7 +660,7 @@ interface AnimatedCard {
     left: string
     top: string
   }
-  stage: "from" | "to"
+  stage: "from" | "to" | "settle"
 }
 
 interface ClearingCard {
@@ -759,8 +722,8 @@ function CodeCard({
   transition,
   opacity = 1,
 }: CodeCardProps) {
-  const width = 64 * scale
-  const height = 96 * scale
+  const width = 50 * scale
+  const height = 72 * scale
   const suitColor = suit === "copas" || suit === "ouros" ? "#b91c1c" : "#1f2937"
 
   return (
@@ -775,54 +738,29 @@ function CodeCard({
         borderRadius: "9px",
         overflow: "hidden",
         background: faceDown
-          ? "linear-gradient(180deg, #7c2d12 0%, #92400e 100%)"
-          : "linear-gradient(180deg, #fffdf5 0%, #f4ecd8 100%)",
+          ? `center / cover no-repeat url(${cardBackAgedPhotoUrl})`
+          : `center / cover no-repeat url(${cardFaceAgedPaperUrl})`,
         border: "1px solid rgba(120,82,48,0.35)",
         boxShadow: highlight
-          ? "0 0 0 3px rgba(250,204,21,0.85), 0 10px 20px rgba(0,0,0,0.22)"
+          ? "0 10px 20px rgba(0,0,0,0.24)"
           : "0 8px 16px rgba(0,0,0,0.18)",
         color: suitColor,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        padding: faceDown ? "7px" : "6px 7px",
+        padding: faceDown ? "5px" : "4px 5px",
         boxSizing: "border-box",
         transition,
         opacity,
       }}
     >
-      {faceDown ? (
+      {faceDown ? null : (
         <>
+          <div style={{ fontSize: "15px", fontWeight: 800, lineHeight: 1 }}>{rank}</div>
+          <div style={{ fontSize: "26px", lineHeight: 1, alignSelf: "center" }}>{suitSymbol}</div>
           <div
             style={{
-              flex: 1,
-              borderRadius: "7px",
-              border: "2px solid rgba(255,244,214,0.45)",
-              background:
-                "radial-gradient(circle at center, rgba(245,158,11,0.65) 0%, rgba(124,45,18,0.15) 100%)",
-              position: "relative",
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                inset: "8px",
-                borderRadius: "5px",
-                border: "1px solid rgba(255,244,214,0.35)",
-                background:
-                  "repeating-linear-gradient(45deg, rgba(255,244,214,0.16) 0 6px, rgba(124,45,18,0.16) 6px 12px)",
-              }}
-            />
-          </div>
-        </>
-      ) : (
-        <>
-          <div style={{ fontSize: "20px", fontWeight: 800, lineHeight: 1 }}>{rank}</div>
-          <div style={{ fontSize: "34px", lineHeight: 1, alignSelf: "center" }}>{suitSymbol}</div>
-          <div
-            style={{
-              fontSize: "20px",
+              fontSize: "15px",
               fontWeight: 800,
               lineHeight: 1,
               alignSelf: "flex-end",

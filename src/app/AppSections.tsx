@@ -15,7 +15,6 @@ import avatarPartnerAsset from "../assets/ui-left/avatar-partner.png"
 import scorePadNotebookAsset from "../assets/ui-left/scorepad-notebook-clean-cut.png"
 import avatarYouAsset from "../assets/ui-left/avatar-you.png"
 import actionButtonAsset from "../assets/ui-right/action-button-solid.png"
-import leatherPanelAsset from "../assets/ui-right/leather-panel-left-tight.png"
 import statsPanelWoodAsset from "../assets/ui-right/stats-panel-wood-main.png"
 import valuePlaqueAsset from "../assets/ui-right/value-plaque-solid.png"
 import type { PlayerProfile } from "../profile/playerProfile"
@@ -482,13 +481,17 @@ export function TableSection({
                           <div style={{ ...styles.scorePadLabel, ...styles.scorePadLabelLeft }}>
                             Nós
                           </div>
-                          <div style={styles.scorePadValue}>{matchState?.score.A ?? 0}</div>
+                          <div style={{ ...styles.scorePadValue, ...styles.scorePadValueLeft }}>
+                            {matchState?.score.A ?? 0}
+                          </div>
                         </div>
                         <div style={styles.scorePadCellTopRight}>
                           <div style={{ ...styles.scorePadLabel, ...styles.scorePadLabelRight }}>
                             Eles
                           </div>
-                          <div style={styles.scorePadValue}>{matchState?.score.B ?? 0}</div>
+                          <div style={{ ...styles.scorePadValue, ...styles.scorePadValueRight }}>
+                            {matchState?.score.B ?? 0}
+                          </div>
                         </div>
                         <div style={styles.scorePadCellBottomLeft}>
                           <div
@@ -499,7 +502,14 @@ export function TableSection({
                           >
                             Mão
                           </div>
-                          <div style={styles.scorePadMetaValue}>{handState?.score.A ?? 0}</div>
+                          <div
+                            style={{
+                              ...styles.scorePadMetaValue,
+                              ...styles.scorePadMetaValueLeft,
+                            }}
+                          >
+                            {handState?.score.A ?? 0}
+                          </div>
                         </div>
                         <div style={styles.scorePadCellBottomRight}>
                           <div
@@ -510,7 +520,14 @@ export function TableSection({
                           >
                             Mão
                           </div>
-                          <div style={styles.scorePadMetaValue}>{handState?.score.B ?? 0}</div>
+                          <div
+                            style={{
+                              ...styles.scorePadMetaValue,
+                              ...styles.scorePadMetaValueRight,
+                            }}
+                          >
+                            {handState?.score.B ?? 0}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -540,15 +557,7 @@ export function TableSection({
                 </div>
 
                 <div style={styles.gameSidebarColumn}>
-                  <div
-                    style={{
-                      ...styles.tableHudSidebar,
-                      backgroundImage: `linear-gradient(180deg, rgba(38,23,15,0.12) 0%, rgba(22,13,9,0.18) 100%), url(${leatherPanelAsset})`,
-                      backgroundSize: "cover, 112% 108%",
-                      backgroundPosition: "center, 48% 50%",
-                      backgroundRepeat: "no-repeat, no-repeat",
-                    }}
-                  >
+                  <div style={styles.tableHudSidebar}>
                     <div
                       style={{
                         ...styles.actionDisplayCard,
@@ -583,6 +592,7 @@ export function TableSection({
                           {currentCampaignVenue?.name ?? "Treino"}
                         </strong>
                       </div>
+                      <div style={styles.tableHudStatsDivider} />
                       <div style={styles.tableHudStatLineCentered}>
                         <span style={styles.tableHudStatLabelCentered}>Endereço</span>
                         <strong style={styles.tableHudStatValueCentered}>
@@ -905,7 +915,6 @@ function HumanCardsPanel({
   return (
     <div style={styles.mobileHandPanel}>
       <div style={styles.mobileHandHeader}>
-        <div style={styles.mobileHandTitle}>Suas cartas</div>
         <div style={styles.mobileHandMeta}>
           {handState && handState.currentPlayerId === 1 && !handState.finished
             ? "Sua vez"

@@ -1,6 +1,10 @@
 import type { Card } from "../game/card"
 import type { BetValue } from "../game/truco"
 import type { RuleSet } from "../game/ruleSet"
+import {
+  getAiTrucoPersonality,
+  type AiTrucoPersonalityId,
+} from "./trucoPersonalities"
 
 export type PartnerAdvice = "BORA!" | "CÊ QUE SABE!" | "MELHOR CORRER!"
 export type TrucoTeamDecision = "accept" | "run" | "raise"
@@ -9,14 +13,16 @@ export function shouldRaiseBet(
   ruleSet: RuleSet,
   hand: Card[],
   currentBet: BetValue,
-  vira?: Card
+  vira?: Card,
+  personalityId: AiTrucoPersonalityId = "balanced"
 ): boolean {
+  const personality = getAiTrucoPersonality(personalityId)
   const strength = evaluateHandStrength(ruleSet, hand, vira)
+  const threshold = personality.raiseThresholdByCurrentBet[currentBet]
 
-  if (currentBet === 1) return strength >= 2
-  if (currentBet === 3) return strength >= 3
-  if (currentBet === 6) return strength >= 4
-  if (currentBet === 9) return strength >= 5
+  if (typeof threshold === "number") {
+    return strength >= threshold
+  }
 
   return false
 }
@@ -25,14 +31,16 @@ export function respondToRaise(
   ruleSet: RuleSet,
   hand: Card[],
   nextBet: BetValue,
-  vira?: Card
+  vira?: Card,
+  personalityId: AiTrucoPersonalityId = "balanced"
 ): "accept" | "run" {
+  const personality = getAiTrucoPersonality(personalityId)
   const strength = evaluateHandStrength(ruleSet, hand, vira)
+  const threshold = personality.acceptThresholdByNextBet[nextBet]
 
-  if (nextBet === 3) return strength >= 1 ? "accept" : "run"
-  if (nextBet === 6) return strength >= 2 ? "accept" : "run"
-  if (nextBet === 9) return strength >= 3 ? "accept" : "run"
-  if (nextBet === 12) return strength >= 4 ? "accept" : "run"
+  if (typeof threshold === "number") {
+    return strength >= threshold ? "accept" : "run"
+  }
 
   return "run"
 }
@@ -41,19 +49,21 @@ export function getTeamPartnerAdvice(
   ruleSet: RuleSet,
   hands: Card[][],
   nextBet: BetValue,
-  vira?: Card
+  vira?: Card,
+  personalityId: AiTrucoPersonalityId = "balanced"
 ): PartnerAdvice {
+  const personality = getAiTrucoPersonality(personalityId)
   const strengths = hands.map((hand) => evaluateHandStrength(ruleSet, hand, vira))
   const best = strengths.length > 0 ? Math.max(...strengths) : 0
   const total = strengths.reduce((sum, value) => sum + value, 0)
-  const acceptThreshold = getAcceptThreshold(nextBet)
-  const goThreshold = acceptThreshold + 1
+  const acceptThreshold = getAcceptThreshold(nextBet, personalityId)
+  const goThreshold = acceptThreshold + personality.partnerGoOffset
 
-  if (best >= goThreshold || total >= goThreshold + 2) {
+  if (best >= goThreshold || total >= goThreshold + personality.partnerTotalGoOffset) {
     return "BORA!"
   }
 
-  if (best >= acceptThreshold || total >= acceptThreshold + 1) {
+  if (best >= acceptThreshold || total >= acceptThreshold + personality.partnerMaybeOffset) {
     return "CÊ QUE SABE!"
   }
 
@@ -64,10 +74,11 @@ export function getTeamTrucoDecision(
   ruleSet: RuleSet,
   hands: Card[][],
   nextBet: BetValue,
-  vira?: Card
+  vira?: Card,
+  personalityId: AiTrucoPersonalityId = "balanced"
 ): TrucoTeamDecision {
   const shouldAccept = hands.some(
-    (hand) => respondToRaise(ruleSet, hand, nextBet, vira) === "accept"
+    (hand) => respondToRaise(ruleSet, hand, nextBet, vira, personalityId) === "accept"
   )
 
   if (!shouldAccept) {
@@ -76,7 +87,8 @@ export function getTeamTrucoDecision(
 
   const canRaise = nextBet !== 12
   const shouldReRaise =
-    canRaise && hands.some((hand) => shouldRaiseBet(ruleSet, hand, nextBet, vira))
+    canRaise &&
+    hands.some((hand) => shouldRaiseBet(ruleSet, hand, nextBet, vira, personalityId))
 
   if (shouldReRaise) {
     return "raise"
@@ -121,11 +133,16 @@ export function evaluateHandStrength(
   return score
 }
 
-function getAcceptThreshold(nextBet: BetValue): number {
-  if (nextBet === 3) return 1
-  if (nextBet === 6) return 2
-  if (nextBet === 9) return 3
-  if (nextBet === 12) return 4
+function getAcceptThreshold(
+  nextBet: BetValue,
+  personalityId: AiTrucoPersonalityId
+): number {
+  const personality = getAiTrucoPersonality(personalityId)
+  const threshold = personality.acceptThresholdByNextBet[nextBet]
+
+  if (typeof threshold === "number") {
+    return threshold
+  }
 
   return 99
 }

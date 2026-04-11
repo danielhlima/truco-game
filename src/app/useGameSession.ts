@@ -130,6 +130,8 @@ export function useGameSession() {
     : null
   const currentCampaignVenue = sessionDebugVenue ?? selectedDebugVenue ?? actualCampaignVenue
   const currentCampaignStage = sessionDebugStage ?? selectedDebugStage ?? actualCampaignStage
+  const partnerAiPersonalityId = "conservative"
+  const opponentAiPersonalityId = "balanced"
   const activeVariant = handState?.variant ?? variant
   const currentVenueWins = currentCampaignVenue
     ? playerProfile.campaign.venueWinsById[currentCampaignVenue.id] ?? 0
@@ -520,7 +522,8 @@ export function useGameSession() {
         ruleSet,
         [player1.hand, player3.hand],
         handState.truco.proposedBet!,
-        handState.vira
+        handState.vira,
+        partnerAiPersonalityId
       )
 
       const decision =
@@ -603,7 +606,10 @@ export function useGameSession() {
         return
       }
 
-      const nextState = stepHand(handState)
+      const nextState = stepHand(handState, {
+        A: partnerAiPersonalityId,
+        B: opponentAiPersonalityId,
+      })
       applyHandState(nextState)
     }, handState.finished ? NEXT_HAND_DELAY_MS : AUTO_STEP_DELAY_MS)
 
@@ -665,7 +671,8 @@ export function useGameSession() {
       getRuleSet(handState.variant),
       [player1?.hand ?? [], player3?.hand ?? []],
       handState.truco.proposedBet!,
-      handState.vira
+      handState.vira,
+      partnerAiPersonalityId
     )
 
     partnerAdviceTimeoutRef.current = window.setTimeout(() => {
@@ -683,7 +690,14 @@ export function useGameSession() {
         partnerAdviceTimeoutRef.current = null
       }
     }
-  }, [BUBBLE_DURATION_MS, handState, partnerAdviceKey, player1, player3, showSpeechBubble])
+  }, [
+    BUBBLE_DURATION_MS,
+    handState,
+    partnerAdviceKey,
+    player1,
+    player3,
+    showSpeechBubble,
+  ])
 
   useEffect(() => {
     if (!partnerConsultKey) {

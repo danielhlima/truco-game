@@ -1,87 +1,117 @@
 # Next Steps
 
-## Pré-plano Consolidado
+## Pre-plano Consolidado
 
 ### 1. Consolidar a gameplay screen
 
-- Fazer a tela principal se resolver dentro da tela do celular.
-- Eliminar dependência de controles externos.
-- Fechar nomenclatura e HUD essencial.
+- fazer a tela principal se resolver dentro da tela do celular
+- eliminar dependencia de controles externos
+- fechar nomenclatura e HUD essencial
 
 Status:
-- em boa parte concluído
+
+- amplamente concluido
 
 ### 2. Fechar o fluxo completo de truco dentro da tela
 
-- decisão em dupla
+- decisao em dupla
 - consultas da parceira
-- balões consistentes
+- baloes consistentes
 - fluxo de aceite, raise e corrida estabilizado
 
 Status:
-- base concluída
-- pode receber ajustes finos futuros
+
+- base concluida
+- segue aberta para ajustes finos de comportamento e UX
 
 ### 3. Preparar a arquitetura/layout da tela final
 
 - coluna esquerda
 - mesa central
 - coluna direita
-- HUD integrada ao cenário
+- HUD integrada ao cenario
 
 Status:
+
 - em andamento
+- ja bem avancado
 
-## Situação Atual
+## Estado Atual Real
 
-### Coluna Direita
+### Coluna esquerda
 
-- já bastante avançada
-- fundo em couro
-- placa `Valendo`
-- quadro central estilizado
-- ações com botões de madeira
+- bloco dos jogadores em bom estado
+- scorepad funcional e visualmente coerente
+- scorepad considerado sensivel e sujeito a retrabalho se mexer sem cuidado
 
-### Centro
+### Mesa central
 
-- mesa funcional
-- animações de carta
-- animação de distribuição entre rodadas
-- monte + vira no Truco Paulista
+- mesa quadrada e dominante
+- gameplay evoluindo para visual mais fotorealista
+- cartas com verso fotografico envelhecido
+- frente das cartas com papel envelhecido
+- animacao de carta entrando de fora da mesa
+- animacao de limpeza entre maos recolhendo cartas para fora do quadro
+- animacao de distribuicao entre rodadas mantida
 
-### Coluna Esquerda
+### Coluna direita
 
-- ainda é a área mais provisória visualmente
-- precisa de mais refinamento, especialmente no placar
+- `Valendo` consolidado com `tento/tentos`
+- card central com `Etapa` e `Endereco`
+- botoes de truco visiveis e sem label `Acoes`
+- fundo estrutural removido para deixar o cenario aparente
 
-## Próximos Passos Naturais
+### Tela inicial
 
-### Opção 1
+- possui debug selector de bar
+- permite testar qualquer venue sem depender da progressao salva
 
-- refinar a coluna esquerda
-- principalmente o `Score Pad`
+### IA
 
-### Opção 2
+- base de personalidades criada
+- adversarios usam `balanced`
+- parceira usa `conservative`
 
-- refinar a área da mão do jogador
-- visual de cartas, encaixe, sensação de estar na mesa
+## Proximo foco recomendado
 
-### Opção 3
+### Opcao principal
 
-- polir ainda mais a mesa central
-- distribuição, monte, vira, pequenos detalhes visuais
+- polir a coluna direita
+- refinar hierarquia visual
+- melhorar respiro interno do card de contexto
+- fazer acabamento fino dos botoes de truco
 
-## Pendências Futuras
+### Opcao secundaria
 
-- rebalancear coragem da IA
-- criar níveis/perfis diferentes de IA
-- melhorar responsividade entre diferentes tamanhos de tela
-- revisar o placar cenográfico final
+- continuar polindo a mesa central conforme novos assets fotograficos chegarem
+- revisar mesa por venue
+- revisar sensacao de profundidade e cena
 
-## Regra de Trabalho
+### Opcao de sistema
 
-Enquanto o layout principal não estiver aprovado:
+- expandir o sistema de personalidades da IA
+- preparar futura escolha de parceira IA pelo jogador
 
-- priorizar composição e legibilidade
-- evitar perder tempo com micro-responsividade
-- documentar decisões consolidadas para não reabrir regras já fechadas
+## Pendencias abertas
+
+- otimizar mais os assets fotograficos grandes
+- converter fundos maiores para formatos mais leves se necessario
+- revisar responsividade final em telas diferentes
+- revisar scorepad apenas se houver necessidade real
+
+## O que nao deve virar prioridade agora
+
+- refatoracao total da engine
+- troca da arquitetura de estado
+- polimento fino de micro-responsividade antes do layout final fechar
+- backend, ranking online ou empacotamento mobile
+
+## Regra de trabalho
+
+Antes de iniciar qualquer nova frente em um chat novo:
+
+1. ler `docs/CONTENT.md`
+2. ler `docs/LAYOUT_RULES.md`
+3. ler `docs/TRUCO_RULES.md`
+4. ler `docs/NEXT_STEPS.md`
+5. validar no codigo os arquivos realmente afetados

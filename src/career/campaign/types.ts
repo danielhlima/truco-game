@@ -1,5 +1,6 @@
 import type { EconomyReward } from "../../economy/types"
 import type { GameVariant } from "../../game/variant"
+import type { AiTrucoPersonalityId } from "../../ai/trucoPersonalities"
 
 export type CampaignTier =
   | "rua"
@@ -17,6 +18,7 @@ export interface DifficultyProfile {
   aiLevel: 1 | 2 | 3 | 4 | 5
   aggression: 1 | 2 | 3 | 4 | 5
   trucoDiscipline: 1 | 2 | 3 | 4 | 5
+  personalityId?: AiTrucoPersonalityId
 }
 
 export interface CampaignVenue {

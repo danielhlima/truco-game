@@ -25,16 +25,16 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 - A mesa é o centro absoluto da experiência.
 - As cartas jogadas ficam na mesa.
 - A mão do jogador humano fica integrada abaixo da mesa.
-- No Truco Paulista, deve aparecer no centro:
-  - um monte virado para baixo
-  - a carta da vira aberta, perpendicular ao monte
+- Não manter pilhas viradas permanentes visíveis na gameplay normal.
+- Animações de distribuição entre rodadas podem usar cartas viradas para baixo.
 
 ### Coluna Direita
 
 - Bloco superior `Valendo`.
 - Bloco central com contexto da partida.
 - Bloco inferior com ações de truco.
-- O fundo da coluna usa material de `couro marrom`, não cor sólida chapada.
+- O fundo estrutural da coluna deve deixar o cenário aparente.
+- Os widgets da coluna podem usar madeira/couro como objetos da cena.
 
 ## Regras Visuais
 
@@ -53,15 +53,16 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 - O bloco central usa placa de madeira/moldura.
 - O bloco central hoje mostra apenas:
   - `Etapa`
-  - `Bairro`
+  - `Endereço`
 - Os botões de ação usam asset de madeira.
 - A label `Ações` foi removida.
 
 ## Regras da Coluna Esquerda
 
 - O bloco de jogadores deve continuar compacto.
-- O placar atual está em versão simples.
-- A ideia de usar caderno/score pad ilustrado continua desejável, mas ainda não está fechada.
+- O placar atual usa scorepad em formato de caderno.
+- O scorepad está funcional e relativamente consolidado.
+- Evitar mexer nele junto com mudanças grandes de layout.
 
 ## Regras da Área do Jogador
 
@@ -89,6 +90,6 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 
 ## Pendências Visuais
 
-- Refinar a coluna esquerda, especialmente o placar.
-- Refinar mais a área da mão do jogador.
+- Refinar a coluna direita.
+- Refinar a mesa central conforme novos assets chegarem.
 - Fazer polimento responsivo final depois do layout aprovado.

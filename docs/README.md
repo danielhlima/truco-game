@@ -1,125 +1,66 @@
-# README.md
+# Documentacao do Projeto
 
-## Truco Game
+## Ordem de leitura obrigatoria
 
-Projeto de jogo de truco em TypeScript com foco em arquitetura modular, engine desacoplada e evolução incremental para uma experiência jogável com IA.
+Para continuar o projeto em qualquer chat novo do Codex, leia nesta ordem:
 
----
+1. `docs/CONTENT.md`
+2. `docs/LAYOUT_RULES.md`
+3. `docs/TRUCO_RULES.md`
+4. `docs/NEXT_STEPS.md`
 
-## Stack
+## Papel de cada arquivo
 
-* TypeScript
-* Vite
-* React
-* Runtime: Browser
+### `docs/CONTENT.md`
 
-Planejado para o futuro:
+Entrega o estado consolidado do projeto:
 
-* UI mais sofisticada
-* possível uso de Three.js
-* backend para ranking
-* empacotamento mobile
+- arquitetura atual
+- layout atual
+- campanha atual
+- IA atual
+- assets em uso
+- pontos sensiveis de continuidade
 
----
+### `docs/LAYOUT_RULES.md`
 
-## Variantes suportadas
+Define as regras consolidadas da gameplay screen:
 
-* Truco Mineiro
-* Truco Paulista
+- hierarquia visual
+- composicao das colunas
+- materiais visuais
+- regras da mesa, scorepad e coluna direita
 
----
+### `docs/TRUCO_RULES.md`
 
-## Estrutura atual
+Define a verdade oficial para:
 
-```txt id="q615tv"
-src/
-  ai/
-    chooseCard.ts
-    trucoDecision.ts
-    utils.ts
+- nomenclatura do projeto
+- falas de truco
+- conselho da parceira
+- ping-pong de truco e raises
 
-  game/
-    card.ts
-    compare.ts
-    createHandState.ts
-    deal.ts
-    deck.ts
-    gameState.ts
-    getPlayerById.ts
-    getRuleSet.ts
-    handState.ts
-    playAiTurn.ts
-    playHand.ts
-    playHumanCard.ts
-    playMatch.ts
-    playRound.ts
-    rankOrder.ts
-    resolveTrick.ts
-    ruleSet.ts
-    rulesMineiroRuleSet.ts
-    rulesPaulistaRuleSet.ts
-    stepHand.ts
-    tableCard.ts
-    teams.ts
-    truco.ts
-    turnOrder.ts
-    variant.ts
-    vira.ts
+### `docs/NEXT_STEPS.md`
 
-  utils/
-    logger.ts
+Define o pre-plano vivo:
 
-  App.tsx
-  main.tsx
-```
+- o que ja esta consolidado
+- o que esta em andamento
+- o proximo foco recomendado
 
----
+## Regra de continuidade
 
-## Estado atual
+Se houver conflito entre memoria de chat e documentacao:
 
-### Engine
+- priorizar os arquivos acima
+- depois validar no codigo
 
-* [x] comparação de cartas
-* [x] manilhas fixas
-* [x] manilhas dinâmicas
-* [x] vira
-* [x] empate
-* [x] times
-* [x] rodada
-* [x] mão
-* [x] partida automática
-* [x] suporte a Mineiro e Paulista
+## Observacao importante
 
-### IA
+O projeto mudou bastante de um prototipo mais “engine-first” para uma gameplay screen cenografica e jogavel.
 
-* [x] escolha de carta
-* [x] lógica de parceiro
-* [x] decisão básica de truco
+Portanto:
 
-### UI
-
-* [x] escolha da variante
-* [x] iniciar mão
-* [x] jogador humano joga carta
-* [x] IA joga passo a passo
-* [x] resolução controlada da vaza
-* [x] logs exibidos e copiáveis
-
----
-
-## Filosofia do projeto
-
-* não refatorar desnecessariamente
-* preservar a engine atual
-* evoluir incrementalmente
-* separar bem lógica, IA e interface
-* usar logs para auditoria
-
----
-
-## Próximas prioridades
-
-* truco interativo na UI
-* melhorar legibilidade da mesa
-* integrar múltiplas mãos na interface
-* polir UX
+- evitar respostas genericas de “vamos reestruturar tudo”
+- evitar refatoracoes totais
+- preferir evolucao incremental sobre a base atual

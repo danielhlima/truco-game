@@ -10,6 +10,7 @@ export interface TableTheme {
   rustColor: string
   illustratedTableAsset?:
     | "rust-classic"
+    | "ze-catinga-photo"
     | "maneco-wood"
     | "wood-street"
     | "steel-patio"
@@ -29,6 +30,20 @@ const STREET_THEME: TableTheme = {
   tableKind: "steel",
   rustColor: "#8a4b28",
   illustratedTableAsset: "rust-classic",
+  illustratedTableScale: 1,
+}
+
+const ZE_CATINGA_PHOTO_THEME: TableTheme = {
+  backgroundColor: "#2d211b",
+  tableColor: "#5c4333",
+  railColor: "#3a2a20",
+  badgeColor: "#9a3412",
+  emptySlotColor: "#f5f5f4",
+  activeSlotColor: "#facc15",
+  accentColor: "#b45309",
+  tableKind: "steel",
+  rustColor: "#7a4a2f",
+  illustratedTableAsset: "ze-catinga-photo",
   illustratedTableScale: 1,
 }
 
@@ -101,6 +116,10 @@ const PREMIUM_THEME: TableTheme = {
 export function getTableTheme(visualTheme?: string): TableTheme {
   if (!visualTheme) {
     return STREET_THEME
+  }
+
+  if (visualTheme.includes("ze-catinga-photo")) {
+    return ZE_CATINGA_PHOTO_THEME
   }
 
   if (visualTheme.includes("madeira-suja")) {

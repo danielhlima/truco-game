@@ -1,4 +1,5 @@
 import { getTeamTrucoDecision, shouldRaiseBet } from "../ai/trucoDecision"
+import type { AiTrucoPersonalityId } from "../ai/trucoPersonalities"
 import { getRuleSet } from "./getRuleSet"
 import type { HandState } from "./handState"
 import { playAiTurn } from "./playAiTurn"
@@ -7,7 +8,18 @@ import { resolveTrick } from "./resolveTrick"
 import { respondToTruco } from "./respondToTruco"
 import { getTeam } from "./teams"
 
-export function stepHand(state: HandState): HandState {
+interface AiPersonalityByTeam {
+  A: AiTrucoPersonalityId
+  B: AiTrucoPersonalityId
+}
+
+export function stepHand(
+  state: HandState,
+  aiPersonalityByTeam: AiPersonalityByTeam = {
+    A: "balanced",
+    B: "balanced",
+  }
+): HandState {
   if (state.finished) {
     return state
   }
@@ -27,11 +39,13 @@ export function stepHand(state: HandState): HandState {
 
     const ruleSet = getRuleSet(state.variant)
     const awaitingPlayers = state.players.filter((player) => getTeam(player.id) === awaitingTeam)
+    const aiPersonalityId = aiPersonalityByTeam[awaitingTeam]
     const decision = getTeamTrucoDecision(
       ruleSet,
       awaitingPlayers.map((player) => player.hand),
       proposedBet,
-      state.vira
+      state.vira,
+      aiPersonalityId
     )
 
     if (decision === "raise") {
@@ -56,6 +70,7 @@ export function stepHand(state: HandState): HandState {
     }
 
         const currentTeam = getTeam(currentPlayer.id)
+    const aiPersonalityId = aiPersonalityByTeam[currentTeam]
 
     const canRaiseNow =
       state.currentBet === 1 ||
@@ -68,7 +83,8 @@ export function stepHand(state: HandState): HandState {
         ruleSet,
         currentPlayer.hand,
         state.currentBet,
-        state.vira
+        state.vira,
+        aiPersonalityId
       )
 
     if (shouldAskForTruco) {

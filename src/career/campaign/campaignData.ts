@@ -15,7 +15,7 @@ export const CAMPAIGN_STAGES: CampaignStage[] = [
         id: "bar-do-ze-catinga",
         name: "Bar do Zé Catinga",
         districtLabel: "Vila do Sací · Rua Viela do Jucuí, 37",
-        visualTheme: "boteco-raiz",
+        visualTheme: "boteco-raiz-ze-catinga-photo",
         atmosphere: "Paredes gastas, piso engordurado e televisão velha ligada no fundo.",
         matchesToClear: 3,
         variant: "MINEIRO",
