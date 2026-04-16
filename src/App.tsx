@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from "react"
 import { useGameSession } from "./app/useGameSession"
 import {
   CampaignPanel,
@@ -8,7 +9,28 @@ import {
 import botecoSceneBgAsset from "./assets/boteco/boteco-scene-bg.png"
 import cardFaceAgedPaperAsset from "./assets/cards/card-face-aged-paper.png"
 
+type GameplayLayoutMode = "regular" | "compact"
+
+function getGameplayLayoutMode(): GameplayLayoutMode {
+  if (typeof window === "undefined") {
+    return "regular"
+  }
+
+  return window.innerWidth < 1440 || window.innerHeight < 860 ? "compact" : "regular"
+}
+
 function App() {
+  const [layoutMode, setLayoutMode] = useState<GameplayLayoutMode>(getGameplayLayoutMode)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setLayoutMode(getGameplayLayoutMode())
+    }
+
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
   const {
     activeVariant,
     canHumanAdvisePartner,
@@ -51,6 +73,94 @@ function App() {
     variantSelectionDisabled,
   } = useGameSession()
 
+  const isCompactLayout = layoutMode === "compact"
+
+  const responsiveStyles = useMemo<Record<string, React.CSSProperties>>(
+    () => ({
+      ...styles,
+      gameViewportFrame: {
+        ...styles.gameViewportFrame,
+        width: isCompactLayout
+          ? "min(100%, calc((100dvh - 228px) * 2.16))"
+          : styles.gameViewportFrame.width,
+        minHeight: isCompactLayout ? "min(400px, 64dvh)" : styles.gameViewportFrame.minHeight,
+        maxHeight: isCompactLayout ? "73dvh" : styles.gameViewportFrame.maxHeight,
+      },
+      gameViewport: {
+        ...styles.gameViewport,
+        gridTemplateColumns: isCompactLayout
+          ? "clamp(172px, 18vw, 196px) minmax(0, 1fr) clamp(170px, 17.4vw, 190px)"
+          : "clamp(184px, 16vw, 212px) minmax(0, 1fr) clamp(176px, 15vw, 196px)",
+        gap: isCompactLayout ? "clamp(5px, 0.55vw, 8px)" : styles.gameViewport.gap,
+      },
+      gameLeftRail: {
+        ...styles.gameLeftRail,
+        justifyItems: "stretch",
+      },
+      gameSidebarColumn: {
+        ...styles.gameSidebarColumn,
+        justifyItems: "stretch",
+      },
+      scenePanel: {
+        ...styles.scenePanel,
+        width: "100%",
+        boxSizing: "border-box",
+      },
+      scorePadCard: {
+        ...styles.scorePadCard,
+        width: "100%",
+        boxSizing: "border-box",
+      },
+      scorePadCardSurface: {
+        ...styles.scorePadCardSurface,
+        width: isCompactLayout ? "min(100%, 156px)" : "min(100%, 174px)",
+        maxHeight: isCompactLayout ? "94%" : "96%",
+      },
+      gameMainColumn: {
+        ...styles.gameMainColumn,
+        gridTemplateRows: isCompactLayout ? "minmax(0, 1fr) minmax(78px, auto)" : "minmax(0, 1fr) auto",
+      },
+      tableSurface: {
+        ...styles.tableSurface,
+        transform: isCompactLayout ? "scale(1.04)" : "scale(1.08)",
+        maxWidth: isCompactLayout ? "98%" : "100%",
+      },
+      playerCardsBlock: {
+        ...styles.playerCardsBlock,
+        width: "100%",
+        boxSizing: "border-box",
+        minHeight: isCompactLayout
+          ? "clamp(74px, 6.6vw, 90px)"
+          : styles.playerCardsBlock.minHeight,
+      },
+      tableHudSidebar: {
+        ...styles.tableHudSidebar,
+        width: "100%",
+        boxSizing: "border-box",
+        gridTemplateRows: isCompactLayout
+          ? "max-content minmax(150px, 1fr) max-content"
+          : "max-content minmax(0, 1fr) max-content",
+      },
+      actionDisplayCard: {
+        ...styles.actionDisplayCard,
+        width: isCompactLayout ? "90%" : "88%",
+      },
+      tableHudStats: {
+        ...styles.tableHudStats,
+        width: isCompactLayout ? "90%" : "88%",
+      },
+      inGameActionsCard: {
+        ...styles.inGameActionsCard,
+        width: isCompactLayout ? "90%" : "88%",
+      },
+      tableCenterArea: {
+        ...styles.tableCenterArea,
+        minHeight: isCompactLayout ? "clamp(300px, 38dvh, 340px)" : styles.tableCenterArea.minHeight,
+      },
+    }),
+    [isCompactLayout]
+  )
+
   return (
     <div style={styles.page}>
       <div style={styles.container}>
@@ -92,7 +202,7 @@ function App() {
           onRaiseTruco={handleRaiseTruco}
           onRunFromTruco={handleRunFromTruco}
           onPlayCard={handlePlayCard}
-          styles={styles}
+          styles={responsiveStyles}
         />
 
         <HandStatusPanel
@@ -105,7 +215,7 @@ function App() {
           currentTurnLabel={currentTurnLabel}
           statusMessage={statusMessage}
           eventMessage={eventMessage}
-          styles={styles}
+          styles={responsiveStyles}
         />
 
         <CampaignPanel
@@ -116,10 +226,10 @@ function App() {
           campaignSummary={campaignSummary}
           playerProfile={playerProfile}
           onResetCampaign={handleResetCampaign}
-          styles={styles}
+          styles={responsiveStyles}
         />
 
-        <LogsPanel logs={logs} onCopyLogs={handleCopyLogs} styles={styles} />
+        <LogsPanel logs={logs} onCopyLogs={handleCopyLogs} styles={responsiveStyles} />
       </div>
     </div>
   )
