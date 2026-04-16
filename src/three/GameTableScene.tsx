@@ -36,7 +36,7 @@ export function GameTableScene({
   const overlaySlots = useMemo(() => {
     return model.slots.map((slot) => ({
       ...slot,
-      ...getPlayedCardOverlayPosition(slot.playerId),
+      ...getPlayedCardOverlayPose(slot.playerId),
     }))
   }, [model.slots])
 
@@ -261,7 +261,7 @@ export function GameTableScene({
       if (!slot.card && previousKey) {
         const [rank, suit] = previousKey.split("-")
         const previousSymbol = getSuitSymbol(suit)
-        const from = getPlayedCardOverlayPosition(slot.playerId)
+        const from = getPlayedCardOverlayPose(slot.playerId)
         const to = getClearingCardOverlayPosition(slot.playerId)
         const clearingKey = `clear-${slot.playerId}-${previousKey}`
 
@@ -307,7 +307,7 @@ export function GameTableScene({
 
       const card = slot.card
       const from = getPlayAnimationOrigin(slot.playerId)
-      const to = getPlayedCardOverlayPosition(slot.playerId)
+      const to = getPlayedCardOverlayPose(slot.playerId)
       const animationKey = `${slot.playerId}-${nextKey}`
 
       const initId = window.setTimeout(() => {
@@ -512,7 +512,7 @@ export function GameTableScene({
               key={`played-${slot.playerId}`}
               left={slot.left}
               top={slot.top}
-              rotation={0}
+              rotation={slot.rotation}
               highlight={slot.highlight}
               rank={slot.card?.rank}
               suit={slot.card?.suit}
@@ -525,12 +525,13 @@ export function GameTableScene({
             key={card.key}
             left={card.stage === "from" ? card.from.left : card.to.left}
             top={card.stage === "from" ? card.from.top : card.to.top}
-            rotation={card.stage === "from" ? card.from.rotation : 0}
-            transition="left 360ms cubic-bezier(0.22, 0.9, 0.24, 1), top 360ms cubic-bezier(0.22, 0.9, 0.24, 1), transform 360ms cubic-bezier(0.22, 0.9, 0.24, 1)"
+            rotation={card.stage === "from" ? card.from.rotation : card.to.rotation}
+            transition="left 360ms cubic-bezier(0.22, 0.9, 0.24, 1), top 360ms cubic-bezier(0.22, 0.9, 0.24, 1), transform 360ms cubic-bezier(0.22, 0.9, 0.24, 1), box-shadow 180ms ease-out"
             rank={card.rank}
             suit={card.suit}
             suitSymbol={card.suitSymbol}
             highlight={card.highlight}
+            settled={card.stage === "settle"}
           />
         ))}
 
@@ -539,7 +540,7 @@ export function GameTableScene({
             key={card.key}
             left={card.stage === "from" ? card.from.left : card.to.left}
             top={card.stage === "from" ? card.from.top : card.to.top}
-            rotation={card.stage === "from" ? 0 : card.to.rotation}
+            rotation={card.stage === "from" ? card.from.rotation : card.to.rotation}
             transition="left 440ms cubic-bezier(0.4, 0, 0.2, 1), top 440ms cubic-bezier(0.4, 0, 0.2, 1), transform 440ms cubic-bezier(0.4, 0, 0.2, 1), opacity 440ms cubic-bezier(0.4, 0, 0.2, 1)"
             rank={card.rank}
             suit={card.suit}
@@ -586,12 +587,28 @@ function getPlayedCardPosition(playerId: number): { x: number; y: number } {
   }
 }
 
-function getPlayedCardOverlayPosition(playerId: number): { left: string; top: string } {
+function getPlayedCardRotation(playerId: number): number {
+  switch (playerId) {
+    case 3:
+      return -5
+    case 2:
+      return 4
+    case 4:
+      return -4
+    default:
+      return 3
+  }
+}
+
+function getPlayedCardOverlayPose(
+  playerId: number
+): { left: string; top: string; rotation: number } {
   const position = getPlayedCardPosition(playerId)
 
   return {
     left: `${((position.x + 2.8) / 5.6) * 100}%`,
     top: `${((2 - position.y) / 4) * 100}%`,
+    rotation: getPlayedCardRotation(playerId),
   }
 }
 
@@ -600,13 +617,13 @@ function getClearingCardOverlayPosition(
 ): { left: string; top: string; rotation: number } {
   switch (playerId) {
     case 3:
-      return { left: "50%", top: "-18%", rotation: -18 }
+      return { left: "50%", top: "-18%", rotation: -22 }
     case 2:
-      return { left: "-18%", top: "50%", rotation: 18 }
+      return { left: "-18%", top: "50%", rotation: 22 }
     case 4:
-      return { left: "118%", top: "50%", rotation: -18 }
+      return { left: "118%", top: "50%", rotation: -22 }
     default:
-      return { left: "50%", top: "118%", rotation: 18 }
+      return { left: "50%", top: "118%", rotation: 22 }
   }
 }
 
@@ -659,6 +676,7 @@ interface AnimatedCard {
   to: {
     left: string
     top: string
+    rotation: number
   }
   stage: "from" | "to" | "settle"
 }
@@ -671,6 +689,7 @@ interface ClearingCard {
   from: {
     left: string
     top: string
+    rotation: number
   }
   to: {
     left: string
@@ -707,6 +726,7 @@ interface CodeCardProps {
   suitSymbol?: string
   transition?: string
   opacity?: number
+  settled?: boolean
 }
 
 function CodeCard({
@@ -721,6 +741,7 @@ function CodeCard({
   suitSymbol,
   transition,
   opacity = 1,
+  settled = false,
 }: CodeCardProps) {
   const width = 50 * scale
   const height = 72 * scale
@@ -741,9 +762,13 @@ function CodeCard({
           ? `center / cover no-repeat url(${cardBackAgedPhotoUrl})`
           : `center / cover no-repeat url(${cardFaceAgedPaperUrl})`,
         border: "1px solid rgba(120,82,48,0.35)",
-        boxShadow: highlight
-          ? "0 10px 20px rgba(0,0,0,0.24)"
-          : "0 8px 16px rgba(0,0,0,0.18)",
+        boxShadow: faceDown
+          ? "0 8px 16px rgba(0,0,0,0.2)"
+          : settled
+            ? "0 12px 20px rgba(0,0,0,0.22), 0 2px 4px rgba(0,0,0,0.1)"
+            : highlight
+              ? "0 10px 20px rgba(0,0,0,0.24)"
+              : "0 8px 16px rgba(0,0,0,0.18)",
         color: suitColor,
         display: "flex",
         flexDirection: "column",
