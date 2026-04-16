@@ -563,7 +563,7 @@ export function TableSection({
                         ...styles.actionDisplayCard,
                         backgroundImage: `url(${valuePlaqueAsset})`,
                         backgroundSize: "cover",
-                        backgroundPosition: "left center",
+                        backgroundPosition: "center",
                         backgroundRepeat: "no-repeat",
                         border: "none",
                         boxShadow: "none",
@@ -579,7 +579,8 @@ export function TableSection({
                       style={{
                         ...styles.tableHudStats,
                         backgroundImage: `linear-gradient(180deg, rgba(28,18,12,0.18) 0%, rgba(14,9,6,0.24) 100%), url(${statsPanelWoodAsset})`,
-                        backgroundSize: "cover, 116% 132%",
+                        backgroundColor: "rgba(57,36,24,0.92)",
+                        backgroundSize: "cover, 112% 128%",
                         backgroundPosition: "center, center",
                         backgroundRepeat: "no-repeat, no-repeat",
                         boxShadow:
@@ -664,7 +665,7 @@ export function TableSection({
                               style={{
                                 ...styles.trucoPrimaryButton,
                                 backgroundImage: `url(${actionButtonAsset})`,
-                                backgroundSize: "cover",
+                                backgroundSize: "100% 100%",
                                 backgroundPosition: "center",
                                 backgroundRepeat: "no-repeat",
                                 border: "none",
@@ -683,7 +684,7 @@ export function TableSection({
                               style={{
                                 ...styles.trucoSecondaryButton,
                                 backgroundImage: `url(${actionButtonAsset})`,
-                                backgroundSize: "cover",
+                                backgroundSize: "100% 100%",
                                 backgroundPosition: "center",
                                 backgroundRepeat: "no-repeat",
                                 border: "none",
@@ -700,7 +701,7 @@ export function TableSection({
                               style={{
                                 ...styles.trucoSecondaryButton,
                                 backgroundImage: `url(${actionButtonAsset})`,
-                                backgroundSize: "cover",
+                                backgroundSize: "100% 100%",
                                 backgroundPosition: "center",
                                 backgroundRepeat: "no-repeat",
                                 border: "none",
@@ -721,7 +722,7 @@ export function TableSection({
                               style={{
                                 ...styles.trucoSecondaryButton,
                                 backgroundImage: `url(${actionButtonAsset})`,
-                                backgroundSize: "cover",
+                                backgroundSize: "100% 100%",
                                 backgroundPosition: "center",
                                 backgroundRepeat: "no-repeat",
                                 border: "none",
