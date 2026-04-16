@@ -17,6 +17,8 @@ export interface TableTheme {
   illustratedTableScale?: number
   illustratedTableOffsetX?: number
   illustratedTableOffsetY?: number
+  sceneWarmGlowStrength?: number
+  sceneVignetteStrength?: number
 }
 
 const STREET_THEME: TableTheme = {
@@ -31,6 +33,8 @@ const STREET_THEME: TableTheme = {
   rustColor: "#8a4b28",
   illustratedTableAsset: "rust-classic",
   illustratedTableScale: 1,
+  sceneWarmGlowStrength: 0.16,
+  sceneVignetteStrength: 0.26,
 }
 
 const ZE_CATINGA_PHOTO_THEME: TableTheme = {
@@ -45,6 +49,8 @@ const ZE_CATINGA_PHOTO_THEME: TableTheme = {
   rustColor: "#7a4a2f",
   illustratedTableAsset: "ze-catinga-photo",
   illustratedTableScale: 1,
+  sceneWarmGlowStrength: 0.22,
+  sceneVignetteStrength: 0.24,
 }
 
 const STREET_CLEAN_THEME: TableTheme = {
@@ -59,6 +65,8 @@ const STREET_CLEAN_THEME: TableTheme = {
   rustColor: "#9a5a2c",
   illustratedTableAsset: "maneco-wood",
   illustratedTableScale: 1,
+  sceneWarmGlowStrength: 0.18,
+  sceneVignetteStrength: 0.22,
 }
 
 const WOOD_STREET_THEME: TableTheme = {
@@ -73,6 +81,8 @@ const WOOD_STREET_THEME: TableTheme = {
   rustColor: "#6f4b34",
   illustratedTableAsset: "wood-street",
   illustratedTableScale: 1.03,
+  sceneWarmGlowStrength: 0.14,
+  sceneVignetteStrength: 0.28,
 }
 
 const STEEL_PATIO_THEME: TableTheme = {
@@ -87,6 +97,8 @@ const STEEL_PATIO_THEME: TableTheme = {
   rustColor: "#8a4b28",
   illustratedTableAsset: "steel-patio",
   illustratedTableScale: 1.38,
+  sceneWarmGlowStrength: 0.1,
+  sceneVignetteStrength: 0.18,
 }
 
 const NEON_THEME: TableTheme = {
@@ -99,6 +111,8 @@ const NEON_THEME: TableTheme = {
   accentColor: "#22d3ee",
   tableKind: "felt",
   rustColor: "#7c3aed",
+  sceneWarmGlowStrength: 0.12,
+  sceneVignetteStrength: 0.2,
 }
 
 const PREMIUM_THEME: TableTheme = {
@@ -111,6 +125,8 @@ const PREMIUM_THEME: TableTheme = {
   accentColor: "#fbbf24",
   tableKind: "felt",
   rustColor: "#92400e",
+  sceneWarmGlowStrength: 0.18,
+  sceneVignetteStrength: 0.18,
 }
 
 export function getTableTheme(visualTheme?: string): TableTheme {

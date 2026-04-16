@@ -54,6 +54,7 @@ export function GameTableScene({
   } = model.theme
   const usesIllustratedTable = tableKind === "steel"
   const usesSteelPatioTable = illustratedTableAsset === "steel-patio"
+  const usesPhotoTable = illustratedTableAsset === "ze-catinga-photo"
   const illustratedTableUrl =
     illustratedTableAsset === "ze-catinga-photo"
       ? tableTopZeCatingaPhotoUrl
@@ -67,6 +68,8 @@ export function GameTableScene({
   const tableScale = illustratedTableScale ?? 1
   const tableOffsetX = illustratedTableOffsetX ?? 0
   const tableOffsetY = illustratedTableOffsetY ?? 0
+  const sceneWarmGlowStrength = model.theme.sceneWarmGlowStrength ?? 0.16
+  const sceneVignetteStrength = model.theme.sceneVignetteStrength ?? 0.24
   const [animatingCards, setAnimatingCards] = useState<AnimatedCard[]>([])
   const [clearingCards, setClearingCards] = useState<ClearingCard[]>([])
   const [dealingCards, setDealingCards] = useState<DealingCard[]>([])
@@ -471,8 +474,10 @@ export function GameTableScene({
               transformOrigin: "center center",
               transform: `translate(${tableOffsetX}%, ${tableOffsetY}%) scale(${tableScale})`,
               filter: usesSteelPatioTable
-                ? "none"
-                : "drop-shadow(0 18px 26px rgba(0,0,0,0.34))",
+                ? "contrast(1.04) saturate(0.96)"
+                : usesPhotoTable
+                  ? "contrast(1.06) saturate(1.02) drop-shadow(0 18px 26px rgba(0,0,0,0.32))"
+                  : "contrast(1.03) saturate(0.98) drop-shadow(0 18px 26px rgba(0,0,0,0.34))",
             }}
           />
         ) : (
@@ -484,6 +489,30 @@ export function GameTableScene({
             }}
           />
         )}
+
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              `radial-gradient(circle at center, rgba(255,244,214,0.08) 0%, rgba(255,244,214,0.04) 28%, rgba(17,12,9,${Math.max(sceneVignetteStrength - 0.12, 0.04)}) 62%, rgba(8,6,5,${sceneVignetteStrength}) 100%)`,
+            }}
+          />
+
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            left: "-6%",
+            right: "-6%",
+            top: "-10%",
+            height: "28%",
+            background:
+              `radial-gradient(ellipse at top, rgba(255,214,140,${sceneWarmGlowStrength}) 0%, rgba(255,214,140,${Math.max(sceneWarmGlowStrength - 0.08, 0.02)}) 34%, rgba(255,214,140,0) 74%)`,
+            pointerEvents: "none",
+          }}
+        />
       </div>
 
       <div
@@ -868,10 +897,10 @@ function SpeechBubbleOverlay({
           borderRight: "2px solid rgba(68, 64, 60, 0.82)",
           borderBottom: "2px solid rgba(68, 64, 60, 0.82)",
           transform: "translateX(-50%) rotate(45deg)",
-          left: playerId === 2 ? "18%" : playerId === 4 ? "82%" : "50%",
-          bottom: playerId === 3 ? "-8px" : playerId === 1 ? "-8px" : "calc(50% - 7px)",
-          top: playerId === 2 || playerId === 4 ? "calc(50% - 7px)" : undefined,
-          right: playerId === 4 ? "-8px" : undefined,
+          left: playerId === 2 ? "24%" : playerId === 4 ? "76%" : "50%",
+          bottom: "-8px",
+          top: undefined,
+          right: undefined,
         }}
       />
     </div>
