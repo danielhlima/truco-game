@@ -890,7 +890,7 @@ function GameStartScreen({
 }
 
 function CharacterSelectionScreen({
-  currentCampaignVenue,
+  currentCampaignVenue: _currentCampaignVenue,
   selectedCharacter,
   selectedCharacterIndex,
   selectableCharacters,
@@ -942,14 +942,13 @@ function CharacterSelectionScreen({
               alt={selectedCharacter.name}
               style={styles.characterPortraitImage}
             />
+            <div style={styles.characterPortraitOverlay}>
+              <div style={styles.characterPortraitName}>{selectedCharacter.name}</div>
+              <div style={styles.characterPortraitNickname}>{selectedCharacter.nickname}</div>
+            </div>
           </div>
 
           <div style={styles.characterIdentityPanel}>
-            <div style={styles.characterIdentityBlock}>
-              <div style={styles.characterName}>{selectedCharacter.name}</div>
-              <div style={styles.characterNickname}>{selectedCharacter.nickname}</div>
-            </div>
-
             <div style={styles.characterNavigator}>
               <button style={styles.characterNavButton} onClick={onPrevious}>
                 ←
@@ -980,17 +979,6 @@ function CharacterSelectionScreen({
         </div>
 
         <div style={styles.characterSelectRightColumn}>
-          <div style={styles.characterContextHeader}>
-            <div>
-              <div style={styles.characterContextKicker}>Perfil da parceira</div>
-              <div style={styles.characterContextLabel}>
-                {currentCampaignVenue
-                  ? `${currentCampaignVenue.name} · ${currentCampaignVenue.districtLabel}`
-                  : "Seleção de parceiro"}
-              </div>
-            </div>
-          </div>
-
           <div style={styles.characterInfoPanel}>
             <div style={styles.characterInfoCard}>
               <div style={styles.characterInfoSection}>
@@ -1036,11 +1024,6 @@ function CharacterSelectionScreen({
             </div>
 
             <div style={styles.characterActionFooter}>
-              <div style={styles.characterActionHint}>
-                A escolha real da parceira entra no próximo passo. Por enquanto, seguimos
-                validando o visual e a navegação.
-              </div>
-
               <button
                 style={{
                   ...styles.characterSelectActionButton,
