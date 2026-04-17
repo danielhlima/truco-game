@@ -11,14 +11,6 @@ import cardFaceAgedPaperAsset from "./assets/cards/card-face-aged-paper.png"
 
 type GameplayLayoutMode = "regular" | "compact"
 
-function shouldUseTightSidebar(): boolean {
-  if (typeof window === "undefined") {
-    return false
-  }
-
-  return window.innerHeight < 780
-}
-
 function getGameplayLayoutMode(): GameplayLayoutMode {
   if (typeof window === "undefined") {
     return "regular"
@@ -29,12 +21,10 @@ function getGameplayLayoutMode(): GameplayLayoutMode {
 
 function App() {
   const [layoutMode, setLayoutMode] = useState<GameplayLayoutMode>(getGameplayLayoutMode)
-  const [useTightSidebar, setUseTightSidebar] = useState(shouldUseTightSidebar)
 
   useEffect(() => {
     const handleResize = () => {
       setLayoutMode(getGameplayLayoutMode())
-      setUseTightSidebar(shouldUseTightSidebar())
     }
 
     window.addEventListener("resize", handleResize)
@@ -148,74 +138,28 @@ function App() {
         ...styles.tableHudSidebar,
         width: "100%",
         boxSizing: "border-box",
-        gridTemplateRows: useTightSidebar
-          ? "max-content max-content"
-          : isCompactLayout
-            ? "max-content max-content"
-            : "max-content max-content",
-        gap: useTightSidebar ? "clamp(6px, 0.5vw, 8px)" : styles.tableHudSidebar.gap,
-        alignContent: "center",
-        alignItems: "center",
+        gridTemplateRows: isCompactLayout
+          ? "max-content minmax(150px, 1fr) max-content"
+          : "max-content minmax(0, 1fr) max-content",
+      },
+      actionDisplayCard: {
+        ...styles.actionDisplayCard,
+        width: isCompactLayout ? "90%" : "88%",
       },
       tableHudStats: {
         ...styles.tableHudStats,
         width: isCompactLayout ? "90%" : "88%",
-        padding: useTightSidebar
-          ? "clamp(8px, 0.62vw, 10px) clamp(10px, 0.82vw, 11px)"
-          : styles.tableHudStats.padding,
-        gap: useTightSidebar ? "clamp(5px, 0.42vw, 7px)" : styles.tableHudStats.gap,
-        minHeight: useTightSidebar ? "clamp(116px, 14vw, 138px)" : undefined,
-        height: useTightSidebar ? "auto" : styles.tableHudStats.height,
       },
       inGameActionsCard: {
         ...styles.inGameActionsCard,
         width: isCompactLayout ? "90%" : "88%",
-        marginTop: useTightSidebar ? "clamp(4px, 0.35vw, 6px)" : styles.inGameActionsCard.marginTop,
-        gap: useTightSidebar ? "clamp(6px, 0.48vw, 8px)" : styles.inGameActionsCard.gap,
       },
       tableCenterArea: {
         ...styles.tableCenterArea,
         minHeight: isCompactLayout ? "clamp(300px, 38dvh, 340px)" : styles.tableCenterArea.minHeight,
       },
-      tableHudStatLineCentered: {
-        ...styles.tableHudStatLineCentered,
-        gap: useTightSidebar ? "clamp(2px, 0.18vw, 3px)" : styles.tableHudStatLineCentered.gap,
-      },
-      tableHudStatLabelCentered: {
-        ...styles.tableHudStatLabelCentered,
-        fontSize: useTightSidebar ? "clamp(7px, 0.62vw, 8px)" : styles.tableHudStatLabelCentered.fontSize,
-      },
-      tableHudStatValueCentered: {
-        ...styles.tableHudStatValueCentered,
-        fontSize: useTightSidebar ? "clamp(10px, 0.92vw, 13px)" : styles.tableHudStatValueCentered.fontSize,
-        lineHeight: useTightSidebar ? 1.05 : styles.tableHudStatValueCentered.lineHeight,
-      },
-      inGameActionsRow: {
-        ...styles.inGameActionsRow,
-        gap: useTightSidebar ? "clamp(5px, 0.42vw, 6px)" : styles.inGameActionsRow.gap,
-      },
-      inGameActionsGrid: {
-        ...styles.inGameActionsGrid,
-        gap: useTightSidebar ? "clamp(5px, 0.42vw, 6px)" : styles.inGameActionsGrid.gap,
-      },
-      trucoPrimaryButton: {
-        ...styles.trucoPrimaryButton,
-        minHeight: useTightSidebar ? "clamp(30px, 2.3vw, 34px)" : styles.trucoPrimaryButton.minHeight,
-        padding: useTightSidebar
-          ? "clamp(4px, 0.34vw, 6px) clamp(10px, 0.82vw, 12px)"
-          : styles.trucoPrimaryButton.padding,
-        fontSize: useTightSidebar ? "clamp(9px, 0.78vw, 10px)" : styles.trucoPrimaryButton.fontSize,
-      },
-      trucoSecondaryButton: {
-        ...styles.trucoSecondaryButton,
-        minHeight: useTightSidebar ? "clamp(30px, 2.3vw, 34px)" : styles.trucoSecondaryButton.minHeight,
-        padding: useTightSidebar
-          ? "clamp(4px, 0.34vw, 6px) clamp(10px, 0.82vw, 12px)"
-          : styles.trucoSecondaryButton.padding,
-        fontSize: useTightSidebar ? "clamp(9px, 0.78vw, 10px)" : styles.trucoSecondaryButton.fontSize,
-      },
     }),
-    [isCompactLayout, useTightSidebar]
+    [isCompactLayout]
   )
 
   return (
@@ -1097,11 +1041,9 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "clamp(9px, 0.82vw, 12px) clamp(9px, 0.88vw, 12px)",
     boxSizing: "border-box",
     display: "grid",
-    gridTemplateRows: "max-content max-content",
+    gridTemplateRows: "max-content minmax(0, 1fr) max-content",
     gap: "clamp(10px, 0.82vw, 12px)",
     justifyItems: "center",
-    alignItems: "center",
-    alignContent: "center",
     color: "#f8fafc",
     minHeight: 0,
     overflow: "hidden",

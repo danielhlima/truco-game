@@ -16,6 +16,7 @@ import scorePadNotebookAsset from "../assets/ui-left/scorepad-notebook-clean-cut
 import avatarYouAsset from "../assets/ui-left/avatar-you.png"
 import actionButtonAsset from "../assets/ui-right/action-button-solid.png"
 import statsPanelWoodAsset from "../assets/ui-right/stats-panel-wood-main.png"
+import valuePlaqueAsset from "../assets/ui-right/value-plaque-solid.png"
 import type { PlayerProfile } from "../profile/playerProfile"
 import type { PartnerAdvice } from "../ai/trucoDecision"
 import {
@@ -558,6 +559,23 @@ export function TableSection({
 
                 <div style={styles.gameSidebarColumn}>
                   <div style={styles.tableHudSidebar}>
+                    <div
+                      style={{
+                        ...styles.actionDisplayCard,
+                        backgroundImage: `url(${valuePlaqueAsset})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        backgroundRepeat: "no-repeat",
+                        border: "none",
+                        boxShadow: "none",
+                      }}
+                    >
+                      <div style={styles.actionDisplayLabel}>Valendo</div>
+                      <div style={styles.actionDisplayValue}>
+                        {handState ? getBetBadgeLabel(handState.currentBet) : getBetBadgeLabel(1)}
+                      </div>
+                    </div>
+
                     <div
                       style={{
                         ...styles.tableHudStats,
