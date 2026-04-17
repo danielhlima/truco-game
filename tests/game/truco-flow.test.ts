@@ -17,6 +17,17 @@ test("requestTruco cria um pedido inicial valendo 3", () => {
   assert.equal(nextState.truco.proposedBet, 3)
 })
 
+test("time com 9 pontos não pode pedir truco", () => {
+  const state = createHandStateFixture()
+
+  const nextState = requestTruco(state, 1, {
+    A: 9,
+    B: 3,
+  })
+
+  assert.equal(nextState, state)
+})
+
 test("respondToTruco com accept atualiza a mão para o valor aceito", () => {
   const state = requestTruco(createHandStateFixture(), 1)
 
@@ -75,6 +86,33 @@ test("stepHand permite que a IA aceite e peça aumento quando a mão for forte",
   assert.equal(nextState.truco.awaitingResponseFromPlayerId, 1)
   assert.equal(nextState.truco.awaitingResponseFromTeam, "A")
   assert.equal(nextState.truco.proposedBet, 6)
+})
+
+test("stepHand não deixa a IA aumentar quando o time já tem 9 pontos", () => {
+  const state = createHandStateFixture({
+    currentBet: 1,
+    truco: {
+      phase: "awaiting-response",
+      requestedByPlayerId: 1,
+      requestedByTeam: "A",
+      awaitingResponseFromPlayerId: 2,
+      awaitingResponseFromTeam: "B",
+      proposedBet: 3,
+    },
+  })
+
+  const nextState = stepHand(
+    state,
+    {
+      A: "balanced",
+      B: "balanced",
+    },
+    { A: 3, B: 9 }
+  )
+
+  assert.equal(nextState.currentBet, 3)
+  assert.equal(nextState.truco.phase, "idle")
+  assert.equal(nextState.truco.nextRaiseByTeam, "B")
 })
 
 test("contra-aumento mantém a resposta com quem fez o pedido anterior", () => {

@@ -7,7 +7,7 @@ import {
 import { createHandStateFixture } from "../helpers/gameFixtures.ts"
 import { requestTruco } from "../../src/game/requestTruco.ts"
 
-test("aceite de contra-aumento pelo autor do truco usa TOMA como fala principal", () => {
+test("aceite de contra-aumento usa DESCE como fala principal do respondente atual", () => {
   const previousState = createHandStateFixture({
     currentBet: 3,
     truco: {
@@ -35,7 +35,7 @@ test("aceite de contra-aumento pelo autor do truco usa TOMA como fala principal"
 
   assert.deepEqual(bubble, {
     playerId: 2,
-    text: "TOMA!",
+    text: "DESCE!",
   })
 })
 
@@ -104,7 +104,7 @@ test("aceite de pedido inicial gera TOMA como follow-up de quem abriu o truco", 
   })
 })
 
-test("aceite de contra-aumento pelo autor do truco não gera TOMA duplicado no follow-up", () => {
+test("aceite de contra-aumento gera TOMA como follow-up de quem propôs o valor atual", () => {
   const previousState = createHandStateFixture({
     currentBet: 3,
     truco: {
@@ -132,7 +132,10 @@ test("aceite de contra-aumento pelo autor do truco não gera TOMA duplicado no f
 
   const bubble = getFollowUpSpeechBubbleForTransition(previousState, nextState)
 
-  assert.equal(bubble, null)
+  assert.deepEqual(bubble, {
+    playerId: 3,
+    text: "TOMA!",
+  })
 })
 
 test("pedido posterior de seis preserva quem falou truco como origem da sequência", () => {
@@ -156,7 +159,7 @@ test("pedido posterior de seis preserva quem falou truco como origem da sequênc
   assert.equal(nextState.truco.initialRequestedByTeam, "B")
 })
 
-test("aceite de nove após seis posterior gera TOMA para quem falou truco original", () => {
+test("aceite de nove após seis posterior gera DESCE de quem aceitou o lance atual", () => {
   const previousState = createHandStateFixture({
     currentBet: 6,
     truco: {
@@ -186,13 +189,16 @@ test("aceite de nove após seis posterior gera TOMA para quem falou truco origin
   const followUp = getFollowUpSpeechBubbleForTransition(previousState, nextState)
 
   assert.deepEqual(primary, {
+    playerId: 3,
+    text: "DESCE!",
+  })
+  assert.deepEqual(followUp, {
     playerId: 2,
     text: "TOMA!",
   })
-  assert.equal(followUp, null)
 })
 
-test("aceite de doze após truco iniciado pelo jogador 4 usa TOMA do jogador 4", () => {
+test("aceite de doze após raise posterior usa DESCE do respondente e TOMA de quem pediu o valor atual", () => {
   const previousState = createHandStateFixture({
     currentBet: 9,
     truco: {
@@ -223,7 +229,49 @@ test("aceite de doze após truco iniciado pelo jogador 4 usa TOMA do jogador 4",
 
   assert.deepEqual(primary, {
     playerId: 4,
+    text: "DESCE!",
+  })
+  assert.deepEqual(followUp, {
+    playerId: 3,
     text: "TOMA!",
   })
-  assert.equal(followUp, null)
+})
+
+test("seis pedido depois de truco inicial usa DESCE de quem aceitou e TOMA de quem pediu seis", () => {
+  const previousState = createHandStateFixture({
+    currentBet: 3,
+    truco: {
+      phase: "awaiting-response",
+      requestedByPlayerId: 3,
+      requestedByTeam: "A",
+      initialRequestedByPlayerId: 2,
+      initialRequestedByTeam: "B",
+      awaitingResponseFromPlayerId: 2,
+      awaitingResponseFromTeam: "B",
+      proposedBet: 6,
+      promptKind: "request",
+    },
+  })
+
+  const nextState = createHandStateFixture({
+    currentBet: 6,
+    truco: {
+      phase: "idle",
+      initialRequestedByPlayerId: 2,
+      initialRequestedByTeam: "B",
+      nextRaiseByTeam: "B",
+    },
+  })
+
+  const primary = getSpeechBubbleForTransition(previousState, nextState)
+  const followUp = getFollowUpSpeechBubbleForTransition(previousState, nextState)
+
+  assert.deepEqual(primary, {
+    playerId: 2,
+    text: "DESCE!",
+  })
+  assert.deepEqual(followUp, {
+    playerId: 3,
+    text: "TOMA!",
+  })
 })

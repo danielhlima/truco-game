@@ -34,6 +34,7 @@ function App() {
   const {
     activeVariant,
     canHumanAdvisePartner,
+    canHumanRaiseTruco,
     canHumanRespondToTruco,
     canPlayHumanCard,
     canRequestTruco,
@@ -189,6 +190,7 @@ function App() {
           player1={player1}
           canRequestTruco={canRequestTruco}
           canHumanAdvisePartner={canHumanAdvisePartner}
+          canHumanRaiseTruco={canHumanRaiseTruco}
           canHumanRespondToTruco={canHumanRespondToTruco}
           canPlayHumanCard={canPlayHumanCard}
           variantSelectionDisabled={variantSelectionDisabled}

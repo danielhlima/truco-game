@@ -266,42 +266,14 @@ function getTrucoSpeechResponderPlayerId(handState: HandState): number {
   return getTrucoTargetPlayerId(handState)
 }
 
-function getInitialTrucoRequesterPlayerId(handState: HandState): number | null {
-  return (
-    handState.truco.initialRequestedByPlayerId ??
-    handState.truco.requestedByPlayerId ??
-    null
-  )
-}
-
 function getTrucoAcceptSpeechSequence(
   handState: HandState
 ): TrucoAcceptSpeechSequence | null {
   const responderPlayerId = getTrucoSpeechResponderPlayerId(handState)
-  const initialRequesterPlayerId = getInitialTrucoRequesterPlayerId(handState)
-  const isInitialRequestAcceptance =
-    handState.truco.promptKind === "request" && handState.truco.proposedBet === 3
+  const currentRequesterPlayerId = handState.truco.requestedByPlayerId ?? null
 
-  if (!initialRequesterPlayerId) {
+  if (!currentRequesterPlayerId) {
     return null
-  }
-
-  if (responderPlayerId === initialRequesterPlayerId) {
-    return {
-      primary: {
-        playerId: initialRequesterPlayerId,
-        text: "TOMA!",
-      },
-    }
-  }
-
-  if (!isInitialRequestAcceptance) {
-    return {
-      primary: {
-        playerId: initialRequesterPlayerId,
-        text: "TOMA!",
-      },
-    }
   }
 
   return {
@@ -310,7 +282,7 @@ function getTrucoAcceptSpeechSequence(
       text: "DESCE!",
     },
     followUp: {
-      playerId: initialRequesterPlayerId,
+      playerId: currentRequesterPlayerId,
       text: "TOMA!",
     },
   }

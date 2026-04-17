@@ -26,7 +26,7 @@ import { playHumanCard } from "../game/playHumanCard"
 import { requestTruco } from "../game/requestTruco"
 import { respondToTruco } from "../game/respondToTruco"
 import { stepHand } from "../game/stepHand"
-import { getBetCallLabel } from "../game/truco"
+import { canTeamAskForTruco, getBetCallLabel } from "../game/truco"
 import type { GameVariant } from "../game/variant"
 import {
   loadPlayerProfile,
@@ -242,15 +242,24 @@ export function useGameSession() {
 
   const canRequestTruco =
     !!handState &&
+    !!matchState &&
     !handState.finished &&
     handState.currentPlayerId === 1 &&
     handState.table.length < 4 &&
     handState.truco.phase === "idle" &&
+    canTeamAskForTruco(matchState.score, "A") &&
     (
       handState.currentBet === 1 ||
       !handState.truco.nextRaiseByTeam ||
       handState.truco.nextRaiseByTeam === "A"
     )
+
+  const canHumanRaiseTruco =
+    !!handState &&
+    !!matchState &&
+    canHumanRespondToTruco &&
+    canTeamAskForTruco(matchState.score, "A") &&
+    getNextRaiseValueFromPendingTruco(handState) !== null
 
   const canPlayHumanCard =
     !!handState &&
@@ -454,7 +463,7 @@ export function useGameSession() {
     if (!handState) return
     if (!canRequestTruco) return
 
-    const nextState = requestTruco(handState, 1)
+    const nextState = requestTruco(handState, 1, matchState?.score)
     const requestedBet = nextState.truco.proposedBet
     applyHandState(nextState, {
       eventMessage: requestedBet
@@ -472,7 +481,7 @@ export function useGameSession() {
   function handleAcceptTruco() {
     if (!handState || !canHumanRespondToTruco) return
 
-    const nextState = respondToTruco(handState, "accept")
+    const nextState = respondToTruco(handState, "accept", matchState?.score)
     const acceptedBet = nextState.currentBet
     applyHandState(nextState, {
       eventMessage: `Você aceitou ${getBetCallLabel(acceptedBet)}.`,
@@ -483,7 +492,7 @@ export function useGameSession() {
   function handleRunFromTruco() {
     if (!handState || !canHumanRespondToTruco) return
 
-    const nextState = respondToTruco(handState, "run")
+    const nextState = respondToTruco(handState, "run", matchState?.score)
     applyHandState(nextState, {
       eventMessage: `Você correu de ${getPendingBetText(handState)}.`,
       trucoMessage: `Nosso time correu de ${getPendingBetText(handState)}.`,
@@ -492,10 +501,10 @@ export function useGameSession() {
   }
 
   function handleRaiseTruco() {
-    if (!handState || !canHumanRespondToTruco) return
+    if (!handState || !canHumanRaiseTruco) return
 
     const requestedValue = getNextRaiseValueFromPendingTruco(handState)
-    const nextState = respondToTruco(handState, "raise")
+    const nextState = respondToTruco(handState, "raise", matchState?.score)
 
     applyHandState(nextState, {
       eventMessage: requestedValue
@@ -533,7 +542,7 @@ export function useGameSession() {
             ? "accept"
             : fallbackDecision
 
-      const nextState = respondToTruco(handState, decision)
+      const nextState = respondToTruco(handState, decision, matchState?.score)
 
       if (decision === "run") {
         applyHandState(nextState, {
@@ -609,7 +618,7 @@ export function useGameSession() {
       const nextState = stepHand(handState, {
         A: partnerAiPersonalityId,
         B: opponentAiPersonalityId,
-      })
+      }, matchState.score)
       applyHandState(nextState)
     }, handState.finished ? NEXT_HAND_DELAY_MS : AUTO_STEP_DELAY_MS)
 
@@ -748,6 +757,7 @@ export function useGameSession() {
     canHumanRespondToTruco,
     canHumanAdvisePartner,
     canPlayHumanCard,
+    canHumanRaiseTruco,
     canRequestTruco,
     campaignCompleted,
     campaignSummary,

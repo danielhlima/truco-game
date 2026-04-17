@@ -3,6 +3,10 @@ export type TrucoResponse = "accept" | "run" | "raise"
 export const BET_STEPS = [1, 3, 6, 9, 12] as const
 
 export type BetValue = (typeof BET_STEPS)[number]
+export interface MatchScore {
+  A: number
+  B: number
+}
 
 export function getBetLabel(bet: BetValue): string {
   switch (bet) {
@@ -41,4 +45,12 @@ export function getPreviousBet(currentBet: BetValue): BetValue {
   }
 
   return BET_STEPS[index - 1]
+}
+
+export function canTeamAskForTruco(matchScore: MatchScore | null | undefined, team: "A" | "B"): boolean {
+  if (!matchScore) {
+    return true
+  }
+
+  return matchScore[team] < 9
 }

@@ -1,11 +1,12 @@
 import { logEvent } from "../utils/logger"
 import type { HandState } from "./handState"
-import { getBetCallLabel, getNextBet } from "./truco"
+import { canTeamAskForTruco, getBetCallLabel, getNextBet, type MatchScore } from "./truco"
 import type { TrucoResponse } from "./truco"
 
 export function respondToTruco(
   state: HandState,
-  response: TrucoResponse
+  response: TrucoResponse,
+  matchScore?: MatchScore
 ): HandState {
   if (state.finished) {
     return state
@@ -35,7 +36,12 @@ export function respondToTruco(
     throw new Error("Estado de truco inválido")
   }
 
-  if (response === "accept") {
+  const normalizedResponse: TrucoResponse =
+    response === "raise" && !canTeamAskForTruco(matchScore, awaitingResponseFromTeam)
+      ? "accept"
+      : response
+
+  if (normalizedResponse === "accept") {
     logEvent(`Time ${awaitingResponseFromTeam} aceitou ${getBetCallLabel(proposedBet)}.`)
     logEvent(`Mão agora vale ${proposedBet} ponto(s).`)
 
@@ -51,7 +57,7 @@ export function respondToTruco(
     }
   }
 
-  if (response === "raise") {
+  if (normalizedResponse === "raise") {
     const nextBet = getNextBet(proposedBet)
 
     if (!nextBet) {

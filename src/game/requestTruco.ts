@@ -1,14 +1,18 @@
 import { logEvent } from "../utils/logger"
 import type { HandState, TeamId } from "./handState"
 import { getTargetPlayerForTruco } from "./trucoTarget"
-import { getBetCallLabel, getNextBet } from "./truco"
+import { canTeamAskForTruco, getBetCallLabel, getNextBet, type MatchScore } from "./truco"
 import { getTeam } from "./teams"
 
 function getOpposingTeam(team: TeamId): TeamId {
   return team === "A" ? "B" : "A"
 }
 
-export function requestTruco(state: HandState, playerId: number): HandState {
+export function requestTruco(
+  state: HandState,
+  playerId: number,
+  matchScore?: MatchScore
+): HandState {
   if (state.finished) {
     return state
   }
@@ -20,12 +24,17 @@ export function requestTruco(state: HandState, playerId: number): HandState {
     const requestingTeam = getTeam(playerId)
 
   if (
-      state.currentBet > 1 &&
-      state.truco.nextRaiseByTeam &&
-      state.truco.nextRaiseByTeam !== requestingTeam
-    ) {
-      throw new Error("Este time não pode aumentar a aposta agora")
-    }
+    state.currentBet > 1 &&
+    state.truco.nextRaiseByTeam &&
+    state.truco.nextRaiseByTeam !== requestingTeam
+  ) {
+    throw new Error("Este time não pode aumentar a aposta agora")
+  }
+
+  if (!canTeamAskForTruco(matchScore, requestingTeam)) {
+    logEvent(`Pedido de truco ignorado: time ${requestingTeam} já atingiu 9 pontos.`)
+    return state
+  }
 
   if (state.currentPlayerId !== playerId) {
     throw new Error("Não é a vez deste jogador pedir truco")

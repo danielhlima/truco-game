@@ -20,7 +20,6 @@ import valuePlaqueAsset from "../assets/ui-right/value-plaque-solid.png"
 import type { PlayerProfile } from "../profile/playerProfile"
 import type { PartnerAdvice } from "../ai/trucoDecision"
 import {
-  canHumanRaiseInResponse,
   formatCard,
   getBetBadgeLabel,
   getCampaignTierLabel,
@@ -361,6 +360,7 @@ interface TableSectionProps {
   player1: Player | null
   canRequestTruco: boolean
   canHumanAdvisePartner: boolean
+  canHumanRaiseTruco: boolean
   canHumanRespondToTruco: boolean
   canPlayHumanCard: boolean
   variantSelectionDisabled: boolean
@@ -393,6 +393,7 @@ export function TableSection({
   player1,
   canRequestTruco,
   canHumanAdvisePartner,
+  canHumanRaiseTruco,
   canHumanRespondToTruco,
   canPlayHumanCard,
   variantSelectionDisabled,
@@ -707,14 +708,12 @@ export function TableSection({
                                 border: "none",
                                 color: "#f7efe0",
                                 boxShadow: "none",
-                                ...(!canHumanRespondToTruco || !canHumanRaiseInResponse(handState)
+                                ...(!canHumanRaiseTruco
                                   ? styles.disabledButton
                                   : {}),
                               }}
                               onClick={onRaiseTruco}
-                              disabled={
-                                !canHumanRespondToTruco || !canHumanRaiseInResponse(handState)
-                              }
+                              disabled={!canHumanRaiseTruco}
                             >
                               {getRaiseResponseButtonLabel(handState)}
                             </button>

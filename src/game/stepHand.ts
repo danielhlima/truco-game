@@ -7,6 +7,7 @@ import { requestTruco } from "./requestTruco"
 import { resolveTrick } from "./resolveTrick"
 import { respondToTruco } from "./respondToTruco"
 import { getTeam } from "./teams"
+import type { MatchScore } from "./truco"
 
 interface AiPersonalityByTeam {
   A: AiTrucoPersonalityId
@@ -18,7 +19,8 @@ export function stepHand(
   aiPersonalityByTeam: AiPersonalityByTeam = {
     A: "balanced",
     B: "balanced",
-  }
+  },
+  matchScore?: MatchScore
 ): HandState {
   if (state.finished) {
     return state
@@ -49,10 +51,10 @@ export function stepHand(
     )
 
     if (decision === "raise") {
-      return respondToTruco(state, "raise")
+      return respondToTruco(state, "raise", matchScore)
     }
 
-    return respondToTruco(state, decision === "accept" ? "accept" : "run")
+    return respondToTruco(state, decision === "accept" ? "accept" : "run", matchScore)
   }
 
   if (state.table.length === 4) {
@@ -88,7 +90,7 @@ export function stepHand(
       )
 
     if (shouldAskForTruco) {
-      return requestTruco(state, currentPlayer.id)
+      return requestTruco(state, currentPlayer.id, matchScore)
     }
 
     return playAiTurn(state)
