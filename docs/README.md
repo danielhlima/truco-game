@@ -48,6 +48,16 @@ Define o pre-plano vivo:
 - o que esta em andamento
 - o proximo foco recomendado
 
+## Estado do foco atual
+
+Neste momento, a gameplay screen esta considerada pronta por enquanto.
+
+O foco ativo mudou para:
+
+- tela de selecao de personagens / parceira IA
+- uso do roster em `src/content/characters.ts`
+- continuidade da interface ja iniciada dentro do proprio menu inicial
+
 ## Regra de continuidade
 
 Se houver conflito entre memoria de chat e documentacao:

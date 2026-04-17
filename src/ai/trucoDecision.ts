@@ -8,20 +8,31 @@ import {
 
 export type PartnerAdvice = "BORA!" | "CÊ QUE SABE!" | "MELHOR CORRER!"
 export type TrucoTeamDecision = "accept" | "run" | "raise"
+export type RandomSource = () => number
 
 export function shouldRaiseBet(
   ruleSet: RuleSet,
   hand: Card[],
   currentBet: BetValue,
   vira?: Card,
-  personalityId: AiTrucoPersonalityId = "balanced"
+  personalityId: AiTrucoPersonalityId = "balanced",
+  randomSource: RandomSource = Math.random
 ): boolean {
   const personality = getAiTrucoPersonality(personalityId)
   const strength = evaluateHandStrength(ruleSet, hand, vira)
   const threshold = personality.raiseThresholdByCurrentBet[currentBet]
 
   if (typeof threshold === "number") {
-    return strength >= threshold
+    if (strength >= threshold) {
+      return true
+    }
+
+    const bluffChance = personality.bluffChanceRequestByCurrentBet[currentBet] ?? 0
+    const withinBluffMargin = strength >= threshold - personality.raiseBluffMargin
+
+    if (withinBluffMargin && bluffChance > 0) {
+      return randomSource() < bluffChance
+    }
   }
 
   return false
@@ -32,14 +43,24 @@ export function respondToRaise(
   hand: Card[],
   nextBet: BetValue,
   vira?: Card,
-  personalityId: AiTrucoPersonalityId = "balanced"
+  personalityId: AiTrucoPersonalityId = "balanced",
+  randomSource: RandomSource = Math.random
 ): "accept" | "run" {
   const personality = getAiTrucoPersonality(personalityId)
   const strength = evaluateHandStrength(ruleSet, hand, vira)
   const threshold = personality.acceptThresholdByNextBet[nextBet]
 
   if (typeof threshold === "number") {
-    return strength >= threshold ? "accept" : "run"
+    if (strength >= threshold) {
+      return "accept"
+    }
+
+    const bluffChance = personality.bluffChanceAcceptByNextBet[nextBet] ?? 0
+    const withinBluffMargin = strength >= threshold - personality.acceptBluffMargin
+
+    if (withinBluffMargin && bluffChance > 0 && randomSource() < bluffChance) {
+      return "accept"
+    }
   }
 
   return "run"
@@ -75,10 +96,11 @@ export function getTeamTrucoDecision(
   hands: Card[][],
   nextBet: BetValue,
   vira?: Card,
-  personalityId: AiTrucoPersonalityId = "balanced"
+  personalityId: AiTrucoPersonalityId = "balanced",
+  randomSource: RandomSource = Math.random
 ): TrucoTeamDecision {
   const shouldAccept = hands.some(
-    (hand) => respondToRaise(ruleSet, hand, nextBet, vira, personalityId) === "accept"
+    (hand) => respondToRaise(ruleSet, hand, nextBet, vira, personalityId, randomSource) === "accept"
   )
 
   if (!shouldAccept) {
@@ -88,7 +110,7 @@ export function getTeamTrucoDecision(
   const canRaise = nextBet !== 12
   const shouldReRaise =
     canRaise &&
-    hands.some((hand) => shouldRaiseBet(ruleSet, hand, nextBet, vira, personalityId))
+    hands.some((hand) => shouldRaiseBet(ruleSet, hand, nextBet, vira, personalityId, randomSource))
 
   if (shouldReRaise) {
     return "raise"

@@ -18,6 +18,7 @@ import actionButtonAsset from "../assets/ui-right/action-button-solid.png"
 import statsPanelWoodAsset from "../assets/ui-right/stats-panel-wood-main.png"
 import type { PlayerProfile } from "../profile/playerProfile"
 import type { PartnerAdvice } from "../ai/trucoDecision"
+import type { TrucoCharacterProfile } from "../content/characters"
 import {
   formatCard,
   getBetBadgeLabel,
@@ -353,6 +354,10 @@ interface TableSectionProps {
   debugVenueId: string
   debugVenueOptions: Array<{ id: string; label: string }>
   dealAnimationNonce: number
+  menuScreen: "start" | "character-select"
+  selectedCharacter: TrucoCharacterProfile | null
+  selectedCharacterIndex: number
+  selectableCharacters: TrucoCharacterProfile[]
   speechBubble: SpeechBubbleState | null
   tableByPlayer: Record<number, Card | undefined>
   lastPlayedPlayerId: number | null
@@ -365,7 +370,11 @@ interface TableSectionProps {
   variantSelectionDisabled: boolean
   onChangeVariant: (variant: GameVariant) => void
   onChangeDebugVenue: (venueId: string) => void
+  onCloseCharacterSelect: () => void
+  onOpenCharacterSelect: () => void
   onResetCampaign: () => void
+  onSelectNextCharacter: () => void
+  onSelectPreviousCharacter: () => void
   onStart: () => void
   onRequestTruco: () => void
   onAcceptTruco: () => void
@@ -386,6 +395,10 @@ export function TableSection({
   debugVenueId,
   debugVenueOptions,
   dealAnimationNonce,
+  menuScreen,
+  selectedCharacter,
+  selectedCharacterIndex,
+  selectableCharacters,
   speechBubble,
   tableByPlayer,
   lastPlayedPlayerId,
@@ -398,7 +411,11 @@ export function TableSection({
   variantSelectionDisabled,
   onChangeVariant,
   onChangeDebugVenue,
+  onCloseCharacterSelect,
+  onOpenCharacterSelect,
   onResetCampaign,
+  onSelectNextCharacter,
+  onSelectPreviousCharacter,
   onStart,
   onRequestTruco,
   onAcceptTruco,
@@ -428,20 +445,34 @@ export function TableSection({
         <div style={styles.gameViewportFrame}>
           <div style={styles.gameViewport}>
             {isMenuMode ? (
-              <GameStartScreen
-                activeVariant={activeVariant}
-                campaignCompleted={campaignCompleted}
-                currentCampaignVenue={currentCampaignVenue}
-                debugModeEnabled={debugModeEnabled}
-                debugVenueId={debugVenueId}
-                debugVenueOptions={debugVenueOptions}
-                onChangeVariant={onChangeVariant}
-                onChangeDebugVenue={onChangeDebugVenue}
-                onResetCampaign={onResetCampaign}
-                onStart={onStart}
-                styles={styles}
-                variantSelectionDisabled={variantSelectionDisabled}
-              />
+              menuScreen === "character-select" ? (
+                <CharacterSelectionScreen
+                  currentCampaignVenue={currentCampaignVenue}
+                  selectedCharacter={selectedCharacter}
+                  selectedCharacterIndex={selectedCharacterIndex}
+                  selectableCharacters={selectableCharacters}
+                  onBack={onCloseCharacterSelect}
+                  onNext={onSelectNextCharacter}
+                  onPrevious={onSelectPreviousCharacter}
+                  styles={styles}
+                />
+              ) : (
+                <GameStartScreen
+                  activeVariant={activeVariant}
+                  campaignCompleted={campaignCompleted}
+                  currentCampaignVenue={currentCampaignVenue}
+                  debugModeEnabled={debugModeEnabled}
+                  debugVenueId={debugVenueId}
+                  debugVenueOptions={debugVenueOptions}
+                  onChangeVariant={onChangeVariant}
+                  onChangeDebugVenue={onChangeDebugVenue}
+                  onOpenCharacterSelect={onOpenCharacterSelect}
+                  onResetCampaign={onResetCampaign}
+                  onStart={onStart}
+                  styles={styles}
+                  variantSelectionDisabled={variantSelectionDisabled}
+                />
+              )
             ) : (
               <>
                 <div style={styles.gameLeftRail}>
@@ -740,6 +771,7 @@ function GameStartScreen({
   debugVenueOptions,
   onChangeVariant,
   onChangeDebugVenue,
+  onOpenCharacterSelect,
   onResetCampaign,
   onStart,
   styles,
@@ -753,6 +785,7 @@ function GameStartScreen({
   debugVenueOptions: Array<{ id: string; label: string }>
   onChangeVariant: (variant: GameVariant) => void
   onChangeDebugVenue: (venueId: string) => void
+  onOpenCharacterSelect: () => void
   onResetCampaign: () => void
   onStart: () => void
   styles: StyleMap
@@ -760,6 +793,9 @@ function GameStartScreen({
 }) {
   return (
     <div style={styles.gameStartScreen}>
+      <button style={styles.gameStartTopActionButton} onClick={onOpenCharacterSelect}>
+        Parceiros
+      </button>
       <div style={styles.gameStartCard}>
         <div style={styles.gameStartEyebrow}>Entrada</div>
         <h2 style={styles.gameStartTitle}>Escolha a variante</h2>
@@ -849,6 +885,200 @@ function GameStartScreen({
           Resetar progresso
         </button>
       </div>
+    </div>
+  )
+}
+
+function CharacterSelectionScreen({
+  currentCampaignVenue,
+  selectedCharacter,
+  selectedCharacterIndex,
+  selectableCharacters,
+  onBack,
+  onNext,
+  onPrevious,
+  styles,
+}: {
+  currentCampaignVenue: CampaignVenue | null
+  selectedCharacter: TrucoCharacterProfile | null
+  selectedCharacterIndex: number
+  selectableCharacters: TrucoCharacterProfile[]
+  onBack: () => void
+  onNext: () => void
+  onPrevious: () => void
+  styles: StyleMap
+}) {
+  if (!selectedCharacter) {
+    return (
+      <div style={styles.characterSelectScreen}>
+        <div style={styles.characterSelectEmptyBox}>
+          Ainda não há personagens com avatar prontos para seleção.
+        </div>
+      </div>
+    )
+  }
+
+  const styleTokens = selectedCharacter.playStyle
+    .split(",")
+    .map((token) => token.trim())
+    .filter(Boolean)
+  const totalCharacters = selectableCharacters.length
+  const currentPosition = selectedCharacterIndex >= 0 ? selectedCharacterIndex + 1 : 1
+
+  return (
+    <div style={styles.characterSelectScreen}>
+      <div style={styles.characterSelectHeader}>
+        <div style={styles.characterSelectEyebrow}>Escolha seu parceiro</div>
+        <button style={styles.characterSelectBackButton} onClick={onBack}>
+          Voltar
+        </button>
+      </div>
+
+      <div style={styles.characterSelectBoard}>
+        <div style={styles.characterSelectLeftColumn}>
+          <div style={styles.characterPortraitFrame}>
+            <img
+              src={selectedCharacter.avatarAsset}
+              alt={selectedCharacter.name}
+              style={styles.characterPortraitImage}
+            />
+          </div>
+
+          <div style={styles.characterIdentityPanel}>
+            <div style={styles.characterIdentityBlock}>
+              <div style={styles.characterName}>{selectedCharacter.name}</div>
+              <div style={styles.characterNickname}>{selectedCharacter.nickname}</div>
+            </div>
+
+            <div style={styles.characterNavigator}>
+              <button style={styles.characterNavButton} onClick={onPrevious}>
+                ←
+              </button>
+              <div style={styles.characterNavDots}>
+                {selectableCharacters.map((character, index) => {
+                  const active = index === selectedCharacterIndex
+                  return (
+                    <span
+                      key={character.id}
+                      style={{
+                        ...styles.characterNavDot,
+                        ...(active ? styles.characterNavDotActive : {}),
+                      }}
+                    />
+                  )
+                })}
+              </div>
+              <button style={styles.characterNavButton} onClick={onNext}>
+                →
+              </button>
+            </div>
+
+            <div style={styles.characterNavCounter}>
+              {currentPosition} de {totalCharacters}
+            </div>
+          </div>
+        </div>
+
+        <div style={styles.characterSelectRightColumn}>
+          <div style={styles.characterContextHeader}>
+            <div>
+              <div style={styles.characterContextKicker}>Perfil da parceira</div>
+              <div style={styles.characterContextLabel}>
+                {currentCampaignVenue
+                  ? `${currentCampaignVenue.name} · ${currentCampaignVenue.districtLabel}`
+                  : "Seleção de parceiro"}
+              </div>
+            </div>
+          </div>
+
+          <div style={styles.characterInfoPanel}>
+            <div style={styles.characterInfoCard}>
+              <div style={styles.characterInfoSection}>
+                <div style={styles.characterInfoTitle}>História</div>
+                <div style={styles.characterStoryQuote}>“{selectedCharacter.story}”</div>
+              </div>
+            </div>
+
+            <div style={styles.characterDetailsGrid}>
+              <div style={styles.characterInfoCard}>
+                <div style={styles.characterInfoSection}>
+                  <div style={styles.characterInfoTitle}>Estilo de jogo</div>
+                  <div style={styles.characterStyleChips}>
+                    {styleTokens.map((token) => (
+                      <span key={token} style={styles.characterStyleChip}>
+                        {token}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div style={styles.characterInfoCard}>
+                <div style={styles.characterInfoSection}>
+                  <div style={styles.characterInfoTitle}>Atributos</div>
+                  <AttributeBar
+                    label="Coragem"
+                    value={selectedCharacter.attributes.courage}
+                    styles={styles}
+                  />
+                  <AttributeBar
+                    label="Paciência"
+                    value={selectedCharacter.attributes.patience}
+                    styles={styles}
+                  />
+                  <AttributeBar
+                    label="Blefe"
+                    value={selectedCharacter.attributes.bluff}
+                    styles={styles}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div style={styles.characterActionFooter}>
+              <div style={styles.characterActionHint}>
+                A escolha real da parceira entra no próximo passo. Por enquanto, seguimos
+                validando o visual e a navegação.
+              </div>
+
+              <button
+                style={{
+                  ...styles.characterSelectActionButton,
+                  ...styles.disabledButton,
+                }}
+                disabled
+              >
+                Jogar com este parceiro
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function AttributeBar({
+  label,
+  value,
+  styles,
+}: {
+  label: string
+  value: 1 | 2 | 3 | 4 | 5
+  styles: StyleMap
+}) {
+  return (
+    <div style={styles.characterAttributeRow}>
+      <div style={styles.characterAttributeLabel}>{label}</div>
+      <div style={styles.characterAttributeTrack}>
+        <div
+          style={{
+            ...styles.characterAttributeFill,
+            width: `${(value / 5) * 100}%`,
+          }}
+        />
+      </div>
+      <div style={styles.characterAttributeValue}>{value}/5</div>
     </div>
   )
 }

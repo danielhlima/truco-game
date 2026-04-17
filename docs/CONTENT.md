@@ -24,6 +24,8 @@ Hoje o projeto ja possui:
 - mesa 3D/2.5D estilizada com cartas animadas
 - HUD lateral esquerda e direita bem avancadas
 - modo debug na tela inicial para abrir qualquer bar sem depender do progresso salvo
+- roster inicial de personagens estruturado em codigo
+- primeira versao da tela de selecao de parceiro IA em implementacao
 
 ## Arquitetura que deve ser preservada
 
@@ -56,6 +58,13 @@ Arquivos principais:
 - `src/ai/trucoDecision.ts`
 - `src/ai/trucoPersonalities.ts`
 
+### Conteudo de personagens
+
+Arquivos principais:
+
+- `src/content/characters.ts`
+- `src/assets/characters/`
+
 ## Regras de ouro de continuidade
 
 - nao refatorar o projeto do zero
@@ -64,6 +73,12 @@ Arquivos principais:
 - evoluir incrementalmente
 - preservar a separacao entre regras, IA e cena
 - sempre validar com `npm run build`
+
+## Marco atual
+
+- a gameplay screen esta tratada como pronta por enquanto
+- o foco atual saiu do polimento do gameplay e foi para a experiencia de selecao de personagens/parceira IA
+- novas alteracoes na gameplay devem ser mais conservadoras, para nao reabrir retrabalho de layout
 
 ## Estado atual da gameplay screen
 
@@ -85,6 +100,8 @@ Importante:
 - as areas sao separadas visualmente, mas ainda compartilham o mesmo layout mestre
 - pequenas alteracoes de proporcao ainda podem afetar outros blocos
 - o scorepad foi parcialmente blindado para responder mais ao proprio card do que ao viewport geral
+- ja foi identificado risco real de acoplamento excessivo entre os blocos
+- a proxima etapa recomendada e uma blindagem estrutural antes de continuar polimento visual pesado
 
 ### Coluna esquerda
 
@@ -162,6 +179,14 @@ Assets em uso:
 - `src/assets/ui-right/stats-panel-wood-main.png`
 - `src/assets/ui-right/action-button-solid.png`
 
+Observacao importante:
+
+- o HUD superior `Valendo` foi removido da coluna direita para liberar altura
+- hoje a coluna direita mostra apenas:
+  - card do local
+  - botoes de truco
+- isso ajudou bastante a responsividade e a manter o botao `Correr` visivel
+
 ## Estado atual da tela inicial
 
 Existe um modo debug para acelerar testes visuais.
@@ -176,6 +201,68 @@ Arquivos principais:
 
 - `src/app/useGameSession.ts`
 - `src/app/AppSections.tsx`
+
+Estado atual:
+
+- a tela inicial ainda existe como ponto de entrada para a campanha
+- nela existe um botao generico no canto superior direito que leva para a nova tela de selecao de personagens
+- esse botao foi colocado explicitamente para testes da nova tela
+
+## Estado atual da selecao de personagens
+
+Nova frente ativa do projeto.
+
+Arquivos principais:
+
+- `src/content/characters.ts`
+- `src/app/useGameSession.ts`
+- `src/app/AppSections.tsx`
+- `src/App.tsx`
+
+Ja existe:
+
+- roster de 24 personagens com:
+  - `id`
+  - `name`
+  - `nickname`
+  - `personalityId`
+  - `role`
+  - `playStyle`
+  - `attributes`
+    - `courage`
+    - `patience`
+    - `bluff`
+  - `avatarAsset`
+  - `story`
+- 16 avatares novos copiados e otimizados em `src/assets/characters/`
+- primeira versao da tela de selecao implementada dentro do `gameViewport`
+- navegação simples entre:
+  - `start`
+  - `character-select`
+- tela de selecao em duas colunas:
+  - esquerda:
+    - retrato grande
+    - nome
+    - alcunha
+    - botoes anterior/proximo
+    - contador de posicao
+  - direita:
+    - historia
+    - chips de estilo de jogo
+    - barras de atributos
+    - CTA visual no rodape
+
+O que ainda NAO esta fechado:
+
+- acabamento visual fino para ficar mais proximo da arte de referencia
+- escolha real da parceira aplicada ao jogo
+- definicao de quais personagens serao parceiras jogaveis e quais serao so NPCs/adversarios
+- tela ainda esta em modo de teste, acessada pelo botao generico do menu inicial
+
+Observacao importante:
+
+- a implementacao atual ja funciona como base estrutural
+- o proximo chat deve continuar a partir dessa tela, nao recomeçar do zero
 
 ## Campanha e bares atuais mais importantes
 
@@ -214,8 +301,100 @@ Ja existe uma base extensivel de perfis em:
 
 Perfis atuais:
 
-- `balanced`
+- `ultra_conservative`
 - `conservative`
+- `balanced`
+- `aggressive`
+- `trickster`
+- `reckless`
+
+Roster estruturado em codigo:
+
+- `src/content/characters.ts`
+
+### Roster em construcao
+
+Ja existe uma lista inicial de personagens para futuro uso em:
+
+- selecao de parceira IA
+- duplas adversarias por bar
+- chefes de circuito
+- apresentacao narrativa/cutscenes
+
+Distribuicao atual dos perfis nomeados:
+
+- `Zeca Viramao` -> `balanced`
+- `Nega Catimbo` -> `conservative`
+- `Tiao Casca Grossa` -> `balanced`
+- `Mane Banguela` -> `reckless`
+- `Ze Catinga` -> `ultra_conservative`
+- `Rita Gambiarra` -> `trickster`
+- `Tonhao Rasga-Lata` -> `aggressive`
+- `Cida Fumaca` -> `balanced`
+- `Dito Marrua` -> `reckless`
+- `Patricia Monique` -> `trickster`
+- `Naldo Tramela` -> `aggressive`
+- `Dalva Seringa` -> `conservative`
+- `Biu Caolho` -> `reckless`
+- `Aninha Passarela` -> `balanced`
+- `Celsinho Breque` -> `conservative`
+- `Quiteria Mao-Torta` -> `trickster`
+- `Norberto Fuba` -> `ultra_conservative`
+- `Rosinha Catraca` -> `aggressive`
+- `Damiao Corote` -> `reckless`
+- `Leninha Lambreta` -> `balanced`
+
+### Nomes e ajustes recentes
+
+- `Jurema Boca de Gamba` foi substituida por `Patricia Monique`
+- `Jandira Beiçola` foi substituida por `Aninha Passarela`
+- as historias dessas duas personagens ja foram reescritas para refletir os novos nomes
+
+### Avatares ja presentes no projeto
+
+Avatares iniciais do gameplay:
+
+- `avatar-you.png`
+- `avatar-partner.png`
+- `avatar-opponent-left.png`
+- `avatar-opponent-right.png`
+
+Novos avatares ja copiados para o roster:
+
+- `ze-catinga.png`
+- `rita-gambiarra.png`
+- `tonhao-rasga-lata.png`
+- `cida-fumaca.png`
+- `dito-marrua.png`
+- `patricia-monique.png`
+- `naldo-tramela.png`
+- `dalva-seringa.png`
+- `biu-caolho.png`
+- `aninha-passarela.png`
+- `celsinho-breque.png`
+- `quiteria-mao-torta.png`
+- `norberto-fuba.png`
+- `rosinha-catraca.png`
+- `damiao-corote.png`
+- `leninha-lambreta.png`
+- `Jura Pancada` -> `aggressive`
+- `Marlene Pimenta` -> `conservative`
+- `Zito Parafuso` -> `trickster`
+- `Creusa Rabugenta` -> `ultra_conservative`
+
+Observacao importante:
+
+- os avatares ja gerados de `10_jurema.png` e `14_jandira.png` agora representam:
+  - `Patricia Monique`
+  - `Aninha Passarela`
+
+Historias absurdas atualizadas:
+
+- `Patricia Monique`:
+  frequenta mesa de truco como se estivesse entrando num ensaio fotografico clandestino em pleno boteco. Diz que ja ganhou um seis porque o adversario ficou nervoso tentando entender se estava sendo blefado ou avaliado esteticamente.
+
+- `Aninha Passarela`:
+  jura que aprendeu a contar carta observando desfile de loja de bairro em piso encerado. Ate hoje entra na mesa como se estivesse cruzando uma passarela invisivel e, por algum motivo, isso sempre faz alguem jogar pior.
 
 ### Regra de uso atual
 
@@ -289,10 +468,19 @@ Se o foco voltar para performance/tamanho de bundle, o proximo passo natural e c
 - animacoes da mesa: pequenas mudancas podem reintroduzir flicker
 - mesa/fundo: o projeto esta migrando para um visual mais fotorealista
 - qualquer novo asset ruim ou mal recortado costuma gerar retrabalho de layout
+- o layout ainda esta sensivel demais a mudancas locais
+- aumentar um bloco pequeno ainda pode impactar scorepad, botoes e mao do jogador
+- isso precisa ser tratado antes de confiar na tela para devices com tamanhos diferentes
 
 ## Proximo foco recomendado
 
-Apos a ultima rodada de ajustes, o proximo foco natural continua sendo:
+Apos a ultima rodada de ajustes, o proximo foco natural mudou para:
+
+- blindagem estrutural do layout principal
+- desacoplamento entre colunas e area central
+- preparacao da tela para devices com tamanhos diferentes
+
+So depois disso:
 
 - polimento da coluna direita
 - refinamento final da mesa central conforme novos assets chegarem

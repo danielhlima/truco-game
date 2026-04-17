@@ -35,6 +35,10 @@ import {
 } from "../platform/storage/profileStorage"
 import { createInitialPlayerProfile } from "../profile/playerProfile"
 import type { PlayerProfile } from "../profile/playerProfile"
+import {
+  TRUCO_CHARACTER_ROSTER,
+  type TrucoCharacterId,
+} from "../content/characters"
 import { clearLogs, getLogsAsText, logEvent } from "../utils/logger"
 import {
   DEFAULT_TRUCO_MESSAGE,
@@ -59,6 +63,7 @@ import {
 import { getRuleSet } from "../game/getRuleSet"
 
 const DEBUG_MODE = true
+type MenuScreen = "start" | "character-select"
 
 interface DebugVenueOption {
   id: string
@@ -82,6 +87,7 @@ export function useGameSession() {
   const [shownPartnerConsultKey, setShownPartnerConsultKey] = useState<string | null>(null)
   const [debugVenueId, setDebugVenueId] = useState("")
   const [sessionDebugVenueId, setSessionDebugVenueId] = useState<string | null>(null)
+  const [menuScreen, setMenuScreen] = useState<MenuScreen>("start")
   const speechBubbleTimeoutRef = useRef<number | null>(null)
   const followUpSpeechTimeoutRef = useRef<number | null>(null)
   const partnerAdviceTimeoutRef = useRef<number | null>(null)
@@ -277,6 +283,29 @@ export function useGameSession() {
     ? `Nós ${matchState.score.A} x ${matchState.score.B} Eles`
     : "Nós 0 x 0 Eles"
   const campaignSummary = buildCampaignSummary(CAMPAIGN_STAGES)
+  const selectableCharacters = useMemo(
+    () =>
+      TRUCO_CHARACTER_ROSTER.filter(
+        (character) => character.id !== "zeca-viramao" && !!character.avatarAsset
+      ),
+    []
+  )
+  const [selectedCharacterId, setSelectedCharacterId] = useState<TrucoCharacterId>(
+    () => selectableCharacters[0]?.id ?? "nega-catimbo"
+  )
+  const selectedCharacter =
+    selectableCharacters.find((character) => character.id === selectedCharacterId) ??
+    selectableCharacters[0] ??
+    null
+  const selectedCharacterIndex = selectedCharacter
+    ? selectableCharacters.findIndex((character) => character.id === selectedCharacter.id)
+    : -1
+
+  useEffect(() => {
+    if (!selectedCharacter && selectableCharacters[0]) {
+      setSelectedCharacterId(selectableCharacters[0].id)
+    }
+  }, [selectedCharacter, selectableCharacters])
 
   const syncLogs = useCallback(() => {
     setLogs(getLogsAsText())
@@ -424,6 +453,7 @@ export function useGameSession() {
     setVariant(activeVariant)
     setMatchState(createMatchState(activeVariant, firstPlayerId))
     setSessionDebugVenueId(DEBUG_MODE && debugVenueId ? debugVenueId : null)
+    setMenuScreen("start")
 
     applyHandState(state, {
       eventMessage: `Partida iniciada em ${currentCampaignVenue.name}.`,
@@ -439,6 +469,7 @@ export function useGameSession() {
     setHandState(null)
     setMatchState(null)
     setSessionDebugVenueId(null)
+    setMenuScreen("start")
     setEventMessage("Campanha reiniciada do zero.")
     setTrucoMessage("Tudo pronto para voltar ao primeiro boteco.")
     showSpeechBubble(null)
@@ -752,6 +783,37 @@ export function useGameSession() {
     }
   }
 
+  function handleOpenCharacterSelect() {
+    setMenuScreen("character-select")
+  }
+
+  function handleCloseCharacterSelect() {
+    setMenuScreen("start")
+  }
+
+  function handleSelectNextCharacter() {
+    if (selectableCharacters.length === 0) return
+
+    const currentIndex = selectableCharacters.findIndex(
+      (character) => character.id === selectedCharacterId
+    )
+    const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % selectableCharacters.length : 0
+    setSelectedCharacterId(selectableCharacters[nextIndex].id)
+  }
+
+  function handleSelectPreviousCharacter() {
+    if (selectableCharacters.length === 0) return
+
+    const currentIndex = selectableCharacters.findIndex(
+      (character) => character.id === selectedCharacterId
+    )
+    const previousIndex =
+      currentIndex >= 0
+        ? (currentIndex - 1 + selectableCharacters.length) % selectableCharacters.length
+        : 0
+    setSelectedCharacterId(selectableCharacters[previousIndex].id)
+  }
+
   return {
     activeVariant,
     canHumanRespondToTruco,
@@ -785,11 +847,15 @@ export function useGameSession() {
     logs,
     matchScoreLabel,
     matchState,
+    menuScreen,
     player1,
     player2,
     player3,
     player4,
     playerProfile,
+    selectedCharacter,
+    selectedCharacterIndex,
+    selectableCharacters,
     setVariant,
     setDebugVenueId,
     statusMessage,
@@ -798,5 +864,9 @@ export function useGameSession() {
     trucoMessage,
     variant,
     variantSelectionDisabled,
+    handleCloseCharacterSelect,
+    handleOpenCharacterSelect,
+    handleSelectNextCharacter,
+    handleSelectPreviousCharacter,
   }
 }

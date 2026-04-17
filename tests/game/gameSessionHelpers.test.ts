@@ -7,7 +7,7 @@ import {
 import { createHandStateFixture } from "../helpers/gameFixtures.ts"
 import { requestTruco } from "../../src/game/requestTruco.ts"
 
-test("aceite de contra-aumento usa DESCE como fala principal do respondente atual", () => {
+test("aceite de contra-aumento no mesmo cabo de guerra usa TOMA de quem abriu o truco", () => {
   const previousState = createHandStateFixture({
     currentBet: 3,
     truco: {
@@ -35,7 +35,7 @@ test("aceite de contra-aumento usa DESCE como fala principal do respondente atua
 
   assert.deepEqual(bubble, {
     playerId: 2,
-    text: "DESCE!",
+    text: "TOMA!",
   })
 })
 
@@ -104,7 +104,7 @@ test("aceite de pedido inicial gera TOMA como follow-up de quem abriu o truco", 
   })
 })
 
-test("aceite de contra-aumento gera TOMA como follow-up de quem propôs o valor atual", () => {
+test("aceite de contra-aumento no mesmo cabo de guerra gera DESCE de quem propôs o valor atual", () => {
   const previousState = createHandStateFixture({
     currentBet: 3,
     truco: {
@@ -134,7 +134,7 @@ test("aceite de contra-aumento gera TOMA como follow-up de quem propôs o valor 
 
   assert.deepEqual(bubble, {
     playerId: 3,
-    text: "TOMA!",
+    text: "DESCE!",
   })
 })
 
@@ -159,7 +159,7 @@ test("pedido posterior de seis preserva quem falou truco como origem da sequênc
   assert.equal(nextState.truco.initialRequestedByTeam, "B")
 })
 
-test("aceite de nove após seis posterior gera DESCE de quem aceitou o lance atual", () => {
+test("aceite de nove depois de nova rodada de apostas usa DESCE de quem aceitou o lance atual", () => {
   const previousState = createHandStateFixture({
     currentBet: 6,
     truco: {
@@ -171,7 +171,7 @@ test("aceite de nove após seis posterior gera DESCE de quem aceitou o lance atu
       awaitingResponseFromPlayerId: 3,
       awaitingResponseFromTeam: "A",
       proposedBet: 9,
-      promptKind: "raise",
+      promptKind: "request",
     },
   })
 
@@ -229,11 +229,11 @@ test("aceite de doze após raise posterior usa DESCE do respondente e TOMA de qu
 
   assert.deepEqual(primary, {
     playerId: 4,
-    text: "DESCE!",
+    text: "TOMA!",
   })
   assert.deepEqual(followUp, {
     playerId: 3,
-    text: "TOMA!",
+    text: "DESCE!",
   })
 })
 

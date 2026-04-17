@@ -36,7 +36,23 @@ Status:
 - em andamento
 - ja bem avancado
 
+### 4. Construir a tela de selecao de parceiro IA
+
+- transformar o roster em experiencia navegavel
+- ligar retrato, historia, estilo de jogo e atributos
+- preparar o fluxo para futura escolha real da parceira
+
+Status:
+
+- iniciado
+- estrutura base ja implementada
+
 ## Estado Atual Real
+
+### Marco de foco
+
+- a gameplay screen esta considerada pronta por enquanto
+- o foco principal agora e a tela de selecao de personagens/parceira IA
 
 ### Coluna esquerda
 
@@ -72,39 +88,88 @@ Status:
 - adversarios usam `balanced`
 - parceira usa `conservative`
 
+### Selecao de personagens
+
+Ja existe uma primeira implementacao:
+
+- acessivel por um botao generico no canto superior direito da tela inicial
+- renderizada dentro do `gameViewport`
+- usa o roster de `src/content/characters.ts`
+- mostra:
+  - retrato
+  - nome
+  - alcunha
+  - historia
+  - estilo de jogo
+  - atributos
+
+Estado:
+
+- funcional como base
+- ainda precisa de polimento visual e definicao de fluxo final
+
 ## Proximo foco recomendado
 
 ### Opcao principal
 
-- polir a coluna direita
-- refinar hierarquia visual
-- melhorar respiro interno do card de contexto
-- fazer acabamento fino dos botoes de truco
+- continuar a tela de selecao de parceiro IA
+- aproximar a implementacao da arte de referencia
+- transformar a selecao em fluxo real do jogo
+
+### Detalhamento do proximo passo recomendado
+
+- refinar o layout em duas colunas da tela de selecao
+- melhorar o enquadramento do retrato principal
+- lapidar tipografia de:
+  - nome
+  - alcunha
+  - historia
+  - atributos
+- definir o conjunto inicial de personagens selecionaveis como parceira
+- decidir se o CTA `Jogar com este parceiro` ja deve alterar estado real ou continuar apenas visual por enquanto
+- pensar a integracao com:
+  - tela inicial
+  - campanha
+  - futura loja / personagens pagos
+
+### Opcao seguinte
+
+- depois da tela de selecao, avançar para:
+  - escolha real da parceira IA
+  - cutscenes
+  - apresentacao narrativa da campanha
+
+### Frente estrutural ja resolvida o suficiente para seguir
+
+- a blindagem estrutural do gameplay layout funcionou bem o bastante
+- nao e mais a prioridade numero 1 neste momento
+- so revisitar se aparecer regressao real no gameplay
+
+### Opcao visual apos a blindagem
+
+- calibrar mesas/ambiencia por bar
+- encaixar novos assets fotograficos
+- continuar pequenos refinamentos da cena central quando fizer sentido
 
 ### Opcao secundaria
-
-- continuar polindo a mesa central conforme novos assets fotograficos chegarem
-- revisar mesa por venue
-- revisar sensacao de profundidade e cena
-
-### Opcao de sistema
-
-- expandir o sistema de personalidades da IA
-- preparar futura escolha de parceira IA pelo jogador
+- seguir expandindo o roster e os perfis de IA conforme novos personagens chegarem
 
 ## Pendencias abertas
 
 - otimizar mais os assets fotograficos grandes
 - converter fundos maiores para formatos mais leves se necessario
-- revisar responsividade final em telas diferentes
+- fechar visual da tela de selecao de personagens
+- ligar a escolha de parceira ao estado real do jogo
+- decidir como parceiros gratuitos/pagos vao entrar no fluxo
+- revisar responsividade da nova tela de selecao em tamanhos diferentes
 - revisar scorepad apenas se houver necessidade real
 
 ## O que nao deve virar prioridade agora
 
 - refatoracao total da engine
 - troca da arquitetura de estado
-- polimento fino de micro-responsividade antes do layout final fechar
 - backend, ranking online ou empacotamento mobile
+- reabrir grandes retrabalhos na gameplay screen sem motivo real
 
 ## Regra de trabalho
 
