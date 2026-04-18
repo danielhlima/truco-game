@@ -474,3 +474,8 @@ export const BAR_ROSTERS: Record<"bar-1" | "bar-2", TrucoCharacterId[]> = {
   "bar-1": ["tiao-casca-grossa", "cida-fumaca", "celsinho-breque"],
   "bar-2": ["tonhao-rasga-lata", "patricia-monique", "mane-banguela"],
 }
+
+export const BAR_ROSTER_BY_CAMPAIGN_VENUE_ID: Partial<Record<string, "bar-1" | "bar-2">> = {
+  "bar-do-ze-catinga": "bar-1",
+  "bar-maneco-banguela": "bar-2",
+}

@@ -79,10 +79,12 @@ function App() {
     matchScoreLabel,
     matchState,
     menuScreen,
+    opponentCharacters,
     player1,
     playerProfile,
     selectedCharacter,
     selectedCharacterIndex,
+    selectedPartnerCharacter,
     selectableCharacters,
     setVariant,
     setDebugVenueId,
@@ -90,6 +92,7 @@ function App() {
     statusMessage,
     tableByPlayer,
     variantSelectionDisabled,
+    handleConfirmCharacterSelect,
   } = useGameSession()
 
   const isCompactLayout = layoutMode === "compact"
@@ -108,8 +111,8 @@ function App() {
       gameViewport: {
         ...styles.gameViewport,
         gridTemplateColumns: isCompactLayout
-          ? "clamp(172px, 18vw, 196px) minmax(0, 1fr) clamp(170px, 17.4vw, 190px)"
-          : "clamp(184px, 16vw, 212px) minmax(0, 1fr) clamp(176px, 15vw, 196px)",
+          ? "clamp(206px, 21vw, 234px) minmax(0, 1fr) clamp(160px, 16.2vw, 182px)"
+          : "clamp(220px, 18.5vw, 252px) minmax(0, 1fr) clamp(168px, 14.2vw, 188px)",
         gap: isCompactLayout ? "clamp(5px, 0.55vw, 8px)" : styles.gameViewport.gap,
       },
       gameLeftRail: {
@@ -249,8 +252,10 @@ function App() {
           debugVenueOptions={debugVenueOptions}
           dealAnimationNonce={dealAnimationNonce}
           menuScreen={menuScreen}
+          opponentCharacters={opponentCharacters}
           selectedCharacter={selectedCharacter}
           selectedCharacterIndex={selectedCharacterIndex}
+          selectedPartnerCharacter={selectedPartnerCharacter}
           selectableCharacters={selectableCharacters}
           speechBubble={speechBubble}
           tableByPlayer={tableByPlayer}
@@ -265,6 +270,7 @@ function App() {
           onChangeVariant={setVariant}
           onChangeDebugVenue={setDebugVenueId}
           onCloseCharacterSelect={handleCloseCharacterSelect}
+          onConfirmCharacterSelect={handleConfirmCharacterSelect}
           onOpenCharacterSelect={handleOpenCharacterSelect}
           onResetCampaign={handleResetCampaign}
           onSelectNextCharacter={handleSelectNextCharacter}
@@ -764,7 +770,7 @@ const styles: Record<string, React.CSSProperties> = {
   rosterGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-    gap: "clamp(2px, 0.2vw, 4px) clamp(6px, 0.55vw, 8px)",
+    gap: "clamp(3px, 0.24vw, 5px) clamp(6px, 0.52vw, 8px)",
     alignItems: "start",
   },
   rosterCard: {
@@ -777,7 +783,7 @@ const styles: Record<string, React.CSSProperties> = {
     gap: "clamp(2px, 0.16vw, 3px)",
     alignItems: "center",
     justifyContent: "flex-start",
-    minHeight: "clamp(56px, 5.2vw, 68px)",
+    minHeight: "clamp(90px, 7.8vw, 106px)",
     boxShadow: "none",
   },
   rosterCardHuman: {
@@ -785,9 +791,9 @@ const styles: Record<string, React.CSSProperties> = {
     boxShadow: "none",
   },
   rosterAvatar: {
-    width: "clamp(34px, 2.7vw, 42px)",
-    height: "clamp(34px, 2.7vw, 42px)",
-    borderRadius: "13px",
+    width: "clamp(60px, 4.55vw, 70px)",
+    height: "clamp(60px, 4.55vw, 70px)",
+    borderRadius: "18px",
     background: "linear-gradient(180deg, #8a745d 0%, #4a392c 100%)",
     display: "flex",
     alignItems: "center",
@@ -800,13 +806,15 @@ const styles: Record<string, React.CSSProperties> = {
     border: "1px solid rgba(240, 226, 206, 0.45)",
   },
   rosterAvatarImage: {
-    width: "100%",
-    height: "100%",
+    width: "118%",
+    height: "118%",
     objectFit: "cover",
+    objectPosition: "center 22%",
     display: "block",
+    transform: "scale(1.12)",
   },
   rosterName: {
-    fontSize: "clamp(7px, 0.66vw, 9px)",
+    fontSize: "clamp(8px, 0.8vw, 11px)",
     fontWeight: 800,
     color: "#fff7ed",
     textAlign: "center",

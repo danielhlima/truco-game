@@ -7,7 +7,7 @@ import { requestTruco } from "./requestTruco"
 import { resolveTrick } from "./resolveTrick"
 import { respondToTruco } from "./respondToTruco"
 import { getTeam } from "./teams"
-import type { MatchScore } from "./truco"
+import { canTeamAskForTruco, type MatchScore } from "./truco"
 
 interface AiPersonalityByTeam {
   A: AiTrucoPersonalityId
@@ -71,15 +71,17 @@ export function stepHand(
       return state
     }
 
-        const currentTeam = getTeam(currentPlayer.id)
+    const currentTeam = getTeam(currentPlayer.id)
     const aiPersonalityId = aiPersonalityByTeam[currentTeam]
 
     const canRaiseNow =
       state.currentBet === 1 ||
       !state.truco.nextRaiseByTeam ||
       state.truco.nextRaiseByTeam === currentTeam
+    const canAskForTruco = canTeamAskForTruco(matchScore, currentTeam)
 
     const shouldAskForTruco =
+      canAskForTruco &&
       canRaiseNow &&
       shouldRaiseBet(
         ruleSet,
@@ -90,7 +92,11 @@ export function stepHand(
       )
 
     if (shouldAskForTruco) {
-      return requestTruco(state, currentPlayer.id, matchScore)
+      const nextState = requestTruco(state, currentPlayer.id, matchScore)
+
+      if (nextState !== state) {
+        return nextState
+      }
     }
 
     return playAiTurn(state)

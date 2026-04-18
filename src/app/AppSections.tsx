@@ -9,9 +9,6 @@ import { CAMPAIGN_STAGES } from "../career/campaign/campaignData"
 import { STORE_PRODUCTS, UNLOCKABLE_ITEMS } from "../economy/catalog"
 import { GameTableScene } from "../three/GameTableScene"
 import { buildTableSceneModel } from "../three/tableSceneModel"
-import avatarOpponentLeftAsset from "../assets/characters/tiao-casca-grossa.png"
-import avatarOpponentRightAsset from "../assets/characters/mane-banguela.png"
-import avatarPartnerAsset from "../assets/characters/nega-catimbo.png"
 import scorePadNotebookAsset from "../assets/ui-left/scorepad-notebook-clean-cut.png"
 import avatarYouAsset from "../assets/characters/zeca-viramao.png"
 import actionButtonAsset from "../assets/ui-right/action-button-solid.png"
@@ -30,18 +27,10 @@ import {
   getStateLabel,
   getSuitColor,
   getSuitSymbol,
-  getPlayerLabel,
   type SpeechBubbleState,
 } from "./gameSessionHelpers"
 
 type StyleMap = Record<string, React.CSSProperties>
-
-const PLAYER_AVATAR_BY_ID: Record<number, string> = {
-  1: avatarYouAsset,
-  2: avatarOpponentLeftAsset,
-  3: avatarPartnerAsset,
-  4: avatarOpponentRightAsset,
-}
 
 interface ControlsPanelProps {
   activeVariant: GameVariant
@@ -357,7 +346,9 @@ interface TableSectionProps {
   menuScreen: "start" | "character-select"
   selectedCharacter: TrucoCharacterProfile | null
   selectedCharacterIndex: number
+  selectedPartnerCharacter: TrucoCharacterProfile | null
   selectableCharacters: TrucoCharacterProfile[]
+  opponentCharacters: TrucoCharacterProfile[]
   speechBubble: SpeechBubbleState | null
   tableByPlayer: Record<number, Card | undefined>
   lastPlayedPlayerId: number | null
@@ -371,6 +362,7 @@ interface TableSectionProps {
   onChangeVariant: (variant: GameVariant) => void
   onChangeDebugVenue: (venueId: string) => void
   onCloseCharacterSelect: () => void
+  onConfirmCharacterSelect: () => void
   onOpenCharacterSelect: () => void
   onResetCampaign: () => void
   onSelectNextCharacter: () => void
@@ -398,7 +390,9 @@ export function TableSection({
   menuScreen,
   selectedCharacter,
   selectedCharacterIndex,
+  selectedPartnerCharacter,
   selectableCharacters,
+  opponentCharacters,
   speechBubble,
   tableByPlayer,
   lastPlayedPlayerId,
@@ -412,6 +406,7 @@ export function TableSection({
   onChangeVariant,
   onChangeDebugVenue,
   onCloseCharacterSelect,
+  onConfirmCharacterSelect,
   onOpenCharacterSelect,
   onResetCampaign,
   onSelectNextCharacter,
@@ -438,6 +433,18 @@ export function TableSection({
     { id: 4, hand: [] },
     { id: 1, hand: [] },
   ]
+  const playerAvatarById: Record<number, string> = {
+    1: avatarYouAsset,
+    2: opponentCharacters[0]?.avatarAsset ?? avatarYouAsset,
+    3: selectedPartnerCharacter?.avatarAsset ?? avatarYouAsset,
+    4: opponentCharacters[1]?.avatarAsset ?? opponentCharacters[0]?.avatarAsset ?? avatarYouAsset,
+  }
+  const playerNameById: Record<number, string> = {
+    1: "Você",
+    2: opponentCharacters[0]?.name ?? "Adversário esquerdo",
+    3: selectedPartnerCharacter?.name ?? "Parceira",
+    4: opponentCharacters[1]?.name ?? "Adversário direito",
+  }
 
   return (
     <section style={styles.tablePanel}>
@@ -450,8 +457,10 @@ export function TableSection({
                   currentCampaignVenue={currentCampaignVenue}
                   selectedCharacter={selectedCharacter}
                   selectedCharacterIndex={selectedCharacterIndex}
+                  selectedPartnerCharacter={selectedPartnerCharacter}
                   selectableCharacters={selectableCharacters}
                   onBack={onCloseCharacterSelect}
+                  onConfirm={onConfirmCharacterSelect}
                   onNext={onSelectNextCharacter}
                   onPrevious={onSelectPreviousCharacter}
                   styles={styles}
@@ -489,12 +498,12 @@ export function TableSection({
                         >
                           <div style={styles.rosterAvatar}>
                             <img
-                              src={PLAYER_AVATAR_BY_ID[player.id]}
-                              alt={getPlayerLabel(player.id)}
+                              src={playerAvatarById[player.id]}
+                              alt={playerNameById[player.id]}
                               style={styles.rosterAvatarImage}
                             />
                           </div>
-                          <div style={styles.rosterName}>{getPlayerLabel(player.id)}</div>
+                          <div style={styles.rosterName}>{playerNameById[player.id]}</div>
                         </div>
                       ))}
                     </div>
@@ -893,8 +902,10 @@ function CharacterSelectionScreen({
   currentCampaignVenue: _currentCampaignVenue,
   selectedCharacter,
   selectedCharacterIndex,
+  selectedPartnerCharacter,
   selectableCharacters,
   onBack,
+  onConfirm,
   onNext,
   onPrevious,
   styles,
@@ -902,8 +913,10 @@ function CharacterSelectionScreen({
   currentCampaignVenue: CampaignVenue | null
   selectedCharacter: TrucoCharacterProfile | null
   selectedCharacterIndex: number
+  selectedPartnerCharacter: TrucoCharacterProfile | null
   selectableCharacters: TrucoCharacterProfile[]
   onBack: () => void
+  onConfirm: () => void
   onNext: () => void
   onPrevious: () => void
   styles: StyleMap
@@ -924,6 +937,10 @@ function CharacterSelectionScreen({
     .filter(Boolean)
   const totalCharacters = selectableCharacters.length
   const currentPosition = selectedCharacterIndex >= 0 ? selectedCharacterIndex + 1 : 1
+  const isSelectedPartner = selectedPartnerCharacter?.id === selectedCharacter.id
+  const actionLabel = isSelectedPartner
+    ? "Parceira atualmente escolhida"
+    : `Jogar com ${selectedCharacter.name}`
 
   return (
     <div style={styles.characterSelectScreen}>
@@ -1025,13 +1042,10 @@ function CharacterSelectionScreen({
 
             <div style={styles.characterActionFooter}>
               <button
-                style={{
-                  ...styles.characterSelectActionButton,
-                  ...styles.disabledButton,
-                }}
-                disabled
+                style={styles.characterSelectActionButton}
+                onClick={onConfirm}
               >
-                Jogar com este parceiro
+                {actionLabel}
               </button>
             </div>
           </div>

@@ -36,8 +36,13 @@ import {
 import { createInitialPlayerProfile } from "../profile/playerProfile"
 import type { PlayerProfile } from "../profile/playerProfile"
 import {
+  BAR_ROSTER_BY_CAMPAIGN_VENUE_ID,
+  BAR_ROSTERS,
+  STARTER_PARTNER_CHARACTER_IDS,
+  TRUCO_CHARACTER_BY_ID,
   TRUCO_CHARACTER_ROSTER,
   type TrucoCharacterId,
+  type TrucoCharacterProfile,
 } from "../content/characters"
 import { clearLogs, getLogsAsText, logEvent } from "../utils/logger"
 import {
@@ -136,8 +141,49 @@ export function useGameSession() {
     : null
   const currentCampaignVenue = sessionDebugVenue ?? selectedDebugVenue ?? actualCampaignVenue
   const currentCampaignStage = sessionDebugStage ?? selectedDebugStage ?? actualCampaignStage
-  const partnerAiPersonalityId = "conservative"
-  const opponentAiPersonalityId = "balanced"
+  const selectableCharacters = useMemo(
+    () =>
+      STARTER_PARTNER_CHARACTER_IDS.map((characterId) => TRUCO_CHARACTER_BY_ID[characterId]).filter(
+        (character) => !!character.avatarAsset
+      ),
+    []
+  )
+  const [selectedCharacterId, setSelectedCharacterId] = useState<TrucoCharacterId>(
+    () => selectableCharacters[0]?.id ?? "nega-catimbo"
+  )
+  const [selectedPartnerCharacterId, setSelectedPartnerCharacterId] = useState<TrucoCharacterId>(
+    () => selectableCharacters[0]?.id ?? "nega-catimbo"
+  )
+  const selectedCharacter =
+    selectableCharacters.find((character) => character.id === selectedCharacterId) ??
+    selectableCharacters[0] ??
+    null
+  const selectedPartnerCharacter =
+    selectableCharacters.find((character) => character.id === selectedPartnerCharacterId) ??
+    selectableCharacters[0] ??
+    null
+  const selectedCharacterIndex = selectedCharacter
+    ? selectableCharacters.findIndex((character) => character.id === selectedCharacter.id)
+    : -1
+  const partnerAiPersonalityId = selectedPartnerCharacter?.personalityId ?? "conservative"
+  const currentBarRoster = useMemo(() => {
+    const rosterId = currentCampaignVenue
+      ? BAR_ROSTER_BY_CAMPAIGN_VENUE_ID[currentCampaignVenue.id]
+      : undefined
+
+    return rosterId ? BAR_ROSTERS[rosterId] : null
+  }, [currentCampaignVenue])
+  const opponentCharacters = useMemo<TrucoCharacterProfile[]>(() => {
+    if (!currentBarRoster) {
+      return TRUCO_CHARACTER_ROSTER.filter((character) => character.role === "opponent").slice(0, 2)
+    }
+
+    return currentBarRoster
+      .map((characterId) => TRUCO_CHARACTER_BY_ID[characterId])
+      .filter(Boolean)
+      .slice(0, 2)
+  }, [currentBarRoster])
+  const opponentAiPersonalityId = opponentCharacters[0]?.personalityId ?? "balanced"
   const activeVariant = handState?.variant ?? variant
   const currentVenueWins = currentCampaignVenue
     ? playerProfile.campaign.venueWinsById[currentCampaignVenue.id] ?? 0
@@ -283,29 +329,18 @@ export function useGameSession() {
     ? `Nós ${matchState.score.A} x ${matchState.score.B} Eles`
     : "Nós 0 x 0 Eles"
   const campaignSummary = buildCampaignSummary(CAMPAIGN_STAGES)
-  const selectableCharacters = useMemo(
-    () =>
-      TRUCO_CHARACTER_ROSTER.filter(
-        (character) => character.id !== "zeca-viramao" && !!character.avatarAsset
-      ),
-    []
-  )
-  const [selectedCharacterId, setSelectedCharacterId] = useState<TrucoCharacterId>(
-    () => selectableCharacters[0]?.id ?? "nega-catimbo"
-  )
-  const selectedCharacter =
-    selectableCharacters.find((character) => character.id === selectedCharacterId) ??
-    selectableCharacters[0] ??
-    null
-  const selectedCharacterIndex = selectedCharacter
-    ? selectableCharacters.findIndex((character) => character.id === selectedCharacter.id)
-    : -1
 
   useEffect(() => {
     if (!selectedCharacter && selectableCharacters[0]) {
       setSelectedCharacterId(selectableCharacters[0].id)
     }
   }, [selectedCharacter, selectableCharacters])
+
+  useEffect(() => {
+    if (!selectedPartnerCharacter && selectableCharacters[0]) {
+      setSelectedPartnerCharacterId(selectableCharacters[0].id)
+    }
+  }, [selectedPartnerCharacter, selectableCharacters])
 
   const syncLogs = useCallback(() => {
     setLogs(getLogsAsText())
@@ -788,6 +823,14 @@ export function useGameSession() {
   }
 
   function handleCloseCharacterSelect() {
+    setSelectedCharacterId(selectedPartnerCharacterId)
+    setMenuScreen("start")
+  }
+
+  function handleConfirmCharacterSelect() {
+    if (!selectedCharacter) return
+
+    setSelectedPartnerCharacterId(selectedCharacter.id)
     setMenuScreen("start")
   }
 
@@ -855,6 +898,7 @@ export function useGameSession() {
     playerProfile,
     selectedCharacter,
     selectedCharacterIndex,
+    selectedPartnerCharacter,
     selectableCharacters,
     setVariant,
     setDebugVenueId,
@@ -864,7 +908,9 @@ export function useGameSession() {
     trucoMessage,
     variant,
     variantSelectionDisabled,
+    opponentCharacters,
     handleCloseCharacterSelect,
+    handleConfirmCharacterSelect,
     handleOpenCharacterSelect,
     handleSelectNextCharacter,
     handleSelectPreviousCharacter,
