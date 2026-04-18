@@ -107,6 +107,10 @@ Estado:
 
 - funcional como base
 - ainda precisa de polimento visual e definicao de fluxo final
+- a amarracao funcional definida para a proxima etapa e:
+  - parceiro escolhido fica mantido enquanto o jogador permanecer no mesmo bar
+  - ao concluir ou trocar de bar, a tela de escolha de parceira volta a ser oferecida
+  - no inicio da campanha, apenas 5 parceiras ficam liberadas
 
 ## Proximo foco recomendado
 
@@ -125,12 +129,42 @@ Estado:
   - alcunha
   - historia
   - atributos
-- definir o conjunto inicial de personagens selecionaveis como parceira
+- consolidar no codigo a organizacao inicial do roster:
+  - mover os 4 avatars antigos do gameplay para `src/assets/characters`
+  - atualizar o roster para usar todos os 20 personagens visuais na mesma pasta
+  - separar explicitamente:
+    - `starter partners`
+    - `unlockable partners`
+    - `bar rosters`
 - decidir se o CTA `Jogar com este parceiro` ja deve alterar estado real ou continuar apenas visual por enquanto
 - pensar a integracao com:
   - tela inicial
   - campanha
   - futura loja / personagens pagos
+
+### Separacao inicial definida
+
+- `starter partners`:
+  - `nega-catimbo`
+  - `leninha-lambreta`
+  - `rosinha-catraca`
+  - `rita-gambiarra`
+  - `ze-catinga`
+- `unlockable partners`:
+  - `aninha-passarela`
+  - `dalva-seringa`
+  - `naldo-tramela`
+  - `quiteria-mao-torta`
+  - `dito-marrua`
+- `bar rosters` iniciais:
+  - bar 1:
+    - `tiao-casca-grossa`
+    - `cida-fumaca`
+    - `celsinho-breque`
+  - bar 2:
+    - `tonhao-rasga-lata`
+    - `patricia-monique`
+    - `mane-banguela`
 
 ### Opcao seguinte
 

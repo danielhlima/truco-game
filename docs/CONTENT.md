@@ -352,15 +352,12 @@ Distribuicao atual dos perfis nomeados:
 
 ### Avatares ja presentes no projeto
 
-Avatares iniciais do gameplay:
+Avatares consolidados do roster em `src/assets/characters/`:
 
-- `avatar-you.png`
-- `avatar-partner.png`
-- `avatar-opponent-left.png`
-- `avatar-opponent-right.png`
-
-Novos avatares ja copiados para o roster:
-
+- `zeca-viramao.png`
+- `nega-catimbo.png`
+- `tiao-casca-grossa.png`
+- `mane-banguela.png`
 - `ze-catinga.png`
 - `rita-gambiarra.png`
 - `tonhao-rasga-lata.png`

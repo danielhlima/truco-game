@@ -1,8 +1,8 @@
 import type { AiTrucoPersonalityId } from "../ai/trucoPersonalities"
-import avatarYouAsset from "../assets/ui-left/avatar-you.png"
-import avatarPartnerAsset from "../assets/ui-left/avatar-partner.png"
-import avatarOpponentLeftAsset from "../assets/ui-left/avatar-opponent-left.png"
-import avatarOpponentRightAsset from "../assets/ui-left/avatar-opponent-right.png"
+import zecaViramaoAsset from "../assets/characters/zeca-viramao.png"
+import negaCatimboAsset from "../assets/characters/nega-catimbo.png"
+import tiaoCascaGrossaAsset from "../assets/characters/tiao-casca-grossa.png"
+import maneBanguelaAsset from "../assets/characters/mane-banguela.png"
 import zeCatingaAsset from "../assets/characters/ze-catinga.png"
 import ritaGambiarraAsset from "../assets/characters/rita-gambiarra.png"
 import tonhaoRasgaLataAsset from "../assets/characters/tonhao-rasga-lata.png"
@@ -79,7 +79,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
       patience: 4,
       bluff: 3,
     },
-    avatarAsset: avatarYouAsset,
+    avatarAsset: zecaViramaoAsset,
     story:
       "Ninguem sabe como, mas Zeca ja ganhou uma partida com tanta calma que o adversario pediu desculpa por ter sentado na mesa. Desde entao corre o boato de que, quando ele vem com carta ruim, e justamente quando esta mais perigoso.",
   },
@@ -95,7 +95,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
       patience: 5,
       bluff: 2,
     },
-    avatarAsset: avatarPartnerAsset,
+    avatarAsset: negaCatimboAsset,
     story:
       "Ela ja expulsou um blefador da mesa usando so um 'aham' tao carregado de desprezo que o sujeito foi embora repensar a propria infancia. Dizem que ela descobre a forca da mao alheia pelo jeito que a pessoa segura o copo.",
   },
@@ -111,7 +111,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
       patience: 3,
       bluff: 3,
     },
-    avatarAsset: avatarOpponentLeftAsset,
+    avatarAsset: tiaoCascaGrossaAsset,
     story:
       "Ele fala pouco porque afirma que desperdiçar palavra enfraquece o truco. Certa vez passou tres horas em silencio, pediu doze com uma sobrancelha e saiu com dinheiro, amendoim e respeito involuntario de todo o bairro.",
   },
@@ -127,7 +127,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
       patience: 1,
       bluff: 4,
     },
-    avatarAsset: avatarOpponentRightAsset,
+    avatarAsset: maneBanguelaAsset,
     story:
       "Reza a lenda que ele ja ficou tao bravo com um parceiro ruim que ganhou a mao so no odio. No bairro, contam que o bigode dele se move um milimetro para cima sempre que alguem esta prestes a cometer uma burrice historica.",
   },
@@ -453,3 +453,24 @@ export const TRUCO_CHARACTER_BY_ID: Record<TrucoCharacterId, TrucoCharacterProfi
   Object.fromEntries(
     TRUCO_CHARACTER_ROSTER.map((character) => [character.id, character])
   ) as Record<TrucoCharacterId, TrucoCharacterProfile>
+
+export const STARTER_PARTNER_CHARACTER_IDS: TrucoCharacterId[] = [
+  "nega-catimbo",
+  "leninha-lambreta",
+  "rosinha-catraca",
+  "rita-gambiarra",
+  "ze-catinga",
+]
+
+export const UNLOCKABLE_PARTNER_CHARACTER_IDS: TrucoCharacterId[] = [
+  "aninha-passarela",
+  "dalva-seringa",
+  "naldo-tramela",
+  "quiteria-mao-torta",
+  "dito-marrua",
+]
+
+export const BAR_ROSTERS: Record<"bar-1" | "bar-2", TrucoCharacterId[]> = {
+  "bar-1": ["tiao-casca-grossa", "cida-fumaca", "celsinho-breque"],
+  "bar-2": ["tonhao-rasga-lata", "patricia-monique", "mane-banguela"],
+}
