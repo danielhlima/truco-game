@@ -270,39 +270,14 @@ function getTrucoAcceptSpeechSequence(
   handState: HandState
 ): TrucoAcceptSpeechSequence | null {
   const responderPlayerId = getTrucoSpeechResponderPlayerId(handState)
-  const currentRequesterPlayerId = handState.truco.requestedByPlayerId ?? null
-  const initialRequesterPlayerId = handState.truco.initialRequestedByPlayerId ?? null
-
-  if (!currentRequesterPlayerId) {
-    return null
-  }
-
-  const originalRequesterAcceptingRaise =
-    handState.truco.promptKind === "raise" &&
-    initialRequesterPlayerId !== null &&
-    responderPlayerId === initialRequesterPlayerId
-
-  if (originalRequesterAcceptingRaise) {
-    return {
-      primary: {
-        playerId: responderPlayerId,
-        text: "TOMA!",
-      },
-      followUp: {
-        playerId: currentRequesterPlayerId,
-        text: "DESCE!",
-      },
-    }
-  }
+  const escalationStarterPlayerId = handState.truco.initialRequestedByPlayerId ?? null
+  const escalationStarterAccepting =
+    escalationStarterPlayerId !== null && responderPlayerId === escalationStarterPlayerId
 
   return {
     primary: {
       playerId: responderPlayerId,
-      text: "DESCE!",
-    },
-    followUp: {
-      playerId: currentRequesterPlayerId,
-      text: "TOMA!",
+      text: escalationStarterAccepting ? "TOMA!" : "DESCE!",
     },
   }
 }

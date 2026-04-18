@@ -119,6 +119,50 @@ export function getTeamTrucoDecision(
   return "accept"
 }
 
+export function getTeamTrucoDecisionFromPartnerAdvice(
+  ruleSet: RuleSet,
+  humanHand: Card[],
+  partnerHand: Card[],
+  nextBet: BetValue,
+  humanAdvice: PartnerAdvice,
+  vira?: Card,
+  personalityId: AiTrucoPersonalityId = "balanced"
+): TrucoTeamDecision {
+  const personality = getAiTrucoPersonality(personalityId)
+  const partnerStrength = evaluateHandStrength(ruleSet, partnerHand, vira)
+  const humanStrength = getWeightedHumanStrength(
+    evaluateHandStrength(ruleSet, humanHand, vira),
+    humanAdvice
+  )
+  const totalStrength = partnerStrength + humanStrength
+  const acceptThreshold = getAcceptThreshold(nextBet, personalityId)
+  const raiseThreshold = personality.raiseThresholdByCurrentBet[nextBet] ?? 99
+
+  const shouldAccept =
+    partnerStrength >= acceptThreshold ||
+    humanStrength >= acceptThreshold ||
+    totalStrength >= acceptThreshold + personality.partnerMaybeOffset
+
+  if (!shouldAccept) {
+    return "run"
+  }
+
+  const canRaise = nextBet !== 12
+  const shouldReRaise =
+    canRaise &&
+    (
+      partnerStrength >= raiseThreshold ||
+      humanStrength >= raiseThreshold ||
+      totalStrength >= raiseThreshold + personality.partnerGoOffset
+    )
+
+  if (shouldReRaise) {
+    return "raise"
+  }
+
+  return "accept"
+}
+
 export function evaluateHandStrength(
   ruleSet: RuleSet,
   hand: Card[],
@@ -167,4 +211,15 @@ function getAcceptThreshold(
   }
 
   return 99
+}
+
+function getWeightedHumanStrength(baseStrength: number, advice: PartnerAdvice): number {
+  switch (advice) {
+    case "BORA!":
+      return baseStrength + 2
+    case "CÊ QUE SABE!":
+      return baseStrength + 1
+    case "MELHOR CORRER!":
+      return Math.max(0, baseStrength - 3)
+  }
 }

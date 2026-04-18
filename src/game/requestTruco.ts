@@ -55,14 +55,8 @@ export function requestTruco(
   const awaitingResponseFromTeam = getOpposingTeam(requestedByTeam)
   const awaitingResponseFromPlayerId = getTargetPlayerForTruco(state, playerId)
   const callLabel = getBetCallLabel(proposedBet)
-  const initialRequestedByPlayerId =
-    state.currentBet > 1
-      ? state.truco.initialRequestedByPlayerId ?? state.truco.requestedByPlayerId ?? playerId
-      : playerId
-  const initialRequestedByTeam =
-    state.currentBet > 1
-      ? state.truco.initialRequestedByTeam ?? state.truco.requestedByTeam ?? requestedByTeam
-      : requestedByTeam
+  const initialRequestedByPlayerId = playerId
+  const initialRequestedByTeam = requestedByTeam
 
   logEvent(`Jogador ${playerId} pediu ${callLabel}.`)
   logEvent("Time que pediu:", requestedByTeam)

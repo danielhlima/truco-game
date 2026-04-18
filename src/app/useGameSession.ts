@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
+  getTeamTrucoDecisionFromPartnerAdvice,
   getTeamPartnerAdvice,
-  getTeamTrucoDecision,
   type PartnerAdvice,
 } from "../ai/trucoDecision"
 import { CAMPAIGN_STAGES } from "../career/campaign/campaignData"
@@ -89,7 +89,6 @@ export function useGameSession() {
   const [speechBubble, setSpeechBubble] = useState<SpeechBubbleState | null>(null)
   const [dealAnimationNonce, setDealAnimationNonce] = useState(0)
   const [shownPartnerAdviceKey, setShownPartnerAdviceKey] = useState<string | null>(null)
-  const [shownPartnerConsultKey, setShownPartnerConsultKey] = useState<string | null>(null)
   const [debugVenueId, setDebugVenueId] = useState("")
   const [sessionDebugVenueId, setSessionDebugVenueId] = useState<string | null>(null)
   const [menuScreen, setMenuScreen] = useState<MenuScreen>("start")
@@ -141,6 +140,7 @@ export function useGameSession() {
     : null
   const currentCampaignVenue = sessionDebugVenue ?? selectedDebugVenue ?? actualCampaignVenue
   const currentCampaignStage = sessionDebugStage ?? selectedDebugStage ?? actualCampaignStage
+  const currentCampaignVenueId = currentCampaignVenue?.id ?? null
   const selectableCharacters = useMemo(
     () =>
       STARTER_PARTNER_CHARACTER_IDS.map((characterId) => TRUCO_CHARACTER_BY_ID[characterId]).filter(
@@ -151,17 +151,18 @@ export function useGameSession() {
   const [selectedCharacterId, setSelectedCharacterId] = useState<TrucoCharacterId>(
     () => selectableCharacters[0]?.id ?? "nega-catimbo"
   )
-  const [selectedPartnerCharacterId, setSelectedPartnerCharacterId] = useState<TrucoCharacterId>(
-    () => selectableCharacters[0]?.id ?? "nega-catimbo"
-  )
+  const currentVenuePartnerCharacterId = currentCampaignVenueId
+    ? (playerProfile.campaign.selectedPartnerCharacterIdByVenueId[currentCampaignVenueId] as
+        | TrucoCharacterId
+        | undefined) ?? null
+    : null
   const selectedCharacter =
     selectableCharacters.find((character) => character.id === selectedCharacterId) ??
     selectableCharacters[0] ??
     null
-  const selectedPartnerCharacter =
-    selectableCharacters.find((character) => character.id === selectedPartnerCharacterId) ??
-    selectableCharacters[0] ??
-    null
+  const selectedPartnerCharacter = currentVenuePartnerCharacterId
+    ? TRUCO_CHARACTER_BY_ID[currentVenuePartnerCharacterId] ?? selectableCharacters[0] ?? null
+    : selectableCharacters[0] ?? null
   const selectedCharacterIndex = selectedCharacter
     ? selectableCharacters.findIndex((character) => character.id === selectedCharacter.id)
     : -1
@@ -258,7 +259,6 @@ export function useGameSession() {
       handState.truco.phase !== "awaiting-response" ||
       handState.truco.awaitingResponseFromTeam !== "A" ||
       handState.truco.awaitingResponseFromPlayerId !== 3 ||
-      handState.truco.promptKind !== "request" ||
       handState.truco.requestedByTeam !== "B" ||
       !handState.truco.proposedBet
     ) {
@@ -288,9 +288,7 @@ export function useGameSession() {
     handState.truco.phase === "awaiting-response" &&
     handState.truco.awaitingResponseFromTeam === "A" &&
     handState.truco.awaitingResponseFromPlayerId === 3 &&
-    handState.truco.promptKind === "request" &&
-    handState.truco.requestedByTeam === "B" &&
-    (!partnerConsultKey || shownPartnerConsultKey === partnerConsultKey)
+    handState.truco.requestedByTeam === "B"
 
   const canRequestTruco =
     !!handState &&
@@ -337,10 +335,25 @@ export function useGameSession() {
   }, [selectedCharacter, selectableCharacters])
 
   useEffect(() => {
-    if (!selectedPartnerCharacter && selectableCharacters[0]) {
-      setSelectedPartnerCharacterId(selectableCharacters[0].id)
+    const preferredCharacterId = currentVenuePartnerCharacterId ?? selectableCharacters[0]?.id
+
+    if (preferredCharacterId) {
+      setSelectedCharacterId(preferredCharacterId)
     }
-  }, [selectedPartnerCharacter, selectableCharacters])
+  }, [currentCampaignVenueId, currentVenuePartnerCharacterId, selectableCharacters])
+
+  useEffect(() => {
+    if (handState || matchState || !currentCampaignVenue || currentVenuePartnerCharacterId) {
+      return
+    }
+
+    setMenuScreen("character-select")
+  }, [
+    currentCampaignVenue,
+    currentVenuePartnerCharacterId,
+    handState,
+    matchState,
+  ])
 
   const syncLogs = useCallback(() => {
     setLogs(getLogsAsText())
@@ -479,6 +492,11 @@ export function useGameSession() {
 
   function handleStartHand() {
     if (!currentCampaignVenue) return
+    if (!currentVenuePartnerCharacterId) {
+      setSelectedCharacterId(selectableCharacters[0]?.id ?? "nega-catimbo")
+      setMenuScreen("character-select")
+      return
+    }
 
     clearLogs()
 
@@ -589,24 +607,18 @@ export function useGameSession() {
     if (!handState || !canHumanAdvisePartner || !player1 || !player3) return
 
     showSpeechBubble({ playerId: 1, text: advice })
-    setShownPartnerConsultKey(partnerConsultKey)
 
     partnerConsultResolutionTimeoutRef.current = window.setTimeout(() => {
       const ruleSet = getRuleSet(handState.variant)
-      const fallbackDecision = getTeamTrucoDecision(
+      const decision = getTeamTrucoDecisionFromPartnerAdvice(
         ruleSet,
-        [player1.hand, player3.hand],
+        player1.hand,
+        player3.hand,
         handState.truco.proposedBet!,
+        advice,
         handState.vira,
         partnerAiPersonalityId
       )
-
-      const decision =
-        advice === "MELHOR CORRER!"
-          ? "run"
-          : advice === "BORA!"
-            ? "accept"
-            : fallbackDecision
 
       const nextState = respondToTruco(handState, decision, matchState?.score)
 
@@ -614,7 +626,7 @@ export function useGameSession() {
         applyHandState(nextState, {
           eventMessage: `A parceira correu de ${getPendingBetText(handState)}.`,
           trucoMessage: `Nosso time correu de ${getPendingBetText(handState)}.`,
-          speechBubble: null,
+          speechBubble: { playerId: 3, text: "TÔ FORA!" },
         })
         partnerConsultResolutionTimeoutRef.current = null
         return
@@ -629,7 +641,9 @@ export function useGameSession() {
           trucoMessage: requestedValue
             ? `Nosso time pediu ${getBetCallLabelFromNumber(requestedValue)}. Aguardando resposta deles.`
             : "Nosso time pediu aumento. Aguardando resposta deles.",
-          speechBubble: null,
+          speechBubble: requestedValue
+            ? { playerId: 3, text: getSpeechBetLabel(requestedValue) }
+            : { playerId: 3, text: "DESCE!" },
         })
         partnerConsultResolutionTimeoutRef.current = null
         return
@@ -639,7 +653,7 @@ export function useGameSession() {
       applyHandState(nextState, {
         eventMessage: `A parceira aceitou ${getBetCallLabel(acceptedBet)}.`,
         trucoMessage: getAcceptedBetMessage(acceptedBet),
-        speechBubble: null,
+        speechBubble: { playerId: 3, text: "DESCE!" },
       })
       partnerConsultResolutionTimeoutRef.current = null
     }, BUBBLE_DURATION_MS + 120)
@@ -797,7 +811,6 @@ export function useGameSession() {
         playerId: 3,
         text: "E AÍ, PARCEIRO?",
       })
-      setShownPartnerConsultKey(consultKey)
       partnerConsultTimeoutRef.current = null
     }, BUBBLE_DURATION_MS + 120)
 
@@ -819,18 +832,28 @@ export function useGameSession() {
   }
 
   function handleOpenCharacterSelect() {
+    setSelectedCharacterId(currentVenuePartnerCharacterId ?? selectableCharacters[0]?.id ?? "nega-catimbo")
     setMenuScreen("character-select")
   }
 
   function handleCloseCharacterSelect() {
-    setSelectedCharacterId(selectedPartnerCharacterId)
+    setSelectedCharacterId(currentVenuePartnerCharacterId ?? selectableCharacters[0]?.id ?? "nega-catimbo")
     setMenuScreen("start")
   }
 
   function handleConfirmCharacterSelect() {
-    if (!selectedCharacter) return
+    if (!selectedCharacter || !currentCampaignVenueId) return
 
-    setSelectedPartnerCharacterId(selectedCharacter.id)
+    setPlayerProfile((currentProfile) => ({
+      ...currentProfile,
+      campaign: {
+        ...currentProfile.campaign,
+        selectedPartnerCharacterIdByVenueId: {
+          ...currentProfile.campaign.selectedPartnerCharacterIdByVenueId,
+          [currentCampaignVenueId]: selectedCharacter.id,
+        },
+      },
+    }))
     setMenuScreen("start")
   }
 

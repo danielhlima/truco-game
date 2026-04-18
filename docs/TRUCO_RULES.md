@@ -20,11 +20,11 @@ Observação:
 ### Aceite
 
 - `DESCE!`
-  - só pode ser falado por quem recebeu o `TRUCO!` inicial e aceitou sem subir.
+  - é falado por quem aceita a aposta atual sem ter sido quem iniciou a escalada vigente.
 
 - `TOMA!`
-  - é falado por quem abriu o `TRUCO!` original.
-  - quem falou `TRUCO!` nunca fala `DESCE!`.
+  - é falado por quem iniciou a escalada vigente e depois aceita um aumento dentro dessa mesma escalada.
+  - quem iniciou a escalada vigente nunca fala `DESCE!`.
 
 ### Corrida
 
@@ -35,16 +35,22 @@ Observação:
 
 ### Regra de ouro 1
 
-- quem fala `TRUCO!` nunca fala `DESCE!`
+- quem iniciou a escalada vigente nunca fala `DESCE!`
 
 ### Regra de ouro 2
 
-- quem falou `TRUCO!` fala `TOMA!` ao final dos aceites da sequência
+- quem iniciou a escalada vigente fala `TOMA!` quando aceita um aumento dentro dessa mesma escalada
+
+### Regra de ouro 3
+
+- quando a jogada de cartas retoma, a escalada vigente e resetada
+- se houver um novo `TRUCO!` ou novo aumento depois disso, nasce uma nova escalada com novo iniciador
 
 ## Regras do Ping-pong do Truco
 
 - No fluxo de `truco + raise`, só falam os dois jogadores envolvidos no lance formal.
 - Parceiro pode aconselhar, mas não entra no ping-pong principal de `DESCE!/TOMA!/SEIS!/NOVE!/DOZE!`.
+- o dono da fala `DESCE!/TOMA!` depende de quem iniciou a escalada vigente, nao apenas de quem abriu o `TRUCO!` original da mao inteira.
 
 ## Decisão em Dupla
 
@@ -82,6 +88,13 @@ Quando a parceira IA é o alvo de um `pedido inicial` adversário:
   - seis
   - nove
   - doze
+
+### Escalada vigente
+
+- a escalada vigente começa quando alguem propoe o valor atual da sequencia (`TRUCO!`, `SEIS!`, `NOVE!`, `DOZE!`)
+- enquanto a sequencia formal ainda nao voltou para a jogada normal de cartas, esse iniciador continua sendo o dono da escalada vigente
+- se esse mesmo lado aceitar um aumento posterior dentro dessa mesma sequencia, a fala correta e `TOMA!`
+- o outro lado, quando aceita sem ser o iniciador da escalada vigente, fala `DESCE!`
 
 ## Lógica de Força Atual da IA
 

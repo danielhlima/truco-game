@@ -5,6 +5,7 @@ export interface CampaignProgress {
   clearedVenueIds: string[]
   completedStageIds: string[]
   venueWinsById: Record<string, number>
+  selectedPartnerCharacterIdByVenueId: Record<string, string>
   wins: number
   losses: number
 }
@@ -33,6 +34,7 @@ export function createInitialPlayerProfile(): PlayerProfile {
       clearedVenueIds: [],
       completedStageIds: [],
       venueWinsById: {},
+      selectedPartnerCharacterIdByVenueId: {},
       wins: 0,
       losses: 0,
     },

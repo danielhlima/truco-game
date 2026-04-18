@@ -35,6 +35,10 @@ export function loadPlayerProfile(): PlayerProfile {
           ...initialProfile.campaign.venueWinsById,
           ...parsed.campaign?.venueWinsById,
         },
+        selectedPartnerCharacterIdByVenueId: {
+          ...initialProfile.campaign.selectedPartnerCharacterIdByVenueId,
+          ...parsed.campaign?.selectedPartnerCharacterIdByVenueId,
+        },
       },
       settings: {
         ...initialProfile.settings,
