@@ -68,7 +68,7 @@ import {
 import { getRuleSet } from "../game/getRuleSet"
 
 const DEBUG_MODE = true
-type MenuScreen = "start" | "character-select"
+type MenuScreen = "start" | "character-select" | "venue-intro"
 
 interface DebugVenueOption {
   id: string
@@ -497,6 +497,10 @@ export function useGameSession() {
       setMenuScreen("character-select")
       return
     }
+    if (!handState && menuScreen !== "venue-intro") {
+      setMenuScreen("venue-intro")
+      return
+    }
 
     clearLogs()
 
@@ -854,7 +858,7 @@ export function useGameSession() {
         },
       },
     }))
-    setMenuScreen("start")
+    setMenuScreen("venue-intro")
   }
 
   function handleSelectNextCharacter() {

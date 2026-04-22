@@ -2,6 +2,7 @@ import test from "node:test"
 import assert from "node:assert/strict"
 import {
   getTeamPartnerAdvice,
+  getTeamTrucoDecisionFromPartnerAdvice,
   getTeamTrucoDecision,
   respondToRaise,
   shouldRaiseBet,
@@ -105,4 +106,110 @@ test("perfil trickster pode transformar aceite em raise por blefe controlado", (
 
   assert.equal(getTeamTrucoDecision(ruleSet, teamHands, 3, undefined, "trickster", () => 0.05), "raise")
   assert.equal(getTeamTrucoDecision(ruleSet, teamHands, 3, undefined, "trickster", () => 0.95), "accept")
+})
+
+test("conselho forte da parceira pode transformar aceite em raise", () => {
+  const humanHand = [
+    createCard("A", "copas"),
+    createCard("7", "espada"),
+    createCard("4", "ouros"),
+  ]
+  const partnerHand = [
+    createCard("2", "paus"),
+    createCard("6", "espada"),
+    createCard("4", "copas"),
+  ]
+
+  assert.equal(
+    getTeamTrucoDecisionFromPartnerAdvice(
+      ruleSet,
+      humanHand,
+      partnerHand,
+      6,
+      "CÊ QUE SABE!"
+    ),
+    "accept"
+  )
+  assert.equal(
+    getTeamTrucoDecisionFromPartnerAdvice(
+      ruleSet,
+      humanHand,
+      partnerHand,
+      6,
+      "BORA!"
+    ),
+    "raise"
+  )
+})
+
+test("MELHOR CORRER! pesa de verdade e pode derrubar o aceite da dupla", () => {
+  const humanHand = [
+    createCard("A", "copas"),
+    createCard("7", "espada"),
+    createCard("4", "ouros"),
+  ]
+  const partnerHand = [
+    createCard("K", "paus"),
+    createCard("6", "espada"),
+    createCard("4", "copas"),
+  ]
+
+  assert.equal(
+    getTeamTrucoDecisionFromPartnerAdvice(
+      ruleSet,
+      humanHand,
+      partnerHand,
+      6,
+      "CÊ QUE SABE!"
+    ),
+    "accept"
+  )
+  assert.equal(
+    getTeamTrucoDecisionFromPartnerAdvice(
+      ruleSet,
+      humanHand,
+      partnerHand,
+      6,
+      "MELHOR CORRER!"
+    ),
+    "run"
+  )
+})
+
+test("conselho da parceira cobre BORA!, CÊ QUE SABE! e MELHOR CORRER!", () => {
+  assert.equal(
+    getTeamPartnerAdvice(
+      ruleSet,
+      [
+        [createCard("3", "copas"), createCard("2", "espada"), createCard("A", "ouros")],
+        [createCard("K", "copas"), createCard("A", "paus"), createCard("7", "espada")],
+      ],
+      6
+    ),
+    "BORA!"
+  )
+
+  assert.equal(
+    getTeamPartnerAdvice(
+      ruleSet,
+      [
+        [createCard("A", "copas"), createCard("7", "espada"), createCard("4", "ouros")],
+        [createCard("A", "paus"), createCard("K", "copas"), createCard("4", "espada")],
+      ],
+      6
+    ),
+    "CÊ QUE SABE!"
+  )
+
+  assert.equal(
+    getTeamPartnerAdvice(
+      ruleSet,
+      [
+        [createCard("7", "espada"), createCard("6", "paus"), createCard("Q", "ouros")],
+        [createCard("J", "paus"), createCard("6", "copas"), createCard("5", "espada")],
+      ],
+      6
+    ),
+    "MELHOR CORRER!"
+  )
 })

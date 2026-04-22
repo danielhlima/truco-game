@@ -270,7 +270,8 @@ function getTrucoAcceptSpeechSequence(
   handState: HandState
 ): TrucoAcceptSpeechSequence | null {
   const responderPlayerId = getTrucoSpeechResponderPlayerId(handState)
-  const escalationStarterPlayerId = handState.truco.initialRequestedByPlayerId ?? null
+  const escalationStarterPlayerId =
+    handState.truco.initialRequestedByPlayerId ?? handState.truco.requestedByPlayerId ?? null
   const escalationStarterAccepting =
     escalationStarterPlayerId !== null && responderPlayerId === escalationStarterPlayerId
 
@@ -279,6 +280,7 @@ function getTrucoAcceptSpeechSequence(
       playerId: responderPlayerId,
       text: escalationStarterAccepting ? "TOMA!" : "DESCE!",
     },
+    followUp: undefined,
   }
 }
 

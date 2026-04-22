@@ -343,7 +343,7 @@ interface TableSectionProps {
   debugVenueId: string
   debugVenueOptions: Array<{ id: string; label: string }>
   dealAnimationNonce: number
-  menuScreen: "start" | "character-select"
+  menuScreen: "start" | "character-select" | "venue-intro"
   selectedCharacter: TrucoCharacterProfile | null
   selectedCharacterIndex: number
   selectedPartnerCharacter: TrucoCharacterProfile | null
@@ -463,6 +463,15 @@ export function TableSection({
                   onConfirm={onConfirmCharacterSelect}
                   onNext={onSelectNextCharacter}
                   onPrevious={onSelectPreviousCharacter}
+                  styles={styles}
+                />
+              ) : menuScreen === "venue-intro" ? (
+                <VenueIntroScreen
+                  currentCampaignVenue={currentCampaignVenue}
+                  selectedPartnerCharacter={selectedPartnerCharacter}
+                  opponentCharacters={opponentCharacters}
+                  onOpenCharacterSelect={onOpenCharacterSelect}
+                  onStart={onStart}
                   styles={styles}
                 />
               ) : (
@@ -1050,6 +1059,121 @@ function CharacterSelectionScreen({
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  )
+}
+
+function VenueIntroScreen({
+  currentCampaignVenue,
+  selectedPartnerCharacter,
+  opponentCharacters,
+  onOpenCharacterSelect,
+  onStart,
+  styles,
+}: {
+  currentCampaignVenue: CampaignVenue | null
+  selectedPartnerCharacter: TrucoCharacterProfile | null
+  opponentCharacters: TrucoCharacterProfile[]
+  onOpenCharacterSelect: () => void
+  onStart: () => void
+  styles: StyleMap
+}) {
+  const participants = [
+    {
+      id: "you",
+      role: "Você",
+      name: "Zeca Viramão",
+      description: "Chega na mesa querendo medir a temperatura do bar no carteado.",
+      avatarAsset: avatarYouAsset,
+    },
+    {
+      id: selectedPartnerCharacter?.id ?? "partner",
+      role: "Sua parceira",
+      name: selectedPartnerCharacter?.name ?? "Parceira",
+      description:
+        selectedPartnerCharacter?.story ?? "Você já escolheu quem vai fechar a dupla com você.",
+      avatarAsset: selectedPartnerCharacter?.avatarAsset ?? avatarYouAsset,
+    },
+    ...opponentCharacters.map((character, index) => ({
+      id: character.id,
+      role: index === 0 ? "Adversário esquerdo" : "Adversário direito",
+      name: character.name,
+      description: character.story,
+      avatarAsset: character.avatarAsset,
+    })),
+  ]
+
+  return (
+    <div style={styles.venueIntroScreen}>
+      <div style={styles.venueIntroHeader}>
+        <div>
+          <div style={styles.venueIntroEyebrow}>Chegada no bar</div>
+          <h2 style={styles.venueIntroTitle}>{currentCampaignVenue?.name ?? "Próxima mesa"}</h2>
+          <div style={styles.venueIntroMeta}>
+            {currentCampaignVenue?.districtLabel ?? "Local ainda não definido"}
+          </div>
+        </div>
+        <button style={styles.characterSelectBackButton} onClick={onOpenCharacterSelect}>
+          Trocar parceira
+        </button>
+      </div>
+
+      <div style={styles.venueIntroBoard}>
+        <div style={styles.venueIntroMainCard}>
+          <div style={styles.venueIntroSectionLabel}>Clima do lugar</div>
+          <p style={styles.venueIntroLead}>
+            {currentCampaignVenue?.entryNarrative ??
+              "A mesa já está armada. Falta só respirar fundo e começar."}
+          </p>
+          <p style={styles.venueIntroText}>
+            {currentCampaignVenue?.atmosphere ??
+              "O bar ainda espera uma descrição própria, mas a partida já está pronta para começar."}
+          </p>
+
+          <div style={styles.venueIntroFactsGrid}>
+            <div style={styles.venueIntroFactCard}>
+              <div style={styles.venueIntroFactLabel}>Variante</div>
+              <strong style={styles.venueIntroFactValue}>
+                {currentCampaignVenue?.variant === "PAULISTA" ? "Truco Paulista" : "Truco Mineiro"}
+              </strong>
+            </div>
+            <div style={styles.venueIntroFactCard}>
+              <div style={styles.venueIntroFactLabel}>Meta do bar</div>
+              <strong style={styles.venueIntroFactValue}>
+                {currentCampaignVenue?.matchesToClear ?? 0} vitórias
+              </strong>
+            </div>
+          </div>
+        </div>
+
+        <div style={styles.venueIntroRosterPanel}>
+          <div style={styles.venueIntroSectionLabel}>Quem vai pra mesa</div>
+          <div style={styles.venueIntroParticipants}>
+            {participants.map((participant) => (
+              <div key={participant.id} style={styles.venueIntroParticipantCard}>
+                <div style={styles.venueIntroParticipantAvatar}>
+                  <img
+                    src={participant.avatarAsset}
+                    alt={participant.name}
+                    style={styles.venueIntroParticipantImage}
+                  />
+                </div>
+                <div style={styles.venueIntroParticipantBody}>
+                  <div style={styles.venueIntroParticipantRole}>{participant.role}</div>
+                  <div style={styles.venueIntroParticipantName}>{participant.name}</div>
+                  <div style={styles.venueIntroParticipantText}>{participant.description}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div style={styles.venueIntroActions}>
+        <button style={styles.gameStartLaunchButton} onClick={onStart}>
+          COMEÇAR
+        </button>
       </div>
     </div>
   )

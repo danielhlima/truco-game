@@ -50,8 +50,6 @@ export function respondToTruco(
       currentBet: proposedBet,
       truco: {
         phase: "idle",
-        initialRequestedByPlayerId,
-        initialRequestedByTeam,
         nextRaiseByTeam: awaitingResponseFromTeam,
       },
     }
@@ -99,8 +97,6 @@ export function respondToTruco(
     winner: requestedByTeam,
     truco: {
       phase: "idle",
-      initialRequestedByPlayerId,
-      initialRequestedByTeam,
       awaitingResponseFromPlayerId: undefined,
       promptKind: undefined,
       nextRaiseByTeam: undefined,

@@ -35,6 +35,8 @@ test("respondToTruco com accept atualiza a mão para o valor aceito", () => {
 
   assert.equal(nextState.currentBet, 3)
   assert.equal(nextState.truco.phase, "idle")
+  assert.equal(nextState.truco.initialRequestedByPlayerId, undefined)
+  assert.equal(nextState.truco.initialRequestedByTeam, undefined)
   assert.equal(nextState.truco.nextRaiseByTeam, "B")
   assert.equal(nextState.finished, false)
 })
@@ -202,4 +204,22 @@ test("escalada completa permite sequência de truco até doze", () => {
   const afterAcceptTwelve = respondToTruco(afterTwelve, "accept")
   assert.equal(afterAcceptTwelve.currentBet, 12)
   assert.equal(afterAcceptTwelve.truco.phase, "idle")
+})
+
+test("novo pedido após aceite começa uma nova escalada vigente", () => {
+  const afterAccept = respondToTruco(requestTruco(createHandStateFixture(), 1), "accept")
+
+  const nextState = requestTruco(
+    createHandStateFixture({
+      currentBet: afterAccept.currentBet,
+      currentPlayerId: 2,
+      truco: afterAccept.truco,
+    }),
+    2
+  )
+
+  assert.equal(nextState.truco.requestedByPlayerId, 2)
+  assert.equal(nextState.truco.initialRequestedByPlayerId, 2)
+  assert.equal(nextState.truco.initialRequestedByTeam, "B")
+  assert.equal(nextState.truco.proposedBet, 6)
 })

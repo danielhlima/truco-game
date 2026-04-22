@@ -3,6 +3,7 @@ import assert from "node:assert/strict"
 import {
   getFollowUpSpeechBubbleForTransition,
   getSpeechBubbleForTransition,
+  getSpeechBetLabel,
 } from "../../src/app/gameSessionHelpers.ts"
 import { createHandStateFixture } from "../helpers/gameFixtures.ts"
 import { requestTruco } from "../../src/game/requestTruco.ts"
@@ -70,7 +71,7 @@ test("aceite de pedido inicial mantém o locutor como quem recebeu o pedido", ()
   })
 })
 
-test("aceite de pedido inicial gera TOMA como follow-up de quem abriu o truco", () => {
+test("aceite de pedido inicial não gera follow-up extra", () => {
   const previousState = createHandStateFixture({
     truco: {
       phase: "awaiting-response",
@@ -98,13 +99,10 @@ test("aceite de pedido inicial gera TOMA como follow-up de quem abriu o truco", 
 
   const bubble = getFollowUpSpeechBubbleForTransition(previousState, nextState)
 
-  assert.deepEqual(bubble, {
-    playerId: 2,
-    text: "TOMA!",
-  })
+  assert.equal(bubble, null)
 })
 
-test("aceite de contra-aumento no mesmo cabo de guerra gera DESCE de quem propôs o valor atual", () => {
+test("aceite de contra-aumento no mesmo cabo de guerra não gera segundo balão", () => {
   const previousState = createHandStateFixture({
     currentBet: 3,
     truco: {
@@ -132,13 +130,10 @@ test("aceite de contra-aumento no mesmo cabo de guerra gera DESCE de quem propô
 
   const bubble = getFollowUpSpeechBubbleForTransition(previousState, nextState)
 
-  assert.deepEqual(bubble, {
-    playerId: 3,
-    text: "DESCE!",
-  })
+  assert.equal(bubble, null)
 })
 
-test("pedido posterior de seis preserva quem falou truco como origem da sequência", () => {
+test("pedido posterior após retomada da jogada reinicia a escalada vigente", () => {
   const state = createHandStateFixture({
     currentBet: 3,
     currentPlayerId: 3,
@@ -155,11 +150,11 @@ test("pedido posterior de seis preserva quem falou truco como origem da sequênc
   const nextState = requestTruco(state, 3)
 
   assert.equal(nextState.truco.requestedByPlayerId, 3)
-  assert.equal(nextState.truco.initialRequestedByPlayerId, 2)
-  assert.equal(nextState.truco.initialRequestedByTeam, "B")
+  assert.equal(nextState.truco.initialRequestedByPlayerId, 3)
+  assert.equal(nextState.truco.initialRequestedByTeam, "A")
 })
 
-test("aceite de nove depois de nova rodada de apostas usa DESCE de quem aceitou o lance atual", () => {
+test("aceite de nove em nova escalada usa DESCE de quem responde", () => {
   const previousState = createHandStateFixture({
     currentBet: 6,
     truco: {
@@ -192,13 +187,10 @@ test("aceite de nove depois de nova rodada de apostas usa DESCE de quem aceitou 
     playerId: 3,
     text: "DESCE!",
   })
-  assert.deepEqual(followUp, {
-    playerId: 2,
-    text: "TOMA!",
-  })
+  assert.equal(followUp, null)
 })
 
-test("aceite de doze após raise posterior usa DESCE do respondente e TOMA de quem pediu o valor atual", () => {
+test("aceite de doze pelo iniciador da escalada vigente usa TOMA", () => {
   const previousState = createHandStateFixture({
     currentBet: 9,
     truco: {
@@ -231,21 +223,18 @@ test("aceite de doze após raise posterior usa DESCE do respondente e TOMA de qu
     playerId: 4,
     text: "TOMA!",
   })
-  assert.deepEqual(followUp, {
-    playerId: 3,
-    text: "DESCE!",
-  })
+  assert.equal(followUp, null)
 })
 
-test("seis pedido depois de truco inicial usa DESCE de quem aceitou e TOMA de quem pediu seis", () => {
+test("seis pedido em nova escalada usa DESCE de quem aceitou", () => {
   const previousState = createHandStateFixture({
     currentBet: 3,
     truco: {
       phase: "awaiting-response",
       requestedByPlayerId: 3,
       requestedByTeam: "A",
-      initialRequestedByPlayerId: 2,
-      initialRequestedByTeam: "B",
+      initialRequestedByPlayerId: 3,
+      initialRequestedByTeam: "A",
       awaitingResponseFromPlayerId: 2,
       awaitingResponseFromTeam: "B",
       proposedBet: 6,
@@ -270,8 +259,72 @@ test("seis pedido depois de truco inicial usa DESCE de quem aceitou e TOMA de qu
     playerId: 2,
     text: "DESCE!",
   })
-  assert.deepEqual(followUp, {
-    playerId: 3,
-    text: "TOMA!",
+  assert.equal(followUp, null)
+})
+
+test("pedidos de truco e raises usam a fala e o emissor corretos", () => {
+  const cases = [
+    { requestedByPlayerId: 1, proposedBet: 3, expectedText: "TRUCO!" },
+    { requestedByPlayerId: 3, proposedBet: 6, expectedText: "SEIS!" },
+    { requestedByPlayerId: 2, proposedBet: 9, expectedText: "NOVE!" },
+    { requestedByPlayerId: 4, proposedBet: 12, expectedText: "DOZE!" },
+  ] as const
+
+  for (const { requestedByPlayerId, proposedBet, expectedText } of cases) {
+    const previousState = createHandStateFixture()
+    const nextState = createHandStateFixture({
+      truco: {
+        phase: "awaiting-response",
+        requestedByPlayerId,
+        requestedByTeam: requestedByPlayerId % 2 === 1 ? "A" : "B",
+        initialRequestedByPlayerId: requestedByPlayerId,
+        initialRequestedByTeam: requestedByPlayerId % 2 === 1 ? "A" : "B",
+        awaitingResponseFromPlayerId: requestedByPlayerId === 4 ? 1 : requestedByPlayerId + 1,
+        awaitingResponseFromTeam: requestedByPlayerId % 2 === 1 ? "B" : "A",
+        proposedBet,
+        promptKind: proposedBet === 3 ? "request" : "raise",
+      },
+    })
+
+    assert.deepEqual(getSpeechBubbleForTransition(previousState, nextState), {
+      playerId: requestedByPlayerId,
+      text: expectedText,
+    })
+  }
+})
+
+test("corrida usa TÔ FORA no balão do respondente", () => {
+  const previousState = createHandStateFixture({
+    truco: {
+      phase: "awaiting-response",
+      requestedByPlayerId: 2,
+      requestedByTeam: "B",
+      initialRequestedByPlayerId: 2,
+      initialRequestedByTeam: "B",
+      awaitingResponseFromPlayerId: 1,
+      awaitingResponseFromTeam: "A",
+      proposedBet: 3,
+      promptKind: "request",
+    },
   })
+
+  const nextState = createHandStateFixture({
+    finished: true,
+    winner: "B",
+    truco: {
+      phase: "idle",
+    },
+  })
+
+  assert.deepEqual(getSpeechBubbleForTransition(previousState, nextState), {
+    playerId: 1,
+    text: "TÔ FORA!",
+  })
+})
+
+test("rótulos de fala cobrem a escada oficial até doze", () => {
+  assert.equal(getSpeechBetLabel(3), "TRUCO!")
+  assert.equal(getSpeechBetLabel(6), "SEIS!")
+  assert.equal(getSpeechBetLabel(9), "NOVE!")
+  assert.equal(getSpeechBetLabel(12), "DOZE!")
 })

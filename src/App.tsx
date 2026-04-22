@@ -1,13 +1,24 @@
-import { useEffect, useMemo, useState } from "react"
+import { Suspense, lazy, useEffect, useMemo, useState } from "react"
 import { useGameSession } from "./app/useGameSession"
-import {
-  CampaignPanel,
-  HandStatusPanel,
-  LogsPanel,
-  TableSection,
-} from "./app/AppSections"
 import botecoSceneBgAsset from "./assets/boteco/boteco-scene-bg.png"
 import cardFaceAgedPaperAsset from "./assets/cards/card-face-aged-paper.png"
+
+const TableSection = lazy(async () => {
+  const mod = await import("./app/AppSections")
+  return { default: mod.TableSection }
+})
+const HandStatusPanel = lazy(async () => {
+  const mod = await import("./app/AppSections")
+  return { default: mod.HandStatusPanel }
+})
+const CampaignPanel = lazy(async () => {
+  const mod = await import("./app/AppSections")
+  return { default: mod.CampaignPanel }
+})
+const LogsPanel = lazy(async () => {
+  const mod = await import("./app/AppSections")
+  return { default: mod.LogsPanel }
+})
 
 type GameplayLayoutMode = "regular" | "compact"
 
@@ -241,75 +252,83 @@ function App() {
           </div>
         </header>
 
-        <TableSection
-          activeVariant={activeVariant}
-          campaignCompleted={campaignCompleted}
-          handState={handState}
-          matchState={matchState}
-          currentCampaignVenue={currentCampaignVenue}
-          debugModeEnabled={debugModeEnabled}
-          debugVenueId={debugVenueId}
-          debugVenueOptions={debugVenueOptions}
-          dealAnimationNonce={dealAnimationNonce}
-          menuScreen={menuScreen}
-          opponentCharacters={opponentCharacters}
-          selectedCharacter={selectedCharacter}
-          selectedCharacterIndex={selectedCharacterIndex}
-          selectedPartnerCharacter={selectedPartnerCharacter}
-          selectableCharacters={selectableCharacters}
-          speechBubble={speechBubble}
-          tableByPlayer={tableByPlayer}
-          lastPlayedPlayerId={lastPlayedPlayerId}
-          player1={player1}
-          canRequestTruco={canRequestTruco}
-          canHumanAdvisePartner={canHumanAdvisePartner}
-          canHumanRaiseTruco={canHumanRaiseTruco}
-          canHumanRespondToTruco={canHumanRespondToTruco}
-          canPlayHumanCard={canPlayHumanCard}
-          variantSelectionDisabled={variantSelectionDisabled}
-          onChangeVariant={setVariant}
-          onChangeDebugVenue={setDebugVenueId}
-          onCloseCharacterSelect={handleCloseCharacterSelect}
-          onConfirmCharacterSelect={handleConfirmCharacterSelect}
-          onOpenCharacterSelect={handleOpenCharacterSelect}
-          onResetCampaign={handleResetCampaign}
-          onSelectNextCharacter={handleSelectNextCharacter}
-          onSelectPreviousCharacter={handleSelectPreviousCharacter}
-          onStart={handleStartHand}
-          onRequestTruco={handleRequestTruco}
-          onAcceptTruco={handleAcceptTruco}
-          onAdvisePartner={handlePartnerAdvice}
-          onRaiseTruco={handleRaiseTruco}
-          onRunFromTruco={handleRunFromTruco}
-          onPlayCard={handlePlayCard}
-          styles={responsiveStyles}
-        />
+        <Suspense fallback={<div style={responsiveStyles.loadingCard}>Carregando mesa...</div>}>
+          <TableSection
+            activeVariant={activeVariant}
+            campaignCompleted={campaignCompleted}
+            handState={handState}
+            matchState={matchState}
+            currentCampaignVenue={currentCampaignVenue}
+            debugModeEnabled={debugModeEnabled}
+            debugVenueId={debugVenueId}
+            debugVenueOptions={debugVenueOptions}
+            dealAnimationNonce={dealAnimationNonce}
+            menuScreen={menuScreen}
+            opponentCharacters={opponentCharacters}
+            selectedCharacter={selectedCharacter}
+            selectedCharacterIndex={selectedCharacterIndex}
+            selectedPartnerCharacter={selectedPartnerCharacter}
+            selectableCharacters={selectableCharacters}
+            speechBubble={speechBubble}
+            tableByPlayer={tableByPlayer}
+            lastPlayedPlayerId={lastPlayedPlayerId}
+            player1={player1}
+            canRequestTruco={canRequestTruco}
+            canHumanAdvisePartner={canHumanAdvisePartner}
+            canHumanRaiseTruco={canHumanRaiseTruco}
+            canHumanRespondToTruco={canHumanRespondToTruco}
+            canPlayHumanCard={canPlayHumanCard}
+            variantSelectionDisabled={variantSelectionDisabled}
+            onChangeVariant={setVariant}
+            onChangeDebugVenue={setDebugVenueId}
+            onCloseCharacterSelect={handleCloseCharacterSelect}
+            onConfirmCharacterSelect={handleConfirmCharacterSelect}
+            onOpenCharacterSelect={handleOpenCharacterSelect}
+            onResetCampaign={handleResetCampaign}
+            onSelectNextCharacter={handleSelectNextCharacter}
+            onSelectPreviousCharacter={handleSelectPreviousCharacter}
+            onStart={handleStartHand}
+            onRequestTruco={handleRequestTruco}
+            onAcceptTruco={handleAcceptTruco}
+            onAdvisePartner={handlePartnerAdvice}
+            onRaiseTruco={handleRaiseTruco}
+            onRunFromTruco={handleRunFromTruco}
+            onPlayCard={handlePlayCard}
+            styles={responsiveStyles}
+          />
+        </Suspense>
 
-        <HandStatusPanel
-          activeVariant={activeVariant}
-          currentCampaignVenue={currentCampaignVenue}
-          handState={handState}
-          matchHandNumber={matchState?.handNumber ?? 1}
-          matchScoreLabel={matchScoreLabel}
-          handScoreLabel={handScoreLabel}
-          currentTurnLabel={currentTurnLabel}
-          statusMessage={statusMessage}
-          eventMessage={eventMessage}
-          styles={responsiveStyles}
-        />
+        <Suspense fallback={<div style={responsiveStyles.panelLoadingCard}>Carregando status...</div>}>
+          <HandStatusPanel
+            activeVariant={activeVariant}
+            currentCampaignVenue={currentCampaignVenue}
+            handState={handState}
+            matchHandNumber={matchState?.handNumber ?? 1}
+            matchScoreLabel={matchScoreLabel}
+            handScoreLabel={handScoreLabel}
+            currentTurnLabel={currentTurnLabel}
+            statusMessage={statusMessage}
+            eventMessage={eventMessage}
+            styles={responsiveStyles}
+          />
+        </Suspense>
 
-        <CampaignPanel
-          campaignCompleted={campaignCompleted}
-          currentCampaignStage={currentCampaignStage}
-          currentCampaignVenue={currentCampaignVenue}
-          currentVenueWins={currentVenueWins}
-          campaignSummary={campaignSummary}
-          playerProfile={playerProfile}
-          onResetCampaign={handleResetCampaign}
-          styles={responsiveStyles}
-        />
+        <Suspense fallback={<div style={responsiveStyles.panelLoadingCard}>Carregando campanha...</div>}>
+          <CampaignPanel
+            campaignCompleted={campaignCompleted}
+            currentCampaignStage={currentCampaignStage}
+            currentCampaignVenue={currentCampaignVenue}
+            currentVenueWins={currentVenueWins}
+            campaignSummary={campaignSummary}
+            playerProfile={playerProfile}
+            onResetCampaign={handleResetCampaign}
+            styles={responsiveStyles}
+          />
+        </Suspense>
 
-        <LogsPanel logs={logs} onCopyLogs={handleCopyLogs} styles={responsiveStyles} />
+        <Suspense fallback={<div style={responsiveStyles.panelLoadingCard}>Carregando logs...</div>}>
+          <LogsPanel logs={logs} onCopyLogs={handleCopyLogs} styles={responsiveStyles} />
+        </Suspense>
       </div>
     </div>
   )
@@ -361,6 +380,31 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "18px",
     boxShadow: "0 10px 24px rgba(15, 23, 42, 0.06)",
     marginBottom: "16px",
+  },
+  loadingCard: {
+    minHeight: "320px",
+    display: "grid",
+    placeItems: "center",
+    borderRadius: "20px",
+    border: "1px solid #d8dee6",
+    background: "#ffffff",
+    boxShadow: "0 10px 24px rgba(15, 23, 42, 0.06)",
+    fontSize: "16px",
+    fontWeight: 700,
+    color: "#475569",
+  },
+  panelLoadingCard: {
+    minHeight: "96px",
+    display: "grid",
+    placeItems: "center",
+    borderRadius: "18px",
+    border: "1px solid #d8dee6",
+    background: "#ffffff",
+    boxShadow: "0 10px 24px rgba(15, 23, 42, 0.06)",
+    fontSize: "14px",
+    fontWeight: 700,
+    color: "#64748b",
+    marginTop: "16px",
   },
   progressionHeader: {
     display: "flex",
@@ -1873,6 +1917,176 @@ const styles: Record<string, React.CSSProperties> = {
     boxSizing: "border-box",
     minWidth: 0,
     minHeight: 0,
+  },
+  venueIntroScreen: {
+    gridColumn: "1 / -1",
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    gap: "clamp(10px, 0.9vw, 14px)",
+    padding: "clamp(12px, 1vw, 16px)",
+    boxSizing: "border-box",
+    minWidth: 0,
+    minHeight: 0,
+  },
+  venueIntroHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: "16px",
+  },
+  venueIntroEyebrow: {
+    fontSize: "clamp(11px, 0.92vw, 13px)",
+    fontWeight: 800,
+    textTransform: "uppercase",
+    letterSpacing: "0.1em",
+    color: "#cda05f",
+  },
+  venueIntroTitle: {
+    margin: "6px 0 4px 0",
+    fontSize: "clamp(24px, 2.1vw, 32px)",
+    lineHeight: 1.02,
+    color: "#f6ead8",
+    fontFamily: "Georgia, serif",
+  },
+  venueIntroMeta: {
+    fontSize: "clamp(12px, 0.95vw, 14px)",
+    color: "#d5bf9a",
+  },
+  venueIntroBoard: {
+    flex: 1,
+    minHeight: 0,
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 0.9fr) minmax(0, 1.1fr)",
+    gap: "clamp(10px, 0.9vw, 16px)",
+  },
+  venueIntroMainCard: {
+    borderRadius: "22px",
+    padding: "clamp(16px, 1.4vw, 22px)",
+    display: "flex",
+    flexDirection: "column",
+    gap: "12px",
+    background: "linear-gradient(180deg, rgba(54,36,24,0.94) 0%, rgba(26,17,11,0.96) 100%)",
+    border: "1px solid rgba(205, 160, 95, 0.18)",
+    color: "#f8e7cb",
+    boxShadow: "0 18px 34px rgba(0,0,0,0.22)",
+  },
+  venueIntroSectionLabel: {
+    fontSize: "12px",
+    fontWeight: 800,
+    textTransform: "uppercase",
+    letterSpacing: "0.08em",
+    color: "#d5bf9a",
+  },
+  venueIntroLead: {
+    margin: 0,
+    fontSize: "clamp(17px, 1.35vw, 21px)",
+    lineHeight: 1.35,
+    fontWeight: 700,
+    color: "#fff2df",
+  },
+  venueIntroText: {
+    margin: 0,
+    fontSize: "clamp(13px, 1vw, 15px)",
+    lineHeight: 1.55,
+    color: "#e7d3b4",
+  },
+  venueIntroFactsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    gap: "10px",
+    marginTop: "auto",
+  },
+  venueIntroFactCard: {
+    borderRadius: "16px",
+    padding: "12px 14px",
+    background: "rgba(255,255,255,0.06)",
+    border: "1px solid rgba(255,255,255,0.08)",
+    display: "flex",
+    flexDirection: "column",
+    gap: "4px",
+  },
+  venueIntroFactLabel: {
+    fontSize: "11px",
+    fontWeight: 800,
+    textTransform: "uppercase",
+    letterSpacing: "0.06em",
+    color: "#cfb48b",
+  },
+  venueIntroFactValue: {
+    fontSize: "clamp(15px, 1.15vw, 18px)",
+    color: "#fff4e3",
+  },
+  venueIntroRosterPanel: {
+    borderRadius: "22px",
+    padding: "clamp(16px, 1.4vw, 22px)",
+    display: "flex",
+    flexDirection: "column",
+    gap: "12px",
+    background: "linear-gradient(180deg, rgba(29,18,12,0.94) 0%, rgba(16,10,7,0.97) 100%)",
+    border: "1px solid rgba(205, 160, 95, 0.18)",
+    boxShadow: "0 18px 34px rgba(0,0,0,0.22)",
+    minHeight: 0,
+  },
+  venueIntroParticipants: {
+    display: "grid",
+    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    gap: "10px",
+    overflow: "auto",
+    paddingRight: "4px",
+  },
+  venueIntroParticipantCard: {
+    display: "grid",
+    gridTemplateColumns: "72px minmax(0, 1fr)",
+    gap: "10px",
+    alignItems: "start",
+    borderRadius: "18px",
+    padding: "10px",
+    background: "rgba(255,255,255,0.05)",
+    border: "1px solid rgba(255,255,255,0.08)",
+  },
+  venueIntroParticipantAvatar: {
+    width: "72px",
+    aspectRatio: "1 / 1.16",
+    borderRadius: "14px",
+    overflow: "hidden",
+    background: "rgba(0,0,0,0.22)",
+  },
+  venueIntroParticipantImage: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    display: "block",
+  },
+  venueIntroParticipantBody: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "4px",
+    minWidth: 0,
+  },
+  venueIntroParticipantRole: {
+    fontSize: "11px",
+    fontWeight: 800,
+    textTransform: "uppercase",
+    letterSpacing: "0.06em",
+    color: "#cda05f",
+  },
+  venueIntroParticipantName: {
+    fontSize: "16px",
+    fontWeight: 800,
+    lineHeight: 1.05,
+    color: "#f7e7cf",
+  },
+  venueIntroParticipantText: {
+    fontSize: "12px",
+    lineHeight: 1.45,
+    color: "#d6c3a5",
+  },
+  venueIntroActions: {
+    display: "flex",
+    justifyContent: "center",
+    paddingTop: "4px",
   },
   characterSelectHeader: {
     display: "flex",
