@@ -23,7 +23,6 @@ import {
   getManilhaLabel,
   getRaiseResponseButtonLabel,
   getRequestBetButtonLabel,
-  getStartMatchButtonLabel,
   getStateLabel,
   getSuitColor,
   getSuitSymbol,
@@ -44,7 +43,7 @@ interface ControlsPanelProps {
 
 export function ControlsPanel({
   activeVariant,
-  campaignCompleted,
+  campaignCompleted: _campaignCompleted,
   variantSelectionDisabled,
   currentCampaignVenue,
   onChangeVariant,
@@ -81,7 +80,7 @@ export function ControlsPanel({
           onClick={onStart}
           disabled={!currentCampaignVenue}
         >
-          {getStartMatchButtonLabel(currentCampaignVenue, campaignCompleted)}
+          COMEÇAR
         </button>
       </div>
 
@@ -307,7 +306,7 @@ export function CampaignPanel({
             <div style={styles.roadmapTitle}>Campanha</div>
             <p style={styles.roadmapText}>
               O jogo agora já tem estrutura para crescer de botecos de rua até o
-              mundial, com pós-campanha intergaláctica.
+              mundial, com uma etapa bônus depois da campanha principal.
             </p>
           </div>
 
@@ -343,7 +342,7 @@ interface TableSectionProps {
   debugVenueId: string
   debugVenueOptions: Array<{ id: string; label: string }>
   dealAnimationNonce: number
-  menuScreen: "start" | "character-select" | "venue-intro"
+  menuScreen: "start" | "journey-intro" | "character-select" | "venue-intro"
   selectedCharacter: TrucoCharacterProfile | null
   selectedCharacterIndex: number
   selectedPartnerCharacter: TrucoCharacterProfile | null
@@ -362,8 +361,12 @@ interface TableSectionProps {
   onChangeVariant: (variant: GameVariant) => void
   onChangeDebugVenue: (venueId: string) => void
   onCloseCharacterSelect: () => void
+  onCloseJourneyIntro: () => void
+  onContinueToCharacterSelect: () => void
   onConfirmCharacterSelect: () => void
+  onLaunchVenue: (venueId: string) => void
   onOpenCharacterSelect: () => void
+  onOpenJourneyIntro: () => void
   onResetCampaign: () => void
   onSelectNextCharacter: () => void
   onSelectPreviousCharacter: () => void
@@ -406,8 +409,12 @@ export function TableSection({
   onChangeVariant,
   onChangeDebugVenue,
   onCloseCharacterSelect,
+  onCloseJourneyIntro,
+  onContinueToCharacterSelect,
   onConfirmCharacterSelect,
+  onLaunchVenue,
   onOpenCharacterSelect,
+  onOpenJourneyIntro,
   onResetCampaign,
   onSelectNextCharacter,
   onSelectPreviousCharacter,
@@ -452,7 +459,15 @@ export function TableSection({
         <div style={styles.gameViewportFrame}>
           <div style={styles.gameViewport}>
             {isMenuMode ? (
-              menuScreen === "character-select" ? (
+              menuScreen === "journey-intro" ? (
+                <JourneyIntroScreen
+                  currentCampaignVenue={currentCampaignVenue}
+                  onBack={onCloseJourneyIntro}
+                  onContinueToCharacterSelect={onContinueToCharacterSelect}
+                  onLaunchVenue={onLaunchVenue}
+                  styles={styles}
+                />
+              ) : menuScreen === "character-select" ? (
                 <CharacterSelectionScreen
                   currentCampaignVenue={currentCampaignVenue}
                   selectedCharacter={selectedCharacter}
@@ -484,7 +499,7 @@ export function TableSection({
                   debugVenueOptions={debugVenueOptions}
                   onChangeVariant={onChangeVariant}
                   onChangeDebugVenue={onChangeDebugVenue}
-                  onOpenCharacterSelect={onOpenCharacterSelect}
+                  onOpenJourneyIntro={onOpenJourneyIntro}
                   onResetCampaign={onResetCampaign}
                   onStart={onStart}
                   styles={styles}
@@ -782,14 +797,14 @@ export function TableSection({
 
 function GameStartScreen({
   activeVariant,
-  campaignCompleted,
+  campaignCompleted: _campaignCompleted,
   currentCampaignVenue,
   debugModeEnabled,
   debugVenueId,
   debugVenueOptions,
   onChangeVariant,
   onChangeDebugVenue,
-  onOpenCharacterSelect,
+  onOpenJourneyIntro,
   onResetCampaign,
   onStart,
   styles,
@@ -803,7 +818,7 @@ function GameStartScreen({
   debugVenueOptions: Array<{ id: string; label: string }>
   onChangeVariant: (variant: GameVariant) => void
   onChangeDebugVenue: (venueId: string) => void
-  onOpenCharacterSelect: () => void
+  onOpenJourneyIntro: () => void
   onResetCampaign: () => void
   onStart: () => void
   styles: StyleMap
@@ -811,7 +826,7 @@ function GameStartScreen({
 }) {
   return (
     <div style={styles.gameStartScreen}>
-      <button style={styles.gameStartTopActionButton} onClick={onOpenCharacterSelect}>
+      <button style={styles.gameStartTopActionButton} onClick={onOpenJourneyIntro}>
         Parceiros
       </button>
       <div style={styles.gameStartCard}>
@@ -876,7 +891,7 @@ function GameStartScreen({
           onClick={onStart}
           disabled={!currentCampaignVenue}
         >
-          {getStartMatchButtonLabel(currentCampaignVenue, campaignCompleted)}
+          COMEÇAR
         </button>
       </div>
 
@@ -890,7 +905,7 @@ function GameStartScreen({
           onClick={onStart}
           disabled={!currentCampaignVenue}
         >
-          {getStartMatchButtonLabel(currentCampaignVenue, campaignCompleted)}
+          COMEÇAR
         </button>
 
         <button
@@ -901,6 +916,138 @@ function GameStartScreen({
           onClick={onResetCampaign}
         >
           Resetar progresso
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function JourneyIntroScreen({
+  currentCampaignVenue,
+  onBack,
+  onContinueToCharacterSelect,
+  onLaunchVenue,
+  styles,
+}: {
+  currentCampaignVenue: CampaignVenue | null
+  onBack: () => void
+  onContinueToCharacterSelect: () => void
+  onLaunchVenue: (venueId: string) => void
+  styles: StyleMap
+}) {
+  const activeStageId = currentCampaignVenue
+    ? CAMPAIGN_STAGES.find((stage) => stage.venues.some((venue) => venue.id === currentCampaignVenue.id))?.id
+    : null
+  const availableStages = CAMPAIGN_STAGES.flatMap((stage) => {
+    const stageIndex = CAMPAIGN_STAGES.findIndex((candidate) => candidate.id === stage.id)
+    const activeStageIndex = CAMPAIGN_STAGES.findIndex((candidate) => candidate.id === activeStageId)
+
+    if (activeStageIndex === -1 || stageIndex > activeStageIndex) {
+      return []
+    }
+
+    const venues =
+      stage.id === activeStageId && currentCampaignVenue
+        ? stage.venues.filter((venue) => {
+            const currentVenueIndex = stage.venues.findIndex((candidate) => candidate.id === currentCampaignVenue.id)
+            const venueIndex = stage.venues.findIndex((candidate) => candidate.id === venue.id)
+            return venueIndex <= currentVenueIndex
+          })
+        : stage.venues
+
+    return [{ stage, venues }]
+  })
+
+  return (
+    <div style={styles.journeyIntroScreen}>
+      <div style={styles.journeyIntroHeader}>
+        <div>
+          <div style={styles.journeyIntroEyebrow}>Jornada de campanha</div>
+          <h2 style={styles.journeyIntroTitle}>Você tem um caminho pela frente</h2>
+          <p style={styles.journeyIntroText}>
+            Escolha a parceira e use este mapa para sentir o tamanho da jornada. Daqui
+            você pode entrar no bar atual ou revisitar qualquer bar anterior já alcançado.
+          </p>
+        </div>
+        <button style={styles.characterSelectBackButton} onClick={onBack}>
+          Voltar
+        </button>
+      </div>
+
+      <div style={styles.journeyIntroLeadCard}>
+        <div style={styles.journeyIntroLeadLabel}>Próximo desafio</div>
+        <div style={styles.journeyIntroLeadVenue}>
+          {currentCampaignVenue?.name ?? "Campanha concluída"}
+        </div>
+        <div style={styles.journeyIntroLeadMeta}>
+          {currentCampaignVenue?.districtLabel ?? "Todas as etapas principais já foram vencidas."}
+        </div>
+        <p style={styles.journeyIntroLeadText}>
+          {currentCampaignVenue?.entryNarrative ??
+            "Você já cruzou toda a jornada principal disponível até aqui."}
+        </p>
+      </div>
+
+      <div style={styles.journeyIntroStages}>
+        {availableStages.map(({ stage, venues }, index) => {
+          const totalMatches = stage.venues.reduce((sum, venue) => sum + venue.matchesToClear, 0)
+          const isActive = stage.id === activeStageId
+
+          return (
+            <div
+              key={stage.id}
+              style={{
+                ...styles.journeyIntroStageCard,
+                ...(isActive ? styles.journeyIntroStageCardActive : {}),
+              }}
+            >
+              <div style={styles.journeyIntroStageOrder}>{String(index + 1).padStart(2, "0")}</div>
+              <div style={styles.journeyIntroStageBody}>
+                <div style={styles.journeyIntroStageTopRow}>
+                  <div>
+                    <div style={styles.journeyIntroStageTitle}>{stage.name}</div>
+                    <div style={styles.journeyIntroStageTier}>
+                      {stage.tier === "bonus" ? "Bônus" : getCampaignTierLabel(stage.tier)}
+                    </div>
+                  </div>
+                  <div style={styles.journeyIntroStageBadge}>
+                    {stage.tier === "bonus" ? "Bônus" : stage.mapLabel}
+                  </div>
+                </div>
+                <div style={styles.journeyIntroStageText}>{stage.shortDescription}</div>
+                <div style={styles.journeyIntroStageMeta}>
+                  <span>{stage.venues.length} locais</span>
+                  <span>{totalMatches} partidas base</span>
+                </div>
+                <div style={styles.journeyIntroVenueList}>
+                  {venues.map((venue) => {
+                    const isCurrentVenue = venue.id === currentCampaignVenue?.id
+                    return (
+                      <button
+                        key={venue.id}
+                        style={{
+                          ...styles.journeyIntroVenueButton,
+                          ...(isCurrentVenue ? styles.journeyIntroVenueButtonActive : {}),
+                        }}
+                        onClick={() => onLaunchVenue(venue.id)}
+                      >
+                        <span style={styles.journeyIntroVenueButtonLabel}>{venue.name}</span>
+                        <span style={styles.journeyIntroVenueButtonMeta}>
+                          {isCurrentVenue ? "Bar atual" : "Bar anterior"}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      <div style={styles.journeyIntroActions}>
+        <button style={styles.gameStartResetButton} onClick={onContinueToCharacterSelect}>
+          TROCAR PARCEIRA
         </button>
       </div>
     </div>

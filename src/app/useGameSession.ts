@@ -68,7 +68,7 @@ import {
 import { getRuleSet } from "../game/getRuleSet"
 
 const DEBUG_MODE = true
-type MenuScreen = "start" | "character-select" | "venue-intro"
+type MenuScreen = "start" | "journey-intro" | "character-select" | "venue-intro"
 
 interface DebugVenueOption {
   id: string
@@ -490,6 +490,32 @@ export function useGameSession() {
     syncLogs,
   ])
 
+  function handleLaunchVenue(venueId?: string) {
+    const selectedVenueId = venueId ?? currentCampaignVenue?.id ?? null
+    const targetVenue = selectedVenueId ? debugVenueLookup.get(selectedVenueId)?.venue ?? null : null
+    const actualVenueId = actualCampaignVenue?.id ?? null
+
+    if (!targetVenue) return
+
+    clearLogs()
+
+    const firstPlayerId = 1
+    const variantToStart = targetVenue.variant
+    const state = createHandState(variantToStart, firstPlayerId)
+    const shouldUseSessionDebugVenue =
+      DEBUG_MODE && (!!debugVenueId || targetVenue.id !== actualVenueId)
+
+    setVariant(variantToStart)
+    setMatchState(createMatchState(variantToStart, firstPlayerId))
+    setSessionDebugVenueId(shouldUseSessionDebugVenue ? targetVenue.id : null)
+    setMenuScreen("start")
+
+    applyHandState(state, {
+      eventMessage: `Partida iniciada em ${targetVenue.name}.`,
+      trucoMessage: targetVenue.entryNarrative,
+    })
+  }
+
   function handleStartHand() {
     if (!currentCampaignVenue) return
     if (!currentVenuePartnerCharacterId) {
@@ -497,25 +523,8 @@ export function useGameSession() {
       setMenuScreen("character-select")
       return
     }
-    if (!handState && menuScreen !== "venue-intro") {
-      setMenuScreen("venue-intro")
-      return
-    }
 
-    clearLogs()
-
-    const firstPlayerId = 1
-    const state = createHandState(activeVariant, firstPlayerId)
-
-    setVariant(activeVariant)
-    setMatchState(createMatchState(activeVariant, firstPlayerId))
-    setSessionDebugVenueId(DEBUG_MODE && debugVenueId ? debugVenueId : null)
-    setMenuScreen("start")
-
-    applyHandState(state, {
-      eventMessage: `Partida iniciada em ${currentCampaignVenue.name}.`,
-      trucoMessage: currentCampaignVenue.entryNarrative,
-    })
+    setMenuScreen("journey-intro")
   }
 
   function handleResetCampaign() {
@@ -840,9 +849,22 @@ export function useGameSession() {
     setMenuScreen("character-select")
   }
 
+  function handleOpenJourneyIntro() {
+    setSelectedCharacterId(currentVenuePartnerCharacterId ?? selectableCharacters[0]?.id ?? "nega-catimbo")
+    setMenuScreen("journey-intro")
+  }
+
+  function handleCloseJourneyIntro() {
+    setMenuScreen("start")
+  }
+
+  function handleContinueToCharacterSelect() {
+    setMenuScreen("character-select")
+  }
+
   function handleCloseCharacterSelect() {
     setSelectedCharacterId(currentVenuePartnerCharacterId ?? selectableCharacters[0]?.id ?? "nega-catimbo")
-    setMenuScreen("start")
+    setMenuScreen("journey-intro")
   }
 
   function handleConfirmCharacterSelect() {
@@ -858,7 +880,7 @@ export function useGameSession() {
         },
       },
     }))
-    setMenuScreen("venue-intro")
+    setMenuScreen("journey-intro")
   }
 
   function handleSelectNextCharacter() {
@@ -938,7 +960,11 @@ export function useGameSession() {
     opponentCharacters,
     handleCloseCharacterSelect,
     handleConfirmCharacterSelect,
+    handleLaunchVenue,
     handleOpenCharacterSelect,
+    handleOpenJourneyIntro,
+    handleCloseJourneyIntro,
+    handleContinueToCharacterSelect,
     handleSelectNextCharacter,
     handleSelectPreviousCharacter,
   }
