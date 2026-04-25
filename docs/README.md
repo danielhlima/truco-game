@@ -57,6 +57,24 @@ O foco ativo mudou para:
 - tela de selecao de personagens / parceira IA
 - uso do roster em `src/content/characters.ts`
 - continuidade da interface ja iniciada dentro do proprio menu inicial
+- estabilidade do fluxo de dialogo de `truco + raise`
+
+## Prioridade imediata para o proximo chat
+
+No proximo chat, comecar por:
+
+- implementar ou reforcar testes unitarios para os fluxos de `truco + raise`
+- cobrir especialmente:
+  - falas `TRUCO!/SEIS!/NOVE!/DOZE!`
+  - falas `DESCE!/TOMA!/TO FORA!`
+  - consultas da parceira
+  - regra da escalada vigente
+
+Depois disso, seguir para:
+
+- UX da escolha de parceira com mais contexto do bar
+- estabilizacao visual/UX do truco
+- identidade narrativa dos bares
 
 ## Regra de continuidade
 

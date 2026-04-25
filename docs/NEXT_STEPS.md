@@ -21,8 +21,9 @@ Status:
 
 Status:
 
-- base concluida
-- segue aberta para ajustes finos de comportamento e UX
+- funcional
+- ainda fragil em regras finas de dialogo
+- precisa de blindagem por testes
 
 ### 3. Preparar a arquitetura/layout da tela final
 
@@ -33,170 +34,105 @@ Status:
 
 Status:
 
-- em andamento
-- ja bem avancado
+- em bom estado para seguir
+- revisitar so se houver regressao real
 
-### 4. Construir a tela de selecao de parceiro IA
+### 4. Construir a tela de selecao de parceira IA
 
 - transformar o roster em experiencia navegavel
 - ligar retrato, historia, estilo de jogo e atributos
-- preparar o fluxo para futura escolha real da parceira
+- preparar o fluxo para escolha real da parceira
 
 Status:
 
-- iniciado
-- estrutura base ja implementada
+- fluxo base funcional concluido
+- segue aberto para UX, narrativa e acabamento
 
 ## Estado Atual Real
 
 ### Marco de foco
 
 - a gameplay screen esta considerada pronta por enquanto
-- o foco principal agora e a tela de selecao de personagens/parceira IA
+- a escolha de parceira por bar ja funciona
+- o foco imediato recomendado agora e blindar o dialogo de `truco + raise` com testes
 
-### Coluna esquerda
+### Truco e dialogos
 
-- bloco dos jogadores em bom estado
-- scorepad funcional e visualmente coerente
-- scorepad considerado sensivel e sujeito a retrabalho se mexer sem cuidado
+Estado atual:
 
-### Mesa central
+- consultas da parceira ja existem
+- conselho da parceira ao humano ja existe
+- a leitura do humano pesa na decisao final da parceira
+- a regra da `escalada vigente` para `DESCE!/TOMA!` foi consolidada
 
-- mesa quadrada e dominante
-- gameplay evoluindo para visual mais fotorealista
-- cartas com verso fotografico envelhecido
-- frente das cartas com papel envelhecido
-- animacao de carta entrando de fora da mesa
-- animacao de limpeza entre maos recolhendo cartas para fora do quadro
-- animacao de distribuicao entre rodadas mantida
+Ponto critico:
 
-### Coluna direita
+- esse bloco ainda sofre risco alto de regressao
+- o historico recente mostrou varios edge cases em baloes e falas
 
-- `Valendo` consolidado com `tento/tentos`
-- card central com `Etapa` e `Endereco`
-- botoes de truco visiveis e sem label `Acoes`
-- fundo estrutural removido para deixar o cenario aparente
+### Selecao de parceira
 
-### Tela inicial
+Estado atual:
 
-- possui debug selector de bar
-- permite testar qualquer venue sem depender da progressao salva
+- apenas as 5 starter partners aparecem
+- a escolha fica salva por bar
+- ao entrar em bar sem escolha salva, a tela reaparece
+- os dois primeiros bares ja tem adversarios fixos
 
-### IA
+Pendencia principal:
 
-- base de personalidades criada
-- adversarios usam `balanced`
-- parceira usa `conservative`
-
-### Selecao de personagens
-
-Ja existe uma primeira implementacao:
-
-- acessivel por um botao generico no canto superior direito da tela inicial
-- renderizada dentro do `gameViewport`
-- usa o roster de `src/content/characters.ts`
-- mostra:
-  - retrato
-  - nome
-  - alcunha
-  - historia
-  - estilo de jogo
-  - atributos
-
-Estado:
-
-- funcional como base
-- ainda precisa de polimento visual e definicao de fluxo final
-- a amarracao funcional definida para a proxima etapa e:
-  - parceiro escolhido fica mantido enquanto o jogador permanecer no mesmo bar
-  - ao concluir ou trocar de bar, a tela de escolha de parceira volta a ser oferecida
-  - no inicio da campanha, apenas 5 parceiras ficam liberadas
+- UX e narrativa da escolha ainda estao simples demais
 
 ## Proximo foco recomendado
 
 ### Opcao principal
 
-- continuar a tela de selecao de parceiro IA
-- aproximar a implementacao da arte de referencia
-- transformar a selecao em fluxo real do jogo
+- implementar testes unitarios ou reforcar os existentes para os fluxos de `truco + raise`
 
-### Detalhamento do proximo passo recomendado
+### Casos que os testes devem cobrir primeiro
 
-- refinar o layout em duas colunas da tela de selecao
-- melhorar o enquadramento do retrato principal
-- lapidar tipografia de:
-  - nome
-  - alcunha
-  - historia
-  - atributos
-- consolidar no codigo a organizacao inicial do roster:
-  - mover os 4 avatars antigos do gameplay para `src/assets/characters`
-  - atualizar o roster para usar todos os 20 personagens visuais na mesma pasta
-  - separar explicitamente:
-    - `starter partners`
-    - `unlockable partners`
-    - `bar rosters`
-- decidir se o CTA `Jogar com este parceiro` ja deve alterar estado real ou continuar apenas visual por enquanto
-- pensar a integracao com:
-  - tela inicial
-  - campanha
-  - futura loja / personagens pagos
+- `TRUCO!/SEIS!/NOVE!/DOZE!` sendo falados por quem propoe o valor
+- `DESCE!` versus `TOMA!` conforme a regra da escalada vigente
+- reset da escalada vigente quando a jogada de cartas retoma
+- `TO FORA!` em corrida
+- consulta da parceira ao humano
+- conselho da parceira para o humano
+- peso real das respostas:
+  - `BORA!`
+  - `CE QUE SABE!`
+  - `MELHOR CORRER!`
+- ordem e emissor correto dos baloes
 
-### Separacao inicial definida
+### Opcao seguinte, depois dos testes
 
-- `starter partners`:
-  - `nega-catimbo`
-  - `leninha-lambreta`
-  - `rosinha-catraca`
-  - `rita-gambiarra`
-  - `ze-catinga`
-- `unlockable partners`:
-  - `aninha-passarela`
-  - `dalva-seringa`
-  - `naldo-tramela`
-  - `quiteria-mao-torta`
-  - `dito-marrua`
-- `bar rosters` iniciais:
-  - bar 1:
-    - `tiao-casca-grossa`
-    - `cida-fumaca`
-    - `celsinho-breque`
-  - bar 2:
-    - `tonhao-rasga-lata`
-    - `patricia-monique`
-    - `mane-banguela`
+- fechar a UX da escolha de parceira com mais contexto do bar
+- deixar a entrada na partida mais narrativa
+- apresentar melhor quem sao os adversarios fixos do bar
 
-### Opcao seguinte
+### Opcao seguinte depois disso
 
-- depois da tela de selecao, avançar para:
-  - escolha real da parceira IA
-  - cutscenes
-  - apresentacao narrativa da campanha
+- estabilizar a UX do truco:
+  - mensagem de status
+  - clareza visual dos botoes
+  - baloes mais intencionais
+  - validacao dos edge cases restantes
 
-### Frente estrutural ja resolvida o suficiente para seguir
+### Opcao seguinte depois disso
 
-- a blindagem estrutural do gameplay layout funcionou bem o bastante
-- nao e mais a prioridade numero 1 neste momento
-- so revisitar se aparecer regressao real no gameplay
-
-### Opcao visual apos a blindagem
-
-- calibrar mesas/ambiencia por bar
-- encaixar novos assets fotograficos
-- continuar pequenos refinamentos da cena central quando fizer sentido
-
-### Opcao secundaria
-- seguir expandindo o roster e os perfis de IA conforme novos personagens chegarem
+- dar identidade de campanha aos bares:
+  - contexto narrativo
+  - apresentacao dos oponentes
+  - diferencas de estilo e atmosfera
 
 ## Pendencias abertas
 
-- otimizar mais os assets fotograficos grandes
-- converter fundos maiores para formatos mais leves se necessario
-- fechar visual da tela de selecao de personagens
-- ligar a escolha de parceira ao estado real do jogo
-- decidir como parceiros gratuitos/pagos vao entrar no fluxo
-- revisar responsividade da nova tela de selecao em tamanhos diferentes
-- revisar scorepad apenas se houver necessidade real
+- blindar o dialogo de truco com testes unitarios
+- consolidar de vez os casos de `DESCE!/TOMA!/TO FORA!`
+- fechar visual da tela de selecao de parceira
+- dar mais contexto narrativo aos bares
+- decidir como parceiros gratuitos/pagos entram no fluxo
+- revisar responsividade final da tela de selecao
+- otimizar mais os assets fotograficos grandes, se necessario
 
 ## O que nao deve virar prioridade agora
 
@@ -214,3 +150,22 @@ Antes de iniciar qualquer nova frente em um chat novo:
 3. ler `docs/TRUCO_RULES.md`
 4. ler `docs/NEXT_STEPS.md`
 5. validar no codigo os arquivos realmente afetados
+
+## Prompt operacional para o proximo chat
+
+No proximo chat, comecar por:
+
+- criar ou reforcar testes unitarios para os fluxos de dialogo de `truco + raise`
+
+Depois disso, seguir para:
+
+- UX da escolha de parceira com contexto do bar
+- estabilizacao visual/UX do truco
+- identidade de campanha dos bares
+
+Importante:
+
+- nao recomecar a gameplay do zero
+- nao desmontar a arquitetura atual
+- usar a documentacao como fonte de verdade
+- validar sempre com `npm run build`
