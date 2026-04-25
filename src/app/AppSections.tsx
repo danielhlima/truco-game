@@ -343,6 +343,12 @@ interface TableSectionProps {
   activeVariant: GameVariant
   campaignCompleted: boolean
   handState: HandState | null
+  inGameConfirmation: {
+    title: string
+    message: string
+    confirmLabel: string
+  } | null
+  inGameContextMenuOpen: boolean
   matchState: MatchState | null
   matchResultScreen: MatchResultScreenState | null
   currentCampaignVenue: CampaignVenue | null
@@ -383,8 +389,14 @@ interface TableSectionProps {
   onRequestTruco: () => void
   onAcceptTruco: () => void
   onAdvisePartner: (advice: PartnerAdvice) => void
+  onCancelInGameConfirmation: () => void
+  onCloseInGameContextMenu: () => void
+  onConfirmInGameConfirmation: () => void
+  onExitMatchFromContextMenu: () => void
+  onOpenInGameContextMenu: () => void
   onRaiseTruco: () => void
   onRunFromTruco: () => void
+  onSwapPartnerFromContextMenu: () => void
   onPlayCard: (card: Card) => void
   styles: StyleMap
 }
@@ -393,6 +405,8 @@ export function TableSection({
   activeVariant,
   campaignCompleted,
   handState,
+  inGameConfirmation,
+  inGameContextMenuOpen,
   matchState,
   matchResultScreen,
   currentCampaignVenue,
@@ -433,8 +447,14 @@ export function TableSection({
   onRequestTruco,
   onAcceptTruco,
   onAdvisePartner,
+  onCancelInGameConfirmation,
+  onCloseInGameContextMenu,
+  onConfirmInGameConfirmation,
+  onExitMatchFromContextMenu,
+  onOpenInGameContextMenu,
   onRaiseTruco,
   onRunFromTruco,
+  onSwapPartnerFromContextMenu,
   onPlayCard,
   styles,
 }: TableSectionProps) {
@@ -639,6 +659,35 @@ export function TableSection({
                 </div>
 
                 <div style={styles.gameSidebarColumn}>
+                  <div style={styles.inGameContextMenuWrap}>
+                    <button style={styles.inGameContextMenuButton} onClick={onOpenInGameContextMenu}>
+                      MENU
+                    </button>
+
+                    {inGameContextMenuOpen ? (
+                      <div style={styles.inGameContextMenuPanel}>
+                        <button
+                          style={styles.inGameContextMenuAction}
+                          onClick={onSwapPartnerFromContextMenu}
+                        >
+                          Trocar de parceira
+                        </button>
+                        <button
+                          style={styles.inGameContextMenuAction}
+                          onClick={onExitMatchFromContextMenu}
+                        >
+                          Sair
+                        </button>
+                        <button
+                          style={styles.inGameContextMenuActionSecondary}
+                          onClick={onCloseInGameContextMenu}
+                        >
+                          Voltar
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
+
                   <div style={styles.tableHudSidebar}>
                     <div
                       style={{
@@ -807,6 +856,33 @@ export function TableSection({
               </>
             )}
           </div>
+
+          {handState && inGameConfirmation ? (
+            <div style={styles.inGameConfirmationOverlay}>
+              <div style={styles.inGameConfirmationCard}>
+                <div style={styles.inGameConfirmationEyebrow}>Confirmação</div>
+                <h3 style={styles.inGameConfirmationTitle}>{inGameConfirmation.title}</h3>
+                <p style={styles.inGameConfirmationText}>{inGameConfirmation.message}</p>
+                <div style={styles.inGameConfirmationWarning}>
+                  Todo o progresso desta partida atual será perdido se você continuar.
+                </div>
+                <div style={styles.inGameConfirmationActions}>
+                  <button
+                    style={styles.inGameConfirmationCancelButton}
+                    onClick={onCancelInGameConfirmation}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    style={styles.inGameConfirmationConfirmButton}
+                    onClick={onConfirmInGameConfirmation}
+                  >
+                    {inGameConfirmation.confirmLabel}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
     </section>
@@ -953,28 +1029,17 @@ function JourneyIntroScreen({
   onLaunchVenue: (venueId: string) => void
   styles: StyleMap
 }) {
+  const hasCurrentVenue = !!currentCampaignVenue
+  const activeStageIndex = currentCampaignVenue
+    ? CAMPAIGN_STAGES.findIndex((stage) => stage.venues.some((venue) => venue.id === currentCampaignVenue.id))
+    : -1
   const activeStageId = currentCampaignVenue
     ? CAMPAIGN_STAGES.find((stage) => stage.venues.some((venue) => venue.id === currentCampaignVenue.id))?.id
     : null
-  const availableStages = CAMPAIGN_STAGES.flatMap((stage) => {
-    const stageIndex = CAMPAIGN_STAGES.findIndex((candidate) => candidate.id === stage.id)
-    const activeStageIndex = CAMPAIGN_STAGES.findIndex((candidate) => candidate.id === activeStageId)
-
-    if (activeStageIndex === -1 || stageIndex > activeStageIndex) {
-      return []
-    }
-
-    const venues =
-      stage.id === activeStageId && currentCampaignVenue
-        ? stage.venues.filter((venue) => {
-            const currentVenueIndex = stage.venues.findIndex((candidate) => candidate.id === currentCampaignVenue.id)
-            const venueIndex = stage.venues.findIndex((candidate) => candidate.id === venue.id)
-            return venueIndex <= currentVenueIndex
-          })
-        : stage.venues
-
-    return [{ stage, venues }]
-  })
+  const activeVenueIndex =
+    currentCampaignVenue && activeStageIndex >= 0
+      ? CAMPAIGN_STAGES[activeStageIndex]?.venues.findIndex((venue) => venue.id === currentCampaignVenue.id) ?? -1
+      : -1
 
   return (
     <div style={styles.journeyIntroScreen}>
@@ -1007,9 +1072,16 @@ function JourneyIntroScreen({
       </div>
 
       <div style={styles.journeyIntroStages}>
-        {availableStages.map(({ stage, venues }, index) => {
+        {CAMPAIGN_STAGES.map((stage, index) => {
           const totalMatches = stage.venues.reduce((sum, venue) => sum + venue.matchesToClear, 0)
-          const isActive = stage.id === activeStageId
+          const isCompleted = !hasCurrentVenue || (activeStageIndex !== -1 && index < activeStageIndex)
+          const isActive = hasCurrentVenue && stage.id === activeStageId
+          const isLocked = hasCurrentVenue && activeStageIndex !== -1 && index > activeStageIndex
+          const stageStatusLabel = isActive
+            ? "Etapa atual"
+            : isCompleted
+              ? "Concluída"
+              : "Bloqueada"
 
           return (
             <div
@@ -1017,6 +1089,8 @@ function JourneyIntroScreen({
               style={{
                 ...styles.journeyIntroStageCard,
                 ...(isActive ? styles.journeyIntroStageCardActive : {}),
+                ...(isCompleted ? styles.journeyIntroStageCardCompleted : {}),
+                ...(isLocked ? styles.journeyIntroStageCardLocked : {}),
               }}
             >
               <div style={styles.journeyIntroStageOrder}>{String(index + 1).padStart(2, "0")}</div>
@@ -1028,8 +1102,20 @@ function JourneyIntroScreen({
                       {stage.tier === "bonus" ? "Bônus" : getCampaignTierLabel(stage.tier)}
                     </div>
                   </div>
-                  <div style={styles.journeyIntroStageBadge}>
-                    {stage.tier === "bonus" ? "Bônus" : stage.mapLabel}
+                  <div style={styles.journeyIntroStageBadgeStack}>
+                    <div style={styles.journeyIntroStageBadge}>
+                      {stage.tier === "bonus" ? "Bônus" : stage.mapLabel}
+                    </div>
+                    <div
+                      style={{
+                        ...styles.journeyIntroStageStatusBadge,
+                        ...(isActive ? styles.journeyIntroStageStatusBadgeActive : {}),
+                        ...(isCompleted ? styles.journeyIntroStageStatusBadgeCompleted : {}),
+                        ...(isLocked ? styles.journeyIntroStageStatusBadgeLocked : {}),
+                      }}
+                    >
+                      {stageStatusLabel}
+                    </div>
                   </div>
                 </div>
                 <div style={styles.journeyIntroStageText}>{stage.shortDescription}</div>
@@ -1038,20 +1124,34 @@ function JourneyIntroScreen({
                   <span>{totalMatches} partidas base</span>
                 </div>
                 <div style={styles.journeyIntroVenueList}>
-                  {venues.map((venue) => {
+                  {stage.venues.map((venue, venueIndex) => {
                     const isCurrentVenue = venue.id === currentCampaignVenue?.id
+                    const isAvailable =
+                      !hasCurrentVenue ||
+                      (activeStageIndex !== -1 &&
+                        (index < activeStageIndex ||
+                          (index === activeStageIndex &&
+                            activeVenueIndex !== -1 &&
+                            venueIndex <= activeVenueIndex)))
+                    const venueStatusLabel = isCurrentVenue
+                      ? "Atual"
+                      : isAvailable
+                        ? "Concluído"
+                        : "Bloqueado"
                     return (
                       <button
                         key={venue.id}
+                        disabled={!isAvailable}
                         style={{
                           ...styles.journeyIntroVenueButton,
                           ...(isCurrentVenue ? styles.journeyIntroVenueButtonActive : {}),
+                          ...(!isAvailable ? styles.journeyIntroVenueButtonLocked : {}),
                         }}
                         onClick={() => onLaunchVenue(venue.id)}
                       >
                         <span style={styles.journeyIntroVenueButtonLabel}>{venue.name}</span>
                         <span style={styles.journeyIntroVenueButtonMeta}>
-                          {isCurrentVenue ? "Bar atual" : "Bar anterior"}
+                          {venueStatusLabel}
                         </span>
                       </button>
                     )

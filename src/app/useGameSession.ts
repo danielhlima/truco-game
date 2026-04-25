@@ -84,6 +84,15 @@ interface DebugVenueOption {
   label: string
 }
 
+type InGameConfirmationIntent = "swap-partner" | "exit-match"
+
+interface InGameConfirmationState {
+  intent: InGameConfirmationIntent
+  title: string
+  message: string
+  confirmLabel: string
+}
+
 export function useGameSession() {
   const AUTO_STEP_DELAY_MS = 820
   const NEXT_HAND_DELAY_MS = 1180
@@ -102,6 +111,8 @@ export function useGameSession() {
   const [sessionDebugVenueId, setSessionDebugVenueId] = useState<string | null>(null)
   const [menuScreen, setMenuScreen] = useState<MenuScreen>("start")
   const [matchResultScreen, setMatchResultScreen] = useState<MatchResultScreenState | null>(null)
+  const [inGameContextMenuOpen, setInGameContextMenuOpen] = useState(false)
+  const [inGameConfirmation, setInGameConfirmation] = useState<InGameConfirmationState | null>(null)
   const speechBubbleTimeoutRef = useRef<number | null>(null)
   const followUpSpeechTimeoutRef = useRef<number | null>(null)
   const partnerAdviceTimeoutRef = useRef<number | null>(null)
@@ -384,6 +395,29 @@ export function useGameSession() {
     }, BUBBLE_DURATION_MS)
   }, [BUBBLE_DURATION_MS])
 
+  const clearPendingUiTimers = useCallback(() => {
+    if (speechBubbleTimeoutRef.current) {
+      window.clearTimeout(speechBubbleTimeoutRef.current)
+      speechBubbleTimeoutRef.current = null
+    }
+    if (followUpSpeechTimeoutRef.current) {
+      window.clearTimeout(followUpSpeechTimeoutRef.current)
+      followUpSpeechTimeoutRef.current = null
+    }
+    if (partnerAdviceTimeoutRef.current) {
+      window.clearTimeout(partnerAdviceTimeoutRef.current)
+      partnerAdviceTimeoutRef.current = null
+    }
+    if (partnerConsultTimeoutRef.current) {
+      window.clearTimeout(partnerConsultTimeoutRef.current)
+      partnerConsultTimeoutRef.current = null
+    }
+    if (partnerConsultResolutionTimeoutRef.current) {
+      window.clearTimeout(partnerConsultResolutionTimeoutRef.current)
+      partnerConsultResolutionTimeoutRef.current = null
+    }
+  }, [])
+
   const applyHandState = useCallback((
     nextState: HandState,
     explicitMessages?: {
@@ -493,6 +527,7 @@ export function useGameSession() {
         }
 
         setSpeechBubble(null)
+        setInGameContextMenuOpen(false)
         setHandState(null)
         setMatchState(null)
         setMatchResultScreen(matchResultState)
@@ -531,6 +566,7 @@ export function useGameSession() {
     setMatchState(createMatchState(variantToStart, firstPlayerId))
     setSessionDebugVenueId(shouldUseSessionDebugVenue ? targetVenue.id : null)
     setMenuScreen("start")
+    setInGameContextMenuOpen(false)
 
     applyHandState(state, {
       eventMessage: `Partida iniciada em ${targetVenue.name}.`,
@@ -540,10 +576,13 @@ export function useGameSession() {
 
   function handleReturnToJourneyFlow() {
     setSpeechBubble(null)
+    clearPendingUiTimers()
     setHandState(null)
     setMatchState(null)
     setMatchResultScreen(null)
     setSessionDebugVenueId(null)
+    setInGameContextMenuOpen(false)
+    setInGameConfirmation(null)
     setMenuScreen("journey-intro")
   }
 
@@ -566,6 +605,8 @@ export function useGameSession() {
     setHandState(null)
     setMatchState(null)
     setSessionDebugVenueId(null)
+    setInGameContextMenuOpen(false)
+    setInGameConfirmation(null)
     setMenuScreen("start")
     setEventMessage("Campanha reiniciada do zero.")
     setTrucoMessage("Tudo pronto para voltar ao primeiro boteco.")
@@ -577,6 +618,7 @@ export function useGameSession() {
 
   function handlePlayCard(card: Card) {
     if (!handState) return
+    if (inGameContextMenuOpen || inGameConfirmation) return
     if (handState.finished) return
     if (handState.currentPlayerId !== 1) return
     if (handState.table.length === 4) return
@@ -590,6 +632,7 @@ export function useGameSession() {
 
   function handleRequestTruco() {
     if (!handState) return
+    if (inGameContextMenuOpen || inGameConfirmation) return
     if (!canRequestTruco) return
 
     const nextState = requestTruco(handState, 1, matchState?.score)
@@ -608,7 +651,7 @@ export function useGameSession() {
   }
 
   function handleAcceptTruco() {
-    if (!handState || !canHumanRespondToTruco) return
+    if (!handState || !canHumanRespondToTruco || inGameContextMenuOpen || inGameConfirmation) return
 
     const nextState = respondToTruco(handState, "accept", matchState?.score)
     const acceptedBet = nextState.currentBet
@@ -619,7 +662,7 @@ export function useGameSession() {
   }
 
   function handleRunFromTruco() {
-    if (!handState || !canHumanRespondToTruco) return
+    if (!handState || !canHumanRespondToTruco || inGameContextMenuOpen || inGameConfirmation) return
 
     const nextState = respondToTruco(handState, "run", matchState?.score)
     applyHandState(nextState, {
@@ -630,7 +673,7 @@ export function useGameSession() {
   }
 
   function handleRaiseTruco() {
-    if (!handState || !canHumanRaiseTruco) return
+    if (!handState || !canHumanRaiseTruco || inGameContextMenuOpen || inGameConfirmation) return
 
     const requestedValue = getNextRaiseValueFromPendingTruco(handState)
     const nextState = respondToTruco(handState, "raise", matchState?.score)
@@ -649,7 +692,7 @@ export function useGameSession() {
   }
 
   function handlePartnerAdvice(advice: PartnerAdvice) {
-    if (!handState || !canHumanAdvisePartner || !player1 || !player3) return
+    if (!handState || !canHumanAdvisePartner || !player1 || !player3 || inGameContextMenuOpen || inGameConfirmation) return
 
     showSpeechBubble({ playerId: 1, text: advice })
 
@@ -705,6 +748,10 @@ export function useGameSession() {
   }
 
   useEffect(() => {
+    if (inGameContextMenuOpen || inGameConfirmation) {
+      return
+    }
+
     if (!handState || !matchState || matchState.finished) {
       return
     }
@@ -760,6 +807,8 @@ export function useGameSession() {
     canHumanRespondToTruco,
     canPlayHumanCard,
     handState,
+    inGameConfirmation,
+    inGameContextMenuOpen,
     matchState,
   ])
 
@@ -784,7 +833,7 @@ export function useGameSession() {
   }, [])
 
   useEffect(() => {
-    if (!partnerAdviceKey || !handState) {
+    if (!partnerAdviceKey || !handState || inGameContextMenuOpen || inGameConfirmation) {
       lastPartnerAdviceKeyRef.current = null
       if (partnerAdviceTimeoutRef.current) {
         window.clearTimeout(partnerAdviceTimeoutRef.current)
@@ -827,6 +876,8 @@ export function useGameSession() {
   }, [
     BUBBLE_DURATION_MS,
     handState,
+    inGameConfirmation,
+    inGameContextMenuOpen,
     partnerAdviceKey,
     player1,
     player3,
@@ -834,7 +885,7 @@ export function useGameSession() {
   ])
 
   useEffect(() => {
-    if (!partnerConsultKey) {
+    if (!partnerConsultKey || inGameContextMenuOpen || inGameConfirmation) {
       lastPartnerConsultKeyRef.current = null
       if (partnerConsultTimeoutRef.current) {
         window.clearTimeout(partnerConsultTimeoutRef.current)
@@ -865,7 +916,19 @@ export function useGameSession() {
         partnerConsultTimeoutRef.current = null
       }
     }
-  }, [BUBBLE_DURATION_MS, partnerConsultKey, showSpeechBubble])
+  }, [BUBBLE_DURATION_MS, inGameConfirmation, inGameContextMenuOpen, partnerConsultKey, showSpeechBubble])
+
+  useEffect(() => {
+    if (!inGameContextMenuOpen && !inGameConfirmation) {
+      return
+    }
+
+    clearPendingUiTimers()
+    setSpeechBubble(null)
+    setShownPartnerAdviceKey(null)
+    lastPartnerAdviceKeyRef.current = null
+    lastPartnerConsultKeyRef.current = null
+  }, [clearPendingUiTimers, inGameConfirmation, inGameContextMenuOpen])
 
   async function handleCopyLogs() {
     try {
@@ -877,24 +940,34 @@ export function useGameSession() {
   }
 
   function handleOpenCharacterSelect() {
+    setInGameContextMenuOpen(false)
+    setInGameConfirmation(null)
     setSelectedCharacterId(currentVenuePartnerCharacterId ?? selectableCharacters[0]?.id ?? "nega-catimbo")
     setMenuScreen("character-select")
   }
 
   function handleOpenJourneyIntro() {
+    setInGameContextMenuOpen(false)
+    setInGameConfirmation(null)
     setSelectedCharacterId(currentVenuePartnerCharacterId ?? selectableCharacters[0]?.id ?? "nega-catimbo")
     setMenuScreen("journey-intro")
   }
 
   function handleCloseJourneyIntro() {
+    setInGameContextMenuOpen(false)
+    setInGameConfirmation(null)
     setMenuScreen("start")
   }
 
   function handleContinueToCharacterSelect() {
+    setInGameContextMenuOpen(false)
+    setInGameConfirmation(null)
     setMenuScreen("character-select")
   }
 
   function handleCloseCharacterSelect() {
+    setInGameContextMenuOpen(false)
+    setInGameConfirmation(null)
     setSelectedCharacterId(currentVenuePartnerCharacterId ?? selectableCharacters[0]?.id ?? "nega-catimbo")
     setMenuScreen("journey-intro")
   }
@@ -912,6 +985,8 @@ export function useGameSession() {
         },
       },
     }))
+    setInGameContextMenuOpen(false)
+    setInGameConfirmation(null)
     setMenuScreen("journey-intro")
   }
 
@@ -938,6 +1013,64 @@ export function useGameSession() {
     setSelectedCharacterId(selectableCharacters[previousIndex].id)
   }
 
+  function handleOpenInGameContextMenu() {
+    setInGameContextMenuOpen(true)
+  }
+
+  function handleCloseInGameContextMenu() {
+    setInGameContextMenuOpen(false)
+  }
+
+  function handleSwapPartnerFromContextMenu() {
+    if (!handState || !matchState) return
+    setInGameConfirmation({
+      intent: "swap-partner",
+      title: "Trocar de parceira?",
+      message: "Se você trocar de parceira agora, todo o progresso desta partida será perdido.",
+      confirmLabel: "Trocar e perder progresso",
+    })
+  }
+
+  function handleExitMatchFromContextMenu() {
+    if (!handState || !matchState) return
+    setInGameConfirmation({
+      intent: "exit-match",
+      title: "Sair da partida?",
+      message: "Se você sair agora, todo o progresso desta partida será perdido.",
+      confirmLabel: "Sair e perder progresso",
+    })
+  }
+
+  function handleCancelInGameConfirmation() {
+    setInGameConfirmation(null)
+  }
+
+  function handleConfirmInGameConfirmation() {
+    if (!inGameConfirmation || !handState || !matchState) return
+
+    clearPendingUiTimers()
+    showSpeechBubble(null)
+
+    if (inGameConfirmation.intent === "swap-partner") {
+      setMatchResultScreen(null)
+      setHandState(null)
+      setMatchState(null)
+      setInGameContextMenuOpen(false)
+      setInGameConfirmation(null)
+      setSelectedCharacterId(currentVenuePartnerCharacterId ?? selectableCharacters[0]?.id ?? "nega-catimbo")
+      setMenuScreen("character-select")
+      return
+    }
+
+    setHandState(null)
+    setMatchState(null)
+    setMatchResultScreen(null)
+    setSessionDebugVenueId(null)
+    setInGameContextMenuOpen(false)
+    setInGameConfirmation(null)
+    setMenuScreen("start")
+  }
+
   return {
     activeVariant,
     canHumanRespondToTruco,
@@ -958,9 +1091,16 @@ export function useGameSession() {
     eventMessage,
     handScoreLabel,
     handState,
+    inGameConfirmation,
+    inGameContextMenuOpen,
     matchResultScreen,
     handleAcceptTruco,
+    handleCancelInGameConfirmation,
+    handleCloseInGameContextMenu,
+    handleConfirmInGameConfirmation,
     handleCopyLogs,
+    handleExitMatchFromContextMenu,
+    handleOpenInGameContextMenu,
     handlePlayCard,
     handlePartnerAdvice,
     handleRaiseTruco,
@@ -968,6 +1108,7 @@ export function useGameSession() {
     handleResetCampaign,
     handleReturnToJourneyFlow,
     handleRunFromTruco,
+    handleSwapPartnerFromContextMenu,
     handleStartHand,
     lastPlayedPlayerId,
     logs,

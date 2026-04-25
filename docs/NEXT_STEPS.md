@@ -129,6 +129,12 @@ Pendencia principal:
 - blindar o dialogo de truco com testes unitarios
 - consolidar de vez os casos de `DESCE!/TOMA!/TO FORA!`
 - fechar visual da tela de selecao de parceira
+- deixar o fluxo de campeonatos mais claro e solido:
+  - cards por etapa com status visual
+  - destaque forte para o bar atual
+  - labels claras para `Concluido`, `Atual` e `Bloqueado`
+  - CTA distinto para bar atual versus bares anteriores
+  - contador simples de progresso no topo
 - dar mais contexto narrativo aos bares
 - decidir como parceiros gratuitos/pagos entram no fluxo
 - revisar responsividade final da tela de selecao

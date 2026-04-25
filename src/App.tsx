@@ -72,14 +72,21 @@ function App() {
     eventMessage,
     handScoreLabel,
     handState,
+    inGameConfirmation,
+    inGameContextMenuOpen,
     matchResultScreen,
     handleAcceptTruco,
+    handleCancelInGameConfirmation,
+    handleCloseInGameContextMenu,
     handleCloseCharacterSelect,
     handleCloseJourneyIntro,
     handlePartnerAdvice,
     handleCopyLogs,
+    handleConfirmInGameConfirmation,
     handleContinueToCharacterSelect,
+    handleExitMatchFromContextMenu,
     handleLaunchVenue,
+    handleOpenInGameContextMenu,
     handleOpenCharacterSelect,
     handleOpenJourneyIntro,
     handlePlayCard,
@@ -91,6 +98,7 @@ function App() {
     handleSelectNextCharacter,
     handleSelectPreviousCharacter,
     handleStartHand,
+    handleSwapPartnerFromContextMenu,
     lastPlayedPlayerId,
     logs,
     matchScoreLabel,
@@ -263,6 +271,8 @@ function App() {
             activeVariant={activeVariant}
             campaignCompleted={campaignCompleted}
             handState={handState}
+            inGameConfirmation={inGameConfirmation}
+            inGameContextMenuOpen={inGameContextMenuOpen}
             matchState={matchState}
             matchResultScreen={matchResultScreen}
             currentCampaignVenue={currentCampaignVenue}
@@ -303,8 +313,14 @@ function App() {
             onRequestTruco={handleRequestTruco}
             onAcceptTruco={handleAcceptTruco}
             onAdvisePartner={handlePartnerAdvice}
+            onCancelInGameConfirmation={handleCancelInGameConfirmation}
+            onCloseInGameContextMenu={handleCloseInGameContextMenu}
+            onConfirmInGameConfirmation={handleConfirmInGameConfirmation}
+            onExitMatchFromContextMenu={handleExitMatchFromContextMenu}
+            onOpenInGameContextMenu={handleOpenInGameContextMenu}
             onRaiseTruco={handleRaiseTruco}
             onRunFromTruco={handleRunFromTruco}
+            onSwapPartnerFromContextMenu={handleSwapPartnerFromContextMenu}
             onPlayCard={handlePlayCard}
             styles={responsiveStyles}
           />
@@ -769,6 +785,7 @@ const styles: Record<string, React.CSSProperties> = {
     maxHeight: "76vh",
     margin: "0 auto",
     display: "flex",
+    position: "relative",
     overflow: "hidden",
     borderRadius: "22px",
   },
@@ -800,10 +817,147 @@ const styles: Record<string, React.CSSProperties> = {
   },
   gameSidebarColumn: {
     display: "grid",
-    gridTemplateRows: "minmax(0, 1fr)",
+    gridTemplateRows: "max-content minmax(0, 1fr)",
+    gap: "clamp(6px, 0.62vw, 8px)",
     minWidth: 0,
     minHeight: 0,
     overflow: "hidden",
+  },
+  inGameContextMenuWrap: {
+    position: "relative",
+    display: "flex",
+    justifyContent: "flex-end",
+    alignItems: "flex-start",
+    minWidth: 0,
+    zIndex: 2,
+  },
+  inGameContextMenuButton: {
+    borderRadius: "12px",
+    border: "1px solid rgba(244, 226, 190, 0.38)",
+    background: "linear-gradient(180deg, rgba(83,56,37,0.94) 0%, rgba(45,30,20,0.96) 100%)",
+    color: "#fff3de",
+    padding: "clamp(8px, 0.7vw, 10px) clamp(12px, 1vw, 14px)",
+    fontSize: "clamp(10px, 0.84vw, 11px)",
+    fontWeight: 900,
+    letterSpacing: "0.08em",
+    textTransform: "uppercase",
+    cursor: "pointer",
+    boxShadow: "0 10px 18px rgba(0,0,0,0.22)",
+  },
+  inGameContextMenuPanel: {
+    position: "absolute",
+    top: "calc(100% + 8px)",
+    right: 0,
+    width: "min(240px, 100%)",
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+    borderRadius: "16px",
+    padding: "12px",
+    background: "linear-gradient(180deg, rgba(31,21,15,0.97) 0%, rgba(18,12,8,0.98) 100%)",
+    border: "1px solid rgba(244, 226, 190, 0.16)",
+    boxShadow: "0 18px 32px rgba(0,0,0,0.32)",
+  },
+  inGameConfirmationOverlay: {
+    position: "absolute",
+    inset: 0,
+    display: "grid",
+    placeItems: "center",
+    padding: "clamp(16px, 1.4vw, 24px)",
+    background: "rgba(0,0,0,0.48)",
+    zIndex: 4,
+  },
+  inGameConfirmationCard: {
+    width: "min(520px, 100%)",
+    borderRadius: "22px",
+    padding: "clamp(18px, 1.5vw, 24px)",
+    background: "linear-gradient(180deg, rgba(40,27,18,0.98) 0%, rgba(20,13,9,0.99) 100%)",
+    border: "1px solid rgba(244, 226, 190, 0.18)",
+    boxShadow: "0 26px 44px rgba(0,0,0,0.42)",
+    color: "#fff4e2",
+    display: "flex",
+    flexDirection: "column",
+    gap: "12px",
+  },
+  inGameConfirmationEyebrow: {
+    fontSize: "11px",
+    fontWeight: 800,
+    textTransform: "uppercase",
+    letterSpacing: "0.08em",
+    color: "#d8c3a5",
+  },
+  inGameConfirmationTitle: {
+    margin: 0,
+    fontSize: "clamp(24px, 1.9vw, 30px)",
+    lineHeight: 1.05,
+    color: "#fff7ed",
+    fontFamily: "Georgia, serif",
+  },
+  inGameConfirmationText: {
+    margin: 0,
+    fontSize: "clamp(14px, 1.02vw, 16px)",
+    lineHeight: 1.55,
+    color: "#ead8bc",
+  },
+  inGameConfirmationWarning: {
+    borderRadius: "14px",
+    padding: "12px 14px",
+    background: "rgba(166, 94, 46, 0.16)",
+    border: "1px solid rgba(213, 141, 71, 0.24)",
+    color: "#f7d8b2",
+    fontSize: "13px",
+    fontWeight: 700,
+    lineHeight: 1.45,
+  },
+  inGameConfirmationActions: {
+    display: "flex",
+    justifyContent: "flex-end",
+    gap: "10px",
+    flexWrap: "wrap",
+    paddingTop: "6px",
+  },
+  inGameConfirmationCancelButton: {
+    borderRadius: "14px",
+    border: "1px solid rgba(244, 226, 190, 0.14)",
+    background: "rgba(255,255,255,0.05)",
+    color: "#ead8bc",
+    padding: "12px 16px",
+    fontSize: "13px",
+    fontWeight: 800,
+    cursor: "pointer",
+  },
+  inGameConfirmationConfirmButton: {
+    borderRadius: "14px",
+    border: "1px solid rgba(213, 141, 71, 0.42)",
+    background: "linear-gradient(180deg, rgba(166,94,46,0.98) 0%, rgba(120,63,28,0.98) 100%)",
+    color: "#fff7ed",
+    padding: "12px 16px",
+    fontSize: "13px",
+    fontWeight: 900,
+    cursor: "pointer",
+    boxShadow: "0 12px 20px rgba(0,0,0,0.24)",
+  },
+  inGameContextMenuAction: {
+    borderRadius: "12px",
+    border: "1px solid rgba(244, 226, 190, 0.18)",
+    background: "rgba(255,255,255,0.06)",
+    color: "#fff3de",
+    padding: "12px 14px",
+    fontSize: "13px",
+    fontWeight: 800,
+    textAlign: "left",
+    cursor: "pointer",
+  },
+  inGameContextMenuActionSecondary: {
+    borderRadius: "12px",
+    border: "1px solid rgba(244, 226, 190, 0.12)",
+    background: "rgba(255,255,255,0.03)",
+    color: "#d8c3a5",
+    padding: "12px 14px",
+    fontSize: "13px",
+    fontWeight: 800,
+    textAlign: "left",
+    cursor: "pointer",
   },
   scenePanel: {
     borderRadius: "22px",
@@ -2015,6 +2169,13 @@ const styles: Record<string, React.CSSProperties> = {
     border: "1px solid rgba(232, 193, 128, 0.42)",
     background: "linear-gradient(180deg, rgba(63,44,29,0.94) 0%, rgba(28,18,12,0.96) 100%)",
   },
+  journeyIntroStageCardCompleted: {
+    border: "1px solid rgba(144, 190, 135, 0.24)",
+    background: "linear-gradient(180deg, rgba(32,37,26,0.9) 0%, rgba(17,20,14,0.94) 100%)",
+  },
+  journeyIntroStageCardLocked: {
+    opacity: 0.62,
+  },
   journeyIntroStageOrder: {
     width: "52px",
     height: "52px",
@@ -2063,6 +2224,39 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 800,
     whiteSpace: "nowrap",
   },
+  journeyIntroStageBadgeStack: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "6px",
+    alignItems: "flex-end",
+  },
+  journeyIntroStageStatusBadge: {
+    borderRadius: "999px",
+    padding: "5px 10px",
+    background: "rgba(255,255,255,0.05)",
+    border: "1px solid rgba(255,255,255,0.08)",
+    color: "#ead8bc",
+    fontSize: "10px",
+    fontWeight: 800,
+    letterSpacing: "0.06em",
+    textTransform: "uppercase",
+    whiteSpace: "nowrap",
+  },
+  journeyIntroStageStatusBadgeActive: {
+    background: "rgba(205, 160, 95, 0.16)",
+    border: "1px solid rgba(232, 193, 128, 0.32)",
+    color: "#ffe9c4",
+  },
+  journeyIntroStageStatusBadgeCompleted: {
+    background: "rgba(124, 182, 108, 0.14)",
+    border: "1px solid rgba(144, 190, 135, 0.26)",
+    color: "#dff0d8",
+  },
+  journeyIntroStageStatusBadgeLocked: {
+    background: "rgba(255,255,255,0.04)",
+    border: "1px solid rgba(255,255,255,0.06)",
+    color: "#c8b59a",
+  },
   journeyIntroStageText: {
     fontSize: "13px",
     lineHeight: 1.5,
@@ -2099,6 +2293,13 @@ const styles: Record<string, React.CSSProperties> = {
     background: "linear-gradient(180deg, rgba(243,231,207,0.92) 0%, rgba(222,196,156,0.9) 100%)",
     border: "1px solid #b18553",
     color: "#2f241b",
+  },
+  journeyIntroVenueButtonLocked: {
+    background: "rgba(255,255,255,0.03)",
+    border: "1px solid rgba(255,255,255,0.05)",
+    color: "#bda88a",
+    cursor: "not-allowed",
+    opacity: 0.7,
   },
   journeyIntroVenueButtonLabel: {
     fontSize: "13px",
