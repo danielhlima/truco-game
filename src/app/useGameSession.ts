@@ -63,12 +63,21 @@ import {
   getStatusMessage,
   getTrucoMessageForTransition,
   getPlayerLabel,
+  shouldPartnerConsultHuman,
   type SpeechBubbleState,
 } from "./gameSessionHelpers"
 import { getRuleSet } from "../game/getRuleSet"
 
 const DEBUG_MODE = true
-type MenuScreen = "start" | "journey-intro" | "character-select" | "venue-intro"
+type MenuScreen = "start" | "journey-intro" | "character-select" | "venue-intro" | "match-result"
+
+interface MatchResultScreenState {
+  hostLine: string
+  outcome: "win" | "loss"
+  title: string
+  subtitle: string
+  venueName: string
+}
 
 interface DebugVenueOption {
   id: string
@@ -92,6 +101,7 @@ export function useGameSession() {
   const [debugVenueId, setDebugVenueId] = useState("")
   const [sessionDebugVenueId, setSessionDebugVenueId] = useState<string | null>(null)
   const [menuScreen, setMenuScreen] = useState<MenuScreen>("start")
+  const [matchResultScreen, setMatchResultScreen] = useState<MatchResultScreenState | null>(null)
   const speechBubbleTimeoutRef = useRef<number | null>(null)
   const followUpSpeechTimeoutRef = useRef<number | null>(null)
   const partnerAdviceTimeoutRef = useRef<number | null>(null)
@@ -253,23 +263,17 @@ export function useGameSession() {
   }, [handState])
 
   const partnerConsultKey = useMemo(() => {
-    if (
-      !handState ||
-      handState.finished ||
-      handState.truco.phase !== "awaiting-response" ||
-      handState.truco.awaitingResponseFromTeam !== "A" ||
-      handState.truco.awaitingResponseFromPlayerId !== 3 ||
-      handState.truco.requestedByTeam !== "B" ||
-      !handState.truco.proposedBet
-    ) {
+    if (!shouldPartnerConsultHuman(handState)) {
       return null
     }
 
+    const consultingState = handState!
+
     return [
-      handState.roundNumber,
-      handState.truco.requestedByPlayerId ?? 0,
-      handState.truco.proposedBet,
-      handState.truco.promptKind ?? "request",
+      consultingState.roundNumber,
+      consultingState.truco.requestedByPlayerId ?? 0,
+      consultingState.truco.proposedBet,
+      consultingState.truco.promptKind ?? "request",
       "consult",
     ].join(":")
   }, [handState])
@@ -283,12 +287,7 @@ export function useGameSession() {
     (!partnerAdviceKey || shownPartnerAdviceKey === partnerAdviceKey)
 
   const canHumanAdvisePartner =
-    !!handState &&
-    !handState.finished &&
-    handState.truco.phase === "awaiting-response" &&
-    handState.truco.awaitingResponseFromTeam === "A" &&
-    handState.truco.awaitingResponseFromPlayerId === 3 &&
-    handState.truco.requestedByTeam === "B"
+    shouldPartnerConsultHuman(handState)
 
   const canRequestTruco =
     !!handState &&
@@ -451,6 +450,23 @@ export function useGameSession() {
 
       if (nextMatchState?.finished) {
         const finalScore = nextMatchState.score
+        const resultVenueName = sessionDebugVenue?.name ?? currentCampaignVenue?.name ?? "o bar"
+        const matchResultState: MatchResultScreenState =
+          nextState.winner === "A"
+            ? {
+                outcome: "win",
+                title: "Vocês levaram essa",
+                subtitle: `O clima pesa depois do ${finalScore.A} a ${finalScore.B}, mas a mesa inteira viu quem saiu por cima em ${resultVenueName}.`,
+                hostLine: `O dono do ${resultVenueName} resmunga: "Ganharam hoje porque a sorte sentou com vocês. Quero ver repetir essa coragem."`,
+                venueName: resultVenueName,
+              }
+            : {
+                outcome: "loss",
+                title: "A casa falou mais alto",
+                subtitle: `Depois do ${finalScore.A} a ${finalScore.B}, o bar cresce para cima de vocês e a derrota fica ecoando na mesa.`,
+                hostLine: `O dono do ${resultVenueName} abre um sorriso torto: "Aqui é assim. Quem entra achando que vai mandar sai escutando a conversa do balcão."`,
+                venueName: resultVenueName,
+              }
 
         if (sessionDebugVenueId) {
           const debugVenueName = sessionDebugVenue?.name ?? currentCampaignVenue?.name ?? "local de debug"
@@ -475,6 +491,12 @@ export function useGameSession() {
               : "Derrota registrada na campanha."
           )
         }
+
+        setSpeechBubble(null)
+        setHandState(null)
+        setMatchState(null)
+        setMatchResultScreen(matchResultState)
+        setMenuScreen("match-result")
       }
     }
 
@@ -516,6 +538,15 @@ export function useGameSession() {
     })
   }
 
+  function handleReturnToJourneyFlow() {
+    setSpeechBubble(null)
+    setHandState(null)
+    setMatchState(null)
+    setMatchResultScreen(null)
+    setSessionDebugVenueId(null)
+    setMenuScreen("journey-intro")
+  }
+
   function handleStartHand() {
     if (!currentCampaignVenue) return
     if (!currentVenuePartnerCharacterId) {
@@ -540,6 +571,7 @@ export function useGameSession() {
     setTrucoMessage("Tudo pronto para voltar ao primeiro boteco.")
     showSpeechBubble(null)
     setShownPartnerAdviceKey(null)
+    setMatchResultScreen(null)
     syncLogs()
   }
 
@@ -666,7 +698,7 @@ export function useGameSession() {
       applyHandState(nextState, {
         eventMessage: `A parceira aceitou ${getBetCallLabel(acceptedBet)}.`,
         trucoMessage: getAcceptedBetMessage(acceptedBet),
-        speechBubble: { playerId: 3, text: "DESCE!" },
+        speechBubble: getSpeechBubbleForTransition(handState, nextState),
       })
       partnerConsultResolutionTimeoutRef.current = null
     }, BUBBLE_DURATION_MS + 120)
@@ -926,6 +958,7 @@ export function useGameSession() {
     eventMessage,
     handScoreLabel,
     handState,
+    matchResultScreen,
     handleAcceptTruco,
     handleCopyLogs,
     handlePlayCard,
@@ -933,6 +966,7 @@ export function useGameSession() {
     handleRaiseTruco,
     handleRequestTruco,
     handleResetCampaign,
+    handleReturnToJourneyFlow,
     handleRunFromTruco,
     handleStartHand,
     lastPlayedPlayerId,

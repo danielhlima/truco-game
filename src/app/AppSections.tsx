@@ -30,6 +30,13 @@ import {
 } from "./gameSessionHelpers"
 
 type StyleMap = Record<string, React.CSSProperties>
+type MatchResultScreenState = {
+  hostLine: string
+  outcome: "win" | "loss"
+  title: string
+  subtitle: string
+  venueName: string
+}
 
 interface ControlsPanelProps {
   activeVariant: GameVariant
@@ -337,12 +344,13 @@ interface TableSectionProps {
   campaignCompleted: boolean
   handState: HandState | null
   matchState: MatchState | null
+  matchResultScreen: MatchResultScreenState | null
   currentCampaignVenue: CampaignVenue | null
   debugModeEnabled: boolean
   debugVenueId: string
   debugVenueOptions: Array<{ id: string; label: string }>
   dealAnimationNonce: number
-  menuScreen: "start" | "journey-intro" | "character-select" | "venue-intro"
+  menuScreen: "start" | "journey-intro" | "character-select" | "venue-intro" | "match-result"
   selectedCharacter: TrucoCharacterProfile | null
   selectedCharacterIndex: number
   selectedPartnerCharacter: TrucoCharacterProfile | null
@@ -367,6 +375,7 @@ interface TableSectionProps {
   onLaunchVenue: (venueId: string) => void
   onOpenCharacterSelect: () => void
   onOpenJourneyIntro: () => void
+  onReturnToJourneyFlow: () => void
   onResetCampaign: () => void
   onSelectNextCharacter: () => void
   onSelectPreviousCharacter: () => void
@@ -385,6 +394,7 @@ export function TableSection({
   campaignCompleted,
   handState,
   matchState,
+  matchResultScreen,
   currentCampaignVenue,
   debugModeEnabled,
   debugVenueId,
@@ -415,6 +425,7 @@ export function TableSection({
   onLaunchVenue,
   onOpenCharacterSelect,
   onOpenJourneyIntro,
+  onReturnToJourneyFlow,
   onResetCampaign,
   onSelectNextCharacter,
   onSelectPreviousCharacter,
@@ -459,7 +470,14 @@ export function TableSection({
         <div style={styles.gameViewportFrame}>
           <div style={styles.gameViewport}>
             {isMenuMode ? (
-              menuScreen === "journey-intro" ? (
+              menuScreen === "match-result" ? (
+                <MatchResultScreen
+                  currentCampaignVenue={currentCampaignVenue}
+                  result={matchResultScreen}
+                  onContinue={onReturnToJourneyFlow}
+                  styles={styles}
+                />
+              ) : menuScreen === "journey-intro" ? (
                 <JourneyIntroScreen
                   currentCampaignVenue={currentCampaignVenue}
                   onBack={onCloseJourneyIntro}
@@ -1048,6 +1066,54 @@ function JourneyIntroScreen({
       <div style={styles.journeyIntroActions}>
         <button style={styles.gameStartResetButton} onClick={onContinueToCharacterSelect}>
           TROCAR PARCEIRA
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function MatchResultScreen({
+  currentCampaignVenue,
+  result,
+  onContinue,
+  styles,
+}: {
+  currentCampaignVenue: CampaignVenue | null
+  result: MatchResultScreenState | null
+  onContinue: () => void
+  styles: StyleMap
+}) {
+  const didWin = result?.outcome === "win"
+
+  return (
+    <div style={styles.matchResultScreen}>
+      <div
+        style={{
+          ...styles.matchResultCard,
+          ...(didWin ? styles.matchResultCardWin : styles.matchResultCardLoss),
+        }}
+      >
+        <div style={styles.matchResultEyebrow}>
+          {didWin ? "Vitória na mesa" : "Derrota na mesa"}
+        </div>
+        <h2 style={styles.matchResultTitle}>{result?.title ?? "Fim da partida"}</h2>
+        <div style={styles.matchResultVenue}>
+          {result?.venueName ?? currentCampaignVenue?.name ?? "Fluxo de bares"}
+        </div>
+        <p style={styles.matchResultSubtitle}>
+          {result?.subtitle ?? "A partida terminou e a casa já reagiu ao resultado."}
+        </p>
+
+        <div style={styles.matchResultHostBox}>
+          <div style={styles.matchResultHostLabel}>Host do bar</div>
+          <p style={styles.matchResultHostLine}>
+            {result?.hostLine ??
+              "A casa comenta o resultado enquanto você se prepara para voltar ao circuito."}
+          </p>
+        </div>
+
+        <button style={styles.gameStartLaunchButton} onClick={onContinue}>
+          VOLTAR AO FLUXO DE BARES
         </button>
       </div>
     </div>

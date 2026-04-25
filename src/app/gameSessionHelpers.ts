@@ -393,6 +393,17 @@ export function getTrucoStatusLabel(handState: HandState | null): string {
   return "Disponível"
 }
 
+export function shouldPartnerConsultHuman(handState: HandState | null): boolean {
+  return !!handState &&
+    !handState.finished &&
+    handState.truco.phase === "awaiting-response" &&
+    handState.truco.awaitingResponseFromTeam === "A" &&
+    handState.truco.awaitingResponseFromPlayerId === 3 &&
+    handState.truco.requestedByTeam === "B" &&
+    handState.truco.promptKind === "request" &&
+    !!handState.truco.proposedBet
+}
+
 export function canHumanRaiseInResponse(handState: HandState | null): boolean {
   if (!handState) return false
   if (handState.truco.phase !== "awaiting-response") return false

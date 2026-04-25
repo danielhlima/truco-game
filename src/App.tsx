@@ -72,6 +72,7 @@ function App() {
     eventMessage,
     handScoreLabel,
     handState,
+    matchResultScreen,
     handleAcceptTruco,
     handleCloseCharacterSelect,
     handleCloseJourneyIntro,
@@ -85,6 +86,7 @@ function App() {
     handleRaiseTruco,
     handleRequestTruco,
     handleResetCampaign,
+    handleReturnToJourneyFlow,
     handleRunFromTruco,
     handleSelectNextCharacter,
     handleSelectPreviousCharacter,
@@ -262,6 +264,7 @@ function App() {
             campaignCompleted={campaignCompleted}
             handState={handState}
             matchState={matchState}
+            matchResultScreen={matchResultScreen}
             currentCampaignVenue={currentCampaignVenue}
             debugModeEnabled={debugModeEnabled}
             debugVenueId={debugVenueId}
@@ -292,6 +295,7 @@ function App() {
             onOpenJourneyIntro={handleOpenJourneyIntro}
             onContinueToCharacterSelect={handleContinueToCharacterSelect}
             onLaunchVenue={handleLaunchVenue}
+            onReturnToJourneyFlow={handleReturnToJourneyFlow}
             onResetCampaign={handleResetCampaign}
             onSelectNextCharacter={handleSelectNextCharacter}
             onSelectPreviousCharacter={handleSelectPreviousCharacter}
@@ -2110,6 +2114,78 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     justifyContent: "center",
     paddingTop: "4px",
+  },
+  matchResultScreen: {
+    gridColumn: "1 / -1",
+    width: "100%",
+    height: "100%",
+    display: "grid",
+    placeItems: "center",
+    padding: "clamp(18px, 1.5vw, 24px)",
+    boxSizing: "border-box",
+  },
+  matchResultCard: {
+    width: "min(100%, 780px)",
+    borderRadius: "28px",
+    padding: "clamp(22px, 2vw, 30px)",
+    display: "flex",
+    flexDirection: "column",
+    gap: "14px",
+    color: "#fff6e8",
+    boxShadow: "0 22px 40px rgba(0,0,0,0.28)",
+    border: "1px solid rgba(255,255,255,0.08)",
+  },
+  matchResultCardWin: {
+    background: "linear-gradient(180deg, rgba(62,38,26,0.95) 0%, rgba(28,17,11,0.96) 100%)",
+  },
+  matchResultCardLoss: {
+    background: "linear-gradient(180deg, rgba(42,24,20,0.96) 0%, rgba(18,10,9,0.97) 100%)",
+  },
+  matchResultEyebrow: {
+    fontSize: "12px",
+    fontWeight: 800,
+    textTransform: "uppercase",
+    letterSpacing: "0.09em",
+    color: "#d9c4a4",
+  },
+  matchResultTitle: {
+    margin: 0,
+    fontSize: "clamp(30px, 2.4vw, 40px)",
+    lineHeight: 1,
+    fontFamily: "Georgia, serif",
+  },
+  matchResultVenue: {
+    fontSize: "clamp(17px, 1.35vw, 22px)",
+    fontWeight: 800,
+    color: "#f4dfbf",
+  },
+  matchResultSubtitle: {
+    margin: 0,
+    fontSize: "clamp(14px, 1.02vw, 16px)",
+    lineHeight: 1.6,
+    color: "#ecd9bd",
+  },
+  matchResultHostBox: {
+    borderRadius: "20px",
+    padding: "16px 18px",
+    background: "rgba(255,255,255,0.06)",
+    border: "1px solid rgba(255,255,255,0.08)",
+    display: "flex",
+    flexDirection: "column",
+    gap: "6px",
+  },
+  matchResultHostLabel: {
+    fontSize: "11px",
+    fontWeight: 800,
+    textTransform: "uppercase",
+    letterSpacing: "0.08em",
+    color: "#d9c4a4",
+  },
+  matchResultHostLine: {
+    margin: 0,
+    fontSize: "clamp(17px, 1.25vw, 20px)",
+    lineHeight: 1.5,
+    color: "#fff4e1",
   },
   characterSelectScreen: {
     gridColumn: "1 / -1",
