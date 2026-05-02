@@ -65,6 +65,7 @@ function App() {
     currentCampaignVenue,
     currentTurnLabel,
     currentVenueWins,
+    hasSelectedPartnerForVenue,
     debugModeEnabled,
     debugVenueId,
     debugVenueOptions,
@@ -84,6 +85,7 @@ function App() {
     handleCopyLogs,
     handleConfirmInGameConfirmation,
     handleContinueToCharacterSelect,
+    handleEnterVenueFromIntro,
     handleExitMatchFromContextMenu,
     handleLaunchVenue,
     handleOpenInGameContextMenu,
@@ -276,12 +278,15 @@ function App() {
             matchState={matchState}
             matchResultScreen={matchResultScreen}
             currentCampaignVenue={currentCampaignVenue}
+            currentVenueWins={currentVenueWins}
             debugModeEnabled={debugModeEnabled}
             debugVenueId={debugVenueId}
             debugVenueOptions={debugVenueOptions}
             dealAnimationNonce={dealAnimationNonce}
+            hasSelectedPartnerForVenue={hasSelectedPartnerForVenue}
             menuScreen={menuScreen}
             opponentCharacters={opponentCharacters}
+            playerProfile={playerProfile}
             selectedCharacter={selectedCharacter}
             selectedCharacterIndex={selectedCharacterIndex}
             selectedPartnerCharacter={selectedPartnerCharacter}
@@ -301,6 +306,7 @@ function App() {
             onCloseCharacterSelect={handleCloseCharacterSelect}
             onCloseJourneyIntro={handleCloseJourneyIntro}
             onConfirmCharacterSelect={handleConfirmCharacterSelect}
+            onEnterVenueFromIntro={handleEnterVenueFromIntro}
             onOpenCharacterSelect={handleOpenCharacterSelect}
             onOpenJourneyIntro={handleOpenJourneyIntro}
             onContinueToCharacterSelect={handleContinueToCharacterSelect}
@@ -844,6 +850,17 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: "pointer",
     boxShadow: "0 10px 18px rgba(0,0,0,0.22)",
   },
+  inGameContextMenuButtonHand: {
+    minHeight: "clamp(38px, 3vw, 44px)",
+    minWidth: "clamp(92px, 8.2vw, 116px)",
+    padding: "clamp(8px, 0.68vw, 10px) clamp(14px, 1.05vw, 16px)",
+    borderRadius: "14px",
+    letterSpacing: "0.08em",
+    justifyContent: "center",
+    alignItems: "center",
+    display: "flex",
+    boxShadow: "0 12px 20px rgba(0,0,0,0.24)",
+  },
   inGameContextMenuPanel: {
     position: "absolute",
     top: "calc(100% + 8px)",
@@ -857,6 +874,21 @@ const styles: Record<string, React.CSSProperties> = {
     background: "linear-gradient(180deg, rgba(31,21,15,0.97) 0%, rgba(18,12,8,0.98) 100%)",
     border: "1px solid rgba(244, 226, 190, 0.16)",
     boxShadow: "0 18px 32px rgba(0,0,0,0.32)",
+  },
+  inGameContextMenuPanelHand: {
+    position: "absolute",
+    right: 0,
+    bottom: "calc(100% + 8px)",
+    width: "min(240px, 68vw)",
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+    borderRadius: "16px",
+    padding: "12px",
+    background: "linear-gradient(180deg, rgba(31,21,15,0.97) 0%, rgba(18,12,8,0.98) 100%)",
+    border: "1px solid rgba(244, 226, 190, 0.16)",
+    boxShadow: "0 18px 32px rgba(0,0,0,0.32)",
+    zIndex: 3,
   },
   inGameConfirmationOverlay: {
     position: "absolute",
@@ -1592,6 +1624,13 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     gap: "12px",
   },
+  mobileHandRowWrap: {
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr) max-content",
+    gap: "clamp(8px, 0.7vw, 12px)",
+    alignItems: "end",
+    minWidth: 0,
+  },
   mobileHandTitle: {
     fontSize: "clamp(10px, 0.82vw, 12px)",
     fontWeight: 800,
@@ -1609,6 +1648,14 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "flex-end",
     justifyContent: "center",
     paddingTop: "clamp(2px, 0.2vw, 4px)",
+    minWidth: 0,
+  },
+  mobileHandMenuDock: {
+    display: "flex",
+    alignItems: "flex-end",
+    justifyContent: "flex-end",
+    paddingBottom: "clamp(2px, 0.2vw, 4px)",
+    minHeight: "100%",
   },
   inGameActionsCard: {
     borderRadius: "16px",
@@ -2387,6 +2434,28 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: "clamp(17px, 1.25vw, 20px)",
     lineHeight: 1.5,
     color: "#fff4e1",
+  },
+  matchResultProgressBox: {
+    borderRadius: "20px",
+    padding: "16px 18px",
+    background: "rgba(205,160,95,0.1)",
+    border: "1px solid rgba(232,193,128,0.2)",
+    display: "flex",
+    flexDirection: "column",
+    gap: "6px",
+  },
+  matchResultProgressLabel: {
+    fontSize: "11px",
+    fontWeight: 800,
+    textTransform: "uppercase",
+    letterSpacing: "0.08em",
+    color: "#d9c4a4",
+  },
+  matchResultProgressText: {
+    margin: 0,
+    fontSize: "clamp(15px, 1.08vw, 17px)",
+    lineHeight: 1.55,
+    color: "#f5e7d2",
   },
   characterSelectScreen: {
     gridColumn: "1 / -1",

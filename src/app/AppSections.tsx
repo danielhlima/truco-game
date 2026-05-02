@@ -13,6 +13,17 @@ import scorePadNotebookAsset from "../assets/ui-left/scorepad-notebook-clean-cut
 import avatarYouAsset from "../assets/characters/zeca-viramao.png"
 import actionButtonAsset from "../assets/ui-right/action-button-solid.png"
 import statsPanelWoodAsset from "../assets/ui-right/stats-panel-wood-main.png"
+import zeCatingaBackgroundAsset from "../assets/venues/ze-catinga/background.png"
+import zeCatingaHostAsset from "../assets/venues/ze-catinga/host-ze-catinga.png"
+import zeCatingaQuoteBoardAsset from "../assets/venues/ze-catinga/host-quote-board.png"
+import zeCatingaPanelAsset from "../assets/venues/ze-catinga/panel-dark-vertical.png"
+import zeCatingaCtaPlaqueAsset from "../assets/venues/ze-catinga/cta-plaque.png"
+import zeCatingaNameStripAsset from "../assets/venues/ze-catinga/name-strip.png"
+import zeCatingaVictoryIconAsset from "../assets/venues/ze-catinga/icon-victory.png"
+import zeCatingaDefeatIconAsset from "../assets/venues/ze-catinga/icon-defeat.png"
+import zeCatingaAccuracyIconAsset from "../assets/venues/ze-catinga/icon-accuracy.png"
+import zeCatingaDifficultyBottleAsset from "../assets/venues/ze-catinga/difficulty-bottle.png"
+import zeCatingaDividerAsset from "../assets/venues/ze-catinga/divider-ornament.png"
 import type { PlayerProfile } from "../profile/playerProfile"
 import type { PartnerAdvice } from "../ai/trucoDecision"
 import type { TrucoCharacterProfile } from "../content/characters"
@@ -33,9 +44,53 @@ type StyleMap = Record<string, React.CSSProperties>
 type MatchResultScreenState = {
   hostLine: string
   outcome: "win" | "loss"
+  progressionText?: string
+  progressionTitle?: string
   title: string
   subtitle: string
   venueName: string
+}
+
+type VenueCoverConfig = {
+  hostName: string
+  hostRole: string
+  hostQuote: string
+  leadEyebrow: string
+  leadText: string
+  description: string
+  backgroundAsset: string
+  hostPortraitAsset: string
+  quoteBoardAsset: string
+  mainPanelAsset: string
+  ctaPlaqueAsset: string
+  nameStripAsset: string
+  iconVictoryAsset: string
+  iconDefeatAsset: string
+  iconAccuracyAsset: string
+  difficultyBottleAsset: string
+  dividerAsset: string
+}
+
+const VENUE_COVER_CONFIG_BY_ID: Record<string, VenueCoverConfig> = {
+  "bar-do-ze-catinga": {
+    hostName: "Zé Catinga",
+    hostRole: "Dono do Bar",
+    hostQuote: "Aqui dentro, fama não paga dose. Só entra quem aguenta pressão.",
+    leadEyebrow: "Próximo desafio",
+    leadText: "Boteco raiz. Cachaça forte, conversa curta e truco valendo a honra.",
+    description: "A mesa aqui não compra pose. Ou você aguenta o calor, ou sai pela porta menor.",
+    backgroundAsset: zeCatingaBackgroundAsset,
+    hostPortraitAsset: zeCatingaHostAsset,
+    quoteBoardAsset: zeCatingaQuoteBoardAsset,
+    mainPanelAsset: zeCatingaPanelAsset,
+    ctaPlaqueAsset: zeCatingaCtaPlaqueAsset,
+    nameStripAsset: zeCatingaNameStripAsset,
+    iconVictoryAsset: zeCatingaVictoryIconAsset,
+    iconDefeatAsset: zeCatingaDefeatIconAsset,
+    iconAccuracyAsset: zeCatingaAccuracyIconAsset,
+    difficultyBottleAsset: zeCatingaDifficultyBottleAsset,
+    dividerAsset: zeCatingaDividerAsset,
+  },
 }
 
 interface ControlsPanelProps {
@@ -352,11 +407,14 @@ interface TableSectionProps {
   matchState: MatchState | null
   matchResultScreen: MatchResultScreenState | null
   currentCampaignVenue: CampaignVenue | null
+  currentVenueWins: number
   debugModeEnabled: boolean
   debugVenueId: string
   debugVenueOptions: Array<{ id: string; label: string }>
   dealAnimationNonce: number
+  hasSelectedPartnerForVenue: boolean
   menuScreen: "start" | "journey-intro" | "character-select" | "venue-intro" | "match-result"
+  playerProfile: PlayerProfile
   selectedCharacter: TrucoCharacterProfile | null
   selectedCharacterIndex: number
   selectedPartnerCharacter: TrucoCharacterProfile | null
@@ -378,6 +436,7 @@ interface TableSectionProps {
   onCloseJourneyIntro: () => void
   onContinueToCharacterSelect: () => void
   onConfirmCharacterSelect: () => void
+  onEnterVenueFromIntro: () => void
   onLaunchVenue: (venueId: string) => void
   onOpenCharacterSelect: () => void
   onOpenJourneyIntro: () => void
@@ -410,11 +469,14 @@ export function TableSection({
   matchState,
   matchResultScreen,
   currentCampaignVenue,
+  currentVenueWins,
   debugModeEnabled,
   debugVenueId,
   debugVenueOptions,
   dealAnimationNonce,
+  hasSelectedPartnerForVenue,
   menuScreen,
+  playerProfile,
   selectedCharacter,
   selectedCharacterIndex,
   selectedPartnerCharacter,
@@ -436,6 +498,7 @@ export function TableSection({
   onCloseJourneyIntro,
   onContinueToCharacterSelect,
   onConfirmCharacterSelect,
+  onEnterVenueFromIntro,
   onLaunchVenue,
   onOpenCharacterSelect,
   onOpenJourneyIntro,
@@ -465,6 +528,7 @@ export function TableSection({
     currentCampaignVenue
   )
   const isMenuMode = !handState
+  const isVenueIntroMode = isMenuMode && menuScreen === "venue-intro"
   const rosterPlayers = handState?.players ?? [
     { id: 2, hand: [] },
     { id: 3, hand: [] },
@@ -482,6 +546,34 @@ export function TableSection({
     2: opponentCharacters[0]?.name ?? "Adversário esquerdo",
     3: selectedPartnerCharacter?.name ?? "Parceira",
     4: opponentCharacters[1]?.name ?? "Adversário direito",
+  }
+
+  if (isVenueIntroMode) {
+    return (
+      <section style={styles.tablePanel}>
+        <div
+          style={{
+            ...styles.tableHudSurface,
+            backgroundImage: "none",
+            backgroundColor: "#120a06",
+            padding: 0,
+          }}
+        >
+          <div style={styles.gameViewportFrame}>
+            <VenueIntroScreen
+              currentCampaignVenue={currentCampaignVenue}
+              currentVenueWins={currentVenueWins}
+              hasSelectedPartnerForVenue={hasSelectedPartnerForVenue}
+              opponentCharacters={opponentCharacters}
+              playerProfile={playerProfile}
+              onOpenCharacterSelect={onOpenCharacterSelect}
+              onStart={onEnterVenueFromIntro}
+              styles={styles}
+            />
+          </div>
+        </div>
+      </section>
+    )
   }
 
   return (
@@ -521,10 +613,12 @@ export function TableSection({
               ) : menuScreen === "venue-intro" ? (
                 <VenueIntroScreen
                   currentCampaignVenue={currentCampaignVenue}
-                  selectedPartnerCharacter={selectedPartnerCharacter}
+                  currentVenueWins={currentVenueWins}
+                  hasSelectedPartnerForVenue={hasSelectedPartnerForVenue}
                   opponentCharacters={opponentCharacters}
+                  playerProfile={playerProfile}
                   onOpenCharacterSelect={onOpenCharacterSelect}
-                  onStart={onStart}
+                  onStart={onEnterVenueFromIntro}
                   styles={styles}
                 />
               ) : (
@@ -650,44 +744,20 @@ export function TableSection({
                   <div style={styles.playerCardsBlock}>
                     <HumanCardsPanel
                       handState={handState}
+                      inGameContextMenuOpen={inGameContextMenuOpen}
                       player1={player1}
                       canPlayHumanCard={canPlayHumanCard}
+                      onCloseInGameContextMenu={onCloseInGameContextMenu}
+                      onExitMatchFromContextMenu={onExitMatchFromContextMenu}
+                      onOpenInGameContextMenu={onOpenInGameContextMenu}
                       onPlayCard={onPlayCard}
+                      onSwapPartnerFromContextMenu={onSwapPartnerFromContextMenu}
                       styles={styles}
                     />
                   </div>
                 </div>
 
                 <div style={styles.gameSidebarColumn}>
-                  <div style={styles.inGameContextMenuWrap}>
-                    <button style={styles.inGameContextMenuButton} onClick={onOpenInGameContextMenu}>
-                      MENU
-                    </button>
-
-                    {inGameContextMenuOpen ? (
-                      <div style={styles.inGameContextMenuPanel}>
-                        <button
-                          style={styles.inGameContextMenuAction}
-                          onClick={onSwapPartnerFromContextMenu}
-                        >
-                          Trocar de parceira
-                        </button>
-                        <button
-                          style={styles.inGameContextMenuAction}
-                          onClick={onExitMatchFromContextMenu}
-                        >
-                          Sair
-                        </button>
-                        <button
-                          style={styles.inGameContextMenuActionSecondary}
-                          onClick={onCloseInGameContextMenu}
-                        >
-                          Voltar
-                        </button>
-                      </div>
-                    ) : null}
-                  </div>
-
                   <div style={styles.tableHudSidebar}>
                     <div
                       style={{
@@ -1212,6 +1282,17 @@ function MatchResultScreen({
           </p>
         </div>
 
+        {result?.progressionTitle || result?.progressionText ? (
+          <div style={styles.matchResultProgressBox}>
+            <div style={styles.matchResultProgressLabel}>
+              {result?.progressionTitle ?? "Progressão"}
+            </div>
+            <p style={styles.matchResultProgressText}>
+              {result?.progressionText ?? "A campanha avançou depois desta vitória."}
+            </p>
+          </div>
+        ) : null}
+
         <button style={styles.gameStartLaunchButton} onClick={onContinue}>
           VOLTAR AO FLUXO DE BARES
         </button>
@@ -1379,114 +1460,633 @@ function CharacterSelectionScreen({
 
 function VenueIntroScreen({
   currentCampaignVenue,
-  selectedPartnerCharacter,
+  currentVenueWins,
+  hasSelectedPartnerForVenue,
   opponentCharacters,
+  playerProfile,
   onOpenCharacterSelect,
   onStart,
   styles,
 }: {
   currentCampaignVenue: CampaignVenue | null
-  selectedPartnerCharacter: TrucoCharacterProfile | null
+  currentVenueWins: number
+  hasSelectedPartnerForVenue: boolean
   opponentCharacters: TrucoCharacterProfile[]
+  playerProfile: PlayerProfile
   onOpenCharacterSelect: () => void
   onStart: () => void
   styles: StyleMap
 }) {
-  const participants = [
-    {
-      id: "you",
-      role: "Você",
-      name: "Zeca Viramão",
-      description: "Chega na mesa querendo medir a temperatura do bar no carteado.",
-      avatarAsset: avatarYouAsset,
-    },
-    {
-      id: selectedPartnerCharacter?.id ?? "partner",
-      role: "Sua parceira",
-      name: selectedPartnerCharacter?.name ?? "Parceira",
-      description:
-        selectedPartnerCharacter?.story ?? "Você já escolheu quem vai fechar a dupla com você.",
-      avatarAsset: selectedPartnerCharacter?.avatarAsset ?? avatarYouAsset,
-    },
-    ...opponentCharacters.map((character, index) => ({
-      id: character.id,
-      role: index === 0 ? "Adversário esquerdo" : "Adversário direito",
-      name: character.name,
-      description: character.story,
-      avatarAsset: character.avatarAsset,
-    })),
-  ]
+  const coverConfig = currentCampaignVenue
+    ? VENUE_COVER_CONFIG_BY_ID[currentCampaignVenue.id]
+    : undefined
+  const progressPercent = currentCampaignVenue
+    ? Math.min(100, Math.round((currentVenueWins / currentCampaignVenue.matchesToClear) * 100))
+    : 0
+  const remainingWins = currentCampaignVenue
+    ? Math.max(0, currentCampaignVenue.matchesToClear - currentVenueWins)
+    : 0
+  const ctaLabel = hasSelectedPartnerForVenue ? "ENTRAR NO BAR" : "ESCOLHER PARCEIRA"
+  const overallMatches = playerProfile.campaign.wins + playerProfile.campaign.losses
+  const overallWinRate = overallMatches > 0
+    ? Math.round((playerProfile.campaign.wins / overallMatches) * 100)
+    : 0
+
+  if (!coverConfig) {
+    const participants = [
+      {
+        id: "you",
+        role: "Você",
+        name: "Zeca Viramão",
+        description: "Chega na mesa querendo medir a temperatura do bar no carteado.",
+        avatarAsset: avatarYouAsset,
+      },
+      ...opponentCharacters.map((character, index) => ({
+        id: character.id,
+        role: index === 0 ? "Adversário esquerdo" : "Adversário direito",
+        name: character.name,
+        description: character.story,
+        avatarAsset: character.avatarAsset,
+      })),
+    ]
+
+    return (
+      <div style={styles.venueIntroScreen}>
+        <div style={styles.venueIntroHeader}>
+          <div>
+            <div style={styles.venueIntroEyebrow}>Chegada no bar</div>
+            <h2 style={styles.venueIntroTitle}>{currentCampaignVenue?.name ?? "Próxima mesa"}</h2>
+            <div style={styles.venueIntroMeta}>
+              {currentCampaignVenue?.districtLabel ?? "Local ainda não definido"}
+            </div>
+          </div>
+          <button style={styles.characterSelectBackButton} onClick={onOpenCharacterSelect}>
+            Trocar parceira
+          </button>
+        </div>
+
+        <div style={styles.venueIntroBoard}>
+          <div style={styles.venueIntroMainCard}>
+            <div style={styles.venueIntroSectionLabel}>Clima do lugar</div>
+            <p style={styles.venueIntroLead}>
+              {currentCampaignVenue?.entryNarrative ??
+                "A mesa já está armada. Falta só respirar fundo e começar."}
+            </p>
+            <p style={styles.venueIntroText}>
+              {currentCampaignVenue?.atmosphere ??
+                "O bar ainda espera uma descrição própria, mas a partida já está pronta para começar."}
+            </p>
+
+            <div style={styles.venueIntroFactsGrid}>
+              <div style={styles.venueIntroFactCard}>
+                <div style={styles.venueIntroFactLabel}>Variante</div>
+                <strong style={styles.venueIntroFactValue}>
+                  {currentCampaignVenue?.variant === "PAULISTA" ? "Truco Paulista" : "Truco Mineiro"}
+                </strong>
+              </div>
+              <div style={styles.venueIntroFactCard}>
+                <div style={styles.venueIntroFactLabel}>Meta do bar</div>
+                <strong style={styles.venueIntroFactValue}>
+                  {currentCampaignVenue?.matchesToClear ?? 0} vitórias
+                </strong>
+              </div>
+            </div>
+          </div>
+
+          <div style={styles.venueIntroRosterPanel}>
+            <div style={styles.venueIntroSectionLabel}>Quem segura a mesa</div>
+            <div style={styles.venueIntroParticipants}>
+              {participants.map((participant) => (
+                <div key={participant.id} style={styles.venueIntroParticipantCard}>
+                  <div style={styles.venueIntroParticipantAvatar}>
+                    <img
+                      src={participant.avatarAsset}
+                      alt={participant.name}
+                      style={styles.venueIntroParticipantImage}
+                    />
+                  </div>
+                  <div style={styles.venueIntroParticipantBody}>
+                    <div style={styles.venueIntroParticipantRole}>{participant.role}</div>
+                    <div style={styles.venueIntroParticipantName}>{participant.name}</div>
+                    <div style={styles.venueIntroParticipantText}>{participant.description}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div style={styles.venueIntroActions}>
+          <button style={styles.gameStartLaunchButton} onClick={onStart}>
+            {ctaLabel}
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div style={styles.venueIntroScreen}>
-      <div style={styles.venueIntroHeader}>
-        <div>
-          <div style={styles.venueIntroEyebrow}>Chegada no bar</div>
-          <h2 style={styles.venueIntroTitle}>{currentCampaignVenue?.name ?? "Próxima mesa"}</h2>
-          <div style={styles.venueIntroMeta}>
-            {currentCampaignVenue?.districtLabel ?? "Local ainda não definido"}
+    <div
+      style={{
+        height: "100%",
+        display: "grid",
+        gridTemplateRows: "minmax(0, 1fr)",
+        padding: 8,
+        color: "#f6e7c4",
+        boxSizing: "border-box",
+        backgroundImage: `linear-gradient(180deg, rgba(11, 7, 4, 0.34) 0%, rgba(11, 7, 4, 0.72) 100%), url(${coverConfig.backgroundAsset})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "246px minmax(0, 1fr) 290px",
+          gap: 14,
+          height: "100%",
+          minHeight: 0,
+          alignItems: "stretch",
+        }}
+      >
+        <div
+          style={{
+            display: "grid",
+            gridTemplateRows: "minmax(0, 1fr) auto auto",
+            gap: 8,
+            alignItems: "end",
+          }}
+        >
+          <div
+            style={{
+              position: "relative",
+              minHeight: 286,
+              display: "flex",
+              alignItems: "flex-end",
+              justifyContent: "center",
+              overflow: "hidden",
+            }}
+          >
+            <img
+              src={coverConfig.hostPortraitAsset}
+              alt={coverConfig.hostName}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                objectPosition: "center bottom",
+                filter: "drop-shadow(0 22px 26px rgba(0,0,0,0.42))",
+                mixBlendMode: "screen",
+              }}
+            />
+          </div>
+
+          <div
+            style={{
+              position: "relative",
+              minHeight: 136,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+              padding: "16px 18px",
+              boxSizing: "border-box",
+            }}
+          >
+            <img
+              src={coverConfig.quoteBoardAsset}
+              alt=""
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                mixBlendMode: "screen",
+              }}
+            />
+            <div
+              style={{
+                position: "relative",
+                maxWidth: "58%",
+                color: "#efe0be",
+                fontFamily: "\"Georgia\", serif",
+                fontSize: 15,
+                lineHeight: 1.08,
+                fontStyle: "italic",
+                textShadow: "0 2px 14px rgba(0,0,0,0.5)",
+                transform: "translateY(6px)",
+              }}
+            >
+              “{coverConfig.hostQuote}”
+            </div>
+          </div>
+
+          <div style={{ textAlign: "center" }}>
+            <div
+              style={{
+                fontFamily: "\"Georgia\", serif",
+                fontSize: 28,
+                fontWeight: 700,
+                letterSpacing: "0.03em",
+              }}
+            >
+              {coverConfig.hostName}
+            </div>
+            <div
+            style={{
+              marginTop: 4,
+              color: "rgba(245, 219, 165, 0.9)",
+              fontSize: 14,
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+            }}
+            >
+              {coverConfig.hostRole}
+            </div>
           </div>
         </div>
-        <button style={styles.characterSelectBackButton} onClick={onOpenCharacterSelect}>
-          Trocar parceira
-        </button>
-      </div>
 
-      <div style={styles.venueIntroBoard}>
-        <div style={styles.venueIntroMainCard}>
-          <div style={styles.venueIntroSectionLabel}>Clima do lugar</div>
-          <p style={styles.venueIntroLead}>
-            {currentCampaignVenue?.entryNarrative ??
-              "A mesa já está armada. Falta só respirar fundo e começar."}
-          </p>
-          <p style={styles.venueIntroText}>
-            {currentCampaignVenue?.atmosphere ??
-              "O bar ainda espera uma descrição própria, mas a partida já está pronta para começar."}
-          </p>
-
-          <div style={styles.venueIntroFactsGrid}>
-            <div style={styles.venueIntroFactCard}>
-              <div style={styles.venueIntroFactLabel}>Variante</div>
-              <strong style={styles.venueIntroFactValue}>
-                {currentCampaignVenue?.variant === "PAULISTA" ? "Truco Paulista" : "Truco Mineiro"}
-              </strong>
-            </div>
-            <div style={styles.venueIntroFactCard}>
-              <div style={styles.venueIntroFactLabel}>Meta do bar</div>
-              <strong style={styles.venueIntroFactValue}>
-                {currentCampaignVenue?.matchesToClear ?? 0} vitórias
-              </strong>
+        <div
+          style={{
+            minHeight: 0,
+            padding: "14px 18px 8px",
+            display: "grid",
+            gridTemplateRows: "auto auto auto auto auto auto",
+            gap: 3,
+            boxSizing: "border-box",
+            background: "linear-gradient(180deg, rgba(19,11,8,0.92) 0%, rgba(10,6,4,0.94) 100%)",
+            border: "1px solid rgba(155, 110, 54, 0.56)",
+            boxShadow: "0 16px 28px rgba(0,0,0,0.3), inset 0 0 0 2px rgba(100,65,31,0.28)",
+            borderRadius: 22,
+          }}
+        >
+          <div style={{ position: "relative", textAlign: "center" }}>
+            <div
+              style={{
+                color: "#e8c780",
+                fontSize: 13,
+                letterSpacing: "0.32em",
+                textTransform: "uppercase",
+              }}
+            >
+              {coverConfig.leadEyebrow}
             </div>
           </div>
-        </div>
 
-        <div style={styles.venueIntroRosterPanel}>
-          <div style={styles.venueIntroSectionLabel}>Quem vai pra mesa</div>
-          <div style={styles.venueIntroParticipants}>
-            {participants.map((participant) => (
-              <div key={participant.id} style={styles.venueIntroParticipantCard}>
-                <div style={styles.venueIntroParticipantAvatar}>
-                  <img
-                    src={participant.avatarAsset}
-                    alt={participant.name}
-                    style={styles.venueIntroParticipantImage}
-                  />
+          <div style={{ position: "relative", textAlign: "center" }}>
+            <img
+              src={coverConfig.dividerAsset}
+              alt=""
+              aria-hidden="true"
+              style={{
+                width: "62%",
+                maxWidth: 280,
+                height: 10,
+                objectFit: "contain",
+                mixBlendMode: "screen",
+                opacity: 0.88,
+              }}
+            />
+            <h2
+              style={{
+                margin: "5px 0 5px",
+                fontFamily: "\"Georgia\", serif",
+                fontSize: 36,
+                lineHeight: 0.96,
+                color: "#e0b25d",
+                textShadow: "0 2px 16px rgba(0,0,0,0.28)",
+              }}
+            >
+              {currentCampaignVenue?.name ?? "Próximo bar"}
+            </h2>
+            <div
+              style={{
+                color: "#f2d9a7",
+                fontSize: 15,
+              }}
+            >
+              {currentCampaignVenue?.districtLabel ?? "Local ainda não definido"}
+            </div>
+          </div>
+
+          <div style={{ position: "relative", textAlign: "center" }}>
+            <img
+              src={coverConfig.dividerAsset}
+              alt=""
+              aria-hidden="true"
+              style={{
+                width: "70%",
+                maxWidth: 320,
+                height: 8,
+                objectFit: "contain",
+                mixBlendMode: "screen",
+                opacity: 0.84,
+              }}
+            />
+          </div>
+
+          <div
+              style={{
+                position: "relative",
+                textAlign: "center",
+                padding: "0 14px",
+              }}
+            >
+            <p
+              style={{
+                margin: 0,
+                fontFamily: "\"Georgia\", serif",
+                fontSize: 16,
+                lineHeight: 1.06,
+                color: "#f0d7a0",
+              }}
+            >
+              {coverConfig.leadText}
+            </p>
+            <p
+              style={{
+                margin: "5px 0 0",
+                fontFamily: "\"Georgia\", serif",
+                fontSize: 14,
+                lineHeight: 1.05,
+                color: "rgba(238, 220, 180, 0.9)",
+              }}
+            >
+              {coverConfig.description}
+            </p>
+          </div>
+
+          <div
+              style={{
+                position: "relative",
+                display: "grid",
+                gap: 6,
+                alignContent: "start",
+              }}
+            >
+            <div
+              style={{
+                color: "#d6aa57",
+                letterSpacing: "0.22em",
+                fontSize: 11,
+                textTransform: "uppercase",
+                textAlign: "center",
+              }}
+            >
+              Adversários
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                gap: 14,
+              }}
+            >
+              {opponentCharacters.map((character) => (
+                <div
+                  key={character.id}
+                  style={{
+                    display: "grid",
+                    gap: 3,
+                    justifyItems: "center",
+                    textAlign: "center",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "100%",
+                      maxWidth: 102,
+                      aspectRatio: "0.84",
+                      borderRadius: 12,
+                      overflow: "hidden",
+                      border: "2px solid rgba(173, 123, 55, 0.78)",
+                      boxShadow: "0 12px 18px rgba(0,0,0,0.28)",
+                      background: "linear-gradient(180deg, rgba(100,72,43,0.26) 0%, rgba(34,21,12,0.46) 100%)",
+                    }}
+                  >
+                    <img
+                      src={character.avatarAsset ?? avatarYouAsset}
+                      alt={character.name}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  </div>
+                  <div
+                    style={{
+                      color: "#f0dcc0",
+                      fontFamily: "\"Georgia\", serif",
+                      fontWeight: 700,
+                      fontSize: 13,
+                      lineHeight: 1.1,
+                    }}
+                  >
+                    <div>
+                      {character.name}
+                    </div>
+                  </div>
                 </div>
-                <div style={styles.venueIntroParticipantBody}>
-                  <div style={styles.venueIntroParticipantRole}>{participant.role}</div>
-                  <div style={styles.venueIntroParticipantName}>{participant.name}</div>
-                  <div style={styles.venueIntroParticipantText}>{participant.description}</div>
+              ))}
+            </div>
+          </div>
+
+          <div
+            style={{
+              position: "relative",
+              display: "grid",
+              gap: 2,
+              justifyItems: "center",
+              alignContent: "start",
+              marginTop: "-2px",
+            }}
+          >
+            <div
+              style={{
+                color: "#c69643",
+                letterSpacing: "0.22em",
+                fontSize: 10,
+                textTransform: "uppercase",
+              }}
+            >
+              Dificuldade do desafio
+            </div>
+            <div style={{ display: "flex", gap: 5, flexWrap: "wrap", justifyContent: "center" }}>
+              {Array.from({ length: 5 }).map((_, index) => (
+                <img
+                  key={`difficulty-${index}`}
+                  src={coverConfig.difficultyBottleAsset}
+                  alt=""
+                  aria-hidden="true"
+                  style={{
+                    width: 13,
+                    height: 20,
+                    objectFit: "contain",
+                    mixBlendMode: "screen",
+                    opacity: index < (currentCampaignVenue?.difficulty.aiLevel ?? 1) ? 0.98 : 0.22,
+                    filter: index < (currentCampaignVenue?.difficulty.aiLevel ?? 1)
+                      ? "drop-shadow(0 4px 10px rgba(237,178,72,0.25))"
+                      : "grayscale(1)",
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateRows: "auto auto",
+            alignContent: "start",
+            gap: 10,
+            minHeight: 0,
+          }}
+        >
+          <div
+            style={{
+              borderRadius: 22,
+              padding: "12px 14px",
+              background:
+                "linear-gradient(180deg, rgba(233, 208, 162, 0.92) 0%, rgba(186, 147, 92, 0.94) 100%)",
+              color: "#2b1608",
+              boxShadow: "0 20px 34px rgba(0,0,0,0.28), inset 0 0 0 2px rgba(121,72,29,0.32)",
+              display: "grid",
+              alignContent: "start",
+              gap: 8,
+            }}
+          >
+            <div
+              style={{
+                textAlign: "center",
+                fontFamily: "\"Georgia\", serif",
+                fontSize: 30,
+                fontWeight: 700,
+                lineHeight: 1.05,
+              }}
+            >
+              Seu histórico aqui
+            </div>
+
+            {[
+              {
+                icon: coverConfig.iconVictoryAsset,
+                label: "Vitórias",
+                value: String(currentVenueWins),
+                accent: "#9a6b1f",
+              },
+              {
+                icon: coverConfig.iconDefeatAsset,
+                label: "Faltam",
+                value: String(remainingWins),
+                accent: "#7a2318",
+              },
+              {
+                icon: coverConfig.iconAccuracyAsset,
+                label: "Progresso",
+                value: `${progressPercent}%`,
+                accent: "#8a5b1f",
+              },
+            ].map((item) => (
+              <div
+                key={item.label}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "minmax(0, 1fr) auto",
+                  alignItems: "center",
+                  gap: 4,
+                  paddingBottom: 2,
+                  borderBottom: "1px solid rgba(95,57,24,0.24)",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 700,
+                    fontFamily: "\"Georgia\", serif",
+                  }}
+                  >
+                  {item.label}
+                </div>
+                <div
+                  style={{
+                    fontSize: 34,
+                    fontWeight: 700,
+                    lineHeight: 1,
+                    color: item.accent,
+                    fontFamily: "\"Georgia\", serif",
+                  }}
+                >
+                  {item.value}
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-      </div>
 
-      <div style={styles.venueIntroActions}>
-        <button style={styles.gameStartLaunchButton} onClick={onStart}>
-          COMEÇAR
-        </button>
+            <div
+              style={{
+                fontSize: 16,
+                lineHeight: 1,
+                color: "rgba(57, 31, 12, 0.82)",
+                textAlign: "center",
+              }}
+            >
+              Geral: {playerProfile.campaign.wins}V · {playerProfile.campaign.losses}D · {overallWinRate}%.
+            </div>
+          </div>
+
+          <button
+            onClick={onStart}
+            style={{
+              position: "relative",
+              width: "100%",
+              minHeight: 82,
+              padding: "10px 12px",
+              border: "none",
+              background: "transparent",
+              cursor: "pointer",
+              color: "#f3d08a",
+              fontFamily: "\"Georgia\", serif",
+              fontWeight: 700,
+              fontSize: 16,
+              lineHeight: 0.92,
+              letterSpacing: "0.03em",
+              textShadow: "0 3px 10px rgba(0,0,0,0.4)",
+              alignSelf: "start",
+            }}
+          >
+            <img
+              src={coverConfig.ctaPlaqueAsset}
+              alt=""
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                mixBlendMode: "screen",
+              }}
+            />
+            <span
+              style={{
+                position: "relative",
+                display: "inline-block",
+                width: 118,
+                maxWidth: "54%",
+                textAlign: "center",
+                whiteSpace: "normal",
+              }}
+            >
+              {ctaLabel}
+            </span>
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -1547,15 +2147,25 @@ export function LogsPanel({ logs, onCopyLogs, styles }: LogsPanelProps) {
 
 function HumanCardsPanel({
   handState,
+  inGameContextMenuOpen,
   player1,
   canPlayHumanCard,
+  onCloseInGameContextMenu,
+  onExitMatchFromContextMenu,
+  onOpenInGameContextMenu,
   onPlayCard,
+  onSwapPartnerFromContextMenu,
   styles,
 }: {
   handState: HandState | null
+  inGameContextMenuOpen: boolean
   player1: Player | null
   canPlayHumanCard: boolean
+  onCloseInGameContextMenu: () => void
+  onExitMatchFromContextMenu: () => void
+  onOpenInGameContextMenu: () => void
   onPlayCard: (card: Card) => void
+  onSwapPartnerFromContextMenu: () => void
   styles: StyleMap
 }) {
   return (
@@ -1568,44 +2178,83 @@ function HumanCardsPanel({
         </div>
       </div>
 
-      {!player1 || player1.hand.length === 0 ? (
-        <div style={styles.emptyHandBox}>Você não tem mais cartas.</div>
-      ) : (
-        <div style={styles.mobileHandRow}>
-          {player1.hand.map((card, index) => (
+      <div style={styles.mobileHandRowWrap}>
+        {!player1 || player1.hand.length === 0 ? (
+          <div style={styles.emptyHandBox}>Você não tem mais cartas.</div>
+        ) : (
+          <div style={styles.mobileHandRow}>
+            {player1.hand.map((card, index) => (
+              <button
+                key={`${card.rank}-${card.suit}-${index}`}
+                style={{
+                  ...styles.mobileCardButton,
+                  ...(canPlayHumanCard ? styles.cardButtonActive : styles.cardButtonDisabled),
+                }}
+                onClick={() => onPlayCard(card)}
+                disabled={!canPlayHumanCard}
+                title={formatCard(card)}
+              >
+                <div style={styles.mobileCardCornerTop}>
+                  <div style={{ ...styles.mobileCardRank, color: getSuitColor(card.suit) }}>
+                    {card.rank}
+                  </div>
+                  <div style={{ ...styles.mobileCardSuit, color: getSuitColor(card.suit) }}>
+                    {getSuitSymbol(card.suit)}
+                  </div>
+                </div>
+                <div style={{ ...styles.mobileCardCenterSuit, color: getSuitColor(card.suit) }}>
+                  {getSuitSymbol(card.suit)}
+                </div>
+                <div style={styles.mobileCardCornerBottom}>
+                  <div style={{ ...styles.mobileCardRank, color: getSuitColor(card.suit) }}>
+                    {card.rank}
+                  </div>
+                  <div style={{ ...styles.mobileCardSuit, color: getSuitColor(card.suit) }}>
+                    {getSuitSymbol(card.suit)}
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div style={styles.mobileHandMenuDock}>
+          <div style={styles.inGameContextMenuWrap}>
             <button
-              key={`${card.rank}-${card.suit}-${index}`}
               style={{
-                ...styles.mobileCardButton,
-                ...(canPlayHumanCard ? styles.cardButtonActive : styles.cardButtonDisabled),
+                ...styles.inGameContextMenuButton,
+                ...styles.inGameContextMenuButtonHand,
               }}
-              onClick={() => onPlayCard(card)}
-              disabled={!canPlayHumanCard}
-              title={formatCard(card)}
+              onClick={onOpenInGameContextMenu}
             >
-              <div style={styles.mobileCardCornerTop}>
-                <div style={{ ...styles.mobileCardRank, color: getSuitColor(card.suit) }}>
-                  {card.rank}
-                </div>
-                <div style={{ ...styles.mobileCardSuit, color: getSuitColor(card.suit) }}>
-                  {getSuitSymbol(card.suit)}
-                </div>
-              </div>
-              <div style={{ ...styles.mobileCardCenterSuit, color: getSuitColor(card.suit) }}>
-                {getSuitSymbol(card.suit)}
-              </div>
-              <div style={styles.mobileCardCornerBottom}>
-                <div style={{ ...styles.mobileCardRank, color: getSuitColor(card.suit) }}>
-                  {card.rank}
-                </div>
-                <div style={{ ...styles.mobileCardSuit, color: getSuitColor(card.suit) }}>
-                  {getSuitSymbol(card.suit)}
-                </div>
-              </div>
+              MENU
             </button>
-          ))}
+
+            {inGameContextMenuOpen ? (
+              <div style={styles.inGameContextMenuPanelHand}>
+                <button
+                  style={styles.inGameContextMenuAction}
+                  onClick={onSwapPartnerFromContextMenu}
+                >
+                  Trocar de parceira
+                </button>
+                <button
+                  style={styles.inGameContextMenuAction}
+                  onClick={onExitMatchFromContextMenu}
+                >
+                  Sair
+                </button>
+                <button
+                  style={styles.inGameContextMenuActionSecondary}
+                  onClick={onCloseInGameContextMenu}
+                >
+                  Voltar
+                </button>
+              </div>
+            ) : null}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   )
 }

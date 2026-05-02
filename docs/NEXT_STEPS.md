@@ -22,8 +22,8 @@ Status:
 Status:
 
 - funcional
-- ainda fragil em regras finas de dialogo
-- precisa de blindagem por testes
+- blindagem por testes reforcada
+- regra de consulta da parceira ajustada para nao consultar de novo quando ela iniciou ou ja recebeu respaldo no fluxo
 
 ### 3. Preparar a arquitetura/layout da tela final
 
@@ -54,7 +54,9 @@ Status:
 
 - a gameplay screen esta considerada pronta por enquanto
 - a escolha de parceira por bar ja funciona
-- o foco imediato recomendado agora e blindar o dialogo de `truco + raise` com testes
+- a tela de campanha ja existe antes da entrada no bar
+- a capa do `Bar do Ze Catinga` ja existe em primeira versao
+- o foco imediato recomendado agora e continuar a capa do bar
 
 ### Truco e dialogos
 
@@ -64,11 +66,12 @@ Estado atual:
 - conselho da parceira ao humano ja existe
 - a leitura do humano pesa na decisao final da parceira
 - a regra da `escalada vigente` para `DESCE!/TOMA!` foi consolidada
+- a parceira nao consulta novamente o humano quando ela iniciou a escalada ou ja recebeu respaldo antes
 
 Ponto critico:
 
-- esse bloco ainda sofre risco alto de regressao
-- o historico recente mostrou varios edge cases em baloes e falas
+- manter a cobertura de testes antes de mexer de novo no fluxo de dialogo
+- qualquer ajuste novo em `truco + raise` deve vir com teste
 
 ### Selecao de parceira
 
@@ -83,39 +86,52 @@ Pendencia principal:
 
 - UX e narrativa da escolha ainda estao simples demais
 
+### Capa do Bar do Ze Catinga
+
+Estado atual:
+
+- fluxo `COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo` ja esta implementado
+- assets do Ze Catinga estao em `src/assets/venues/ze-catinga/`
+- a capa usa fundo, dono do bar, lousa, HUD de estatisticas, adversarios e placa `ENTRAR NO BAR`
+- coluna esquerda esta aceitavel por enquanto
+- coluna central ja mostra informacoes do bar e adversarios
+- coluna direita ja mostra estatisticas e CTA
+
+Pendencias principais:
+
+- refinar o HUD de estatisticas da coluna direita
+- fazer `Dificuldade do desafio` aparecer abaixo dos adversarios
+- compactar a coluna central sem reduzir demais a leitura
+- garantir que o texto da lousa do dono caiba dentro da placa
+- garantir que `ENTRAR NO BAR` caiba dentro da placa
+- estabilizar o layout interno para variar menos quando a janela do navegador muda
+
 ## Proximo foco recomendado
 
 ### Opcao principal
 
-- implementar testes unitarios ou reforcar os existentes para os fluxos de `truco + raise`
+- continuar a tela de capa do `Bar do Ze Catinga`
 
-### Casos que os testes devem cobrir primeiro
+### Itens para atacar primeiro
 
-- `TRUCO!/SEIS!/NOVE!/DOZE!` sendo falados por quem propoe o valor
-- `DESCE!` versus `TOMA!` conforme a regra da escalada vigente
-- reset da escalada vigente quando a jogada de cartas retoma
-- `TO FORA!` em corrida
-- consulta da parceira ao humano
-- conselho da parceira para o humano
-- peso real das respostas:
-  - `BORA!`
-  - `CE QUE SABE!`
-  - `MELHOR CORRER!`
-- ordem e emissor correto dos baloes
-
-### Opcao seguinte, depois dos testes
-
-- fechar a UX da escolha de parceira com mais contexto do bar
-- deixar a entrada na partida mais narrativa
-- apresentar melhor quem sao os adversarios fixos do bar
+- HUD de estatisticas do bar:
+  - melhorar proporcao
+  - ajustar hierarquia dos numeros
+  - manter dentro da coluna direita
+- dificuldade do desafio:
+  - aparecer abaixo dos nomes dos adversarios
+  - caber dentro do painel central
+  - usar os marcadores de garrafa sem corte
+- botao `ENTRAR NO BAR`:
+  - texto deve ficar contido na placa
+  - permitir quebra em duas linhas quando necessario
+- estabilidade da moldura:
+  - reduzir uso de `vw` dentro da capa
+  - preferir blocos fixos/controlados dentro da viewport da moldura
 
 ### Opcao seguinte depois disso
 
-- estabilizar a UX do truco:
-  - mensagem de status
-  - clareza visual dos botoes
-  - baloes mais intencionais
-  - validacao dos edge cases restantes
+- polir a capa final do Ze Catinga
 
 ### Opcao seguinte depois disso
 
@@ -126,8 +142,10 @@ Pendencia principal:
 
 ## Pendencias abertas
 
-- blindar o dialogo de truco com testes unitarios
-- consolidar de vez os casos de `DESCE!/TOMA!/TO FORA!`
+- continuar a capa do `Bar do Ze Catinga`
+- refinar HUD de estatisticas do bar
+- fazer a dificuldade do desafio aparecer abaixo dos adversarios
+- estabilizar layout da capa contra mudancas de tamanho da janela
 - fechar visual da tela de selecao de parceira
 - deixar o fluxo de campeonatos mais claro e solido:
   - cards por etapa com status visual
@@ -161,13 +179,21 @@ Antes de iniciar qualquer nova frente em um chat novo:
 
 No proximo chat, comecar por:
 
-- criar ou reforcar testes unitarios para os fluxos de dialogo de `truco + raise`
+- continuar a tela de capa do `Bar do Ze Catinga`
 
-Depois disso, seguir para:
+Contexto para o proximo chat:
 
-- UX da escolha de parceira com contexto do bar
-- estabilizacao visual/UX do truco
-- identidade de campanha dos bares
+- a capa ja esta implementada em primeira versao
+- arquivos principais:
+  - `src/app/AppSections.tsx`
+  - `src/app/useGameSession.ts`
+  - `src/App.tsx`
+  - `src/assets/venues/ze-catinga/`
+- a coluna esquerda esta boa o suficiente por enquanto
+- o HUD de estatisticas da coluna direita ainda precisa de refinamento
+- `Dificuldade do desafio` nao esta aparecendo de forma confiavel abaixo dos adversarios
+- o texto de `ENTRAR NO BAR` e a frase da lousa precisam continuar protegidos contra estouro
+- o layout interno deve variar menos quando o tamanho da janela do navegador muda
 
 Importante:
 

@@ -20,6 +20,8 @@ Hoje o projeto ja possui:
 - engine funcional para Truco Mineiro e Truco Paulista
 - fluxo jogavel com humano + parceira IA + dupla adversaria IA
 - progressao de campanha por bares e circuitos
+- tela de campanha antes do bar escolhido
+- capa autoral do bar antes da partida
 - gameplay principal integrada dentro da tela do celular
 - mesa 3D/2.5D estilizada com cartas animadas
 - HUD lateral esquerda e direita bem avancadas
@@ -29,6 +31,7 @@ Hoje o projeto ja possui:
 - parceira escolhida persistida por bar
 - dois primeiros bares com adversarios fixos
 - fluxo de consulta/conselho da parceira no truco ja implementado
+- primeira versao da capa do `Bar do Ze Catinga` com assets proprios
 
 ## Arquitetura que deve ser preservada
 
@@ -80,10 +83,11 @@ Arquivos principais:
 ## Marco atual
 
 - a gameplay screen esta tratada como pronta por enquanto
-- o foco principal saiu do polimento do gameplay e foi para:
-  - selecao de parceira
-  - fluxo de campanha por bar
-  - estabilidade do dialogo de `truco + raise`
+- o foco principal saiu do polimento do gameplay e esta na capa do bar:
+  - tela de campanha
+  - capa do `Bar do Ze Catinga`
+  - selecao de parceira depois da capa, se necessario
+  - entrada na partida
 
 ## Estado atual da gameplay screen
 
@@ -231,8 +235,58 @@ Estado:
 - funcional no fluxo real
 - ainda precisa de:
   - acabamento visual fino
-  - contexto do bar antes da escolha
+  - refinamento da capa do bar
   - transicao mais narrativa entre escolha e partida
+
+## Fluxo atual antes da partida
+
+Fluxo desejado e implementado parcialmente:
+
+1. tela inicial com `COMEÇAR`
+2. tela de campanha com os desafios
+3. capa do bar selecionado
+4. escolha de parceira, caso o bar ainda nao tenha parceira salva
+5. jogo
+
+Observacoes:
+
+- a capa do bar nao deve falar da campanha inteira
+- a capa deve falar apenas daquele bar
+- o `Bar do Ze Catinga` ja possui uma primeira capa autoral
+- outros bares ainda podem cair em fallback generico
+
+### Capa do Bar do Ze Catinga
+
+Arquivos principais:
+
+- `src/app/AppSections.tsx`
+- `src/app/useGameSession.ts`
+- `src/App.tsx`
+- `src/assets/venues/ze-catinga/`
+
+Assets atuais:
+
+- `background.png`
+- `host-ze-catinga.png`
+- `host-quote-board.png`
+- `panel-dark-vertical.png`
+- `cta-plaque.png`
+- `name-strip.png`
+- `icon-victory.png`
+- `icon-defeat.png`
+- `icon-accuracy.png`
+- `difficulty-bottle.png`
+- `divider-ornament.png`
+
+Estado visual atual:
+
+- coluna esquerda esta aceitavel por enquanto
+- coluna central ja mostra nome do bar, endereco, descricao e adversarios
+- coluna direita ja mostra estatisticas e botao de entrada
+- o HUD de estatisticas ainda precisa de refinamento
+- `Dificuldade do desafio` ainda nao esta aparecendo de forma confiavel
+- a placa `ENTRAR NO BAR` e a lousa do dono precisam continuar protegidas contra estouro de texto
+- o layout interno da capa ainda precisa ficar menos sensivel ao tamanho da janela do navegador
 
 ## Campanha e bares atuais mais importantes
 

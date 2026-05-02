@@ -74,6 +74,8 @@ type MenuScreen = "start" | "journey-intro" | "character-select" | "venue-intro"
 interface MatchResultScreenState {
   hostLine: string
   outcome: "win" | "loss"
+  progressionText?: string
+  progressionTitle?: string
   title: string
   subtitle: string
   venueName: string
@@ -85,6 +87,7 @@ interface DebugVenueOption {
 }
 
 type InGameConfirmationIntent = "swap-partner" | "exit-match"
+type CharacterSelectReturnScreen = "journey-intro" | "venue-intro"
 
 interface InGameConfirmationState {
   intent: InGameConfirmationIntent
@@ -113,6 +116,9 @@ export function useGameSession() {
   const [matchResultScreen, setMatchResultScreen] = useState<MatchResultScreenState | null>(null)
   const [inGameContextMenuOpen, setInGameContextMenuOpen] = useState(false)
   const [inGameConfirmation, setInGameConfirmation] = useState<InGameConfirmationState | null>(null)
+  const [characterSelectReturnScreen, setCharacterSelectReturnScreen] =
+    useState<CharacterSelectReturnScreen>("journey-intro")
+  const [launchVenueAfterCharacterSelect, setLaunchVenueAfterCharacterSelect] = useState(false)
   const speechBubbleTimeoutRef = useRef<number | null>(null)
   const followUpSpeechTimeoutRef = useRef<number | null>(null)
   const partnerAdviceTimeoutRef = useRef<number | null>(null)
@@ -353,7 +359,14 @@ export function useGameSession() {
   }, [currentCampaignVenueId, currentVenuePartnerCharacterId, selectableCharacters])
 
   useEffect(() => {
-    if (handState || matchState || !currentCampaignVenue || currentVenuePartnerCharacterId) {
+    if (
+      handState ||
+      matchState ||
+      !currentCampaignVenue ||
+      currentVenuePartnerCharacterId ||
+      menuScreen === "match-result" ||
+      !!matchResultScreen
+    ) {
       return
     }
 
@@ -362,7 +375,9 @@ export function useGameSession() {
     currentCampaignVenue,
     currentVenuePartnerCharacterId,
     handState,
+    matchResultScreen,
     matchState,
+    menuScreen,
   ])
 
   const syncLogs = useCallback(() => {
@@ -485,7 +500,7 @@ export function useGameSession() {
       if (nextMatchState?.finished) {
         const finalScore = nextMatchState.score
         const resultVenueName = sessionDebugVenue?.name ?? currentCampaignVenue?.name ?? "o bar"
-        const matchResultState: MatchResultScreenState =
+        let matchResultState: MatchResultScreenState =
           nextState.winner === "A"
             ? {
                 outcome: "win",
@@ -515,6 +530,40 @@ export function useGameSession() {
           setPlayerProfile(resolution.profile)
           setEventMessage(getCampaignWinMessage(finalScore, resolution))
           setTrucoMessage(getCampaignTrucoSummary(resolution))
+
+          if (resolution.campaignCompleted) {
+            matchResultState = {
+              ...matchResultState,
+              title: "Campanha concluída",
+              subtitle: `Depois do ${finalScore.A} a ${finalScore.B}, vocês fecharam a campanha disponível inteira e não deixaram dúvida no ${resultVenueName}.`,
+              progressionTitle: "Jornada encerrada",
+              progressionText: "Toda a campanha disponível foi concluída. Agora dá para revisitar os bares ou esperar os próximos desafios.",
+            }
+          } else if (resolution.clearedStage && resolution.unlockedStage) {
+            matchResultState = {
+              ...matchResultState,
+              title: `${resolution.clearedStage.name} concluída`,
+              subtitle: `Depois do ${finalScore.A} a ${finalScore.B}, vocês fecharam ${resultVenueName} e abriram caminho para ${resolution.unlockedStage.name}.`,
+              progressionTitle: "Nova fase liberada",
+              progressionText:
+                resolution.unlockedStage.cutsceneIntro ??
+                `A próxima etapa agora é ${resolution.unlockedStage.name}.`,
+            }
+          } else if (resolution.clearedVenue && resolution.currentVenue) {
+            matchResultState = {
+              ...matchResultState,
+              title: `${resolution.clearedVenue.name} conquistado`,
+              subtitle: `Depois do ${finalScore.A} a ${finalScore.B}, vocês encerraram a fase deste bar e avançaram no circuito.`,
+              progressionTitle: "Próximo bar liberado",
+              progressionText: `Vocês passaram de fase. O próximo destino agora é ${resolution.currentVenue.name}.`,
+            }
+          } else if (resolution.clearedVenue) {
+            matchResultState = {
+              ...matchResultState,
+              progressionTitle: "Bar concluído",
+              progressionText: `Vocês concluíram ${resolution.clearedVenue.name} e seguiram adiante na campanha.`,
+            }
+          }
         } else {
           const resolution = applyCampaignLoss(playerProfile, CAMPAIGN_STAGES)
           setPlayerProfile(resolution.profile)
@@ -547,18 +596,13 @@ export function useGameSession() {
     syncLogs,
   ])
 
-  function handleLaunchVenue(venueId?: string) {
-    const selectedVenueId = venueId ?? currentCampaignVenue?.id ?? null
-    const targetVenue = selectedVenueId ? debugVenueLookup.get(selectedVenueId)?.venue ?? null : null
-    const actualVenueId = actualCampaignVenue?.id ?? null
-
-    if (!targetVenue) return
-
+  function startVenueMatch(targetVenue: CampaignVenue) {
     clearLogs()
 
     const firstPlayerId = 1
     const variantToStart = targetVenue.variant
     const state = createHandState(variantToStart, firstPlayerId)
+    const actualVenueId = actualCampaignVenue?.id ?? null
     const shouldUseSessionDebugVenue =
       DEBUG_MODE && (!!debugVenueId || targetVenue.id !== actualVenueId)
 
@@ -567,11 +611,32 @@ export function useGameSession() {
     setSessionDebugVenueId(shouldUseSessionDebugVenue ? targetVenue.id : null)
     setMenuScreen("start")
     setInGameContextMenuOpen(false)
+    setInGameConfirmation(null)
+    setLaunchVenueAfterCharacterSelect(false)
+    setCharacterSelectReturnScreen("journey-intro")
 
     applyHandState(state, {
       eventMessage: `Partida iniciada em ${targetVenue.name}.`,
       trucoMessage: targetVenue.entryNarrative,
     })
+  }
+
+  function handleLaunchVenue(venueId?: string) {
+    const selectedVenueId = venueId ?? currentCampaignVenue?.id ?? null
+    const targetVenue = selectedVenueId ? debugVenueLookup.get(selectedVenueId)?.venue ?? null : null
+    const actualVenueId = actualCampaignVenue?.id ?? null
+
+    if (!targetVenue) return
+
+    const shouldUseSessionDebugVenue =
+      DEBUG_MODE && (!!debugVenueId || targetVenue.id !== actualVenueId)
+
+    setSessionDebugVenueId(shouldUseSessionDebugVenue ? targetVenue.id : null)
+    setMenuScreen("venue-intro")
+    setInGameContextMenuOpen(false)
+    setInGameConfirmation(null)
+    setLaunchVenueAfterCharacterSelect(false)
+    setCharacterSelectReturnScreen("journey-intro")
   }
 
   function handleReturnToJourneyFlow() {
@@ -588,13 +653,22 @@ export function useGameSession() {
 
   function handleStartHand() {
     if (!currentCampaignVenue) return
+
+    setMenuScreen("journey-intro")
+  }
+
+  function handleEnterVenueFromIntro() {
+    if (!currentCampaignVenue) return
+
     if (!currentVenuePartnerCharacterId) {
       setSelectedCharacterId(selectableCharacters[0]?.id ?? "nega-catimbo")
+      setCharacterSelectReturnScreen("venue-intro")
+      setLaunchVenueAfterCharacterSelect(true)
       setMenuScreen("character-select")
       return
     }
 
-    setMenuScreen("journey-intro")
+    startVenueMatch(currentCampaignVenue)
   }
 
   function handleResetCampaign() {
@@ -943,6 +1017,8 @@ export function useGameSession() {
     setInGameContextMenuOpen(false)
     setInGameConfirmation(null)
     setSelectedCharacterId(currentVenuePartnerCharacterId ?? selectableCharacters[0]?.id ?? "nega-catimbo")
+    setCharacterSelectReturnScreen("venue-intro")
+    setLaunchVenueAfterCharacterSelect(false)
     setMenuScreen("character-select")
   }
 
@@ -962,6 +1038,8 @@ export function useGameSession() {
   function handleContinueToCharacterSelect() {
     setInGameContextMenuOpen(false)
     setInGameConfirmation(null)
+    setCharacterSelectReturnScreen("journey-intro")
+    setLaunchVenueAfterCharacterSelect(false)
     setMenuScreen("character-select")
   }
 
@@ -969,7 +1047,8 @@ export function useGameSession() {
     setInGameContextMenuOpen(false)
     setInGameConfirmation(null)
     setSelectedCharacterId(currentVenuePartnerCharacterId ?? selectableCharacters[0]?.id ?? "nega-catimbo")
-    setMenuScreen("journey-intro")
+    setLaunchVenueAfterCharacterSelect(false)
+    setMenuScreen(characterSelectReturnScreen)
   }
 
   function handleConfirmCharacterSelect() {
@@ -987,7 +1066,13 @@ export function useGameSession() {
     }))
     setInGameContextMenuOpen(false)
     setInGameConfirmation(null)
-    setMenuScreen("journey-intro")
+
+    if (launchVenueAfterCharacterSelect && currentCampaignVenue) {
+      startVenueMatch(currentCampaignVenue)
+      return
+    }
+
+    setMenuScreen(characterSelectReturnScreen)
   }
 
   function handleSelectNextCharacter() {
@@ -1058,6 +1143,8 @@ export function useGameSession() {
       setInGameContextMenuOpen(false)
       setInGameConfirmation(null)
       setSelectedCharacterId(currentVenuePartnerCharacterId ?? selectableCharacters[0]?.id ?? "nega-catimbo")
+      setCharacterSelectReturnScreen("journey-intro")
+      setLaunchVenueAfterCharacterSelect(false)
       setMenuScreen("character-select")
       return
     }
@@ -1084,6 +1171,7 @@ export function useGameSession() {
     currentCampaignVenue,
     currentTurnLabel,
     currentVenueWins,
+    hasSelectedPartnerForVenue: !!currentVenuePartnerCharacterId,
     debugModeEnabled: DEBUG_MODE,
     debugVenueId,
     debugVenueOptions,
@@ -1099,6 +1187,7 @@ export function useGameSession() {
     handleCloseInGameContextMenu,
     handleConfirmInGameConfirmation,
     handleCopyLogs,
+    handleEnterVenueFromIntro,
     handleExitMatchFromContextMenu,
     handleOpenInGameContextMenu,
     handlePlayCard,

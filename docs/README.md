@@ -52,29 +52,30 @@ Define o pre-plano vivo:
 
 Neste momento, a gameplay screen esta considerada pronta por enquanto.
 
-O foco ativo mudou para:
+O foco ativo mudou para a capa do bar antes da partida:
 
-- tela de selecao de personagens / parceira IA
-- uso do roster em `src/content/characters.ts`
-- continuidade da interface ja iniciada dentro do proprio menu inicial
-- estabilidade do fluxo de dialogo de `truco + raise`
+- fluxo `COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo`
+- primeira capa autoral do `Bar do Ze Catinga`
+- uso de assets proprios em `src/assets/venues/ze-catinga/`
+- refinamento visual do HUD de estatisticas do bar
+- ajuste da area de adversarios e dificuldade do desafio
 
 ## Prioridade imediata para o proximo chat
 
-No proximo chat, comecar por:
+No proximo chat, continuar na capa do `Bar do Ze Catinga`.
 
-- implementar ou reforcar testes unitarios para os fluxos de `truco + raise`
-- cobrir especialmente:
-  - falas `TRUCO!/SEIS!/NOVE!/DOZE!`
-  - falas `DESCE!/TOMA!/TO FORA!`
-  - consultas da parceira
-  - regra da escalada vigente
+Atacar primeiro:
+
+- refinar o HUD de estatisticas do bar na coluna direita
+- fazer `Dificuldade do desafio` aparecer abaixo dos adversarios
+- impedir estouros de texto na lousa do dono e na placa `ENTRAR NO BAR`
+- estabilizar o layout interno para variar menos quando a janela do navegador muda
 
 Depois disso, seguir para:
 
-- UX da escolha de parceira com mais contexto do bar
-- estabilizacao visual/UX do truco
-- identidade narrativa dos bares
+- polimento final da capa do bar
+- reaproveitamento do modelo para outros bares
+- escolha de quais assets novos ficam para bares futuros
 
 ## Regra de continuidade
 

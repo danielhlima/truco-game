@@ -80,6 +80,41 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
   - hierarquia visual
 - Evitar solução por remendo visual quando o problema for asset ruim ou recorte ruim.
 
+## Regras da Capa do Bar
+
+- A capa do bar acontece dentro da mesma moldura de celular em landscape.
+- A capa deve ser uma tela propria, nao uma variacao da gameplay screen.
+- O conteudo interno da capa deve se comportar como composicao fixa dentro da moldura.
+- Evitar fontes e espaçamentos baseados em `vw`, porque isso faz a arte mudar quando a janela do navegador muda.
+- Preferir medidas previsiveis, grid com colunas controladas e blocos com altura definida.
+- A capa do bar fala apenas do bar selecionado, nao da campanha inteira.
+- A tela de campanha e a capa do bar sao etapas diferentes do fluxo.
+
+### Estrutura da Capa do Ze Catinga
+
+- Coluna esquerda:
+  - dono do bar
+  - lousa com frase do dono
+  - nome/role do dono, se houver espaço
+- Coluna central:
+  - eyebrow `Proximo desafio`
+  - nome do bar
+  - endereco
+  - descricao curta
+  - adversarios fixos
+  - dificuldade do desafio abaixo dos adversarios
+- Coluna direita:
+  - HUD de estatisticas do bar
+  - botao `ENTRAR NO BAR`
+
+### Pendencias da Capa do Ze Catinga
+
+- Refinar o HUD de estatisticas da coluna direita.
+- Fazer `Dificuldade do desafio` aparecer sem corte abaixo dos adversarios.
+- Garantir que a lousa do dono nao corte a frase.
+- Garantir que o texto do botao `ENTRAR NO BAR` nunca estoure a placa.
+- Reduzir a variacao visual causada por mudanca no tamanho da janela do navegador.
+
 ## Decisões Já Tomadas
 
 - O jogo deve se resolver dentro da tela do celular.
@@ -93,3 +128,4 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 - Refinar a coluna direita.
 - Refinar a mesa central conforme novos assets chegarem.
 - Fazer polimento responsivo final depois do layout aprovado.
+- Continuar a capa do `Bar do Ze Catinga` antes de expandir para outros bares.
