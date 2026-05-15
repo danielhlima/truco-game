@@ -16,14 +16,10 @@ import statsPanelWoodAsset from "../assets/ui-right/stats-panel-wood-main.png"
 import zeCatingaBackgroundAsset from "../assets/venues/ze-catinga/background.png"
 import zeCatingaHostAsset from "../assets/venues/ze-catinga/host-ze-catinga.png"
 import zeCatingaQuoteBoardAsset from "../assets/venues/ze-catinga/host-quote-board.png"
-import zeCatingaPanelAsset from "../assets/venues/ze-catinga/panel-dark-vertical.png"
 import zeCatingaCtaPlaqueAsset from "../assets/venues/ze-catinga/cta-plaque.png"
-import zeCatingaNameStripAsset from "../assets/venues/ze-catinga/name-strip.png"
-import zeCatingaVictoryIconAsset from "../assets/venues/ze-catinga/icon-victory.png"
-import zeCatingaDefeatIconAsset from "../assets/venues/ze-catinga/icon-defeat.png"
-import zeCatingaAccuracyIconAsset from "../assets/venues/ze-catinga/icon-accuracy.png"
 import zeCatingaDifficultyBottleAsset from "../assets/venues/ze-catinga/difficulty-bottle.png"
 import zeCatingaDividerAsset from "../assets/venues/ze-catinga/divider-ornament.png"
+import zeCatingaStatsPlaqueAsset from "../assets/venues/ze-catinga/stats-plaque-aged-blank.png"
 import type { PlayerProfile } from "../profile/playerProfile"
 import type { PartnerAdvice } from "../ai/trucoDecision"
 import type { TrucoCharacterProfile } from "../content/characters"
@@ -55,20 +51,15 @@ type VenueCoverConfig = {
   hostName: string
   hostRole: string
   hostQuote: string
-  leadEyebrow: string
   leadText: string
   description: string
   backgroundAsset: string
   hostPortraitAsset: string
   quoteBoardAsset: string
-  mainPanelAsset: string
   ctaPlaqueAsset: string
-  nameStripAsset: string
-  iconVictoryAsset: string
-  iconDefeatAsset: string
-  iconAccuracyAsset: string
   difficultyBottleAsset: string
   dividerAsset: string
+  statsPlaqueAsset: string
 }
 
 const VENUE_COVER_CONFIG_BY_ID: Record<string, VenueCoverConfig> = {
@@ -76,20 +67,15 @@ const VENUE_COVER_CONFIG_BY_ID: Record<string, VenueCoverConfig> = {
     hostName: "Zé Catinga",
     hostRole: "Dono do Bar",
     hostQuote: "Aqui dentro, fama não paga dose. Só entra quem aguenta pressão.",
-    leadEyebrow: "Próximo desafio",
     leadText: "Boteco raiz. Cachaça forte, conversa curta e truco valendo a honra.",
     description: "A mesa aqui não compra pose. Ou você aguenta o calor, ou sai pela porta menor.",
     backgroundAsset: zeCatingaBackgroundAsset,
     hostPortraitAsset: zeCatingaHostAsset,
     quoteBoardAsset: zeCatingaQuoteBoardAsset,
-    mainPanelAsset: zeCatingaPanelAsset,
     ctaPlaqueAsset: zeCatingaCtaPlaqueAsset,
-    nameStripAsset: zeCatingaNameStripAsset,
-    iconVictoryAsset: zeCatingaVictoryIconAsset,
-    iconDefeatAsset: zeCatingaDefeatIconAsset,
-    iconAccuracyAsset: zeCatingaAccuracyIconAsset,
     difficultyBottleAsset: zeCatingaDifficultyBottleAsset,
     dividerAsset: zeCatingaDividerAsset,
+    statsPlaqueAsset: zeCatingaStatsPlaqueAsset,
   },
 }
 
@@ -105,7 +91,6 @@ interface ControlsPanelProps {
 
 export function ControlsPanel({
   activeVariant,
-  campaignCompleted: _campaignCompleted,
   variantSelectionDisabled,
   currentCampaignVenue,
   onChangeVariant,
@@ -961,7 +946,6 @@ export function TableSection({
 
 function GameStartScreen({
   activeVariant,
-  campaignCompleted: _campaignCompleted,
   currentCampaignVenue,
   debugModeEnabled,
   debugVenueId,
@@ -1302,7 +1286,6 @@ function MatchResultScreen({
 }
 
 function CharacterSelectionScreen({
-  currentCampaignVenue: _currentCampaignVenue,
   selectedCharacter,
   selectedCharacterIndex,
   selectedPartnerCharacter,
@@ -1480,17 +1463,12 @@ function VenueIntroScreen({
   const coverConfig = currentCampaignVenue
     ? VENUE_COVER_CONFIG_BY_ID[currentCampaignVenue.id]
     : undefined
-  const progressPercent = currentCampaignVenue
-    ? Math.min(100, Math.round((currentVenueWins / currentCampaignVenue.matchesToClear) * 100))
-    : 0
-  const remainingWins = currentCampaignVenue
-    ? Math.max(0, currentCampaignVenue.matchesToClear - currentVenueWins)
-    : 0
   const ctaLabel = hasSelectedPartnerForVenue ? "ENTRAR NO BAR" : "ESCOLHER PARCEIRA"
   const overallMatches = playerProfile.campaign.wins + playerProfile.campaign.losses
   const overallWinRate = overallMatches > 0
     ? Math.round((playerProfile.campaign.wins / overallMatches) * 100)
     : 0
+  const challengeDifficulty = currentCampaignVenue?.difficulty.aiLevel ?? 1
 
   if (!coverConfig) {
     const participants = [
@@ -1588,6 +1566,7 @@ function VenueIntroScreen({
   return (
     <div
       style={{
+        width: "100%",
         height: "100%",
         display: "grid",
         gridTemplateRows: "minmax(0, 1fr)",
@@ -1604,8 +1583,8 @@ function VenueIntroScreen({
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "246px minmax(0, 1fr) 290px",
-          gap: 14,
+          gridTemplateColumns: "220px minmax(340px, 386px) minmax(302px, 1fr)",
+          gap: 12,
           height: "100%",
           minHeight: 0,
           alignItems: "stretch",
@@ -1614,15 +1593,16 @@ function VenueIntroScreen({
         <div
           style={{
             display: "grid",
-            gridTemplateRows: "minmax(0, 1fr) auto auto",
+            gridTemplateRows: "minmax(190px, 1fr) 128px auto",
             gap: 8,
             alignItems: "end",
+            minHeight: 0,
           }}
         >
           <div
             style={{
               position: "relative",
-              minHeight: 286,
+              minHeight: 0,
               display: "flex",
               alignItems: "flex-end",
               justifyContent: "center",
@@ -1646,7 +1626,7 @@ function VenueIntroScreen({
           <div
             style={{
               position: "relative",
-              minHeight: 136,
+              minHeight: 128,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -1671,14 +1651,15 @@ function VenueIntroScreen({
             <div
               style={{
                 position: "relative",
-                maxWidth: "58%",
+                maxWidth: "66%",
                 color: "#efe0be",
                 fontFamily: "\"Georgia\", serif",
-                fontSize: 15,
-                lineHeight: 1.08,
+                fontSize: 13,
+                lineHeight: 1.12,
                 fontStyle: "italic",
+                overflowWrap: "break-word",
                 textShadow: "0 2px 14px rgba(0,0,0,0.5)",
-                transform: "translateY(6px)",
+                transform: "translateY(4px)",
               }}
             >
               “{coverConfig.hostQuote}”
@@ -1689,7 +1670,7 @@ function VenueIntroScreen({
             <div
               style={{
                 fontFamily: "\"Georgia\", serif",
-                fontSize: 28,
+                fontSize: 26,
                 fontWeight: 700,
                 letterSpacing: "0.03em",
               }}
@@ -1700,7 +1681,7 @@ function VenueIntroScreen({
             style={{
               marginTop: 4,
               color: "rgba(245, 219, 165, 0.9)",
-              fontSize: 14,
+              fontSize: 12,
               letterSpacing: "0.14em",
               textTransform: "uppercase",
             }}
@@ -1713,10 +1694,11 @@ function VenueIntroScreen({
         <div
           style={{
             minHeight: 0,
-            padding: "14px 18px 8px",
+            padding: "10px 16px 12px",
             display: "grid",
-            gridTemplateRows: "auto auto auto auto auto auto",
-            gap: 3,
+            gridTemplateRows: "auto auto auto auto auto",
+            alignContent: "start",
+            gap: 5,
             boxSizing: "border-box",
             background: "linear-gradient(180deg, rgba(19,11,8,0.92) 0%, rgba(10,6,4,0.94) 100%)",
             border: "1px solid rgba(155, 110, 54, 0.56)",
@@ -1724,19 +1706,6 @@ function VenueIntroScreen({
             borderRadius: 22,
           }}
         >
-          <div style={{ position: "relative", textAlign: "center" }}>
-            <div
-              style={{
-                color: "#e8c780",
-                fontSize: 13,
-                letterSpacing: "0.32em",
-                textTransform: "uppercase",
-              }}
-            >
-              {coverConfig.leadEyebrow}
-            </div>
-          </div>
-
           <div style={{ position: "relative", textAlign: "center" }}>
             <img
               src={coverConfig.dividerAsset}
@@ -1753,10 +1722,10 @@ function VenueIntroScreen({
             />
             <h2
               style={{
-                margin: "5px 0 5px",
+                margin: "3px 0 5px",
                 fontFamily: "\"Georgia\", serif",
-                fontSize: 36,
-                lineHeight: 0.96,
+                fontSize: 32,
+                lineHeight: 0.98,
                 color: "#e0b25d",
                 textShadow: "0 2px 16px rgba(0,0,0,0.28)",
               }}
@@ -1766,7 +1735,8 @@ function VenueIntroScreen({
             <div
               style={{
                 color: "#f2d9a7",
-                fontSize: 15,
+                fontSize: 13,
+                lineHeight: 1.15,
               }}
             >
               {currentCampaignVenue?.districtLabel ?? "Local ainda não definido"}
@@ -1790,18 +1760,18 @@ function VenueIntroScreen({
           </div>
 
           <div
-              style={{
-                position: "relative",
-                textAlign: "center",
-                padding: "0 14px",
-              }}
-            >
+            style={{
+              position: "relative",
+              textAlign: "center",
+              padding: "0 8px",
+            }}
+          >
             <p
               style={{
                 margin: 0,
                 fontFamily: "\"Georgia\", serif",
-                fontSize: 16,
-                lineHeight: 1.06,
+                fontSize: 15,
+                lineHeight: 1.08,
                 color: "#f0d7a0",
               }}
             >
@@ -1811,8 +1781,8 @@ function VenueIntroScreen({
               style={{
                 margin: "5px 0 0",
                 fontFamily: "\"Georgia\", serif",
-                fontSize: 14,
-                lineHeight: 1.05,
+                fontSize: 13,
+                lineHeight: 1.08,
                 color: "rgba(238, 220, 180, 0.9)",
               }}
             >
@@ -1821,18 +1791,19 @@ function VenueIntroScreen({
           </div>
 
           <div
-              style={{
-                position: "relative",
-                display: "grid",
-                gap: 6,
-                alignContent: "start",
-              }}
-            >
+            style={{
+              position: "relative",
+              display: "grid",
+              gap: 5,
+              alignContent: "start",
+              minHeight: 132,
+            }}
+          >
             <div
               style={{
                 color: "#d6aa57",
-                letterSpacing: "0.22em",
-                fontSize: 11,
+                letterSpacing: "0.18em",
+                fontSize: 10,
                 textTransform: "uppercase",
                 textAlign: "center",
               }}
@@ -1844,7 +1815,7 @@ function VenueIntroScreen({
               style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-                gap: 14,
+                gap: 10,
               }}
             >
               {opponentCharacters.map((character) => (
@@ -1860,7 +1831,7 @@ function VenueIntroScreen({
                   <div
                     style={{
                       width: "100%",
-                      maxWidth: 102,
+                      maxWidth: 86,
                       aspectRatio: "0.84",
                       borderRadius: 12,
                       overflow: "hidden",
@@ -1884,7 +1855,7 @@ function VenueIntroScreen({
                       color: "#f0dcc0",
                       fontFamily: "\"Georgia\", serif",
                       fontWeight: 700,
-                      fontSize: 13,
+                      fontSize: 12,
                       lineHeight: 1.1,
                     }}
                   >
@@ -1904,20 +1875,21 @@ function VenueIntroScreen({
               gap: 2,
               justifyItems: "center",
               alignContent: "start",
-              marginTop: "-2px",
+              minHeight: 92,
             }}
           >
             <div
               style={{
                 color: "#c69643",
-                letterSpacing: "0.22em",
-                fontSize: 10,
+                letterSpacing: "0.18em",
+                fontSize: 12,
                 textTransform: "uppercase",
+                textAlign: "center",
               }}
             >
               Dificuldade do desafio
             </div>
-            <div style={{ display: "flex", gap: 5, flexWrap: "wrap", justifyContent: "center" }}>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
               {Array.from({ length: 5 }).map((_, index) => (
                 <img
                   key={`difficulty-${index}`}
@@ -1925,13 +1897,13 @@ function VenueIntroScreen({
                   alt=""
                   aria-hidden="true"
                   style={{
-                    width: 13,
-                    height: 20,
+                    width: 32,
+                    height: 52,
                     objectFit: "contain",
                     mixBlendMode: "screen",
-                    opacity: index < (currentCampaignVenue?.difficulty.aiLevel ?? 1) ? 0.98 : 0.22,
-                    filter: index < (currentCampaignVenue?.difficulty.aiLevel ?? 1)
-                      ? "drop-shadow(0 4px 10px rgba(237,178,72,0.25))"
+                    opacity: index < challengeDifficulty ? 0.98 : 0.3,
+                    filter: index < challengeDifficulty
+                      ? "drop-shadow(0 6px 14px rgba(237,178,72,0.34))"
                       : "grayscale(1)",
                   }}
                 />
@@ -1943,100 +1915,146 @@ function VenueIntroScreen({
         <div
           style={{
             display: "grid",
-            gridTemplateRows: "auto auto",
-            alignContent: "start",
-            gap: 10,
+            gridTemplateRows: "auto 100px",
+            alignContent: "center",
+            justifyItems: "center",
+            gap: 14,
+            height: "100%",
             minHeight: 0,
           }}
         >
           <div
             style={{
-              borderRadius: 22,
-              padding: "12px 14px",
-              background:
-                "linear-gradient(180deg, rgba(233, 208, 162, 0.92) 0%, rgba(186, 147, 92, 0.94) 100%)",
+              position: "relative",
+              width: "min(96%, 302px)",
+              aspectRatio: "1 / 1.08",
               color: "#2b1608",
-              boxShadow: "0 20px 34px rgba(0,0,0,0.28), inset 0 0 0 2px rgba(121,72,29,0.32)",
-              display: "grid",
-              alignContent: "start",
-              gap: 8,
+              filter: "drop-shadow(0 20px 28px rgba(0,0,0,0.32))",
+              minWidth: 0,
             }}
           >
+            <img
+              src={coverConfig.statsPlaqueAsset}
+              alt=""
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "fill",
+                pointerEvents: "none",
+              }}
+            />
             <div
               style={{
+                position: "absolute",
+                top: "10%",
+                left: "12%",
+                right: "12%",
                 textAlign: "center",
                 fontFamily: "\"Georgia\", serif",
-                fontSize: 30,
+                fontSize: 20,
                 fontWeight: 700,
-                lineHeight: 1.05,
+                lineHeight: 0.95,
+                color: "#2a1307",
+                whiteSpace: "nowrap",
+                textShadow: "0 1px 0 rgba(248,218,151,0.32)",
               }}
             >
               Seu histórico aqui
             </div>
 
-            {[
-              {
-                icon: coverConfig.iconVictoryAsset,
-                label: "Vitórias",
-                value: String(currentVenueWins),
-                accent: "#9a6b1f",
-              },
-              {
-                icon: coverConfig.iconDefeatAsset,
-                label: "Faltam",
-                value: String(remainingWins),
-                accent: "#7a2318",
-              },
-              {
-                icon: coverConfig.iconAccuracyAsset,
-                label: "Progresso",
-                value: `${progressPercent}%`,
-                accent: "#8a5b1f",
-              },
-            ].map((item) => (
-              <div
-                key={item.label}
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "minmax(0, 1fr) auto",
-                  alignItems: "center",
-                  gap: 4,
-                  paddingBottom: 2,
-                  borderBottom: "1px solid rgba(95,57,24,0.24)",
-                }}
-              >
+            <div
+              style={{
+                position: "absolute",
+                top: "28%",
+                left: "14%",
+                right: "14%",
+                bottom: "18%",
+                display: "grid",
+                gridTemplateRows: "repeat(3, minmax(0, 1fr))",
+                gap: 3,
+              }}
+            >
+              {[
+                {
+                  label: "VITÓRIAS",
+                  value: String(playerProfile.campaign.wins),
+                  accent: "#75480f",
+                },
+                {
+                  label: "DERROTAS",
+                  value: String(playerProfile.campaign.losses),
+                  accent: "#762218",
+                },
+                {
+                  label: "APROVEITAMENTO",
+                  value: `${overallWinRate}%`,
+                  accent: "#704611",
+                },
+              ].map((item) => (
                 <div
+                  key={item.label}
                   style={{
-                    fontSize: 22,
-                    fontWeight: 700,
-                    fontFamily: "\"Georgia\", serif",
-                  }}
-                  >
-                  {item.label}
-                </div>
-                <div
-                  style={{
-                    fontSize: 34,
-                    fontWeight: 700,
-                    lineHeight: 1,
-                    color: item.accent,
-                    fontFamily: "\"Georgia\", serif",
+                    display: "grid",
+                    gridTemplateColumns: "minmax(0, 1fr) minmax(48px, auto)",
+                    alignItems: "center",
+                    gap: 10,
+                    minHeight: 0,
+                    padding: "0 12px",
+                    borderBottom: item.label === "APROVEITAMENTO"
+                      ? "none"
+                      : "1px solid rgba(83, 45, 15, 0.22)",
                   }}
                 >
-                  {item.value}
+                  <div
+                    style={{
+                      fontSize: item.label === "APROVEITAMENTO" ? 11 : 16,
+                      fontWeight: 700,
+                      fontFamily: "\"Georgia\", serif",
+                      lineHeight: 1,
+                      letterSpacing: item.label === "APROVEITAMENTO" ? 0 : "0.02em",
+                      color: "#2a1307",
+                      textAlign: "center",
+                      whiteSpace: "nowrap",
+                      textShadow: "0 1px 0 rgba(251,225,169,0.32)",
+                    }}
+                    >
+                    {item.label}
+                  </div>
+                  <div
+                    style={{
+                      minWidth: 0,
+                      textAlign: "right",
+                      fontSize: item.value.length >= 3 ? 26 : 34,
+                      fontWeight: 700,
+                      lineHeight: 0.95,
+                      color: item.accent,
+                      fontFamily: "\"Georgia\", serif",
+                      textShadow: "0 1px 0 rgba(251,225,169,0.25)",
+                    }}
+                  >
+                    {item.value}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
 
             <div
               style={{
-                fontSize: 16,
+                position: "absolute",
+                left: "13%",
+                right: "13%",
+                bottom: "7.6%",
+                fontSize: 12,
                 lineHeight: 1,
-                color: "rgba(57, 31, 12, 0.82)",
+                color: "rgba(47, 24, 9, 0.72)",
                 textAlign: "center",
+                fontWeight: 700,
               }}
             >
-              Geral: {playerProfile.campaign.wins}V · {playerProfile.campaign.losses}D · {overallWinRate}%.
+              Neste bar: {currentVenueWins}/{currentCampaignVenue?.matchesToClear ?? 0} vitórias
             </div>
           </div>
 
@@ -2044,8 +2062,8 @@ function VenueIntroScreen({
             onClick={onStart}
             style={{
               position: "relative",
-              width: "100%",
-              minHeight: 82,
+              width: "min(96%, 302px)",
+              minHeight: 100,
               padding: "10px 12px",
               border: "none",
               background: "transparent",
@@ -2053,11 +2071,14 @@ function VenueIntroScreen({
               color: "#f3d08a",
               fontFamily: "\"Georgia\", serif",
               fontWeight: 700,
-              fontSize: 16,
-              lineHeight: 0.92,
+              fontSize: 15,
+              lineHeight: 0.98,
               letterSpacing: "0.03em",
               textShadow: "0 3px 10px rgba(0,0,0,0.4)",
               alignSelf: "start",
+              display: "grid",
+              placeItems: "center",
+              boxSizing: "border-box",
             }}
           >
             <img
@@ -2077,10 +2098,11 @@ function VenueIntroScreen({
               style={{
                 position: "relative",
                 display: "inline-block",
-                width: 118,
-                maxWidth: "54%",
+                width: 132,
+                maxWidth: "58%",
                 textAlign: "center",
                 whiteSpace: "normal",
+                overflowWrap: "break-word",
               }}
             >
               {ctaLabel}

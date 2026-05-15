@@ -269,12 +269,8 @@ Assets atuais:
 - `background.png`
 - `host-ze-catinga.png`
 - `host-quote-board.png`
-- `panel-dark-vertical.png`
 - `cta-plaque.png`
-- `name-strip.png`
-- `icon-victory.png`
-- `icon-defeat.png`
-- `icon-accuracy.png`
+- `stats-plaque-aged-blank.png`
 - `difficulty-bottle.png`
 - `divider-ornament.png`
 
