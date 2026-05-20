@@ -32,6 +32,7 @@ Hoje o projeto ja possui:
 - dois primeiros bares com adversarios fixos
 - fluxo de consulta/conselho da parceira no truco ja implementado
 - primeira versao da capa do `Bar do Ze Catinga` com assets proprios
+- scorepad da coluna esquerda corrigido e validado visualmente na gameplay
 
 ## Arquitetura que deve ser preservada
 
@@ -82,12 +83,20 @@ Arquivos principais:
 
 ## Marco atual
 
-- a gameplay screen esta tratada como pronta por enquanto
-- o foco principal saiu do polimento do gameplay e esta na capa do bar:
+- a capa do `Bar do Ze Catinga` foi refinada e salva no Git
+- o scorepad da coluna esquerda foi corrigido sem trocar o asset do caderno
+- o fluxo antes da partida esta preservado:
   - tela de campanha
   - capa do `Bar do Ze Catinga`
   - selecao de parceira depois da capa, se necessario
   - entrada na partida
+- a validacao visual confirmou o fluxo real ate a gameplay:
+  - campanha
+  - capa do bar
+  - entrada no jogo
+  - scorepad renderizado sem sobreposicao entre labels e numeros
+- `npm run build` passou depois do ajuste do scorepad
+- o proximo foco recomendado continua na gameplay screen, agora para estabilizar a escala responsiva da moldura de celular
 
 ## Estado atual da gameplay screen
 
@@ -109,7 +118,9 @@ Importante:
 - as areas sao separadas visualmente, mas ainda compartilham o mesmo layout mestre
 - pequenas alteracoes de proporcao ainda podem afetar outros blocos
 - o scorepad foi parcialmente blindado para responder mais ao proprio card do que ao viewport geral
-- evitar reabrir retrabalho estrutural da gameplay sem motivo real
+- foi observado em video que redimensionar a janela do navegador ainda pode baguncar a composicao dentro da tela de celular
+- o problema provavel e que a gameplay ainda reflowa como pagina responsiva, em vez de se comportar como stage fixo escalado
+- evitar reabrir retrabalho estrutural da gameplay sem motivo real, mas estabilizar a escala da moldura virou a prioridade visual
 
 ### Coluna esquerda
 
@@ -118,6 +129,11 @@ Estado atual:
 - bloco compacto dos 4 jogadores
 - avatares ampliados recentemente
 - scorepad em formato de caderno consolidado
+- scorepad com grid interno corrigido:
+  - topo: `Nos` e `Eles` com pontuacao da partida
+  - baixo: `Mao` e `Mao` com pontuacao parcial da rodada
+  - labels e numeros centralizados nas suas celulas
+  - divisao visual sutil entre placar da partida e placar da mao
 
 Regras consolidadas:
 
@@ -130,7 +146,25 @@ Regras consolidadas:
 
 Observacao:
 
-- evitar mexer no scorepad junto com outras alteracoes grandes de layout
+- o ajuste do scorepad foi incremental e ficou restrito a `src/App.tsx`
+- o asset do caderno foi preservado
+- evitar reabrir o scorepad junto com outras alteracoes grandes de layout, salvo regressao visual nova
+- preservar a mesa, a coluna direita, o fluxo de truco e a capa do bar
+
+### Responsividade da gameplay
+
+Problema atual observado:
+
+- ao redimensionar a janela do navegador, os elementos dentro da moldura de celular podem mudar de proporcao e se desalinharem
+- isso pode virar problema em devices com tamanhos e proporcoes diferentes
+
+Diagnostico de continuidade:
+
+- a gameplay deve passar a se comportar como um stage de jogo com resolucao logica fixa
+- o wrapper externo pode escalar esse stage para caber no viewport
+- dentro da moldura, evitar que cada subarea responda diretamente a `vw`/`dvh` da janela
+- aceitar letterbox/pillarbox quando a proporcao externa nao bater com a proporcao do jogo
+- manter poucos modos internos controlados, como `regular`, `compact` e `tiny`, apenas quando realmente necessario
 
 ### Coluna central
 
@@ -277,12 +311,11 @@ Assets atuais:
 Estado visual atual:
 
 - coluna esquerda esta aceitavel por enquanto
-- coluna central ja mostra nome do bar, endereco, descricao e adversarios
-- coluna direita ja mostra estatisticas e botao de entrada
-- o HUD de estatisticas ainda precisa de refinamento
-- `Dificuldade do desafio` ainda nao esta aparecendo de forma confiavel
-- a placa `ENTRAR NO BAR` e a lousa do dono precisam continuar protegidas contra estouro de texto
-- o layout interno da capa ainda precisa ficar menos sensivel ao tamanho da janela do navegador
+- coluna central mostra nome, endereco, descricao, adversarios e dificuldade ampliada
+- coluna direita mostra estatisticas em placa propria e botao de entrada centralizados
+- a frase `Proximo desafio` foi removida da capa
+- a placa `ENTRAR NO BAR` e a lousa do dono seguem protegidas contra estouro de texto
+- assets antigos da capa foram limpos
 
 ## Campanha e bares atuais mais importantes
 

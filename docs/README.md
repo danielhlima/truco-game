@@ -50,32 +50,45 @@ Define o pre-plano vivo:
 
 ## Estado do foco atual
 
-Neste momento, a gameplay screen esta considerada pronta por enquanto.
+A capa do `Bar do Ze Catinga` foi refinada e salva no Git.
 
-O foco ativo mudou para a capa do bar antes da partida:
+Estado consolidado:
 
 - fluxo `COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo`
-- primeira capa autoral do `Bar do Ze Catinga`
-- uso de assets proprios em `src/assets/venues/ze-catinga/`
-- refinamento visual do HUD de estatisticas do bar
-- ajuste da area de adversarios e dificuldade do desafio
+- capa autoral do `Bar do Ze Catinga` com HUD de estatisticas em placa propria
+- coluna direita da capa centralizada
+- coluna central da capa sem `Proximo desafio`
+- dificuldade do desafio ampliada abaixo dos adversarios
+- limpeza de assets antigos da capa realizada
+- scorepad da coluna esquerda corrigido:
+  - labels `Nos`, `Eles`, `Mao` e `Mao` nao se sobrepoem mais aos numeros
+  - placar da partida e placar da mao ficaram separados por grid interno previsivel
+  - asset `src/assets/ui-left/scorepad-notebook-clean-cut.png` preservado
+  - validacao visual feita no fluxo real ate a gameplay
+  - `npm run build` validado
 
 ## Prioridade imediata para o proximo chat
 
-No proximo chat, continuar na capa do `Bar do Ze Catinga`.
+No proximo chat, estabilizar a responsividade da gameplay screen.
 
-Atacar primeiro:
+Problema observado em video:
 
-- refinar o HUD de estatisticas do bar na coluna direita
-- fazer `Dificuldade do desafio` aparecer abaixo dos adversarios
-- impedir estouros de texto na lousa do dono e na placa `ENTRAR NO BAR`
-- estabilizar o layout interno para variar menos quando a janela do navegador muda
+- quando a janela do navegador muda de tamanho, os elementos dentro da moldura de celular em landscape refluem e ficam baguncados
+- o problema parece vir de uma mistura de medidas responsivas internas (`vw`, `dvh`, `clamp`, transforms e grids fluidos)
+- a gameplay deve se comportar mais como um stage de jogo escalado do que como uma pagina web que reflowa continuamente
+
+Proximo foco recomendado:
+
+- fixar uma resolucao logica da gameplay
+- escalar a tela inteira como uma unidade
+- permitir letterbox/pillarbox quando a proporcao do device for diferente
+- reduzir dependencia de `vw`/`dvh` dentro da gameplay
+- manter no maximo 2 ou 3 modos internos controlados (`regular`, `compact`, `tiny`)
 
 Depois disso, seguir para:
 
-- polimento final da capa do bar
-- reaproveitamento do modelo para outros bares
-- escolha de quais assets novos ficam para bares futuros
+- revisao responsiva da tela de selecao de parceira
+- expansao do modelo da capa para outros bares
 
 ## Regra de continuidade
 

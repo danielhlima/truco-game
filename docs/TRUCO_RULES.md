@@ -118,3 +118,8 @@ Hoje a força da mão é calculada assim:
 - Já foi identificado que a IA atual está `trucando com pouco`.
 - Este comportamento ainda será rebalanceado futuramente.
 - Por enquanto, este arquivo registra a lógica atual, não a lógica ideal.
+
+## Nota de Continuidade
+
+- O ajuste recente do scorepad e o proximo foco de responsividade da gameplay nao mudam regras de truco.
+- Se a estabilizacao visual tocar fluxo de botoes, falas ou estados de truco, validar novamente as regras deste arquivo e rodar testes antes de concluir.

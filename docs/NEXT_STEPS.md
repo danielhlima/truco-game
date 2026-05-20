@@ -52,11 +52,17 @@ Status:
 
 ### Marco de foco
 
-- a gameplay screen esta considerada pronta por enquanto
+- a gameplay screen esta em bom estado, e o scorepad da coluna esquerda ja teve a sobreposicao corrigida
 - a escolha de parceira por bar ja funciona
 - a tela de campanha ja existe antes da entrada no bar
-- a capa do `Bar do Ze Catinga` ja existe em primeira versao
-- o foco imediato recomendado agora e continuar a capa do bar
+- a capa do `Bar do Ze Catinga` foi refinada, limpa e salva no Git
+- o ajuste do scorepad:
+  - preservou `src/assets/ui-left/scorepad-notebook-clean-cut.png`
+  - ficou restrito ao layout interno em `src/App.tsx`
+  - separou placar da partida e placar da mao
+  - foi validado visualmente no fluxo real ate a gameplay
+  - passou em `npm run build`
+- o foco imediato recomendado agora e estabilizar a responsividade da gameplay screen quando o navegador ou device muda de tamanho
 
 ### Truco e dialogos
 
@@ -92,46 +98,43 @@ Estado atual:
 
 - fluxo `COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo` ja esta implementado
 - assets do Ze Catinga estao em `src/assets/venues/ze-catinga/`
-- a capa usa fundo, dono do bar, lousa, HUD de estatisticas, adversarios e placa `ENTRAR NO BAR`
+- a capa usa fundo, dono do bar, lousa, HUD de estatisticas, adversarios, dificuldade e placa `ENTRAR NO BAR`
 - coluna esquerda esta aceitavel por enquanto
-- coluna central ja mostra informacoes do bar e adversarios
-- coluna direita ja mostra estatisticas e CTA
+- coluna central mostra informacoes do bar, adversarios e dificuldade ampliada
+- coluna direita mostra estatisticas e CTA centralizados
+- assets antigos da capa foram limpos
+- commit salvo e enviado:
+  - `0f90926 Refine Ze Catinga venue cover`
 
-Pendencias principais:
+Pendencias principais da capa:
 
-- refinar o HUD de estatisticas da coluna direita
-- fazer `Dificuldade do desafio` aparecer abaixo dos adversarios
-- compactar a coluna central sem reduzir demais a leitura
-- garantir que o texto da lousa do dono caiba dentro da placa
-- garantir que `ENTRAR NO BAR` caiba dentro da placa
-- estabilizar o layout interno para variar menos quando a janela do navegador muda
+- nao ha pendencia imediata bloqueante na capa
+- manter o layout atual preservado enquanto o foco volta para a gameplay
 
 ## Proximo foco recomendado
 
 ### Opcao principal
 
-- continuar a tela de capa do `Bar do Ze Catinga`
+- estabilizar a escala da gameplay screen dentro da moldura de celular em landscape
 
 ### Itens para atacar primeiro
 
-- HUD de estatisticas do bar:
-  - melhorar proporcao
-  - ajustar hierarquia dos numeros
-  - manter dentro da coluna direita
-- dificuldade do desafio:
-  - aparecer abaixo dos nomes dos adversarios
-  - caber dentro do painel central
-  - usar os marcadores de garrafa sem corte
-- botao `ENTRAR NO BAR`:
-  - texto deve ficar contido na placa
-  - permitir quebra em duas linhas quando necessario
-- estabilidade da moldura:
-  - reduzir uso de `vw` dentro da capa
-  - preferir blocos fixos/controlados dentro da viewport da moldura
+- Responsividade da gameplay:
+  1. fixar uma resolucao logica da gameplay
+  2. escalar a tela inteira como uma unidade
+  3. usar letterbox/pillarbox quando a proporcao do device for diferente
+  4. evitar `vw`/`dvh` dentro da gameplay, deixando essas medidas no wrapper externo
+  5. manter apenas 2 ou 3 modos internos controlados, como `regular`, `compact` e `tiny`
+- Validacao:
+  - abrir a gameplay screen no navegador
+  - redimensionar a janela como no video enviado pelo usuario
+  - testar em pelo menos alguns tamanhos representativos de desktop e mobile landscape
+  - confirmar que mesa, coluna esquerda, coluna direita e mao do jogador escalam juntas sem baguncar
+  - rodar `npm run build`
 
 ### Opcao seguinte depois disso
 
-- polir a capa final do Ze Catinga
+- polir a gameplay screen conforme novas capturas, sem reabrir fluxo de jogo
 
 ### Opcao seguinte depois disso
 
@@ -142,10 +145,7 @@ Pendencias principais:
 
 ## Pendencias abertas
 
-- continuar a capa do `Bar do Ze Catinga`
-- refinar HUD de estatisticas do bar
-- fazer a dificuldade do desafio aparecer abaixo dos adversarios
-- estabilizar layout da capa contra mudancas de tamanho da janela
+- estabilizar responsividade da gameplay dentro da moldura de celular
 - fechar visual da tela de selecao de parceira
 - deixar o fluxo de campeonatos mais claro e solido:
   - cards por etapa com status visual
@@ -177,27 +177,53 @@ Antes de iniciar qualquer nova frente em um chat novo:
 
 ## Prompt operacional para o proximo chat
 
-No proximo chat, comecar por:
+Copie e cole no proximo chat:
 
-- continuar a tela de capa do `Bar do Ze Catinga`
+```text
+Estamos continuando o projeto truco-game.
 
-Contexto para o proximo chat:
+Antes de agir, leia nesta ordem:
+1. docs/README.md
+2. docs/CONTENT.md
+3. docs/LAYOUT_RULES.md
+4. docs/TRUCO_RULES.md
+5. docs/NEXT_STEPS.md
 
-- a capa ja esta implementada em primeira versao
-- arquivos principais:
-  - `src/app/AppSections.tsx`
-  - `src/app/useGameSession.ts`
-  - `src/App.tsx`
-  - `src/assets/venues/ze-catinga/`
-- a coluna esquerda esta boa o suficiente por enquanto
-- o HUD de estatisticas da coluna direita ainda precisa de refinamento
-- `Dificuldade do desafio` nao esta aparecendo de forma confiavel abaixo dos adversarios
-- o texto de `ENTRAR NO BAR` e a frase da lousa precisam continuar protegidos contra estouro
-- o layout interno deve variar menos quando o tamanho da janela do navegador muda
+Use esses arquivos como fonte de verdade.
+
+Estado atual:
+- a capa do Bar do Ze Catinga foi refinada, limpa, commitada e enviada para origin/main
+- commit salvo: 0f90926 Refine Ze Catinga venue cover
+- o fluxo atual deve ser preservado: COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo
+- o scorepad da coluna esquerda ja foi corrigido:
+  - labels `Nos`, `Eles`, `Mao` e `Mao` nao se sobrepoem mais aos numeros
+  - placar da partida e placar da mao foram separados
+  - asset `src/assets/ui-left/scorepad-notebook-clean-cut.png` preservado
+  - validacao visual feita no fluxo real ate a gameplay
+  - `npm run build` passou
+- agora o problema principal e responsividade:
+  - ao redimensionar a janela do navegador, os elementos dentro da moldura que simula o celular ficam baguncados
+  - a gameplay ainda parece reflowar como pagina web, em vez de escalar como stage de jogo
+
+Objetivo deste chat:
+1. estabilizar a gameplay screen dentro da moldura de celular em landscape
+2. fixar uma resolucao logica ou fortemente controlada para a gameplay
+3. escalar a tela inteira como uma unidade quando o viewport externo muda
+4. aceitar letterbox/pillarbox quando a proporcao do device for diferente
+5. reduzir ou remover dependencia de `vw`/`dvh` dentro da gameplay, mantendo essas medidas no wrapper externo
+6. manter no maximo 2 ou 3 modos internos controlados (`regular`, `compact`, `tiny`)
+7. preservar o fluxo de jogo, a capa do bar, a selecao de parceira e as regras de truco
+
+Arquivos provaveis:
+- src/App.tsx
+- src/app/AppSections.tsx
+- src/index.css
+- possivelmente nenhum asset
 
 Importante:
-
 - nao recomecar a gameplay do zero
 - nao desmontar a arquitetura atual
-- usar a documentacao como fonte de verdade
-- validar sempre com `npm run build`
+- fazer mudancas incrementais
+- validar visualmente no navegador redimensionando a janela como no video
+- validar com `npm run build`
+```

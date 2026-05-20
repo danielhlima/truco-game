@@ -9,6 +9,11 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 - A tela principal é uma `tela de celular em landscape`.
 - O layout deve se resolver `dentro da tela do celular`.
 - Elementos externos podem existir temporariamente para debug, mas não fazem parte da experiência final.
+- A gameplay deve se comportar como um `stage de jogo`:
+  - composicao interna previsivel
+  - proporcao controlada
+  - escala aplicada no conjunto quando o viewport externo muda
+  - sem reflow livre dos blocos principais a cada mudanca de tamanho da janela
 
 ## Composição Atual
 
@@ -62,7 +67,13 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 - O bloco de jogadores deve continuar compacto.
 - O placar atual usa scorepad em formato de caderno.
 - O scorepad está funcional e relativamente consolidado.
+- As labels do scorepad (`Nos`, `Eles`, `Mao`, `Mao`) nao podem se sobrepor aos numeros nem entre si.
+- Ajustes no scorepad devem priorizar grid interno previsivel, alturas fixas/controladas e separacao clara entre placar da partida e placar da mao.
 - Evitar mexer nele junto com mudanças grandes de layout.
+- Estado atual:
+  - sobreposicao das labels com os numeros foi corrigida
+  - placar da partida e placar da mao estao separados por grid interno
+  - asset `src/assets/ui-left/scorepad-notebook-clean-cut.png` preservado
 
 ## Regras da Área do Jogador
 
@@ -79,6 +90,22 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
   - legibilidade
   - hierarquia visual
 - Evitar solução por remendo visual quando o problema for asset ruim ou recorte ruim.
+
+## Regras de Responsividade da Gameplay
+
+- O proximo ajuste estrutural deve estabilizar a moldura da gameplay antes de novos polimentos visuais.
+- A tela interna deve ter uma resolucao logica fixa ou fortemente controlada.
+- O navegador pode mudar de tamanho, mas a composicao interna da moldura deve manter proporcao e hierarquia.
+- Preferir escalar a gameplay inteira como unidade.
+- Aceitar letterbox/pillarbox quando a proporcao do device for diferente.
+- Evitar medidas baseadas diretamente em `vw` e `dvh` dentro dos elementos internos da gameplay.
+- `vw`, `dvh` e calculos similares podem existir no wrapper externo que encaixa a moldura na janela.
+- Dentro da gameplay, preferir:
+  - grid com trilhas previsiveis
+  - dimensoes relativas ao stage/container
+  - areas com proporcao fixa
+  - poucos modos controlados (`regular`, `compact`, `tiny`)
+- Nao resolver responsividade movendo elementos isolados com transforms compensatorios quando o problema for escala global da tela.
 
 ## Regras da Capa do Bar
 
@@ -97,7 +124,6 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
   - lousa com frase do dono
   - nome/role do dono, se houver espaço
 - Coluna central:
-  - eyebrow `Proximo desafio`
   - nome do bar
   - endereco
   - descricao curta
@@ -109,11 +135,10 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 
 ### Pendencias da Capa do Ze Catinga
 
-- Refinar o HUD de estatisticas da coluna direita.
-- Fazer `Dificuldade do desafio` aparecer sem corte abaixo dos adversarios.
-- Garantir que a lousa do dono nao corte a frase.
-- Garantir que o texto do botao `ENTRAR NO BAR` nunca estoure a placa.
-- Reduzir a variacao visual causada por mudanca no tamanho da janela do navegador.
+- Capa refinada e salva no Git.
+- Manter a coluna direita centralizada.
+- Manter `Dificuldade do desafio` ampliada abaixo dos adversarios.
+- Manter a lousa do dono e o botao `ENTRAR NO BAR` protegidos contra estouro.
 
 ## Decisões Já Tomadas
 
@@ -125,7 +150,7 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 
 ## Pendências Visuais
 
-- Refinar a coluna direita.
+- Estabilizar responsividade da gameplay quando a janela do navegador muda de tamanho.
 - Refinar a mesa central conforme novos assets chegarem.
 - Fazer polimento responsivo final depois do layout aprovado.
-- Continuar a capa do `Bar do Ze Catinga` antes de expandir para outros bares.
+- Expandir o modelo da capa do `Bar do Ze Catinga` para outros bares quando a gameplay estiver estabilizada.
