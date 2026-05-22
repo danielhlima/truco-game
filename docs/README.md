@@ -50,7 +50,7 @@ Define o pre-plano vivo:
 
 ## Estado do foco atual
 
-A capa do `Bar do Ze Catinga` foi refinada e salva no Git.
+A responsividade estrutural da gameplay foi estabilizada depois da capa do `Bar do Ze Catinga`.
 
 Estado consolidado:
 
@@ -66,29 +66,28 @@ Estado consolidado:
   - asset `src/assets/ui-left/scorepad-notebook-clean-cut.png` preservado
   - validacao visual feita no fluxo real ate a gameplay
   - `npm run build` validado
+- gameplay dentro de stage logico `1080x500` escalado como unidade
+- modos internos controlados `regular`, `compact` e `tiny`
+- cartas da mao e botao `MENU` protegidos dentro da faixa inferior
+- popover do `MENU` fica acima da mesa e fecha antes dos modais de confirmacao
+- telas autorais de vitoria e derrota do `Bar do Ze Catinga`:
+  - `src/assets/venues/ze-catinga/match-result-win.png`
+  - `src/assets/venues/ze-catinga/match-result-loss.png`
 
 ## Prioridade imediata para o proximo chat
 
-No proximo chat, estabilizar a responsividade da gameplay screen.
-
-Problema observado em video:
-
-- quando a janela do navegador muda de tamanho, os elementos dentro da moldura de celular em landscape refluem e ficam baguncados
-- o problema parece vir de uma mistura de medidas responsivas internas (`vw`, `dvh`, `clamp`, transforms e grids fluidos)
-- a gameplay deve se comportar mais como um stage de jogo escalado do que como uma pagina web que reflowa continuamente
+No proximo chat, revisar a tela de selecao de parceira dentro da moldura em landscape.
 
 Proximo foco recomendado:
 
-- fixar uma resolucao logica da gameplay
-- escalar a tela inteira como uma unidade
-- permitir letterbox/pillarbox quando a proporcao do device for diferente
-- reduzir dependencia de `vw`/`dvh` dentro da gameplay
-- manter no maximo 2 ou 3 modos internos controlados (`regular`, `compact`, `tiny`)
+- validar a selecao em tamanhos representativos do stage
+- melhorar UX, narrativa e hierarquia da escolha sem quebrar persistencia por bar
+- manter o fluxo `capa do bar > escolha de parceira se necessario > jogo`
 
 Depois disso, seguir para:
 
-- revisao responsiva da tela de selecao de parceira
 - expansao do modelo da capa para outros bares
+- telas autorais de resultado para os proximos bares
 
 ## Regra de continuidade
 

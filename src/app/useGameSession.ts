@@ -78,6 +78,7 @@ interface MatchResultScreenState {
   progressionTitle?: string
   title: string
   subtitle: string
+  venueId?: string
   venueName: string
 }
 
@@ -499,21 +500,24 @@ export function useGameSession() {
 
       if (nextMatchState?.finished) {
         const finalScore = nextMatchState.score
-        const resultVenueName = sessionDebugVenue?.name ?? currentCampaignVenue?.name ?? "o bar"
+        const resultVenue = sessionDebugVenue ?? currentCampaignVenue
+        const resultVenueName = resultVenue?.name ?? "o bar"
         let matchResultState: MatchResultScreenState =
           nextState.winner === "A"
             ? {
                 outcome: "win",
                 title: "Vocês levaram essa",
-                subtitle: `O clima pesa depois do ${finalScore.A} a ${finalScore.B}, mas a mesa inteira viu quem saiu por cima em ${resultVenueName}.`,
+                subtitle: `O clima pesa no fim da queda, mas a mesa inteira viu quem saiu por cima em ${resultVenueName}.`,
                 hostLine: `O dono do ${resultVenueName} resmunga: "Ganharam hoje porque a sorte sentou com vocês. Quero ver repetir essa coragem."`,
+                venueId: resultVenue?.id,
                 venueName: resultVenueName,
               }
             : {
                 outcome: "loss",
                 title: "A casa falou mais alto",
-                subtitle: `Depois do ${finalScore.A} a ${finalScore.B}, o bar cresce para cima de vocês e a derrota fica ecoando na mesa.`,
+                subtitle: "O bar cresce para cima de vocês e a derrota fica ecoando na mesa.",
                 hostLine: `O dono do ${resultVenueName} abre um sorriso torto: "Aqui é assim. Quem entra achando que vai mandar sai escutando a conversa do balcão."`,
+                venueId: resultVenue?.id,
                 venueName: resultVenueName,
               }
 
@@ -535,7 +539,7 @@ export function useGameSession() {
             matchResultState = {
               ...matchResultState,
               title: "Campanha concluída",
-              subtitle: `Depois do ${finalScore.A} a ${finalScore.B}, vocês fecharam a campanha disponível inteira e não deixaram dúvida no ${resultVenueName}.`,
+              subtitle: `Vocês fecharam a campanha disponível inteira e não deixaram dúvida no ${resultVenueName}.`,
               progressionTitle: "Jornada encerrada",
               progressionText: "Toda a campanha disponível foi concluída. Agora dá para revisitar os bares ou esperar os próximos desafios.",
             }
@@ -543,7 +547,7 @@ export function useGameSession() {
             matchResultState = {
               ...matchResultState,
               title: `${resolution.clearedStage.name} concluída`,
-              subtitle: `Depois do ${finalScore.A} a ${finalScore.B}, vocês fecharam ${resultVenueName} e abriram caminho para ${resolution.unlockedStage.name}.`,
+              subtitle: `Vocês fecharam ${resultVenueName} e abriram caminho para ${resolution.unlockedStage.name}.`,
               progressionTitle: "Nova fase liberada",
               progressionText:
                 resolution.unlockedStage.cutsceneIntro ??
@@ -553,7 +557,7 @@ export function useGameSession() {
             matchResultState = {
               ...matchResultState,
               title: `${resolution.clearedVenue.name} conquistado`,
-              subtitle: `Depois do ${finalScore.A} a ${finalScore.B}, vocês encerraram a fase deste bar e avançaram no circuito.`,
+              subtitle: "Vocês encerraram a fase deste bar e avançaram no circuito.",
               progressionTitle: "Próximo bar liberado",
               progressionText: `Vocês passaram de fase. O próximo destino agora é ${resolution.currentVenue.name}.`,
             }
@@ -1108,6 +1112,7 @@ export function useGameSession() {
 
   function handleSwapPartnerFromContextMenu() {
     if (!handState || !matchState) return
+    setInGameContextMenuOpen(false)
     setInGameConfirmation({
       intent: "swap-partner",
       title: "Trocar de parceira?",
@@ -1118,6 +1123,7 @@ export function useGameSession() {
 
   function handleExitMatchFromContextMenu() {
     if (!handState || !matchState) return
+    setInGameContextMenuOpen(false)
     setInGameConfirmation({
       intent: "exit-match",
       title: "Sair da partida?",

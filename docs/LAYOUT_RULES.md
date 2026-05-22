@@ -93,8 +93,8 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 
 ## Regras de Responsividade da Gameplay
 
-- O proximo ajuste estrutural deve estabilizar a moldura da gameplay antes de novos polimentos visuais.
-- A tela interna deve ter uma resolucao logica fixa ou fortemente controlada.
+- A gameplay consolidada usa stage logico `1080x500` dentro da moldura.
+- A tela interna deve manter resolucao logica fixa ou fortemente controlada.
 - O navegador pode mudar de tamanho, mas a composicao interna da moldura deve manter proporcao e hierarquia.
 - Preferir escalar a gameplay inteira como unidade.
 - Aceitar letterbox/pillarbox quando a proporcao do device for diferente.
@@ -105,7 +105,19 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
   - dimensoes relativas ao stage/container
   - areas com proporcao fixa
   - poucos modos controlados (`regular`, `compact`, `tiny`)
+- A faixa da mao deve manter cartas e botao `MENU` visiveis dentro da moldura.
+- O popover do `MENU` pode sair da faixa da mao, mas deve ficar acima da mesa.
+- Menus de contexto devem fechar antes de abrir modal de confirmacao.
 - Nao resolver responsividade movendo elementos isolados com transforms compensatorios quando o problema for escala global da tela.
+
+## Regras das Telas de Resultado
+
+- Cada bar pode ter arte propria de vitoria e derrota.
+- Para o `Bar do Ze Catinga`, as artes atuais ocupam a tela inteira de resultado dentro da moldura.
+- A acao `VOLTAR AO FLUXO DE BARES` continua sendo um controle real por cima da placa desenhada na arte.
+- Resultado autoral nao deve embutir placar numerico especifico no texto ou na composicao principal.
+- Rabiscos e marcadores de boteco podem existir como decoracao quando nao forem placar real do resultado.
+- Bares sem arte propria continuam usando a tela generica de fallback.
 
 ## Regras da Capa do Bar
 
@@ -150,7 +162,7 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 
 ## Pendências Visuais
 
-- Estabilizar responsividade da gameplay quando a janela do navegador muda de tamanho.
+- Revisar responsividade e acabamento da tela de selecao de parceira.
 - Refinar a mesa central conforme novos assets chegarem.
 - Fazer polimento responsivo final depois do layout aprovado.
-- Expandir o modelo da capa do `Bar do Ze Catinga` para outros bares quando a gameplay estiver estabilizada.
+- Expandir capa e telas autorais de resultado para outros bares.

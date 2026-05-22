@@ -56,13 +56,16 @@ Status:
 - a escolha de parceira por bar ja funciona
 - a tela de campanha ja existe antes da entrada no bar
 - a capa do `Bar do Ze Catinga` foi refinada, limpa e salva no Git
+- a gameplay foi estabilizada como stage logico `1080x500` escalado dentro da moldura landscape
+- a mao do jogador, o `MENU`, o popover do menu e modais de confirmacao foram ajustados dentro desse stage
+- o `Bar do Ze Catinga` ganhou telas autorais de vitoria e derrota com CTA clicavel sobre a arte
 - o ajuste do scorepad:
   - preservou `src/assets/ui-left/scorepad-notebook-clean-cut.png`
   - ficou restrito ao layout interno em `src/App.tsx`
   - separou placar da partida e placar da mao
   - foi validado visualmente no fluxo real ate a gameplay
   - passou em `npm run build`
-- o foco imediato recomendado agora e estabilizar a responsividade da gameplay screen quando o navegador ou device muda de tamanho
+- o foco imediato recomendado agora e revisar UX e responsividade da selecao de parceira
 
 ### Truco e dialogos
 
@@ -111,41 +114,46 @@ Pendencias principais da capa:
 - nao ha pendencia imediata bloqueante na capa
 - manter o layout atual preservado enquanto o foco volta para a gameplay
 
+### Resultados do Bar do Ze Catinga
+
+Estado atual:
+
+- vitoria usa `src/assets/venues/ze-catinga/match-result-win.png`
+- derrota usa `src/assets/venues/ze-catinga/match-result-loss.png`
+- as artes ocupam a tela de resultado inteira dentro da moldura
+- `VOLTAR AO FLUXO DE BARES` fica clicavel por area real sobre a placa desenhada
+- o resultado guarda `venueId` para continuar usando a arte do bar encerrado quando a campanha avanca
+- placares numericos foram removidos dos textos autorais de resultado
+
 ## Proximo foco recomendado
 
 ### Opcao principal
 
-- estabilizar a escala da gameplay screen dentro da moldura de celular em landscape
+- revisar a tela de selecao de parceira dentro da moldura landscape
 
 ### Itens para atacar primeiro
 
-- Responsividade da gameplay:
-  1. fixar uma resolucao logica da gameplay
-  2. escalar a tela inteira como uma unidade
-  3. usar letterbox/pillarbox quando a proporcao do device for diferente
-  4. evitar `vw`/`dvh` dentro da gameplay, deixando essas medidas no wrapper externo
-  5. manter apenas 2 ou 3 modos internos controlados, como `regular`, `compact` e `tiny`
+- Selecao de parceira:
+  1. validar a tela no stage estabilizado em tamanhos representativos
+  2. reforcar hierarquia de personagem, estilo de jogo, atributos e CTA
+  3. melhorar narrativa da escolha sem quebrar persistencia por bar
+  4. preservar a reoferta automatica em bar sem parceira salva
 - Validacao:
-  - abrir a gameplay screen no navegador
-  - redimensionar a janela como no video enviado pelo usuario
-  - testar em pelo menos alguns tamanhos representativos de desktop e mobile landscape
-  - confirmar que mesa, coluna esquerda, coluna direita e mao do jogador escalam juntas sem baguncar
+  - abrir o fluxo real `capa > selecao > jogo`
+  - testar em tamanhos representativos de desktop e landscape mais apertado
+  - confirmar que selecao e CTA cabem dentro da moldura
   - rodar `npm run build`
-
-### Opcao seguinte depois disso
-
-- polir a gameplay screen conforme novas capturas, sem reabrir fluxo de jogo
 
 ### Opcao seguinte depois disso
 
 - dar identidade de campanha aos bares:
   - contexto narrativo
   - apresentacao dos oponentes
+  - capas e telas de resultado proprias
   - diferencas de estilo e atmosfera
 
 ## Pendencias abertas
 
-- estabilizar responsividade da gameplay dentro da moldura de celular
 - fechar visual da tela de selecao de parceira
 - deixar o fluxo de campeonatos mais claro e solido:
   - cards por etapa com status visual
@@ -201,29 +209,30 @@ Estado atual:
   - asset `src/assets/ui-left/scorepad-notebook-clean-cut.png` preservado
   - validacao visual feita no fluxo real ate a gameplay
   - `npm run build` passou
-- agora o problema principal e responsividade:
-  - ao redimensionar a janela do navegador, os elementos dentro da moldura que simula o celular ficam baguncados
-  - a gameplay ainda parece reflowar como pagina web, em vez de escalar como stage de jogo
+- a gameplay foi estabilizada como stage logico `1080x500`:
+  - moldura escala a tela como unidade
+  - modos internos controlados `regular`, `compact` e `tiny`
+  - mao do jogador e `MENU` foram protegidos
+- o Bar do Ze Catinga tem telas autorais de resultado:
+  - vitoria em `src/assets/venues/ze-catinga/match-result-win.png`
+  - derrota em `src/assets/venues/ze-catinga/match-result-loss.png`
 
 Objetivo deste chat:
-1. estabilizar a gameplay screen dentro da moldura de celular em landscape
-2. fixar uma resolucao logica ou fortemente controlada para a gameplay
-3. escalar a tela inteira como uma unidade quando o viewport externo muda
-4. aceitar letterbox/pillarbox quando a proporcao do device for diferente
-5. reduzir ou remover dependencia de `vw`/`dvh` dentro da gameplay, mantendo essas medidas no wrapper externo
-6. manter no maximo 2 ou 3 modos internos controlados (`regular`, `compact`, `tiny`)
-7. preservar o fluxo de jogo, a capa do bar, a selecao de parceira e as regras de truco
+1. revisar a tela de selecao de parceira dentro da moldura em landscape
+2. melhorar UX, hierarquia e narrativa da escolha
+3. validar a selecao em tamanhos representativos do stage
+4. preservar o fluxo de jogo, a capa do bar, a gameplay e as regras de truco
 
 Arquivos provaveis:
 - src/App.tsx
 - src/app/AppSections.tsx
-- src/index.css
+- src/app/useGameSession.ts
 - possivelmente nenhum asset
 
 Importante:
-- nao recomecar a gameplay do zero
+- nao reabrir a responsividade da gameplay sem regressao real
 - nao desmontar a arquitetura atual
 - fazer mudancas incrementais
-- validar visualmente no navegador redimensionando a janela como no video
+- validar visualmente no navegador
 - validar com `npm run build`
 ```

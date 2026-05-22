@@ -3,6 +3,9 @@ import { useGameSession } from "./app/useGameSession"
 import botecoSceneBgAsset from "./assets/boteco/boteco-scene-bg.png"
 import cardFaceAgedPaperAsset from "./assets/cards/card-face-aged-paper.png"
 
+const GAMEPLAY_STAGE_WIDTH = 1080
+const GAMEPLAY_STAGE_HEIGHT = 500
+
 const TableSection = lazy(async () => {
   const mod = await import("./app/AppSections")
   return { default: mod.TableSection }
@@ -20,32 +23,41 @@ const LogsPanel = lazy(async () => {
   return { default: mod.LogsPanel }
 })
 
-type GameplayLayoutMode = "regular" | "compact"
-
-function shouldUseTightSidebar(): boolean {
-  if (typeof window === "undefined") {
-    return false
-  }
-
-  return window.innerHeight < 780
+type GameplayLayoutMode = "regular" | "compact" | "tiny"
+type GameplayViewportMetrics = {
+  mode: GameplayLayoutMode
+  scale: number
 }
 
-function getGameplayLayoutMode(): GameplayLayoutMode {
+function getGameplayViewportMetrics(): GameplayViewportMetrics {
   if (typeof window === "undefined") {
-    return "regular"
+    return { mode: "regular", scale: 1 }
   }
 
-  return window.innerWidth < 1440 || window.innerHeight < 860 ? "compact" : "regular"
+  const availableWidth = Math.max(320, Math.min(window.innerWidth, 1126) - 116)
+  const availableHeight = Math.max(260, window.innerHeight - 260)
+  const scale = Math.max(
+    0.5,
+    Math.min(1, availableWidth / GAMEPLAY_STAGE_WIDTH, availableHeight / GAMEPLAY_STAGE_HEIGHT)
+  )
+
+  if (scale < 0.72) {
+    return { mode: "tiny", scale }
+  }
+  if (scale < 0.9) {
+    return { mode: "compact", scale }
+  }
+  return { mode: "regular", scale }
 }
 
 function App() {
-  const [layoutMode, setLayoutMode] = useState<GameplayLayoutMode>(getGameplayLayoutMode)
-  const [useTightSidebar, setUseTightSidebar] = useState(shouldUseTightSidebar)
+  const [viewportMetrics, setViewportMetrics] = useState<GameplayViewportMetrics>(
+    getGameplayViewportMetrics
+  )
 
   useEffect(() => {
     const handleResize = () => {
-      setLayoutMode(getGameplayLayoutMode())
-      setUseTightSidebar(shouldUseTightSidebar())
+      setViewportMetrics(getGameplayViewportMetrics())
     }
 
     window.addEventListener("resize", handleResize)
@@ -122,32 +134,44 @@ function App() {
     handleConfirmCharacterSelect,
   } = useGameSession()
 
-  const isCompactLayout = layoutMode === "compact"
+  const layoutMode = viewportMetrics.mode
+  const stageScale = viewportMetrics.scale
+  const isCompactLayout = layoutMode !== "regular"
+  const isTinyLayout = layoutMode === "tiny"
+  const useTightSidebar = layoutMode !== "regular"
 
   const responsiveStyles = useMemo<Record<string, React.CSSProperties>>(
     () => ({
       ...styles,
+      gameViewportStageSlot: {
+        ...styles.gameViewportStageSlot,
+        width: `${GAMEPLAY_STAGE_WIDTH * stageScale}px`,
+        height: `${GAMEPLAY_STAGE_HEIGHT * stageScale}px`,
+      },
       gameViewportFrame: {
         ...styles.gameViewportFrame,
-        width: isCompactLayout
-          ? "min(100%, calc((100dvh - 228px) * 2.16))"
-          : styles.gameViewportFrame.width,
-        minHeight: isCompactLayout ? "min(400px, 64dvh)" : styles.gameViewportFrame.minHeight,
-        maxHeight: isCompactLayout ? "73dvh" : styles.gameViewportFrame.maxHeight,
+        width: `${GAMEPLAY_STAGE_WIDTH}px`,
+        height: `${GAMEPLAY_STAGE_HEIGHT}px`,
+        transform: `scale(${stageScale})`,
       },
       gameViewport: {
         ...styles.gameViewport,
         gridTemplateColumns: isCompactLayout
-          ? "clamp(206px, 21vw, 234px) minmax(0, 1fr) clamp(160px, 16.2vw, 182px)"
-          : "clamp(220px, 18.5vw, 252px) minmax(0, 1fr) clamp(168px, 14.2vw, 188px)",
-        gap: isCompactLayout ? "clamp(5px, 0.55vw, 8px)" : styles.gameViewport.gap,
+          ? isTinyLayout
+            ? "196px minmax(0, 1fr) 154px"
+            : "214px minmax(0, 1fr) 170px"
+          : "232px minmax(0, 1fr) 184px",
+        gap: isTinyLayout ? "6px" : isCompactLayout ? "7px" : "9px",
       },
       gameLeftRail: {
         ...styles.gameLeftRail,
+        gridTemplateRows: isTinyLayout ? "120px minmax(0, 1fr)" : isCompactLayout ? "138px minmax(0, 1fr)" : styles.gameLeftRail.gridTemplateRows,
+        gap: isTinyLayout ? "5px" : "6px",
         justifyItems: "stretch",
       },
       gameSidebarColumn: {
         ...styles.gameSidebarColumn,
+        gap: isTinyLayout ? "5px" : "7px",
         justifyItems: "stretch",
       },
       scenePanel: {
@@ -157,20 +181,28 @@ function App() {
       },
       scorePadCard: {
         ...styles.scorePadCard,
+        padding: isTinyLayout ? "7px" : "9px",
         width: "100%",
         boxSizing: "border-box",
       },
       scorePadCardSurface: {
         ...styles.scorePadCardSurface,
-        width: isCompactLayout ? "min(100%, 156px)" : "min(100%, 174px)",
+        width: isTinyLayout ? "126px" : isCompactLayout ? "140px" : "174px",
         maxHeight: isCompactLayout ? "94%" : "96%",
       },
       gameMainColumn: {
         ...styles.gameMainColumn,
-        gridTemplateRows: isCompactLayout ? "minmax(0, 1fr) minmax(78px, auto)" : "minmax(0, 1fr) auto",
+        gridTemplateRows: isTinyLayout
+          ? "minmax(0, 1fr) 92px"
+          : isCompactLayout
+            ? "minmax(0, 1fr) 104px"
+            : "minmax(0, 1fr) 118px",
+        gap: isTinyLayout ? "3px" : "4px",
+        overflow: "visible",
       },
       tableSurface: {
         ...styles.tableSurface,
+        padding: isTinyLayout ? "6px" : "8px",
         transform: isCompactLayout ? "scale(1.04)" : "scale(1.08)",
         maxWidth: isCompactLayout ? "98%" : "100%",
       },
@@ -178,9 +210,12 @@ function App() {
         ...styles.playerCardsBlock,
         width: "100%",
         boxSizing: "border-box",
-        minHeight: isCompactLayout
-          ? "clamp(74px, 6.6vw, 90px)"
-          : styles.playerCardsBlock.minHeight,
+        height: "100%",
+        minHeight: isTinyLayout ? "92px" : isCompactLayout ? "104px" : "118px",
+        padding: isTinyLayout ? "5px 8px 8px" : isCompactLayout ? "6px 9px 10px" : "8px 11px 12px",
+        overflow: "visible",
+        position: "relative",
+        zIndex: 6,
       },
       tableHudSidebar: {
         ...styles.tableHudSidebar,
@@ -191,69 +226,122 @@ function App() {
           : isCompactLayout
             ? "max-content max-content"
             : "max-content max-content",
-        gap: useTightSidebar ? "clamp(6px, 0.5vw, 8px)" : styles.tableHudSidebar.gap,
+        gap: useTightSidebar ? (isTinyLayout ? "6px" : "8px") : "12px",
         alignContent: "center",
         alignItems: "center",
       },
       tableHudStats: {
         ...styles.tableHudStats,
         width: isCompactLayout ? "90%" : "88%",
-        padding: useTightSidebar
-          ? "clamp(8px, 0.62vw, 10px) clamp(10px, 0.82vw, 11px)"
-          : styles.tableHudStats.padding,
-        gap: useTightSidebar ? "clamp(5px, 0.42vw, 7px)" : styles.tableHudStats.gap,
-        minHeight: useTightSidebar ? "clamp(116px, 14vw, 138px)" : undefined,
+        padding: useTightSidebar ? (isTinyLayout ? "8px 9px" : "9px 11px") : "12px 14px",
+        gap: useTightSidebar ? (isTinyLayout ? "5px" : "7px") : "11px",
+        minHeight: useTightSidebar ? (isTinyLayout ? "108px" : "124px") : undefined,
         height: useTightSidebar ? "auto" : styles.tableHudStats.height,
       },
       inGameActionsCard: {
         ...styles.inGameActionsCard,
         width: isCompactLayout ? "90%" : "88%",
-        marginTop: useTightSidebar ? "clamp(4px, 0.35vw, 6px)" : styles.inGameActionsCard.marginTop,
-        gap: useTightSidebar ? "clamp(6px, 0.48vw, 8px)" : styles.inGameActionsCard.gap,
+        marginTop: useTightSidebar ? (isTinyLayout ? "4px" : "6px") : "14px",
+        gap: useTightSidebar ? (isTinyLayout ? "6px" : "8px") : "11px",
       },
       tableCenterArea: {
         ...styles.tableCenterArea,
-        minHeight: isCompactLayout ? "clamp(300px, 38dvh, 340px)" : styles.tableCenterArea.minHeight,
+        minHeight: isTinyLayout ? "314px" : isCompactLayout ? "332px" : "360px",
       },
       tableHudStatLineCentered: {
         ...styles.tableHudStatLineCentered,
-        gap: useTightSidebar ? "clamp(2px, 0.18vw, 3px)" : styles.tableHudStatLineCentered.gap,
+        gap: useTightSidebar ? "3px" : "5px",
       },
       tableHudStatLabelCentered: {
         ...styles.tableHudStatLabelCentered,
-        fontSize: useTightSidebar ? "clamp(7px, 0.62vw, 8px)" : styles.tableHudStatLabelCentered.fontSize,
+        fontSize: useTightSidebar ? (isTinyLayout ? "7px" : "8px") : "9px",
       },
       tableHudStatValueCentered: {
         ...styles.tableHudStatValueCentered,
-        fontSize: useTightSidebar ? "clamp(10px, 0.92vw, 13px)" : styles.tableHudStatValueCentered.fontSize,
+        fontSize: useTightSidebar ? (isTinyLayout ? "11px" : "13px") : "15px",
         lineHeight: useTightSidebar ? 1.05 : styles.tableHudStatValueCentered.lineHeight,
       },
       inGameActionsRow: {
         ...styles.inGameActionsRow,
-        gap: useTightSidebar ? "clamp(5px, 0.42vw, 6px)" : styles.inGameActionsRow.gap,
+        gap: useTightSidebar ? "6px" : "10px",
       },
       inGameActionsGrid: {
         ...styles.inGameActionsGrid,
-        gap: useTightSidebar ? "clamp(5px, 0.42vw, 6px)" : styles.inGameActionsGrid.gap,
+        gap: useTightSidebar ? "6px" : "10px",
       },
       trucoPrimaryButton: {
         ...styles.trucoPrimaryButton,
-        minHeight: useTightSidebar ? "clamp(30px, 2.3vw, 34px)" : styles.trucoPrimaryButton.minHeight,
-        padding: useTightSidebar
-          ? "clamp(4px, 0.34vw, 6px) clamp(10px, 0.82vw, 12px)"
-          : styles.trucoPrimaryButton.padding,
-        fontSize: useTightSidebar ? "clamp(9px, 0.78vw, 10px)" : styles.trucoPrimaryButton.fontSize,
+        minHeight: useTightSidebar ? (isTinyLayout ? "30px" : "34px") : "38px",
+        padding: useTightSidebar ? (isTinyLayout ? "4px 9px" : "6px 12px") : "8px 14px",
+        fontSize: useTightSidebar ? (isTinyLayout ? "9px" : "10px") : "11px",
       },
       trucoSecondaryButton: {
         ...styles.trucoSecondaryButton,
-        minHeight: useTightSidebar ? "clamp(30px, 2.3vw, 34px)" : styles.trucoSecondaryButton.minHeight,
-        padding: useTightSidebar
-          ? "clamp(4px, 0.34vw, 6px) clamp(10px, 0.82vw, 12px)"
-          : styles.trucoSecondaryButton.padding,
-        fontSize: useTightSidebar ? "clamp(9px, 0.78vw, 10px)" : styles.trucoSecondaryButton.fontSize,
+        minHeight: useTightSidebar ? (isTinyLayout ? "30px" : "34px") : "38px",
+        padding: useTightSidebar ? (isTinyLayout ? "4px 9px" : "6px 12px") : "8px 14px",
+        fontSize: useTightSidebar ? (isTinyLayout ? "9px" : "10px") : "11px",
+      },
+      rosterGrid: {
+        ...styles.rosterGrid,
+        gap: isTinyLayout ? "3px 6px" : "4px 8px",
+      },
+      rosterCard: {
+        ...styles.rosterCard,
+        minHeight: isTinyLayout ? "50px" : isCompactLayout ? "60px" : "104px",
+        padding: isTinyLayout ? "2px" : "4px",
+        gap: "3px",
+      },
+      rosterAvatar: {
+        ...styles.rosterAvatar,
+        width: isTinyLayout ? "34px" : isCompactLayout ? "44px" : "70px",
+        height: isTinyLayout ? "34px" : isCompactLayout ? "44px" : "70px",
+        borderRadius: isTinyLayout ? "10px" : isCompactLayout ? "12px" : styles.rosterAvatar.borderRadius,
+        fontSize: isTinyLayout ? "12px" : "14px",
+      },
+      rosterName: {
+        ...styles.rosterName,
+        fontSize: isTinyLayout ? "6px" : isCompactLayout ? "7px" : "10px",
+      },
+      mobileHandRowWrap: {
+        ...styles.mobileHandRowWrap,
+        gap: isTinyLayout ? "8px" : "10px",
+        alignItems: "center",
+      },
+      mobileHandRow: {
+        ...styles.mobileHandRow,
+        gap: isTinyLayout ? "4px" : "6px",
+        alignItems: "center",
+        paddingTop: 0,
+      },
+      mobileHandTitle: {
+        ...styles.mobileHandTitle,
+        fontSize: isTinyLayout ? "10px" : "12px",
+      },
+      mobileHandMeta: {
+        ...styles.mobileHandMeta,
+        fontSize: isTinyLayout ? "8px" : "9px",
+      },
+      mobileCardButton: {
+        ...styles.mobileCardButton,
+        width: isTinyLayout ? "40px" : isCompactLayout ? "45px" : "50px",
+        minWidth: isTinyLayout ? "40px" : isCompactLayout ? "45px" : "50px",
+        minHeight: isTinyLayout ? "58px" : isCompactLayout ? "64px" : "70px",
+        padding: isTinyLayout ? "3px" : "4px",
+      },
+      mobileCardRank: {
+        ...styles.mobileCardRank,
+        fontSize: isTinyLayout ? "11px" : "13px",
+      },
+      mobileCardSuit: {
+        ...styles.mobileCardSuit,
+        fontSize: isTinyLayout ? "11px" : "13px",
+      },
+      mobileCardCenterSuit: {
+        ...styles.mobileCardCenterSuit,
+        fontSize: isTinyLayout ? "16px" : "20px",
       },
     }),
-    [isCompactLayout, useTightSidebar]
+    [isCompactLayout, isTinyLayout, stageScale, useTightSidebar]
   )
 
   return (
@@ -783,14 +871,17 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     overflow: "hidden",
   },
-  gameViewportFrame: {
-    width: "min(100%, calc((100vh - 240px) * 2.16))",
-    maxWidth: "100%",
-    aspectRatio: "19.5 / 9",
-    minHeight: "min(420px, 68vh)",
-    maxHeight: "76vh",
+  gameViewportStageSlot: {
+    position: "relative",
+    flex: "0 0 auto",
+    overflow: "hidden",
     margin: "0 auto",
+  },
+  gameViewportFrame: {
+    width: "1080px",
+    height: "500px",
     display: "flex",
+    transformOrigin: "top left",
     position: "relative",
     overflow: "hidden",
     borderRadius: "22px",
@@ -835,7 +926,7 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: "flex-end",
     alignItems: "flex-start",
     minWidth: 0,
-    zIndex: 2,
+    zIndex: 30,
   },
   inGameContextMenuButton: {
     borderRadius: "12px",
@@ -879,7 +970,7 @@ const styles: Record<string, React.CSSProperties> = {
     position: "absolute",
     right: 0,
     bottom: "calc(100% + 8px)",
-    width: "min(240px, 68vw)",
+    width: "220px",
     display: "flex",
     flexDirection: "column",
     gap: "8px",
@@ -888,7 +979,7 @@ const styles: Record<string, React.CSSProperties> = {
     background: "linear-gradient(180deg, rgba(31,21,15,0.97) 0%, rgba(18,12,8,0.98) 100%)",
     border: "1px solid rgba(244, 226, 190, 0.16)",
     boxShadow: "0 18px 32px rgba(0,0,0,0.32)",
-    zIndex: 3,
+    zIndex: 40,
   },
   inGameConfirmationOverlay: {
     position: "absolute",
@@ -897,7 +988,7 @@ const styles: Record<string, React.CSSProperties> = {
     placeItems: "center",
     padding: "clamp(16px, 1.4vw, 24px)",
     background: "rgba(0,0,0,0.48)",
-    zIndex: 4,
+    zIndex: 80,
   },
   inGameConfirmationCard: {
     width: "min(520px, 100%)",
@@ -1599,10 +1690,11 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: "14px",
   },
   mobileHandPanel: {
-    display: "flex",
-    flexDirection: "column",
+    display: "grid",
+    gridTemplateRows: "16px minmax(0, 1fr)",
     gap: "6px",
-    minHeight: "100%",
+    height: "100%",
+    minHeight: 0,
   },
   mobileHandHeader: {
     display: "flex",
@@ -1614,8 +1706,9 @@ const styles: Record<string, React.CSSProperties> = {
     display: "grid",
     gridTemplateColumns: "minmax(0, 1fr) max-content",
     gap: "clamp(8px, 0.7vw, 12px)",
-    alignItems: "end",
+    alignItems: "center",
     minWidth: 0,
+    minHeight: 0,
   },
   mobileHandTitle: {
     fontSize: "clamp(10px, 0.82vw, 12px)",
@@ -1638,10 +1731,10 @@ const styles: Record<string, React.CSSProperties> = {
   },
   mobileHandMenuDock: {
     display: "flex",
-    alignItems: "flex-end",
+    alignItems: "center",
     justifyContent: "flex-end",
-    paddingBottom: "clamp(2px, 0.2vw, 4px)",
-    minHeight: "100%",
+    paddingBottom: 0,
+    minHeight: 0,
   },
   inGameActionsCard: {
     borderRadius: "16px",
@@ -2357,6 +2450,32 @@ const styles: Record<string, React.CSSProperties> = {
     placeItems: "center",
     padding: "clamp(18px, 1.5vw, 24px)",
     boxSizing: "border-box",
+  },
+  matchResultImageScreen: {
+    gridColumn: "1 / -1",
+    width: "100%",
+    height: "100%",
+    position: "relative",
+    overflow: "hidden",
+    borderRadius: "22px",
+    background: "#080604",
+  },
+  matchResultImage: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    display: "block",
+  },
+  matchResultImageCta: {
+    position: "absolute",
+    left: "31%",
+    bottom: "5.8%",
+    width: "40%",
+    height: "13%",
+    border: "none",
+    borderRadius: "18px",
+    background: "transparent",
+    cursor: "pointer",
   },
   matchResultCard: {
     width: "min(100%, 780px)",

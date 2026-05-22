@@ -33,6 +33,8 @@ Hoje o projeto ja possui:
 - fluxo de consulta/conselho da parceira no truco ja implementado
 - primeira versao da capa do `Bar do Ze Catinga` com assets proprios
 - scorepad da coluna esquerda corrigido e validado visualmente na gameplay
+- gameplay escalada como stage logico dentro da moldura landscape
+- telas autorais de vitoria e derrota do `Bar do Ze Catinga`
 
 ## Arquitetura que deve ser preservada
 
@@ -95,8 +97,12 @@ Arquivos principais:
   - capa do bar
   - entrada no jogo
   - scorepad renderizado sem sobreposicao entre labels e numeros
-- `npm run build` passou depois do ajuste do scorepad
-- o proximo foco recomendado continua na gameplay screen, agora para estabilizar a escala responsiva da moldura de celular
+- a gameplay foi estabilizada como stage logico `1080x500` escalado no wrapper externo
+- a mao do humano e o botao `MENU` foram protegidos dentro da faixa inferior
+- o menu em jogo abre acima da mesa e fecha antes dos modais de confirmacao
+- as telas de resultado do `Bar do Ze Catinga` agora usam artes proprias para vitoria e derrota
+- `npm run build` passou depois da estabilizacao da gameplay e das telas de resultado
+- o proximo foco recomendado e revisar UX e responsividade da selecao de parceira
 
 ## Estado atual da gameplay screen
 
@@ -116,11 +122,10 @@ Dentro da coluna central:
 Importante:
 
 - as areas sao separadas visualmente, mas ainda compartilham o mesmo layout mestre
-- pequenas alteracoes de proporcao ainda podem afetar outros blocos
-- o scorepad foi parcialmente blindado para responder mais ao proprio card do que ao viewport geral
-- foi observado em video que redimensionar a janela do navegador ainda pode baguncar a composicao dentro da tela de celular
-- o problema provavel e que a gameplay ainda reflowa como pagina responsiva, em vez de se comportar como stage fixo escalado
-- evitar reabrir retrabalho estrutural da gameplay sem motivo real, mas estabilizar a escala da moldura virou a prioridade visual
+- o stage interno da gameplay tem resolucao logica fixa e escala no conjunto quando o viewport muda
+- pequenas alteracoes de composicao interna ainda devem respeitar as trilhas controladas do stage
+- o scorepad responde ao proprio card e nao deve ser reaberto junto com mudancas grandes de layout
+- evitar reabrir retrabalho estrutural da gameplay sem regressao real
 
 ### Coluna esquerda
 
@@ -153,18 +158,15 @@ Observacao:
 
 ### Responsividade da gameplay
 
-Problema atual observado:
+Estado consolidado:
 
-- ao redimensionar a janela do navegador, os elementos dentro da moldura de celular podem mudar de proporcao e se desalinharem
-- isso pode virar problema em devices com tamanhos e proporcoes diferentes
-
-Diagnostico de continuidade:
-
-- a gameplay deve passar a se comportar como um stage de jogo com resolucao logica fixa
-- o wrapper externo pode escalar esse stage para caber no viewport
-- dentro da moldura, evitar que cada subarea responda diretamente a `vw`/`dvh` da janela
-- aceitar letterbox/pillarbox quando a proporcao externa nao bater com a proporcao do jogo
-- manter poucos modos internos controlados, como `regular`, `compact` e `tiny`, apenas quando realmente necessario
+- stage logico interno em `1080x500`
+- wrapper externo calcula a escala para caber na area disponivel
+- o frame interno recebe `transform: scale(...)` e a composicao principal escala como unidade
+- ajustes internos ficam limitados aos modos `regular`, `compact` e `tiny`
+- mesa, rails laterais, faixa da mao e menu em jogo foram validados em tamanhos representativos
+- continuar aceitando letterbox/pillarbox quando a proporcao externa nao bater com a proporcao do jogo
+- dentro da gameplay, evitar recolocar `vw`/`dvh` em blocos que deveriam seguir o stage
 
 ### Coluna central
 
@@ -205,6 +207,17 @@ Assets em uso:
 - `src/assets/ui-right/value-plaque-solid.png`
 - `src/assets/ui-right/stats-panel-wood-main.png`
 - `src/assets/ui-right/action-button-solid.png`
+
+## Estado atual das telas de resultado
+
+- `Bar do Ze Catinga` tem artes proprias para:
+  - vitoria: `src/assets/venues/ze-catinga/match-result-win.png`
+  - derrota: `src/assets/venues/ze-catinga/match-result-loss.png`
+- a arte ocupa a tela de resultado dentro da moldura do stage
+- a placa `VOLTAR AO FLUXO DE BARES` da arte recebe uma area clicavel invisivel por cima
+- o `venueId` do resultado preserva qual arte usar mesmo quando a campanha avanca depois da partida
+- placares numericos nao devem ser embutidos nas artes ou textos de resultado autorais
+- a tela generica continua como fallback para bares sem arte de resultado
 
 ## Estado atual da tela inicial
 

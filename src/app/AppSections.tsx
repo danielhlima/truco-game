@@ -19,6 +19,8 @@ import zeCatingaQuoteBoardAsset from "../assets/venues/ze-catinga/host-quote-boa
 import zeCatingaCtaPlaqueAsset from "../assets/venues/ze-catinga/cta-plaque.png"
 import zeCatingaDifficultyBottleAsset from "../assets/venues/ze-catinga/difficulty-bottle.png"
 import zeCatingaDividerAsset from "../assets/venues/ze-catinga/divider-ornament.png"
+import zeCatingaMatchResultLossAsset from "../assets/venues/ze-catinga/match-result-loss.png"
+import zeCatingaMatchResultWinAsset from "../assets/venues/ze-catinga/match-result-win.png"
 import zeCatingaStatsPlaqueAsset from "../assets/venues/ze-catinga/stats-plaque-aged-blank.png"
 import type { PlayerProfile } from "../profile/playerProfile"
 import type { PartnerAdvice } from "../ai/trucoDecision"
@@ -44,6 +46,7 @@ type MatchResultScreenState = {
   progressionTitle?: string
   title: string
   subtitle: string
+  venueId?: string
   venueName: string
 }
 
@@ -76,6 +79,13 @@ const VENUE_COVER_CONFIG_BY_ID: Record<string, VenueCoverConfig> = {
     difficultyBottleAsset: zeCatingaDifficultyBottleAsset,
     dividerAsset: zeCatingaDividerAsset,
     statsPlaqueAsset: zeCatingaStatsPlaqueAsset,
+  },
+}
+
+const MATCH_RESULT_ASSET_BY_VENUE_ID: Record<string, { loss?: string; win?: string }> = {
+  "bar-do-ze-catinga": {
+    loss: zeCatingaMatchResultLossAsset,
+    win: zeCatingaMatchResultWinAsset,
   },
 }
 
@@ -544,17 +554,19 @@ export function TableSection({
             padding: 0,
           }}
         >
-          <div style={styles.gameViewportFrame}>
-            <VenueIntroScreen
-              currentCampaignVenue={currentCampaignVenue}
-              currentVenueWins={currentVenueWins}
-              hasSelectedPartnerForVenue={hasSelectedPartnerForVenue}
-              opponentCharacters={opponentCharacters}
-              playerProfile={playerProfile}
-              onOpenCharacterSelect={onOpenCharacterSelect}
-              onStart={onEnterVenueFromIntro}
-              styles={styles}
-            />
+          <div style={styles.gameViewportStageSlot}>
+            <div style={styles.gameViewportFrame}>
+              <VenueIntroScreen
+                currentCampaignVenue={currentCampaignVenue}
+                currentVenueWins={currentVenueWins}
+                hasSelectedPartnerForVenue={hasSelectedPartnerForVenue}
+                opponentCharacters={opponentCharacters}
+                playerProfile={playerProfile}
+                onOpenCharacterSelect={onOpenCharacterSelect}
+                onStart={onEnterVenueFromIntro}
+                styles={styles}
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -564,67 +576,68 @@ export function TableSection({
   return (
     <section style={styles.tablePanel}>
       <div style={styles.tableHudSurface}>
-        <div style={styles.gameViewportFrame}>
-          <div style={styles.gameViewport}>
-            {isMenuMode ? (
-              menuScreen === "match-result" ? (
-                <MatchResultScreen
-                  currentCampaignVenue={currentCampaignVenue}
-                  result={matchResultScreen}
-                  onContinue={onReturnToJourneyFlow}
-                  styles={styles}
-                />
-              ) : menuScreen === "journey-intro" ? (
-                <JourneyIntroScreen
-                  currentCampaignVenue={currentCampaignVenue}
-                  onBack={onCloseJourneyIntro}
-                  onContinueToCharacterSelect={onContinueToCharacterSelect}
-                  onLaunchVenue={onLaunchVenue}
-                  styles={styles}
-                />
-              ) : menuScreen === "character-select" ? (
-                <CharacterSelectionScreen
-                  currentCampaignVenue={currentCampaignVenue}
-                  selectedCharacter={selectedCharacter}
-                  selectedCharacterIndex={selectedCharacterIndex}
-                  selectedPartnerCharacter={selectedPartnerCharacter}
-                  selectableCharacters={selectableCharacters}
-                  onBack={onCloseCharacterSelect}
-                  onConfirm={onConfirmCharacterSelect}
-                  onNext={onSelectNextCharacter}
-                  onPrevious={onSelectPreviousCharacter}
-                  styles={styles}
-                />
-              ) : menuScreen === "venue-intro" ? (
-                <VenueIntroScreen
-                  currentCampaignVenue={currentCampaignVenue}
-                  currentVenueWins={currentVenueWins}
-                  hasSelectedPartnerForVenue={hasSelectedPartnerForVenue}
-                  opponentCharacters={opponentCharacters}
-                  playerProfile={playerProfile}
-                  onOpenCharacterSelect={onOpenCharacterSelect}
-                  onStart={onEnterVenueFromIntro}
-                  styles={styles}
-                />
+        <div style={styles.gameViewportStageSlot}>
+          <div style={styles.gameViewportFrame}>
+            <div style={styles.gameViewport}>
+              {isMenuMode ? (
+                menuScreen === "match-result" ? (
+                  <MatchResultScreen
+                    currentCampaignVenue={currentCampaignVenue}
+                    result={matchResultScreen}
+                    onContinue={onReturnToJourneyFlow}
+                    styles={styles}
+                  />
+                ) : menuScreen === "journey-intro" ? (
+                  <JourneyIntroScreen
+                    currentCampaignVenue={currentCampaignVenue}
+                    onBack={onCloseJourneyIntro}
+                    onContinueToCharacterSelect={onContinueToCharacterSelect}
+                    onLaunchVenue={onLaunchVenue}
+                    styles={styles}
+                  />
+                ) : menuScreen === "character-select" ? (
+                  <CharacterSelectionScreen
+                    currentCampaignVenue={currentCampaignVenue}
+                    selectedCharacter={selectedCharacter}
+                    selectedCharacterIndex={selectedCharacterIndex}
+                    selectedPartnerCharacter={selectedPartnerCharacter}
+                    selectableCharacters={selectableCharacters}
+                    onBack={onCloseCharacterSelect}
+                    onConfirm={onConfirmCharacterSelect}
+                    onNext={onSelectNextCharacter}
+                    onPrevious={onSelectPreviousCharacter}
+                    styles={styles}
+                  />
+                ) : menuScreen === "venue-intro" ? (
+                  <VenueIntroScreen
+                    currentCampaignVenue={currentCampaignVenue}
+                    currentVenueWins={currentVenueWins}
+                    hasSelectedPartnerForVenue={hasSelectedPartnerForVenue}
+                    opponentCharacters={opponentCharacters}
+                    playerProfile={playerProfile}
+                    onOpenCharacterSelect={onOpenCharacterSelect}
+                    onStart={onEnterVenueFromIntro}
+                    styles={styles}
+                  />
+                ) : (
+                  <GameStartScreen
+                    activeVariant={activeVariant}
+                    campaignCompleted={campaignCompleted}
+                    currentCampaignVenue={currentCampaignVenue}
+                    debugModeEnabled={debugModeEnabled}
+                    debugVenueId={debugVenueId}
+                    debugVenueOptions={debugVenueOptions}
+                    onChangeVariant={onChangeVariant}
+                    onChangeDebugVenue={onChangeDebugVenue}
+                    onOpenJourneyIntro={onOpenJourneyIntro}
+                    onResetCampaign={onResetCampaign}
+                    onStart={onStart}
+                    styles={styles}
+                    variantSelectionDisabled={variantSelectionDisabled}
+                  />
+                )
               ) : (
-                <GameStartScreen
-                  activeVariant={activeVariant}
-                  campaignCompleted={campaignCompleted}
-                  currentCampaignVenue={currentCampaignVenue}
-                  debugModeEnabled={debugModeEnabled}
-                  debugVenueId={debugVenueId}
-                  debugVenueOptions={debugVenueOptions}
-                  onChangeVariant={onChangeVariant}
-                  onChangeDebugVenue={onChangeDebugVenue}
-                  onOpenJourneyIntro={onOpenJourneyIntro}
-                  onResetCampaign={onResetCampaign}
-                  onStart={onStart}
-                  styles={styles}
-                  variantSelectionDisabled={variantSelectionDisabled}
-                />
-              )
-            ) : (
-              <>
+                <>
                 <div style={styles.gameLeftRail}>
                   <div style={styles.scenePanel}>
                     <div style={styles.scenePanelTitle}>Mesa</div>
@@ -908,36 +921,37 @@ export function TableSection({
                     </div>
                   </div>
                 </div>
-              </>
-            )}
-          </div>
+                </>
+              )}
+            </div>
 
-          {handState && inGameConfirmation ? (
-            <div style={styles.inGameConfirmationOverlay}>
-              <div style={styles.inGameConfirmationCard}>
-                <div style={styles.inGameConfirmationEyebrow}>Confirmação</div>
-                <h3 style={styles.inGameConfirmationTitle}>{inGameConfirmation.title}</h3>
-                <p style={styles.inGameConfirmationText}>{inGameConfirmation.message}</p>
-                <div style={styles.inGameConfirmationWarning}>
-                  Todo o progresso desta partida atual será perdido se você continuar.
-                </div>
-                <div style={styles.inGameConfirmationActions}>
-                  <button
-                    style={styles.inGameConfirmationCancelButton}
-                    onClick={onCancelInGameConfirmation}
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    style={styles.inGameConfirmationConfirmButton}
-                    onClick={onConfirmInGameConfirmation}
-                  >
-                    {inGameConfirmation.confirmLabel}
-                  </button>
+            {handState && inGameConfirmation ? (
+              <div style={styles.inGameConfirmationOverlay}>
+                <div style={styles.inGameConfirmationCard}>
+                  <div style={styles.inGameConfirmationEyebrow}>Confirmação</div>
+                  <h3 style={styles.inGameConfirmationTitle}>{inGameConfirmation.title}</h3>
+                  <p style={styles.inGameConfirmationText}>{inGameConfirmation.message}</p>
+                  <div style={styles.inGameConfirmationWarning}>
+                    Todo o progresso desta partida atual será perdido se você continuar.
+                  </div>
+                  <div style={styles.inGameConfirmationActions}>
+                    <button
+                      style={styles.inGameConfirmationCancelButton}
+                      onClick={onCancelInGameConfirmation}
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      style={styles.inGameConfirmationConfirmButton}
+                      onClick={onConfirmInGameConfirmation}
+                    >
+                      {inGameConfirmation.confirmLabel}
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : null}
+            ) : null}
+          </div>
         </div>
       </div>
     </section>
@@ -1238,6 +1252,28 @@ function MatchResultScreen({
   styles: StyleMap
 }) {
   const didWin = result?.outcome === "win"
+  const resultVenueId = result?.venueId ?? currentCampaignVenue?.id
+  const resultAsset =
+    result?.outcome && resultVenueId
+      ? MATCH_RESULT_ASSET_BY_VENUE_ID[resultVenueId]?.[result.outcome] ?? null
+      : null
+
+  if (resultAsset) {
+    return (
+      <div style={styles.matchResultImageScreen}>
+        <img
+          src={resultAsset}
+          alt={result?.title ?? "Vitória na mesa"}
+          style={styles.matchResultImage}
+        />
+        <button
+          aria-label="Voltar ao fluxo de bares"
+          style={styles.matchResultImageCta}
+          onClick={onContinue}
+        />
+      </div>
+    )
+  }
 
   return (
     <div style={styles.matchResultScreen}>
