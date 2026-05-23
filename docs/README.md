@@ -56,6 +56,7 @@ Estado consolidado:
 
 - fluxo `COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo`
 - capa autoral do `Bar do Ze Catinga` com HUD de estatisticas em placa propria
+- capa e gameplay do `Bar Maneco Banguela` usam o mesmo background proprio, reaproveitando os HUDs/placas da capa do Ze Catinga
 - coluna direita da capa centralizada
 - coluna central da capa sem `Proximo desafio`
 - dificuldade do desafio ampliada abaixo dos adversarios
@@ -72,8 +73,9 @@ Estado consolidado:
 - popover do `MENU` fica acima da mesa e fecha antes dos modais de confirmacao
 - tela de selecao de parceira aceita como pronta no estado atual
 - parceira antes chamada `Ze Catinga` renomeada para `Joca do Busão` com id `joca-busao`
-- tela de campanha do primeiro trecho (`Botecos da Rua`) usa arte autoral para o estado atual do `Bar do Ze Catinga`
-- a arte de campanha fica em `src/assets/campaign/botecos-rua-ze-catinga.png`
+- tela de campanha do primeiro trecho (`Botecos da Rua`) usa artes autorais para os estados atuais:
+  - `Bar do Ze Catinga`: `src/assets/campaign/botecos-rua-ze-catinga.png`
+  - `Bar Maneco Banguela`: `src/assets/campaign/botecos-rua-maneco-banguela.png`
 - os botoes da campanha autoral sao areas HTML invisiveis sobre a imagem:
   - `VOLTAR`
   - `ENTRAR NO BAR`
@@ -86,13 +88,12 @@ Estado consolidado:
 
 ## Prioridade imediata para o proximo chat
 
-No proximo chat, expandir o modelo autoral da campanha para o proximo estado do percurso.
+No proximo chat, seguir para a mesa, resultados ou proximo estado visual do `Bar Maneco Banguela`.
 
 Proximo foco recomendado:
 
-- gerar/implementar a arte de campanha quando o jogador estiver no `Bar Maneco Banguela`
-- manter a abordagem de imagem autoral com hotspots HTML invisiveis
-- preservar o fallback dinamico para estados ainda sem arte propria
+- criar telas autorais de vitoria/derrota do `Bar Maneco Banguela`
+- preservar a capa e o background de gameplay atuais do Maneco
 
 Depois disso, seguir para:
 

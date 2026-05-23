@@ -104,13 +104,15 @@ Arquivos principais:
 - a tela de selecao de parceira foi aceita como pronta no estado atual
 - a parceira antes chamada `Ze Catinga` foi renomeada para `Joca do Busão` com id `joca-busao`
 - a persistencia antiga do perfil foi invalidada depois da mudanca de id
-- a tela de campanha do primeiro trecho agora tem arte autoral para o estado atual do `Bar do Ze Catinga`
-- a campanha autoral usa `src/assets/campaign/botecos-rua-ze-catinga.png`
+- a tela de campanha do primeiro trecho agora tem artes autorais para `Bar do Ze Catinga` e `Bar Maneco Banguela`
+- as artes de campanha ficam em:
+  - `src/assets/campaign/botecos-rua-ze-catinga.png`
+  - `src/assets/campaign/botecos-rua-maneco-banguela.png`
 - os controles `VOLTAR`, `ENTRAR NO BAR` e `TROCAR PARCEIRA` sao hotspots HTML invisiveis sobre a imagem
 - a tela de campanha dinamica continua como fallback para bares/estados sem arte propria
 - a tela de resultado preserva a ultima mesa visivel e espera 1 segundo antes de exibir vitoria/derrota
 - `npm run build` passou depois da estabilizacao da gameplay, das telas de resultado, da campanha autoral e da consistencia da parceira renomeada
-- o proximo foco recomendado e criar o proximo estado autoral da campanha, começando pelo `Bar Maneco Banguela`
+- o proximo foco recomendado e criar a entrada/capa autoral do `Bar Maneco Banguela`
 
 ## Estado atual da gameplay screen
 
@@ -306,9 +308,11 @@ Observacoes:
 - a capa do bar nao deve falar da campanha inteira
 - a capa deve falar apenas daquele bar
 - o `Bar do Ze Catinga` ja possui uma primeira capa autoral
+- o `Bar Maneco Banguela` ja possui capa propria reaproveitando os HUDs/placas existentes e trocando host/background
+- a gameplay do `Bar Maneco Banguela` usa o mesmo background da entrada do bar
 - outros bares ainda podem cair em fallback generico
 
-### Capa do Bar do Ze Catinga
+### Capas autorais dos primeiros bares
 
 Arquivos principais:
 
@@ -316,6 +320,7 @@ Arquivos principais:
 - `src/app/useGameSession.ts`
 - `src/App.tsx`
 - `src/assets/venues/ze-catinga/`
+- `src/assets/venues/maneco-banguela/`
 
 Assets atuais:
 
@@ -326,11 +331,15 @@ Assets atuais:
 - `stats-plaque-aged-blank.png`
 - `difficulty-bottle.png`
 - `divider-ornament.png`
+- `src/assets/venues/maneco-banguela/background.png`
+- `src/assets/venues/maneco-banguela/host-maneco-banguela.png`
 
 Estado visual atual:
 
 - coluna esquerda esta aceitavel por enquanto
 - coluna central mostra nome, endereco, descricao, adversarios e dificuldade ampliada
+- Maneco usa o mesmo sistema de layout, HUD, placa de fala, CTA, divisor, dificuldade e placa de estatisticas do Ze Catinga
+- Maneco tambem usa `src/assets/venues/maneco-banguela/background.png` como background da gameplay
 - coluna direita mostra estatisticas em placa propria e botao de entrada centralizados
 - a frase `Proximo desafio` foi removida da capa
 - a placa `ENTRAR NO BAR` e a lousa do dono seguem protegidas contra estouro de texto
@@ -340,9 +349,11 @@ Estado visual atual:
 
 ### Estado atual da tela de campanha
 
-- para o estado atual do `Bar do Ze Catinga`, a campanha usa uma arte autoral completa
-- a arte mostra o trecho `Botecos da Rua`, o bar atual, o proximo bar bloqueado e a etapa seguinte
-- a imagem fica em `src/assets/campaign/botecos-rua-ze-catinga.png`
+- para os estados atuais do `Bar do Ze Catinga` e do `Bar Maneco Banguela`, a campanha usa arte autoral completa
+- as artes mostram o trecho `Botecos da Rua`, o bar atual, o progresso anterior e a etapa seguinte
+- as imagens ficam em:
+  - `src/assets/campaign/botecos-rua-ze-catinga.png`
+  - `src/assets/campaign/botecos-rua-maneco-banguela.png`
 - o React posiciona areas clicaveis invisiveis sobre:
   - `VOLTAR`
   - `ENTRAR NO BAR`

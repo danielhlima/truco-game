@@ -68,9 +68,10 @@ Status:
 - a tela de selecao de parceira foi aceita como pronta no estado atual
 - a parceira antes chamada `Ze Catinga` agora e `Joca do Busão`, id `joca-busao`
 - a persistencia antiga do perfil foi invalidada para nao carregar escolha salva com o id anterior
-- a tela de campanha do estado atual do `Bar do Ze Catinga` usa arte autoral com hotspots HTML invisiveis
+- a tela de campanha dos estados atuais do `Bar do Ze Catinga` e do `Bar Maneco Banguela` usa arte autoral com hotspots HTML invisiveis
 - a tela dinamica de campanha segue como fallback para estados sem arte propria
-- o foco imediato recomendado agora e expandir o modelo autoral para o proximo estado da campanha
+- a capa e a gameplay do `Bar Maneco Banguela` ja usam o background proprio do bar e reaproveitam os HUDs/placas existentes
+- o foco imediato recomendado agora e criar telas de resultado autorais do `Bar Maneco Banguela`
 
 ### Truco e dialogos
 
@@ -136,15 +137,15 @@ Estado atual:
 
 ### Opcao principal
 
-- expandir o modelo autoral de campanha para o proximo estado do percurso
+- criar telas de resultado autorais do `Bar Maneco Banguela`
 
 ### Itens para atacar primeiro
 
-- Campanha:
-  1. gerar arte para o estado em que o jogador esta no `Bar Maneco Banguela`
-  2. manter o mesmo padrao de hotspots HTML invisiveis sobre a imagem
-  3. preservar a tela dinamica como fallback para estados ainda sem arte propria
-  4. revisar coordenadas dos hotspots no navegador antes de concluir
+- Maneco Banguela:
+  1. criar telas autorais de vitoria e derrota
+  2. preservar o background compartilhado entre capa e gameplay
+  3. preservar o fluxo `campanha > capa do bar > escolha de parceira se necessario > jogo`
+  4. validar no fluxo real antes de concluir
 - Validacao:
   - abrir o fluxo real `COMEÇAR > campanha`
   - confirmar que o refinamento nao quebra `campanha > capa do bar > escolha de parceira se necessario > jogo`
@@ -162,10 +163,10 @@ Estado atual:
 ## Pendencias abertas
 
 - expandir o fluxo autoral da campanha:
-  - imagem para `Bar Maneco Banguela`
   - imagem para estados concluidos do primeiro trecho
   - imagem para transicao ao `Circuito do Bairro`
   - hotspots revisados por estado
+- criar resultado autoral do `Bar Maneco Banguela`
 - dar mais contexto narrativo aos bares
 - decidir como parceiros gratuitos/pagos entram no fluxo
 - otimizar mais os assets fotograficos grandes, se necessario
@@ -224,16 +225,22 @@ Estado atual:
 - a tela de selecao de parceira foi considerada pronta no estado atual e nao deve ser reaberta neste chat
 - a parceira antes chamada Ze Catinga agora e Joca do Busão, com id `joca-busao`
 - a persistencia antiga do perfil foi invalidada depois dessa mudanca de id
-- a tela de campanha do estado atual do Bar do Ze Catinga usa arte autoral:
+- a tela de campanha dos estados atuais de Ze Catinga e Maneco Banguela usa arte autoral:
   - `src/assets/campaign/botecos-rua-ze-catinga.png`
+  - `src/assets/campaign/botecos-rua-maneco-banguela.png`
   - botoes HTML invisiveis sobre `VOLTAR`, `ENTRAR NO BAR` e `TROCAR PARCEIRA`
   - tela dinamica preservada como fallback
 - a tela de resultado preserva a ultima mesa visivel e espera 1 segundo antes de exibir vitoria/derrota
+- a capa do Bar Maneco Banguela usa:
+  - `src/assets/venues/maneco-banguela/background.png`
+  - `src/assets/venues/maneco-banguela/host-maneco-banguela.png`
+  - HUDs/placas reaproveitados do Ze Catinga
+- a gameplay do Bar Maneco Banguela usa o mesmo background da entrada
 
 Objetivo deste chat:
-1. expandir o modelo autoral da campanha para o proximo estado do jogador
-2. gerar/implementar a arte da campanha para o Bar Maneco Banguela ou o estado escolhido
-3. manter hotspots HTML invisiveis e preservar a tela dinamica como fallback
+1. criar a proxima peca autoral do Bar Maneco Banguela
+2. priorizar telas de resultado, conforme assets disponiveis
+3. preservar a capa atual e a tela dinamica de campanha como fallback
 4. preservar o fluxo de jogo, a capa do bar, a selecao de parceira, a gameplay e as regras de truco
 
 Arquivos provaveis:

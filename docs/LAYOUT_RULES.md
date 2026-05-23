@@ -132,7 +132,7 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 ## Regras da Tela de Campanha
 
 - A tela de campanha acontece antes da capa do bar.
-- Para o primeiro estado do `Bar do Ze Catinga`, usar a arte autoral `src/assets/campaign/botecos-rua-ze-catinga.png`.
+- Para os estados atuais do `Bar do Ze Catinga` e do `Bar Maneco Banguela`, usar artes autorais em `src/assets/campaign/`.
 - A arte autoral pode conter textos, placas e ilustrações ja renderizados.
 - Controles de fluxo sobre arte autoral devem ser botoes HTML invisiveis posicionados por percentual.
 - Os hotspots atuais sao `VOLTAR`, `ENTRAR NO BAR` e `TROCAR PARCEIRA`.
@@ -172,7 +172,7 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 ## Pendências Visuais
 
 - A tela de selecao de parceira foi aceita como pronta no estado atual; reabrir apenas com regressao ou nova decisao de produto.
-- Expandir a tela de campanha autoral para o estado do `Bar Maneco Banguela`.
+- A capa do `Bar Maneco Banguela` ja reaproveita os HUDs do Ze Catinga e troca host/background proprios.
 - Refinar a mesa central conforme novos assets chegarem.
 - Fazer polimento responsivo final depois do layout aprovado.
 - Expandir capa e telas autorais de resultado para outros bares.

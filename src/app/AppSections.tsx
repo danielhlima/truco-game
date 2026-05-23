@@ -13,6 +13,9 @@ import scorePadNotebookAsset from "../assets/ui-left/scorepad-notebook-clean-cut
 import avatarYouAsset from "../assets/characters/zeca-viramao.png"
 import actionButtonAsset from "../assets/ui-right/action-button-solid.png"
 import statsPanelWoodAsset from "../assets/ui-right/stats-panel-wood-main.png"
+import manecoBanguelaCampaignJourneyAsset from "../assets/campaign/botecos-rua-maneco-banguela.png"
+import manecoBanguelaBackgroundAsset from "../assets/venues/maneco-banguela/background.png"
+import manecoBanguelaHostAsset from "../assets/venues/maneco-banguela/host-maneco-banguela.png"
 import zeCatingaCampaignJourneyAsset from "../assets/campaign/botecos-rua-ze-catinga.png"
 import zeCatingaBackgroundAsset from "../assets/venues/ze-catinga/background.png"
 import zeCatingaHostAsset from "../assets/venues/ze-catinga/host-ze-catinga.png"
@@ -75,6 +78,20 @@ const VENUE_COVER_CONFIG_BY_ID: Record<string, VenueCoverConfig> = {
     description: "A mesa aqui não compra pose. Ou você aguenta o calor, ou sai pela porta menor.",
     backgroundAsset: zeCatingaBackgroundAsset,
     hostPortraitAsset: zeCatingaHostAsset,
+    quoteBoardAsset: zeCatingaQuoteBoardAsset,
+    ctaPlaqueAsset: zeCatingaCtaPlaqueAsset,
+    difficultyBottleAsset: zeCatingaDifficultyBottleAsset,
+    dividerAsset: zeCatingaDividerAsset,
+    statsPlaqueAsset: zeCatingaStatsPlaqueAsset,
+  },
+  "bar-maneco-banguela": {
+    hostName: "Maneco Banguela",
+    hostRole: "Dono do Bar",
+    hostQuote: "Aqui sorriso bonito não ganha truco.",
+    leadText: "Mesa apertada, fala atravessada e truco ligeiro no balcão.",
+    description: "No Maneco, ponto fácil vira história. Piscou, a mão já mudou de dono.",
+    backgroundAsset: manecoBanguelaBackgroundAsset,
+    hostPortraitAsset: manecoBanguelaHostAsset,
     quoteBoardAsset: zeCatingaQuoteBoardAsset,
     ctaPlaqueAsset: zeCatingaCtaPlaqueAsset,
     difficultyBottleAsset: zeCatingaDifficultyBottleAsset,
@@ -1122,17 +1139,16 @@ function JourneyIntroScreen({
   const currentStageVenueCount = currentCampaignVenue && activeStageIndex >= 0
     ? CAMPAIGN_STAGES[activeStageIndex]?.venues.length ?? 0
     : 0
-  const authoredCampaignAsset =
-    currentCampaignVenue?.id === "bar-do-ze-catinga"
-      ? zeCatingaCampaignJourneyAsset
-      : null
+  const authoredCampaign = currentCampaignVenue
+    ? authoredCampaignScreens[currentCampaignVenue.id]
+    : null
 
-  if (authoredCampaignAsset && currentCampaignVenue) {
+  if (authoredCampaign && currentCampaignVenue) {
     return (
       <div style={styles.authoredCampaignScreen}>
         <img
-          src={authoredCampaignAsset}
-          alt="Jornada de campanha dos Botecos da Rua"
+          src={authoredCampaign.asset}
+          alt={authoredCampaign.alt}
           style={styles.authoredCampaignImage}
         />
         <button
@@ -1140,16 +1156,16 @@ function JourneyIntroScreen({
           title="Voltar"
           style={{
             ...styles.authoredCampaignHotspot,
-            ...styles.authoredCampaignBackHotspot,
+            ...authoredCampaign.backHotspot,
           }}
           onClick={onBack}
         />
         <button
-          aria-label="Abrir capa do Bar do Zé Catinga"
-          title="Abrir capa do Bar do Zé Catinga"
+          aria-label={`Abrir capa do ${currentCampaignVenue.name}`}
+          title={`Abrir capa do ${currentCampaignVenue.name}`}
           style={{
             ...styles.authoredCampaignHotspot,
-            ...styles.authoredCampaignEnterHotspot,
+            ...authoredCampaign.enterHotspot,
           }}
           onClick={() => onLaunchVenue(currentCampaignVenue.id)}
         />
@@ -1158,7 +1174,7 @@ function JourneyIntroScreen({
           title="Trocar parceira"
           style={{
             ...styles.authoredCampaignHotspot,
-            ...styles.authoredCampaignPartnerHotspot,
+            ...authoredCampaign.partnerHotspot,
           }}
           onClick={onContinueToCharacterSelect}
         />
@@ -1351,6 +1367,68 @@ function JourneyIntroScreen({
       </div>
     </div>
   )
+}
+
+const authoredCampaignScreens: Record<
+  string,
+  {
+    asset: string
+    alt: string
+    backHotspot: React.CSSProperties
+    enterHotspot: React.CSSProperties
+    partnerHotspot: React.CSSProperties
+  }
+> = {
+  "bar-do-ze-catinga": {
+    asset: zeCatingaCampaignJourneyAsset,
+    alt: "Jornada de campanha dos Botecos da Rua com Bar do Ze Catinga atual",
+    backHotspot: {
+      left: "86.2%",
+      top: "6.1%",
+      width: "9.5%",
+      height: "7.9%",
+      borderRadius: "999px",
+    },
+    enterHotspot: {
+      left: "14.5%",
+      top: "72.2%",
+      width: "25.3%",
+      height: "11.6%",
+      borderRadius: "8px",
+    },
+    partnerHotspot: {
+      left: "39.6%",
+      top: "84.1%",
+      width: "23.8%",
+      height: "8.2%",
+      borderRadius: "8px",
+    },
+  },
+  "bar-maneco-banguela": {
+    asset: manecoBanguelaCampaignJourneyAsset,
+    alt: "Jornada de campanha dos Botecos da Rua com Bar Maneco Banguela atual",
+    backHotspot: {
+      left: "82.4%",
+      top: "2.9%",
+      width: "12.1%",
+      height: "8.7%",
+      borderRadius: "8px",
+    },
+    enterHotspot: {
+      left: "38.7%",
+      top: "70.2%",
+      width: "25.1%",
+      height: "10.8%",
+      borderRadius: "8px",
+    },
+    partnerHotspot: {
+      left: "35.2%",
+      top: "85.4%",
+      width: "29.4%",
+      height: "8.6%",
+      borderRadius: "8px",
+    },
+  },
 }
 
 function isCampaignVenueCleared(playerProfile: PlayerProfile, venue: CampaignVenue) {

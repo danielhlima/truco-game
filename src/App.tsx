@@ -2,6 +2,7 @@ import { Suspense, lazy, useEffect, useMemo, useState } from "react"
 import { useGameSession } from "./app/useGameSession"
 import botecoSceneBgAsset from "./assets/boteco/boteco-scene-bg.png"
 import cardFaceAgedPaperAsset from "./assets/cards/card-face-aged-paper.png"
+import manecoBanguelaSceneBgAsset from "./assets/venues/maneco-banguela/background.png"
 
 const GAMEPLAY_STAGE_WIDTH = 1080
 const GAMEPLAY_STAGE_HEIGHT = 500
@@ -139,10 +140,17 @@ function App() {
   const isCompactLayout = layoutMode !== "regular"
   const isTinyLayout = layoutMode === "tiny"
   const useTightSidebar = layoutMode !== "regular"
+  const gameplayBackgroundAsset = currentCampaignVenue?.id === "bar-maneco-banguela"
+    ? manecoBanguelaSceneBgAsset
+    : botecoSceneBgAsset
 
   const responsiveStyles = useMemo<Record<string, React.CSSProperties>>(
     () => ({
       ...styles,
+      tableHudSurface: {
+        ...styles.tableHudSurface,
+        backgroundImage: getGameplayBackgroundImage(gameplayBackgroundAsset),
+      },
       gameViewportStageSlot: {
         ...styles.gameViewportStageSlot,
         width: `${GAMEPLAY_STAGE_WIDTH * stageScale}px`,
@@ -341,7 +349,7 @@ function App() {
         fontSize: isTinyLayout ? "16px" : "20px",
       },
     }),
-    [isCompactLayout, isTinyLayout, stageScale, useTightSidebar]
+    [gameplayBackgroundAsset, isCompactLayout, isTinyLayout, stageScale, useTightSidebar]
   )
 
   return (
@@ -454,6 +462,10 @@ function App() {
       </div>
     </div>
   )
+}
+
+function getGameplayBackgroundImage(backgroundAsset: string) {
+  return `linear-gradient(180deg, rgba(16, 10, 7, 0.42) 0%, rgba(10, 7, 5, 0.5) 100%), url(${backgroundAsset})`
 }
 
 const styles: Record<string, React.CSSProperties> = {
@@ -858,7 +870,7 @@ const styles: Record<string, React.CSSProperties> = {
     gap: "14px",
   },
   tableHudSurface: {
-    backgroundImage: `linear-gradient(180deg, rgba(16, 10, 7, 0.42) 0%, rgba(10, 7, 5, 0.5) 100%), url(${botecoSceneBgAsset})`,
+    backgroundImage: getGameplayBackgroundImage(botecoSceneBgAsset),
     backgroundSize: "cover, cover",
     backgroundPosition: "center, center",
     backgroundRepeat: "no-repeat, no-repeat",
@@ -2615,27 +2627,6 @@ const styles: Record<string, React.CSSProperties> = {
     color: "transparent",
     cursor: "pointer",
     appearance: "none",
-  },
-  authoredCampaignBackHotspot: {
-    left: "86.2%",
-    top: "6.1%",
-    width: "9.5%",
-    height: "7.9%",
-    borderRadius: "999px",
-  },
-  authoredCampaignEnterHotspot: {
-    left: "14.5%",
-    top: "72.2%",
-    width: "25.3%",
-    height: "11.6%",
-    borderRadius: "8px",
-  },
-  authoredCampaignPartnerHotspot: {
-    left: "39.6%",
-    top: "84.1%",
-    width: "23.8%",
-    height: "8.2%",
-    borderRadius: "8px",
   },
   matchResultScreen: {
     gridColumn: "1 / -1",
