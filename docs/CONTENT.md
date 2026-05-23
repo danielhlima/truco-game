@@ -101,8 +101,16 @@ Arquivos principais:
 - a mao do humano e o botao `MENU` foram protegidos dentro da faixa inferior
 - o menu em jogo abre acima da mesa e fecha antes dos modais de confirmacao
 - as telas de resultado do `Bar do Ze Catinga` agora usam artes proprias para vitoria e derrota
-- `npm run build` passou depois da estabilizacao da gameplay e das telas de resultado
-- o proximo foco recomendado e revisar UX e responsividade da selecao de parceira
+- a tela de selecao de parceira foi aceita como pronta no estado atual
+- a parceira antes chamada `Ze Catinga` foi renomeada para `Joca do Busão` com id `joca-busao`
+- a persistencia antiga do perfil foi invalidada depois da mudanca de id
+- a tela de campanha do primeiro trecho agora tem arte autoral para o estado atual do `Bar do Ze Catinga`
+- a campanha autoral usa `src/assets/campaign/botecos-rua-ze-catinga.png`
+- os controles `VOLTAR`, `ENTRAR NO BAR` e `TROCAR PARCEIRA` sao hotspots HTML invisiveis sobre a imagem
+- a tela de campanha dinamica continua como fallback para bares/estados sem arte propria
+- a tela de resultado preserva a ultima mesa visivel e espera 1 segundo antes de exibir vitoria/derrota
+- `npm run build` passou depois da estabilizacao da gameplay, das telas de resultado, da campanha autoral e da consistencia da parceira renomeada
+- o proximo foco recomendado e criar o proximo estado autoral da campanha, começando pelo `Bar Maneco Banguela`
 
 ## Estado atual da gameplay screen
 
@@ -267,7 +275,7 @@ Starter partners atuais:
 - `leninha-lambreta`
 - `rosinha-catraca`
 - `rita-gambiarra`
-- `ze-catinga`
+- `joca-busao`
 
 Unlockables separados em codigo:
 
@@ -280,10 +288,8 @@ Unlockables separados em codigo:
 Estado:
 
 - funcional no fluxo real
-- ainda precisa de:
-  - acabamento visual fino
-  - refinamento da capa do bar
-  - transicao mais narrativa entre escolha e partida
+- aceita como pronta no estado atual
+- nao reabrir sem regressao real ou nova decisao de produto
 
 ## Fluxo atual antes da partida
 
@@ -331,6 +337,23 @@ Estado visual atual:
 - assets antigos da capa foram limpos
 
 ## Campanha e bares atuais mais importantes
+
+### Estado atual da tela de campanha
+
+- para o estado atual do `Bar do Ze Catinga`, a campanha usa uma arte autoral completa
+- a arte mostra o trecho `Botecos da Rua`, o bar atual, o proximo bar bloqueado e a etapa seguinte
+- a imagem fica em `src/assets/campaign/botecos-rua-ze-catinga.png`
+- o React posiciona areas clicaveis invisiveis sobre:
+  - `VOLTAR`
+  - `ENTRAR NO BAR`
+  - `TROCAR PARCEIRA`
+- a tela de campanha dinamica permanece como fallback para outros bares/estados
+- o jogador deve reconhecer com clareza onde esta naquele momento
+- preservar a separacao entre:
+  - tela de campanha com percurso e progresso
+  - capa do bar com contexto do local selecionado
+  - selecao de parceira quando o bar ainda nao tiver escolha salva
+- nao reabrir a tela de selecao de parceira nem a responsividade da gameplay sem regressao real
 
 ### Botecos da Rua
 

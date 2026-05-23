@@ -101,6 +101,7 @@ export function useGameSession() {
   const AUTO_STEP_DELAY_MS = 820
   const NEXT_HAND_DELAY_MS = 1180
   const BUBBLE_DURATION_MS = 1500
+  const MATCH_RESULT_REVEAL_DELAY_MS = 1000
   const [variant, setVariant] = useState<GameVariant>("MINEIRO")
   const [playerProfile, setPlayerProfile] = useState<PlayerProfile>(loadPlayerProfile)
   const [handState, setHandState] = useState<HandState | null>(null)
@@ -125,6 +126,7 @@ export function useGameSession() {
   const partnerAdviceTimeoutRef = useRef<number | null>(null)
   const partnerConsultTimeoutRef = useRef<number | null>(null)
   const partnerConsultResolutionTimeoutRef = useRef<number | null>(null)
+  const matchResultRevealTimeoutRef = useRef<number | null>(null)
   const lastPartnerAdviceKeyRef = useRef<string | null>(null)
   const lastPartnerConsultKeyRef = useRef<string | null>(null)
   const lastDealAnimationKeyRef = useRef<string | null>(null)
@@ -432,6 +434,10 @@ export function useGameSession() {
       window.clearTimeout(partnerConsultResolutionTimeoutRef.current)
       partnerConsultResolutionTimeoutRef.current = null
     }
+    if (matchResultRevealTimeoutRef.current) {
+      window.clearTimeout(matchResultRevealTimeoutRef.current)
+      matchResultRevealTimeoutRef.current = null
+    }
   }, [])
 
   const applyHandState = useCallback((
@@ -579,12 +585,15 @@ export function useGameSession() {
           )
         }
 
-        setSpeechBubble(null)
         setInGameContextMenuOpen(false)
-        setHandState(null)
-        setMatchState(null)
-        setMatchResultScreen(matchResultState)
-        setMenuScreen("match-result")
+        matchResultRevealTimeoutRef.current = window.setTimeout(() => {
+          setSpeechBubble(null)
+          setHandState(null)
+          setMatchState(null)
+          setMatchResultScreen(matchResultState)
+          setMenuScreen("match-result")
+          matchResultRevealTimeoutRef.current = null
+        }, MATCH_RESULT_REVEAL_DELAY_MS)
       }
     }
 
@@ -906,6 +915,9 @@ export function useGameSession() {
       }
       if (partnerConsultResolutionTimeoutRef.current) {
         window.clearTimeout(partnerConsultResolutionTimeoutRef.current)
+      }
+      if (matchResultRevealTimeoutRef.current) {
+        window.clearTimeout(matchResultRevealTimeoutRef.current)
       }
     }
   }, [])

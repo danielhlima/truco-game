@@ -80,6 +80,6 @@ export function resolveTrick(state: HandState): HandState {
     roundNumber: nextRoundNumber,
     finished: handFinished,
     winner: nextWinner,
-    table: [],
+    table: handFinished ? state.table : [],
   }
 }

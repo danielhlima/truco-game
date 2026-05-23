@@ -129,3 +129,21 @@ test("storage salva, carrega e reseta o perfil da campanha", () => {
     cleanup()
   }
 })
+
+test("storage descarta perfis persistidos na chave legada", () => {
+  const { cleanup, localStorage } = installWindowLocalStorageMock()
+
+  try {
+    const legacyProfile = createInitialPlayerProfile()
+    legacyProfile.campaign.wins = 7
+    legacyProfile.campaign.selectedPartnerCharacterIdByVenueId["bar-do-ze-catinga"] = "ze-catinga"
+    localStorage.setItem("truco-game.player-profile", JSON.stringify(legacyProfile))
+
+    const loadedProfile = loadPlayerProfile()
+
+    assert.deepEqual(loadedProfile.campaign, INITIAL_PLAYER_PROFILE.campaign)
+    assert.equal(localStorage.getItem("truco-game.player-profile"), null)
+  } finally {
+    cleanup()
+  }
+})

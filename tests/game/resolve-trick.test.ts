@@ -3,7 +3,7 @@ import assert from "node:assert/strict"
 import { resolveTrick } from "../../src/game/resolveTrick.ts"
 import { createCard, createHandStateFixture } from "../helpers/gameFixtures.ts"
 
-test("resolveTrick marca vencedor da vaza e encerra a mão ao fazer duas vazas", () => {
+test("resolveTrick preserva a mesa final quando encerra a mão ao fazer duas vazas", () => {
   const state = createHandStateFixture({
     roundNumber: 2,
     score: { A: 1, B: 0 },
@@ -22,7 +22,7 @@ test("resolveTrick marca vencedor da vaza e encerra a mão ao fazer duas vazas",
   assert.equal(nextState.score.A, 2)
   assert.equal(nextState.finished, true)
   assert.equal(nextState.winner, "A")
-  assert.deepEqual(nextState.table, [])
+  assert.deepEqual(nextState.table, state.table)
   assert.equal(nextState.currentPlayerId, 3)
 })
 

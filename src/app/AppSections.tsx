@@ -13,6 +13,7 @@ import scorePadNotebookAsset from "../assets/ui-left/scorepad-notebook-clean-cut
 import avatarYouAsset from "../assets/characters/zeca-viramao.png"
 import actionButtonAsset from "../assets/ui-right/action-button-solid.png"
 import statsPanelWoodAsset from "../assets/ui-right/stats-panel-wood-main.png"
+import zeCatingaCampaignJourneyAsset from "../assets/campaign/botecos-rua-ze-catinga.png"
 import zeCatingaBackgroundAsset from "../assets/venues/ze-catinga/background.png"
 import zeCatingaHostAsset from "../assets/venues/ze-catinga/host-ze-catinga.png"
 import zeCatingaQuoteBoardAsset from "../assets/venues/ze-catinga/host-quote-board.png"
@@ -590,6 +591,7 @@ export function TableSection({
                 ) : menuScreen === "journey-intro" ? (
                   <JourneyIntroScreen
                     currentCampaignVenue={currentCampaignVenue}
+                    playerProfile={playerProfile}
                     onBack={onCloseJourneyIntro}
                     onContinueToCharacterSelect={onContinueToCharacterSelect}
                     onLaunchVenue={onLaunchVenue}
@@ -1086,12 +1088,14 @@ function GameStartScreen({
 
 function JourneyIntroScreen({
   currentCampaignVenue,
+  playerProfile,
   onBack,
   onContinueToCharacterSelect,
   onLaunchVenue,
   styles,
 }: {
   currentCampaignVenue: CampaignVenue | null
+  playerProfile: PlayerProfile
   onBack: () => void
   onContinueToCharacterSelect: () => void
   onLaunchVenue: (venueId: string) => void
@@ -1108,6 +1112,59 @@ function JourneyIntroScreen({
     currentCampaignVenue && activeStageIndex >= 0
       ? CAMPAIGN_STAGES[activeStageIndex]?.venues.findIndex((venue) => venue.id === currentCampaignVenue.id) ?? -1
       : -1
+  const journeyVenues = CAMPAIGN_STAGES.flatMap((stage) => stage.venues)
+  const totalVenueCount = journeyVenues.length
+  const clearedVenueCount = journeyVenues.filter((venue) => isCampaignVenueCleared(playerProfile, venue)).length
+  const currentVenueRouteIndex = currentCampaignVenue
+    ? journeyVenues.findIndex((venue) => venue.id === currentCampaignVenue.id)
+    : -1
+  const nextVenue = currentVenueRouteIndex >= 0 ? journeyVenues[currentVenueRouteIndex + 1] ?? null : null
+  const currentStageVenueCount = currentCampaignVenue && activeStageIndex >= 0
+    ? CAMPAIGN_STAGES[activeStageIndex]?.venues.length ?? 0
+    : 0
+  const authoredCampaignAsset =
+    currentCampaignVenue?.id === "bar-do-ze-catinga"
+      ? zeCatingaCampaignJourneyAsset
+      : null
+
+  if (authoredCampaignAsset && currentCampaignVenue) {
+    return (
+      <div style={styles.authoredCampaignScreen}>
+        <img
+          src={authoredCampaignAsset}
+          alt="Jornada de campanha dos Botecos da Rua"
+          style={styles.authoredCampaignImage}
+        />
+        <button
+          aria-label="Voltar"
+          title="Voltar"
+          style={{
+            ...styles.authoredCampaignHotspot,
+            ...styles.authoredCampaignBackHotspot,
+          }}
+          onClick={onBack}
+        />
+        <button
+          aria-label="Abrir capa do Bar do Zé Catinga"
+          title="Abrir capa do Bar do Zé Catinga"
+          style={{
+            ...styles.authoredCampaignHotspot,
+            ...styles.authoredCampaignEnterHotspot,
+          }}
+          onClick={() => onLaunchVenue(currentCampaignVenue.id)}
+        />
+        <button
+          aria-label="Trocar parceira"
+          title="Trocar parceira"
+          style={{
+            ...styles.authoredCampaignHotspot,
+            ...styles.authoredCampaignPartnerHotspot,
+          }}
+          onClick={onContinueToCharacterSelect}
+        />
+      </div>
+    )
+  }
 
   return (
     <div style={styles.journeyIntroScreen}>
@@ -1116,8 +1173,8 @@ function JourneyIntroScreen({
           <div style={styles.journeyIntroEyebrow}>Jornada de campanha</div>
           <h2 style={styles.journeyIntroTitle}>Você tem um caminho pela frente</h2>
           <p style={styles.journeyIntroText}>
-            Escolha a parceira e use este mapa para sentir o tamanho da jornada. Daqui
-            você pode entrar no bar atual ou revisitar qualquer bar anterior já alcançado.
+            Leia o percurso completo, veja o que já ficou para trás e avance pelo bar
+            destacado agora. Locais vencidos continuam abertos para revisita.
           </p>
         </div>
         <button style={styles.characterSelectBackButton} onClick={onBack}>
@@ -1126,25 +1183,70 @@ function JourneyIntroScreen({
       </div>
 
       <div style={styles.journeyIntroLeadCard}>
-        <div style={styles.journeyIntroLeadLabel}>Próximo desafio</div>
-        <div style={styles.journeyIntroLeadVenue}>
-          {currentCampaignVenue?.name ?? "Campanha concluída"}
+        <div style={styles.journeyIntroLeadGrid}>
+          <div style={styles.journeyIntroLeadPrimary}>
+            <div style={styles.journeyIntroLeadLabel}>
+              {currentCampaignVenue ? "Você está aqui" : "Jornada concluída"}
+            </div>
+            <div style={styles.journeyIntroLeadVenue}>
+              {currentCampaignVenue?.name ?? "Campanha concluída"}
+            </div>
+            <div style={styles.journeyIntroLeadMeta}>
+              {currentCampaignVenue?.districtLabel ?? "Todas as etapas principais já foram vencidas."}
+            </div>
+            <p style={styles.journeyIntroLeadText}>
+              {currentCampaignVenue?.entryNarrative ??
+                "Você já cruzou toda a jornada principal disponível até aqui."}
+            </p>
+          </div>
+          <div style={styles.journeyIntroProgressPanel}>
+            <div style={styles.journeyIntroProgressValue}>
+              {clearedVenueCount}/{totalVenueCount}
+            </div>
+            <div style={styles.journeyIntroProgressLabel}>Bares concluídos</div>
+            <div style={styles.journeyIntroProgressText}>
+              {currentCampaignVenue
+                ? `Local ${activeVenueIndex + 1} de ${currentStageVenueCount} em ${currentCampaignStageLabel(currentCampaignVenue)}.`
+                : "Todos os locais da campanha atual já foram vencidos."}
+            </div>
+            {currentCampaignVenue ? (
+              <button
+                style={styles.journeyIntroLeadCta}
+                onClick={() => onLaunchVenue(currentCampaignVenue.id)}
+              >
+                ABRIR CAPA DO BAR
+              </button>
+            ) : null}
+          </div>
         </div>
-        <div style={styles.journeyIntroLeadMeta}>
-          {currentCampaignVenue?.districtLabel ?? "Todas as etapas principais já foram vencidas."}
+        <div style={styles.journeyIntroRouteRow}>
+          <div style={styles.journeyIntroRouteItem}>
+            <span style={styles.journeyIntroRouteLabel}>Agora</span>
+            <strong style={styles.journeyIntroRouteValue}>
+              {currentCampaignVenue?.name ?? "Fluxo completo"}
+            </strong>
+          </div>
+          <div style={styles.journeyIntroRouteDivider} />
+          <div style={styles.journeyIntroRouteItem}>
+            <span style={styles.journeyIntroRouteLabel}>Depois</span>
+            <strong style={styles.journeyIntroRouteValue}>
+              {nextVenue?.name ?? "Fim do percurso atual"}
+            </strong>
+          </div>
+          <div style={styles.journeyIntroLegend}>
+            <span style={styles.journeyIntroLegendDone}>Concluído</span>
+            <span style={styles.journeyIntroLegendCurrent}>Atual</span>
+            <span style={styles.journeyIntroLegendLocked}>Bloqueado</span>
+          </div>
         </div>
-        <p style={styles.journeyIntroLeadText}>
-          {currentCampaignVenue?.entryNarrative ??
-            "Você já cruzou toda a jornada principal disponível até aqui."}
-        </p>
       </div>
 
       <div style={styles.journeyIntroStages}>
         {CAMPAIGN_STAGES.map((stage, index) => {
           const totalMatches = stage.venues.reduce((sum, venue) => sum + venue.matchesToClear, 0)
-          const isCompleted = !hasCurrentVenue || (activeStageIndex !== -1 && index < activeStageIndex)
+          const isCompleted = stage.venues.every((venue) => isCampaignVenueCleared(playerProfile, venue))
           const isActive = hasCurrentVenue && stage.id === activeStageId
-          const isLocked = hasCurrentVenue && activeStageIndex !== -1 && index > activeStageIndex
+          const isLocked = !isActive && !isCompleted
           const stageStatusLabel = isActive
             ? "Etapa atual"
             : isCompleted
@@ -1192,20 +1294,20 @@ function JourneyIntroScreen({
                   <span>{totalMatches} partidas base</span>
                 </div>
                 <div style={styles.journeyIntroVenueList}>
-                  {stage.venues.map((venue, venueIndex) => {
+                  {stage.venues.map((venue) => {
                     const isCurrentVenue = venue.id === currentCampaignVenue?.id
-                    const isAvailable =
-                      !hasCurrentVenue ||
-                      (activeStageIndex !== -1 &&
-                        (index < activeStageIndex ||
-                          (index === activeStageIndex &&
-                            activeVenueIndex !== -1 &&
-                            venueIndex <= activeVenueIndex)))
+                    const isClearedVenue = isCampaignVenueCleared(playerProfile, venue)
+                    const isAvailable = isCurrentVenue || isClearedVenue
                     const venueStatusLabel = isCurrentVenue
                       ? "Atual"
-                      : isAvailable
+                      : isClearedVenue
                         ? "Concluído"
                         : "Bloqueado"
+                    const venueActionLabel = isCurrentVenue
+                      ? "Abrir capa"
+                      : isClearedVenue
+                        ? "Revisitar"
+                        : "Adiante"
                     return (
                       <button
                         key={venue.id}
@@ -1218,8 +1320,19 @@ function JourneyIntroScreen({
                         onClick={() => onLaunchVenue(venue.id)}
                       >
                         <span style={styles.journeyIntroVenueButtonLabel}>{venue.name}</span>
-                        <span style={styles.journeyIntroVenueButtonMeta}>
-                          {venueStatusLabel}
+                        <span style={styles.journeyIntroVenueButtonMetaRow}>
+                          <span
+                            style={{
+                              ...styles.journeyIntroVenueButtonMeta,
+                              ...(isCurrentVenue ? styles.journeyIntroVenueButtonMetaActive : {}),
+                              ...(isClearedVenue && !isCurrentVenue
+                                ? styles.journeyIntroVenueButtonMetaCompleted
+                                : {}),
+                            }}
+                          >
+                            {venueStatusLabel}
+                          </span>
+                          <span style={styles.journeyIntroVenueButtonAction}>{venueActionLabel}</span>
                         </span>
                       </button>
                     )
@@ -1237,6 +1350,20 @@ function JourneyIntroScreen({
         </button>
       </div>
     </div>
+  )
+}
+
+function isCampaignVenueCleared(playerProfile: PlayerProfile, venue: CampaignVenue) {
+  return (
+    playerProfile.campaign.clearedVenueIds.includes(venue.id) ||
+    (playerProfile.campaign.venueWinsById[venue.id] ?? 0) >= venue.matchesToClear
+  )
+}
+
+function currentCampaignStageLabel(currentCampaignVenue: CampaignVenue) {
+  return (
+    CAMPAIGN_STAGES.find((stage) => stage.venues.some((venue) => venue.id === currentCampaignVenue.id))
+      ?.name ?? "sua etapa atual"
   )
 }
 

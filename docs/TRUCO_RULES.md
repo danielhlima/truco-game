@@ -121,5 +121,8 @@ Hoje a força da mão é calculada assim:
 
 ## Nota de Continuidade
 
-- O ajuste recente do scorepad e o proximo foco de responsividade da gameplay nao mudam regras de truco.
-- Se a estabilizacao visual tocar fluxo de botoes, falas ou estados de truco, validar novamente as regras deste arquivo e rodar testes antes de concluir.
+- O ajuste recente do scorepad e a tela autoral de campanha nao mudam regras de truco.
+- A tela de resultado deve aparecer apenas depois da ultima carta da vaza decisiva estar visivel na mesa.
+- Depois disso, esperar 1 segundo antes de exibir a arte de vitoria ou derrota.
+- Se a mao termina por corrida em pedido de truco, nao gerar cartas artificiais para completar a mesa.
+- Se qualquer refinamento visual tocar fluxo de botoes, falas ou estados de truco, validar novamente as regras deste arquivo e rodar testes antes de concluir.

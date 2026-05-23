@@ -3,7 +3,7 @@ import zecaViramaoAsset from "../assets/characters/zeca-viramao.png"
 import negaCatimboAsset from "../assets/characters/nega-catimbo.png"
 import tiaoCascaGrossaAsset from "../assets/characters/tiao-casca-grossa.png"
 import maneBanguelaAsset from "../assets/characters/mane-banguela.png"
-import zeCatingaAsset from "../assets/characters/ze-catinga.png"
+import jocaBusaoAsset from "../assets/characters/joca-busao.png"
 import ritaGambiarraAsset from "../assets/characters/rita-gambiarra.png"
 import tonhaoRasgaLataAsset from "../assets/characters/tonhao-rasga-lata.png"
 import cidaFumacaAsset from "../assets/characters/cida-fumaca.png"
@@ -25,7 +25,7 @@ export type TrucoCharacterId =
   | "nega-catimbo"
   | "tiao-casca-grossa"
   | "mane-banguela"
-  | "ze-catinga"
+  | "joca-busao"
   | "rita-gambiarra"
   | "tonhao-rasga-lata"
   | "cida-fumaca"
@@ -132,8 +132,8 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
       "Reza a lenda que ele ja ficou tao bravo com um parceiro ruim que ganhou a mao so no odio. No bairro, contam que o bigode dele se move um milimetro para cima sempre que alguem esta prestes a cometer uma burrice historica.",
   },
   {
-    id: "ze-catinga",
-    name: "Ze Catinga",
+    id: "joca-busao",
+    name: "Joca do Busão",
     nickname: "O Nariz da Vitoria",
     personalityId: "ultra_conservative",
     role: "npc",
@@ -143,9 +143,9 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
       patience: 5,
       bluff: 1,
     },
-    avatarAsset: zeCatingaAsset,
+    avatarAsset: jocaBusaoAsset,
     story:
-      "Dizem que ele aprendeu a jogar truco com um papagaio aposentado de feira. O papagaio morreu invicto, e desde entao Ze jura ouvir dicas taticas vindas do cinzeiro.",
+      "Dizem que ele aprendeu a jogar truco com um papagaio aposentado de feira. O papagaio morreu invicto, e desde entao Joca jura ouvir dicas taticas vindas do cinzeiro.",
   },
   {
     id: "rita-gambiarra",
@@ -459,7 +459,7 @@ export const STARTER_PARTNER_CHARACTER_IDS: TrucoCharacterId[] = [
   "leninha-lambreta",
   "rosinha-catraca",
   "rita-gambiarra",
-  "ze-catinga",
+  "joca-busao",
 ]
 
 export const UNLOCKABLE_PARTNER_CHARACTER_IDS: TrucoCharacterId[] = [

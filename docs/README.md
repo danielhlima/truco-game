@@ -70,19 +70,29 @@ Estado consolidado:
 - modos internos controlados `regular`, `compact` e `tiny`
 - cartas da mao e botao `MENU` protegidos dentro da faixa inferior
 - popover do `MENU` fica acima da mesa e fecha antes dos modais de confirmacao
+- tela de selecao de parceira aceita como pronta no estado atual
+- parceira antes chamada `Ze Catinga` renomeada para `Joca do Busão` com id `joca-busao`
+- tela de campanha do primeiro trecho (`Botecos da Rua`) usa arte autoral para o estado atual do `Bar do Ze Catinga`
+- a arte de campanha fica em `src/assets/campaign/botecos-rua-ze-catinga.png`
+- os botoes da campanha autoral sao areas HTML invisiveis sobre a imagem:
+  - `VOLTAR`
+  - `ENTRAR NO BAR`
+  - `TROCAR PARCEIRA`
+- a tela de campanha dinamica continua como fallback para outros bares/estados
 - telas autorais de vitoria e derrota do `Bar do Ze Catinga`:
   - `src/assets/venues/ze-catinga/match-result-win.png`
   - `src/assets/venues/ze-catinga/match-result-loss.png`
+- a tela de resultado so aparece depois da ultima carta visivel na mesa, com atraso de 1 segundo para leitura humana
 
 ## Prioridade imediata para o proximo chat
 
-No proximo chat, revisar a tela de selecao de parceira dentro da moldura em landscape.
+No proximo chat, expandir o modelo autoral da campanha para o proximo estado do percurso.
 
 Proximo foco recomendado:
 
-- validar a selecao em tamanhos representativos do stage
-- melhorar UX, narrativa e hierarquia da escolha sem quebrar persistencia por bar
-- manter o fluxo `capa do bar > escolha de parceira se necessario > jogo`
+- gerar/implementar a arte de campanha quando o jogador estiver no `Bar Maneco Banguela`
+- manter a abordagem de imagem autoral com hotspots HTML invisiveis
+- preservar o fallback dinamico para estados ainda sem arte propria
 
 Depois disso, seguir para:
 

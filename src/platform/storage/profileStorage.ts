@@ -3,7 +3,14 @@ import {
   type PlayerProfile,
 } from "../../profile/playerProfile"
 
-const PLAYER_PROFILE_STORAGE_KEY = "truco-game.player-profile"
+const PLAYER_PROFILE_STORAGE_KEY = "truco-game.player-profile.v2"
+const LEGACY_PLAYER_PROFILE_STORAGE_KEYS = ["truco-game.player-profile"]
+
+function clearLegacyPlayerProfileStorage() {
+  LEGACY_PLAYER_PROFILE_STORAGE_KEYS.forEach((storageKey) => {
+    window.localStorage.removeItem(storageKey)
+  })
+}
 
 export function loadPlayerProfile(): PlayerProfile {
   const initialProfile = createInitialPlayerProfile()
@@ -12,6 +19,7 @@ export function loadPlayerProfile(): PlayerProfile {
     return initialProfile
   }
 
+  clearLegacyPlayerProfileStorage()
   const rawValue = window.localStorage.getItem(PLAYER_PROFILE_STORAGE_KEY)
 
   if (!rawValue) {
@@ -65,4 +73,5 @@ export function resetPlayerProfileStorage() {
   }
 
   window.localStorage.removeItem(PLAYER_PROFILE_STORAGE_KEY)
+  clearLegacyPlayerProfileStorage()
 }

@@ -45,8 +45,8 @@ Status:
 
 Status:
 
-- fluxo base funcional concluido
-- segue aberto para UX, narrativa e acabamento
+- funcional e aceito como pronto no estado atual
+- reabrir apenas se houver regressao real ou nova decisao de produto
 
 ## Estado Atual Real
 
@@ -65,7 +65,12 @@ Status:
   - separou placar da partida e placar da mao
   - foi validado visualmente no fluxo real ate a gameplay
   - passou em `npm run build`
-- o foco imediato recomendado agora e revisar UX e responsividade da selecao de parceira
+- a tela de selecao de parceira foi aceita como pronta no estado atual
+- a parceira antes chamada `Ze Catinga` agora e `Joca do Busão`, id `joca-busao`
+- a persistencia antiga do perfil foi invalidada para nao carregar escolha salva com o id anterior
+- a tela de campanha do estado atual do `Bar do Ze Catinga` usa arte autoral com hotspots HTML invisiveis
+- a tela dinamica de campanha segue como fallback para estados sem arte propria
+- o foco imediato recomendado agora e expandir o modelo autoral para o proximo estado da campanha
 
 ### Truco e dialogos
 
@@ -91,9 +96,11 @@ Estado atual:
 - ao entrar em bar sem escolha salva, a tela reaparece
 - os dois primeiros bares ja tem adversarios fixos
 
-Pendencia principal:
+Decisao atual:
 
-- UX e narrativa da escolha ainda estao simples demais
+- a tela foi considerada pronta no estado em que esta
+- manter o fluxo e a persistencia por bar
+- nao reabrir acabamento da selecao no proximo chat
 
 ### Capa do Bar do Ze Catinga
 
@@ -129,19 +136,19 @@ Estado atual:
 
 ### Opcao principal
 
-- revisar a tela de selecao de parceira dentro da moldura landscape
+- expandir o modelo autoral de campanha para o proximo estado do percurso
 
 ### Itens para atacar primeiro
 
-- Selecao de parceira:
-  1. validar a tela no stage estabilizado em tamanhos representativos
-  2. reforcar hierarquia de personagem, estilo de jogo, atributos e CTA
-  3. melhorar narrativa da escolha sem quebrar persistencia por bar
-  4. preservar a reoferta automatica em bar sem parceira salva
+- Campanha:
+  1. gerar arte para o estado em que o jogador esta no `Bar Maneco Banguela`
+  2. manter o mesmo padrao de hotspots HTML invisiveis sobre a imagem
+  3. preservar a tela dinamica como fallback para estados ainda sem arte propria
+  4. revisar coordenadas dos hotspots no navegador antes de concluir
 - Validacao:
-  - abrir o fluxo real `capa > selecao > jogo`
-  - testar em tamanhos representativos de desktop e landscape mais apertado
-  - confirmar que selecao e CTA cabem dentro da moldura
+  - abrir o fluxo real `COMEÇAR > campanha`
+  - confirmar que o refinamento nao quebra `campanha > capa do bar > escolha de parceira se necessario > jogo`
+  - testar em tamanhos representativos da moldura landscape
   - rodar `npm run build`
 
 ### Opcao seguinte depois disso
@@ -154,16 +161,13 @@ Estado atual:
 
 ## Pendencias abertas
 
-- fechar visual da tela de selecao de parceira
-- deixar o fluxo de campeonatos mais claro e solido:
-  - cards por etapa com status visual
-  - destaque forte para o bar atual
-  - labels claras para `Concluido`, `Atual` e `Bloqueado`
-  - CTA distinto para bar atual versus bares anteriores
-  - contador simples de progresso no topo
+- expandir o fluxo autoral da campanha:
+  - imagem para `Bar Maneco Banguela`
+  - imagem para estados concluidos do primeiro trecho
+  - imagem para transicao ao `Circuito do Bairro`
+  - hotspots revisados por estado
 - dar mais contexto narrativo aos bares
 - decidir como parceiros gratuitos/pagos entram no fluxo
-- revisar responsividade final da tela de selecao
 - otimizar mais os assets fotograficos grandes, se necessario
 
 ## O que nao deve virar prioridade agora
@@ -201,7 +205,8 @@ Use esses arquivos como fonte de verdade.
 
 Estado atual:
 - a capa do Bar do Ze Catinga foi refinada, limpa, commitada e enviada para origin/main
-- commit salvo: 0f90926 Refine Ze Catinga venue cover
+- commit da capa: 0f90926 Refine Ze Catinga venue cover
+- commit mais recente conhecido: 1f2efef Stabilize gameplay stage and Ze Catinga results
 - o fluxo atual deve ser preservado: COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo
 - o scorepad da coluna esquerda ja foi corrigido:
   - labels `Nos`, `Eles`, `Mao` e `Mao` nao se sobrepoem mais aos numeros
@@ -216,21 +221,32 @@ Estado atual:
 - o Bar do Ze Catinga tem telas autorais de resultado:
   - vitoria em `src/assets/venues/ze-catinga/match-result-win.png`
   - derrota em `src/assets/venues/ze-catinga/match-result-loss.png`
+- a tela de selecao de parceira foi considerada pronta no estado atual e nao deve ser reaberta neste chat
+- a parceira antes chamada Ze Catinga agora e Joca do Busão, com id `joca-busao`
+- a persistencia antiga do perfil foi invalidada depois dessa mudanca de id
+- a tela de campanha do estado atual do Bar do Ze Catinga usa arte autoral:
+  - `src/assets/campaign/botecos-rua-ze-catinga.png`
+  - botoes HTML invisiveis sobre `VOLTAR`, `ENTRAR NO BAR` e `TROCAR PARCEIRA`
+  - tela dinamica preservada como fallback
+- a tela de resultado preserva a ultima mesa visivel e espera 1 segundo antes de exibir vitoria/derrota
 
 Objetivo deste chat:
-1. revisar a tela de selecao de parceira dentro da moldura em landscape
-2. melhorar UX, hierarquia e narrativa da escolha
-3. validar a selecao em tamanhos representativos do stage
-4. preservar o fluxo de jogo, a capa do bar, a gameplay e as regras de truco
+1. expandir o modelo autoral da campanha para o proximo estado do jogador
+2. gerar/implementar a arte da campanha para o Bar Maneco Banguela ou o estado escolhido
+3. manter hotspots HTML invisiveis e preservar a tela dinamica como fallback
+4. preservar o fluxo de jogo, a capa do bar, a selecao de parceira, a gameplay e as regras de truco
 
 Arquivos provaveis:
 - src/App.tsx
 - src/app/AppSections.tsx
 - src/app/useGameSession.ts
+- src/career/campaign/campaignData.ts
 - possivelmente nenhum asset
 
 Importante:
+- verificar `git status` e preservar mudancas locais existentes
 - nao reabrir a responsividade da gameplay sem regressao real
+- nao reabrir a tela de selecao de parceira sem regressao real
 - nao desmontar a arquitetura atual
 - fazer mudancas incrementais
 - validar visualmente no navegador
