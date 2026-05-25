@@ -71,6 +71,11 @@ Estado consolidado:
 - modos internos controlados `regular`, `compact` e `tiny`
 - cartas da mao e botao `MENU` protegidos dentro da faixa inferior
 - popover do `MENU` fica acima da mesa e fecha antes dos modais de confirmacao
+- intro cinematografica curta antes da gameplay:
+  - exibe apenas o background do bar por cerca de 1 segundo
+  - revela mesa, HUDs, oponentes e cartas com fade curto
+  - bloqueia cartas, truco e `MENU` ate terminar
+  - validada no `Bar do Ze Catinga` e no `Bar Maneco Banguela`
 - tela de selecao de parceira aceita como pronta no estado atual
 - parceira antes chamada `Ze Catinga` renomeada para `Joca do Busão` com id `joca-busao`
 - tela de campanha do primeiro trecho (`Botecos da Rua`) usa artes autorais para os estados atuais:
@@ -88,15 +93,18 @@ Estado consolidado:
 
 ## Prioridade imediata para o proximo chat
 
-No proximo chat, seguir para a mesa, resultados ou proximo estado visual do `Bar Maneco Banguela`.
+No proximo chat, trabalhar a tela inicial definitiva do jogo, usando a tela atual enviada em captura como ponto de partida visual.
 
 Proximo foco recomendado:
 
-- criar telas autorais de vitoria/derrota do `Bar Maneco Banguela`
-- preservar a capa e o background de gameplay atuais do Maneco
+- redesenhar a tela inicial como experiencia final, nao tela temporaria de debug
+- preservar o fluxo `COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo`
+- manter debug de bar acessivel apenas de forma discreta, se ainda necessario para desenvolvimento
+- usar a moldura landscape e o clima visual de boteco ja consolidados
 
 Depois disso, seguir para:
 
+- telas autorais de vitoria/derrota do `Bar Maneco Banguela`
 - expansao do modelo da capa para outros bares
 - telas autorais de resultado para os proximos bares
 

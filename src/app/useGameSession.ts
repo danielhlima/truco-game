@@ -89,6 +89,7 @@ interface DebugVenueOption {
 
 type InGameConfirmationIntent = "swap-partner" | "exit-match"
 type CharacterSelectReturnScreen = "journey-intro" | "venue-intro"
+type GameplayIntroPhase = "background" | "reveal" | "done"
 
 interface InGameConfirmationState {
   intent: InGameConfirmationIntent
@@ -102,6 +103,8 @@ export function useGameSession() {
   const NEXT_HAND_DELAY_MS = 1180
   const BUBBLE_DURATION_MS = 1500
   const MATCH_RESULT_REVEAL_DELAY_MS = 1000
+  const GAMEPLAY_INTRO_BACKGROUND_MS = 1000
+  const GAMEPLAY_INTRO_REVEAL_MS = 420
   const [variant, setVariant] = useState<GameVariant>("MINEIRO")
   const [playerProfile, setPlayerProfile] = useState<PlayerProfile>(loadPlayerProfile)
   const [handState, setHandState] = useState<HandState | null>(null)
@@ -118,6 +121,7 @@ export function useGameSession() {
   const [matchResultScreen, setMatchResultScreen] = useState<MatchResultScreenState | null>(null)
   const [inGameContextMenuOpen, setInGameContextMenuOpen] = useState(false)
   const [inGameConfirmation, setInGameConfirmation] = useState<InGameConfirmationState | null>(null)
+  const [gameplayIntroPhase, setGameplayIntroPhase] = useState<GameplayIntroPhase>("done")
   const [characterSelectReturnScreen, setCharacterSelectReturnScreen] =
     useState<CharacterSelectReturnScreen>("journey-intro")
   const [launchVenueAfterCharacterSelect, setLaunchVenueAfterCharacterSelect] = useState(false)
@@ -127,6 +131,8 @@ export function useGameSession() {
   const partnerConsultTimeoutRef = useRef<number | null>(null)
   const partnerConsultResolutionTimeoutRef = useRef<number | null>(null)
   const matchResultRevealTimeoutRef = useRef<number | null>(null)
+  const gameplayIntroBackgroundTimeoutRef = useRef<number | null>(null)
+  const gameplayIntroRevealTimeoutRef = useRef<number | null>(null)
   const lastPartnerAdviceKeyRef = useRef<string | null>(null)
   const lastPartnerConsultKeyRef = useRef<string | null>(null)
   const lastDealAnimationKeyRef = useRef<string | null>(null)
@@ -220,6 +226,7 @@ export function useGameSession() {
     ? playerProfile.campaign.venueWinsById[currentCampaignVenue.id] ?? 0
     : 0
   const variantSelectionDisabled = !!matchState && !matchState.finished
+  const isGameplayIntroActive = gameplayIntroPhase !== "done"
 
   useEffect(() => {
     savePlayerProfile(playerProfile)
@@ -300,6 +307,7 @@ export function useGameSession() {
 
   const canHumanRespondToTruco =
     !!handState &&
+    !isGameplayIntroActive &&
     !handState.finished &&
     handState.truco.phase === "awaiting-response" &&
     handState.truco.awaitingResponseFromTeam === "A" &&
@@ -307,11 +315,12 @@ export function useGameSession() {
     (!partnerAdviceKey || shownPartnerAdviceKey === partnerAdviceKey)
 
   const canHumanAdvisePartner =
-    shouldPartnerConsultHuman(handState)
+    !isGameplayIntroActive && shouldPartnerConsultHuman(handState)
 
   const canRequestTruco =
     !!handState &&
     !!matchState &&
+    !isGameplayIntroActive &&
     !handState.finished &&
     handState.currentPlayerId === 1 &&
     handState.table.length < 4 &&
@@ -333,6 +342,7 @@ export function useGameSession() {
   const canPlayHumanCard =
     !!handState &&
     !handState.finished &&
+    !isGameplayIntroActive &&
     handState.currentPlayerId === 1 &&
     handState.table.length < 4 &&
     handState.truco.phase === "idle"
@@ -438,7 +448,36 @@ export function useGameSession() {
       window.clearTimeout(matchResultRevealTimeoutRef.current)
       matchResultRevealTimeoutRef.current = null
     }
+    if (gameplayIntroBackgroundTimeoutRef.current) {
+      window.clearTimeout(gameplayIntroBackgroundTimeoutRef.current)
+      gameplayIntroBackgroundTimeoutRef.current = null
+    }
+    if (gameplayIntroRevealTimeoutRef.current) {
+      window.clearTimeout(gameplayIntroRevealTimeoutRef.current)
+      gameplayIntroRevealTimeoutRef.current = null
+    }
   }, [])
+
+  const startGameplayIntro = useCallback(() => {
+    if (gameplayIntroBackgroundTimeoutRef.current) {
+      window.clearTimeout(gameplayIntroBackgroundTimeoutRef.current)
+    }
+    if (gameplayIntroRevealTimeoutRef.current) {
+      window.clearTimeout(gameplayIntroRevealTimeoutRef.current)
+    }
+
+    setGameplayIntroPhase("background")
+
+    gameplayIntroBackgroundTimeoutRef.current = window.setTimeout(() => {
+      setGameplayIntroPhase("reveal")
+      gameplayIntroBackgroundTimeoutRef.current = null
+
+      gameplayIntroRevealTimeoutRef.current = window.setTimeout(() => {
+        setGameplayIntroPhase("done")
+        gameplayIntroRevealTimeoutRef.current = null
+      }, GAMEPLAY_INTRO_REVEAL_MS)
+    }, GAMEPLAY_INTRO_BACKGROUND_MS)
+  }, [GAMEPLAY_INTRO_BACKGROUND_MS, GAMEPLAY_INTRO_REVEAL_MS])
 
   const applyHandState = useCallback((
     nextState: HandState,
@@ -627,6 +666,7 @@ export function useGameSession() {
     setInGameConfirmation(null)
     setLaunchVenueAfterCharacterSelect(false)
     setCharacterSelectReturnScreen("journey-intro")
+    startGameplayIntro()
 
     applyHandState(state, {
       eventMessage: `Partida iniciada em ${targetVenue.name}.`,
@@ -661,6 +701,7 @@ export function useGameSession() {
     setSessionDebugVenueId(null)
     setInGameContextMenuOpen(false)
     setInGameConfirmation(null)
+    setGameplayIntroPhase("done")
     setMenuScreen("journey-intro")
   }
 
@@ -694,6 +735,7 @@ export function useGameSession() {
     setSessionDebugVenueId(null)
     setInGameContextMenuOpen(false)
     setInGameConfirmation(null)
+    setGameplayIntroPhase("done")
     setMenuScreen("start")
     setEventMessage("Campanha reiniciada do zero.")
     setTrucoMessage("Tudo pronto para voltar ao primeiro boteco.")
@@ -705,6 +747,7 @@ export function useGameSession() {
 
   function handlePlayCard(card: Card) {
     if (!handState) return
+    if (isGameplayIntroActive) return
     if (inGameContextMenuOpen || inGameConfirmation) return
     if (handState.finished) return
     if (handState.currentPlayerId !== 1) return
@@ -719,6 +762,7 @@ export function useGameSession() {
 
   function handleRequestTruco() {
     if (!handState) return
+    if (isGameplayIntroActive) return
     if (inGameContextMenuOpen || inGameConfirmation) return
     if (!canRequestTruco) return
 
@@ -738,7 +782,7 @@ export function useGameSession() {
   }
 
   function handleAcceptTruco() {
-    if (!handState || !canHumanRespondToTruco || inGameContextMenuOpen || inGameConfirmation) return
+    if (!handState || isGameplayIntroActive || !canHumanRespondToTruco || inGameContextMenuOpen || inGameConfirmation) return
 
     const nextState = respondToTruco(handState, "accept", matchState?.score)
     const acceptedBet = nextState.currentBet
@@ -749,7 +793,7 @@ export function useGameSession() {
   }
 
   function handleRunFromTruco() {
-    if (!handState || !canHumanRespondToTruco || inGameContextMenuOpen || inGameConfirmation) return
+    if (!handState || isGameplayIntroActive || !canHumanRespondToTruco || inGameContextMenuOpen || inGameConfirmation) return
 
     const nextState = respondToTruco(handState, "run", matchState?.score)
     applyHandState(nextState, {
@@ -760,7 +804,7 @@ export function useGameSession() {
   }
 
   function handleRaiseTruco() {
-    if (!handState || !canHumanRaiseTruco || inGameContextMenuOpen || inGameConfirmation) return
+    if (!handState || isGameplayIntroActive || !canHumanRaiseTruco || inGameContextMenuOpen || inGameConfirmation) return
 
     const requestedValue = getNextRaiseValueFromPendingTruco(handState)
     const nextState = respondToTruco(handState, "raise", matchState?.score)
@@ -779,7 +823,7 @@ export function useGameSession() {
   }
 
   function handlePartnerAdvice(advice: PartnerAdvice) {
-    if (!handState || !canHumanAdvisePartner || !player1 || !player3 || inGameContextMenuOpen || inGameConfirmation) return
+    if (!handState || isGameplayIntroActive || !canHumanAdvisePartner || !player1 || !player3 || inGameContextMenuOpen || inGameConfirmation) return
 
     showSpeechBubble({ playerId: 1, text: advice })
 
@@ -835,6 +879,10 @@ export function useGameSession() {
   }
 
   useEffect(() => {
+    if (isGameplayIntroActive) {
+      return
+    }
+
     if (inGameContextMenuOpen || inGameConfirmation) {
       return
     }
@@ -896,6 +944,7 @@ export function useGameSession() {
     handState,
     inGameConfirmation,
     inGameContextMenuOpen,
+    isGameplayIntroActive,
     matchState,
   ])
 
@@ -918,6 +967,12 @@ export function useGameSession() {
       }
       if (matchResultRevealTimeoutRef.current) {
         window.clearTimeout(matchResultRevealTimeoutRef.current)
+      }
+      if (gameplayIntroBackgroundTimeoutRef.current) {
+        window.clearTimeout(gameplayIntroBackgroundTimeoutRef.current)
+      }
+      if (gameplayIntroRevealTimeoutRef.current) {
+        window.clearTimeout(gameplayIntroRevealTimeoutRef.current)
       }
     }
   }, [])
@@ -1115,6 +1170,7 @@ export function useGameSession() {
   }
 
   function handleOpenInGameContextMenu() {
+    if (isGameplayIntroActive) return
     setInGameContextMenuOpen(true)
   }
 
@@ -1195,6 +1251,7 @@ export function useGameSession() {
     debugVenueOptions,
     dealAnimationNonce,
     eventMessage,
+    gameplayIntroPhase,
     handScoreLabel,
     handState,
     inGameConfirmation,

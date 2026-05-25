@@ -35,6 +35,7 @@ Hoje o projeto ja possui:
 - scorepad da coluna esquerda corrigido e validado visualmente na gameplay
 - gameplay escalada como stage logico dentro da moldura landscape
 - telas autorais de vitoria e derrota do `Bar do Ze Catinga`
+- intro cinematografica curta antes da gameplay
 
 ## Arquitetura que deve ser preservada
 
@@ -111,8 +112,15 @@ Arquivos principais:
 - os controles `VOLTAR`, `ENTRAR NO BAR` e `TROCAR PARCEIRA` sao hotspots HTML invisiveis sobre a imagem
 - a tela de campanha dinamica continua como fallback para bares/estados sem arte propria
 - a tela de resultado preserva a ultima mesa visivel e espera 1 segundo antes de exibir vitoria/derrota
+- a intro de gameplay foi implementada:
+  - ao iniciar a partida, a moldura mostra apenas o background do bar por cerca de 1 segundo
+  - mesa, HUDs, oponentes e cartas aparecem depois com fade curto
+  - cartas, truco e `MENU` ficam bloqueados ate a intro terminar
+  - a logica da partida fica preparada por baixo sem alterar regras, placares ou progressao
+  - validacao visual feita no `Bar do Ze Catinga` e no `Bar Maneco Banguela`
 - `npm run build` passou depois da estabilizacao da gameplay, das telas de resultado, da campanha autoral e da consistencia da parceira renomeada
-- o proximo foco recomendado e criar a entrada/capa autoral do `Bar Maneco Banguela`
+- `npm run build` passou depois da intro cinematografica curta
+- o proximo foco recomendado e trabalhar a tela inicial definitiva do jogo
 
 ## Estado atual da gameplay screen
 
@@ -177,6 +185,18 @@ Estado consolidado:
 - mesa, rails laterais, faixa da mao e menu em jogo foram validados em tamanhos representativos
 - continuar aceitando letterbox/pillarbox quando a proporcao externa nao bater com a proporcao do jogo
 - dentro da gameplay, evitar recolocar `vw`/`dvh` em blocos que deveriam seguir o stage
+
+### Intro antes da partida
+
+Estado consolidado:
+
+- antes de cada partida, a tela exibe apenas o background do bar por cerca de 1 segundo dentro da moldura
+- depois revela mesa, HUDs, oponentes e cartas com fade curto
+- a logica da partida e preparada por baixo, mas a interacao fica bloqueada ate a intro terminar
+- cartas, truco e `MENU` nao ficam clicaveis durante a intro
+- a primeira versao e simples e reutilizavel para qualquer bar
+- a intro reutiliza o background correto do bar atual, incluindo o background proprio do `Bar Maneco Banguela`
+- preservar o stage logico `1080x500` e o fluxo `campanha > capa do bar > escolha de parceira se necessario > jogo`
 
 ### Coluna central
 

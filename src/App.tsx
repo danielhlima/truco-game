@@ -84,6 +84,7 @@ function App() {
     debugVenueOptions,
     dealAnimationNonce,
     eventMessage,
+    gameplayIntroPhase,
     handScoreLabel,
     handState,
     inGameConfirmation,
@@ -379,6 +380,7 @@ function App() {
             debugVenueId={debugVenueId}
             debugVenueOptions={debugVenueOptions}
             dealAnimationNonce={dealAnimationNonce}
+            gameplayIntroPhase={gameplayIntroPhase}
             hasSelectedPartnerForVenue={hasSelectedPartnerForVenue}
             menuScreen={menuScreen}
             opponentCharacters={opponentCharacters}
@@ -906,6 +908,31 @@ const styles: Record<string, React.CSSProperties> = {
     width: "100%",
     height: "100%",
     minHeight: 0,
+  },
+  gameplayIntroContentBackground: {
+    opacity: 0,
+    transform: "scale(0.985)",
+    pointerEvents: "none",
+  },
+  gameplayIntroContentReveal: {
+    opacity: 1,
+    transform: "scale(1)",
+    transition: "opacity 0.42s ease, transform 0.42s ease",
+    pointerEvents: "none",
+  },
+  gameplayIntroBlockerBackground: {
+    position: "absolute",
+    inset: 0,
+    zIndex: 20,
+    background: "transparent",
+    pointerEvents: "auto",
+  },
+  gameplayIntroBlockerReveal: {
+    position: "absolute",
+    inset: 0,
+    zIndex: 20,
+    background: "transparent",
+    pointerEvents: "auto",
   },
   gameLeftRail: {
     display: "grid",

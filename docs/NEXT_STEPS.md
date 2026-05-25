@@ -71,7 +71,12 @@ Status:
 - a tela de campanha dos estados atuais do `Bar do Ze Catinga` e do `Bar Maneco Banguela` usa arte autoral com hotspots HTML invisiveis
 - a tela dinamica de campanha segue como fallback para estados sem arte propria
 - a capa e a gameplay do `Bar Maneco Banguela` ja usam o background proprio do bar e reaproveitam os HUDs/placas existentes
-- o foco imediato recomendado agora e criar telas de resultado autorais do `Bar Maneco Banguela`
+- a intro cinematografica curta antes da gameplay foi implementada e validada:
+  - mostra apenas o background do bar por cerca de 1 segundo
+  - revela mesa, HUDs, oponentes e cartas com fade curto
+  - bloqueia cartas, truco e `MENU` ate terminar
+  - foi validada no `Bar do Ze Catinga` e no `Bar Maneco Banguela`
+- o foco imediato recomendado agora e trabalhar a tela inicial definitiva do jogo
 
 ### Truco e dialogos
 
@@ -137,28 +142,26 @@ Estado atual:
 
 ### Opcao principal
 
-- criar telas de resultado autorais do `Bar Maneco Banguela`
+- trabalhar a tela inicial definitiva do jogo
 
 ### Itens para atacar primeiro
 
-- Maneco Banguela:
-  1. criar telas autorais de vitoria e derrota
-  2. preservar o background compartilhado entre capa e gameplay
-  3. preservar o fluxo `campanha > capa do bar > escolha de parceira se necessario > jogo`
-  4. validar no fluxo real antes de concluir
+- Tela inicial:
+  1. transformar a tela atual de entrada em experiencia final
+  2. usar a captura enviada em 2026-05-25 como referencia do estado atual a melhorar
+  3. preservar `COMEÇAR` como entrada para o fluxo `campanha > capa do bar > escolha de parceira se necessario > jogo`
+  4. manter o debug de bar discreto, se ainda necessario para desenvolvimento
+  5. manter a moldura landscape e o clima visual de boteco
 - Validacao:
-  - abrir o fluxo real `COMEÇAR > campanha`
-  - confirmar que o refinamento nao quebra `campanha > capa do bar > escolha de parceira se necessario > jogo`
+  - abrir a tela inicial em tamanhos representativos
+  - confirmar que `COMEÇAR` continua abrindo a campanha
+  - confirmar que o fluxo ate a gameplay continua preservado
   - testar em tamanhos representativos da moldura landscape
   - rodar `npm run build`
 
 ### Opcao seguinte depois disso
 
-- dar identidade de campanha aos bares:
-  - contexto narrativo
-  - apresentacao dos oponentes
-  - capas e telas de resultado proprias
-  - diferencas de estilo e atmosfera
+- criar telas autorais de vitoria/derrota do `Bar Maneco Banguela`
 
 ## Pendencias abertas
 
@@ -167,6 +170,8 @@ Estado atual:
   - imagem para transicao ao `Circuito do Bairro`
   - hotspots revisados por estado
 - criar resultado autoral do `Bar Maneco Banguela`
+- refinar a intro de gameplay com entrada escalonada de mesa, HUDs e cartas, caso haja nova decisao visual
+- transformar a tela inicial em tela definitiva do jogo
 - dar mais contexto narrativo aos bares
 - decidir como parceiros gratuitos/pagos entram no fluxo
 - otimizar mais os assets fotograficos grandes, se necessario
@@ -207,7 +212,7 @@ Use esses arquivos como fonte de verdade.
 Estado atual:
 - a capa do Bar do Ze Catinga foi refinada, limpa, commitada e enviada para origin/main
 - commit da capa: 0f90926 Refine Ze Catinga venue cover
-- commit mais recente conhecido: 1f2efef Stabilize gameplay stage and Ze Catinga results
+- commit mais recente conhecido: 7b427d9 Add Maneco Banguela campaign and venue visuals
 - o fluxo atual deve ser preservado: COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo
 - o scorepad da coluna esquerda ja foi corrigido:
   - labels `Nos`, `Eles`, `Mao` e `Mao` nao se sobrepoem mais aos numeros
@@ -236,24 +241,35 @@ Estado atual:
   - `src/assets/venues/maneco-banguela/host-maneco-banguela.png`
   - HUDs/placas reaproveitados do Ze Catinga
 - a gameplay do Bar Maneco Banguela usa o mesmo background da entrada
+- a intro cinematografica curta antes da gameplay esta implementada:
+  - antes de cada partida, exibe apenas o background do bar por cerca de 1 segundo
+  - depois revela mesa, HUDs, oponentes e cartas com fade curto
+  - bloqueia cartas, truco e `MENU` ate terminar
+  - mantem a intro curta e reutilizavel para qualquer bar
+  - validada no `Bar do Ze Catinga` e no `Bar Maneco Banguela`
+- proximo foco:
+  - trabalhar a tela inicial definitiva do jogo
+  - usar a captura enviada em 2026-05-25 como referencia do estado atual
+  - preservar o fluxo `COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo`
 
 Objetivo deste chat:
-1. criar a proxima peca autoral do Bar Maneco Banguela
-2. priorizar telas de resultado, conforme assets disponiveis
-3. preservar a capa atual e a tela dinamica de campanha como fallback
-4. preservar o fluxo de jogo, a capa do bar, a selecao de parceira, a gameplay e as regras de truco
+1. transformar a tela inicial atual em uma tela definitiva do jogo
+2. preservar `COMEÇAR` como entrada para a campanha
+3. manter debug de bar discreto, se ainda necessario para desenvolvimento
+4. preservar a capa do bar, a selecao de parceira, a gameplay, a intro curta e as regras de truco
 
 Arquivos provaveis:
 - src/App.tsx
 - src/app/AppSections.tsx
 - src/app/useGameSession.ts
-- src/career/campaign/campaignData.ts
-- possivelmente nenhum asset
+- possivelmente assets novos para a tela inicial, se a direcao visual pedir
 
 Importante:
 - verificar `git status` e preservar mudancas locais existentes
 - nao reabrir a responsividade da gameplay sem regressao real
 - nao reabrir a tela de selecao de parceira sem regressao real
+- nao mudar regras de truco, pontuacao ou progressao de campanha
+- nao quebrar a intro cinematografica curta antes da gameplay
 - nao desmontar a arquitetura atual
 - fazer mudancas incrementais
 - validar visualmente no navegador

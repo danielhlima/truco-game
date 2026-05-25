@@ -110,6 +110,26 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 - Menus de contexto devem fechar antes de abrir modal de confirmacao.
 - Nao resolver responsividade movendo elementos isolados com transforms compensatorios quando o problema for escala global da tela.
 
+## Regras da Intro de Gameplay
+
+- Antes de cada partida, existe uma intro visual curta dentro da moldura.
+- A intro exibe apenas o background do bar por cerca de 1 segundo.
+- Em seguida, mesa, HUDs, oponentes e cartas entram com fade curto.
+- A interacao com cartas, truco e `MENU` fica bloqueada ate a intro terminar.
+- A intro reutiliza o background do bar atual, inclusive o background proprio do `Bar Maneco Banguela`.
+- A intro nao altera regras de truco, estado da partida, placares ou progressao da campanha.
+- Evitar animacoes longas; a experiencia deve dar atmosfera sem atrasar o jogador.
+- Nao reabrir a responsividade estrutural da gameplay para ajustar essa intro sem regressao real.
+
+## Regras da Tela Inicial
+
+- A tela inicial deve evoluir de tela temporaria/debug para tela definitiva do jogo.
+- A primeira tela deve preservar a moldura landscape e o clima visual de boteco ja consolidado.
+- `COMEÇAR` deve continuar levando ao fluxo `campanha > capa do bar > escolha de parceira se necessario > jogo`.
+- A tela inicial nao deve substituir a tela de campanha nem a capa do bar; ela e a porta de entrada anterior ao fluxo.
+- O debug de bar pode continuar existindo durante desenvolvimento, mas deve ficar discreto e nao dominar a composicao final.
+- Evitar reabrir responsividade da gameplay ou selecao de parceira enquanto a tela inicial estiver sendo trabalhada.
+
 ## Regras das Telas de Resultado
 
 - Cada bar pode ter arte propria de vitoria e derrota.

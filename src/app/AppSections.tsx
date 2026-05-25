@@ -53,6 +53,7 @@ type MatchResultScreenState = {
   venueId?: string
   venueName: string
 }
+type GameplayIntroPhase = "background" | "reveal" | "done"
 
 type VenueCoverConfig = {
   hostName: string
@@ -425,6 +426,7 @@ interface TableSectionProps {
   debugVenueId: string
   debugVenueOptions: Array<{ id: string; label: string }>
   dealAnimationNonce: number
+  gameplayIntroPhase: GameplayIntroPhase
   hasSelectedPartnerForVenue: boolean
   menuScreen: "start" | "journey-intro" | "character-select" | "venue-intro" | "match-result"
   playerProfile: PlayerProfile
@@ -487,6 +489,7 @@ export function TableSection({
   debugVenueId,
   debugVenueOptions,
   dealAnimationNonce,
+  gameplayIntroPhase,
   hasSelectedPartnerForVenue,
   menuScreen,
   playerProfile,
@@ -541,6 +544,13 @@ export function TableSection({
     currentCampaignVenue
   )
   const isMenuMode = !handState
+  const isGameplayIntroActive = gameplayIntroPhase !== "done"
+  const gameplayIntroContentStyle =
+    gameplayIntroPhase === "background"
+      ? styles.gameplayIntroContentBackground
+      : gameplayIntroPhase === "reveal"
+        ? styles.gameplayIntroContentReveal
+        : undefined
   const isVenueIntroMode = isMenuMode && menuScreen === "venue-intro"
   const rosterPlayers = handState?.players ?? [
     { id: 2, hand: [] },
@@ -657,7 +667,7 @@ export function TableSection({
                 )
               ) : (
                 <>
-                <div style={styles.gameLeftRail}>
+                <div style={{ ...styles.gameLeftRail, ...gameplayIntroContentStyle }}>
                   <div style={styles.scenePanel}>
                     <div style={styles.scenePanelTitle}>Mesa</div>
                     <div style={styles.rosterGrid}>
@@ -747,7 +757,7 @@ export function TableSection({
                   </div>
                 </div>
 
-                <div style={styles.gameMainColumn}>
+                <div style={{ ...styles.gameMainColumn, ...gameplayIntroContentStyle }}>
                   <div style={styles.tableSurfaceWrap}>
                     <div style={styles.tableSurface}>
                       <GameTableScene
@@ -769,12 +779,13 @@ export function TableSection({
                       onOpenInGameContextMenu={onOpenInGameContextMenu}
                       onPlayCard={onPlayCard}
                       onSwapPartnerFromContextMenu={onSwapPartnerFromContextMenu}
+                      gameplayIntroActive={isGameplayIntroActive}
                       styles={styles}
                     />
                   </div>
                 </div>
 
-                <div style={styles.gameSidebarColumn}>
+                <div style={{ ...styles.gameSidebarColumn, ...gameplayIntroContentStyle }}>
                   <div style={styles.tableHudSidebar}>
                     <div
                       style={{
@@ -969,6 +980,16 @@ export function TableSection({
                   </div>
                 </div>
               </div>
+            ) : null}
+            {handState && isGameplayIntroActive ? (
+              <div
+                aria-hidden="true"
+                style={
+                  gameplayIntroPhase === "background"
+                    ? styles.gameplayIntroBlockerBackground
+                    : styles.gameplayIntroBlockerReveal
+                }
+              />
             ) : null}
           </div>
         </div>
@@ -2413,6 +2434,7 @@ function HumanCardsPanel({
   inGameContextMenuOpen,
   player1,
   canPlayHumanCard,
+  gameplayIntroActive,
   onCloseInGameContextMenu,
   onExitMatchFromContextMenu,
   onOpenInGameContextMenu,
@@ -2424,6 +2446,7 @@ function HumanCardsPanel({
   inGameContextMenuOpen: boolean
   player1: Player | null
   canPlayHumanCard: boolean
+  gameplayIntroActive: boolean
   onCloseInGameContextMenu: () => void
   onExitMatchFromContextMenu: () => void
   onOpenInGameContextMenu: () => void
@@ -2489,6 +2512,7 @@ function HumanCardsPanel({
                 ...styles.inGameContextMenuButtonHand,
               }}
               onClick={onOpenInGameContextMenu}
+              disabled={gameplayIntroActive}
             >
               MENU
             </button>
