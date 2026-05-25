@@ -79,9 +79,6 @@ function App() {
     currentTurnLabel,
     currentVenueWins,
     hasSelectedPartnerForVenue,
-    debugModeEnabled,
-    debugVenueId,
-    debugVenueOptions,
     dealAnimationNonce,
     eventMessage,
     gameplayIntroPhase,
@@ -104,7 +101,6 @@ function App() {
     handleLaunchVenue,
     handleOpenInGameContextMenu,
     handleOpenCharacterSelect,
-    handleOpenJourneyIntro,
     handlePlayCard,
     handleRaiseTruco,
     handleRequestTruco,
@@ -127,12 +123,9 @@ function App() {
     selectedCharacterIndex,
     selectedPartnerCharacter,
     selectableCharacters,
-    setVariant,
-    setDebugVenueId,
     speechBubble,
     statusMessage,
     tableByPlayer,
-    variantSelectionDisabled,
     handleConfirmCharacterSelect,
   } = useGameSession()
 
@@ -367,8 +360,6 @@ function App() {
 
         <Suspense fallback={<div style={responsiveStyles.loadingCard}>Carregando mesa...</div>}>
           <TableSection
-            activeVariant={activeVariant}
-            campaignCompleted={campaignCompleted}
             handState={handState}
             inGameConfirmation={inGameConfirmation}
             inGameContextMenuOpen={inGameContextMenuOpen}
@@ -376,9 +367,6 @@ function App() {
             matchResultScreen={matchResultScreen}
             currentCampaignVenue={currentCampaignVenue}
             currentVenueWins={currentVenueWins}
-            debugModeEnabled={debugModeEnabled}
-            debugVenueId={debugVenueId}
-            debugVenueOptions={debugVenueOptions}
             dealAnimationNonce={dealAnimationNonce}
             gameplayIntroPhase={gameplayIntroPhase}
             hasSelectedPartnerForVenue={hasSelectedPartnerForVenue}
@@ -398,19 +386,14 @@ function App() {
             canHumanRaiseTruco={canHumanRaiseTruco}
             canHumanRespondToTruco={canHumanRespondToTruco}
             canPlayHumanCard={canPlayHumanCard}
-            variantSelectionDisabled={variantSelectionDisabled}
-            onChangeVariant={setVariant}
-            onChangeDebugVenue={setDebugVenueId}
             onCloseCharacterSelect={handleCloseCharacterSelect}
             onCloseJourneyIntro={handleCloseJourneyIntro}
             onConfirmCharacterSelect={handleConfirmCharacterSelect}
             onEnterVenueFromIntro={handleEnterVenueFromIntro}
             onOpenCharacterSelect={handleOpenCharacterSelect}
-            onOpenJourneyIntro={handleOpenJourneyIntro}
             onContinueToCharacterSelect={handleContinueToCharacterSelect}
             onLaunchVenue={handleLaunchVenue}
             onReturnToJourneyFlow={handleReturnToJourneyFlow}
-            onResetCampaign={handleResetCampaign}
             onSelectNextCharacter={handleSelectNextCharacter}
             onSelectPreviousCharacter={handleSelectPreviousCharacter}
             onStart={handleStartHand}
@@ -2092,13 +2075,48 @@ const styles: Record<string, React.CSSProperties> = {
   gameStartScreen: {
     width: "100%",
     height: "100%",
-    display: "flex",
+    gridColumn: "1 / -1",
+    display: "block",
     position: "relative",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "clamp(14px, 1.4vw, 24px)",
+    overflow: "hidden",
+    background: "#090604",
+  },
+  gameStartBackdrop: {
+    position: "absolute",
+    inset: 0,
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    objectPosition: "center",
+    display: "block",
+    filter: "blur(12px)",
+    transform: "scale(1.06)",
+    opacity: 0.72,
+  },
+  gameStartImage: {
+    position: "absolute",
+    inset: 0,
+    width: "100%",
+    height: "100%",
+    objectFit: "contain",
+    objectPosition: "center",
+    display: "block",
+    zIndex: 1,
+  },
+  gameStartHotspot: {
+    position: "absolute",
+    left: "62.2%",
+    top: "68%",
+    width: "26.8%",
+    height: "28.5%",
+    border: "none",
+    borderRadius: "18px",
+    padding: 0,
+    background: "transparent",
+    cursor: "pointer",
+    opacity: 0,
+    zIndex: 2,
     boxSizing: "border-box",
-    gap: "clamp(16px, 2vw, 28px)",
   },
   gameStartCard: {
     width: "min(100%, 460px)",

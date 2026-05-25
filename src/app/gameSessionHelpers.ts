@@ -53,7 +53,7 @@ export function getWinnerLabel(winner?: "A" | "B"): string {
 
 export function getStatusMessage(handState: HandState | null): string {
   if (!handState) {
-    return "Escolha a variante e clique em “Iniciar partida”."
+    return "Clique em COMEÇAR para entrar na jornada."
   }
 
   if (handState.finished) {

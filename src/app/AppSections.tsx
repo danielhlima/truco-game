@@ -16,6 +16,7 @@ import statsPanelWoodAsset from "../assets/ui-right/stats-panel-wood-main.png"
 import manecoBanguelaCampaignJourneyAsset from "../assets/campaign/botecos-rua-maneco-banguela.png"
 import manecoBanguelaBackgroundAsset from "../assets/venues/maneco-banguela/background.png"
 import manecoBanguelaHostAsset from "../assets/venues/maneco-banguela/host-maneco-banguela.png"
+import startScreenAsset from "../assets/start/truco-raiz-start.png"
 import zeCatingaCampaignJourneyAsset from "../assets/campaign/botecos-rua-ze-catinga.png"
 import zeCatingaBackgroundAsset from "../assets/venues/ze-catinga/background.png"
 import zeCatingaHostAsset from "../assets/venues/ze-catinga/host-ze-catinga.png"
@@ -409,8 +410,6 @@ export function CampaignPanel({
 }
 
 interface TableSectionProps {
-  activeVariant: GameVariant
-  campaignCompleted: boolean
   handState: HandState | null
   inGameConfirmation: {
     title: string
@@ -422,9 +421,6 @@ interface TableSectionProps {
   matchResultScreen: MatchResultScreenState | null
   currentCampaignVenue: CampaignVenue | null
   currentVenueWins: number
-  debugModeEnabled: boolean
-  debugVenueId: string
-  debugVenueOptions: Array<{ id: string; label: string }>
   dealAnimationNonce: number
   gameplayIntroPhase: GameplayIntroPhase
   hasSelectedPartnerForVenue: boolean
@@ -444,9 +440,6 @@ interface TableSectionProps {
   canHumanRaiseTruco: boolean
   canHumanRespondToTruco: boolean
   canPlayHumanCard: boolean
-  variantSelectionDisabled: boolean
-  onChangeVariant: (variant: GameVariant) => void
-  onChangeDebugVenue: (venueId: string) => void
   onCloseCharacterSelect: () => void
   onCloseJourneyIntro: () => void
   onContinueToCharacterSelect: () => void
@@ -454,9 +447,7 @@ interface TableSectionProps {
   onEnterVenueFromIntro: () => void
   onLaunchVenue: (venueId: string) => void
   onOpenCharacterSelect: () => void
-  onOpenJourneyIntro: () => void
   onReturnToJourneyFlow: () => void
-  onResetCampaign: () => void
   onSelectNextCharacter: () => void
   onSelectPreviousCharacter: () => void
   onStart: () => void
@@ -476,8 +467,6 @@ interface TableSectionProps {
 }
 
 export function TableSection({
-  activeVariant,
-  campaignCompleted,
   handState,
   inGameConfirmation,
   inGameContextMenuOpen,
@@ -485,9 +474,6 @@ export function TableSection({
   matchResultScreen,
   currentCampaignVenue,
   currentVenueWins,
-  debugModeEnabled,
-  debugVenueId,
-  debugVenueOptions,
   dealAnimationNonce,
   gameplayIntroPhase,
   hasSelectedPartnerForVenue,
@@ -507,9 +493,6 @@ export function TableSection({
   canHumanRaiseTruco,
   canHumanRespondToTruco,
   canPlayHumanCard,
-  variantSelectionDisabled,
-  onChangeVariant,
-  onChangeDebugVenue,
   onCloseCharacterSelect,
   onCloseJourneyIntro,
   onContinueToCharacterSelect,
@@ -517,9 +500,7 @@ export function TableSection({
   onEnterVenueFromIntro,
   onLaunchVenue,
   onOpenCharacterSelect,
-  onOpenJourneyIntro,
   onReturnToJourneyFlow,
-  onResetCampaign,
   onSelectNextCharacter,
   onSelectPreviousCharacter,
   onStart,
@@ -650,19 +631,9 @@ export function TableSection({
                   />
                 ) : (
                   <GameStartScreen
-                    activeVariant={activeVariant}
-                    campaignCompleted={campaignCompleted}
                     currentCampaignVenue={currentCampaignVenue}
-                    debugModeEnabled={debugModeEnabled}
-                    debugVenueId={debugVenueId}
-                    debugVenueOptions={debugVenueOptions}
-                    onChangeVariant={onChangeVariant}
-                    onChangeDebugVenue={onChangeDebugVenue}
-                    onOpenJourneyIntro={onOpenJourneyIntro}
-                    onResetCampaign={onResetCampaign}
                     onStart={onStart}
                     styles={styles}
-                    variantSelectionDisabled={variantSelectionDisabled}
                   />
                 )
               ) : (
@@ -999,127 +970,37 @@ export function TableSection({
 }
 
 function GameStartScreen({
-  activeVariant,
   currentCampaignVenue,
-  debugModeEnabled,
-  debugVenueId,
-  debugVenueOptions,
-  onChangeVariant,
-  onChangeDebugVenue,
-  onOpenJourneyIntro,
-  onResetCampaign,
   onStart,
   styles,
-  variantSelectionDisabled,
 }: {
-  activeVariant: GameVariant
-  campaignCompleted: boolean
   currentCampaignVenue: CampaignVenue | null
-  debugModeEnabled: boolean
-  debugVenueId: string
-  debugVenueOptions: Array<{ id: string; label: string }>
-  onChangeVariant: (variant: GameVariant) => void
-  onChangeDebugVenue: (venueId: string) => void
-  onOpenJourneyIntro: () => void
-  onResetCampaign: () => void
   onStart: () => void
   styles: StyleMap
-  variantSelectionDisabled: boolean
 }) {
   return (
     <div style={styles.gameStartScreen}>
-      <button style={styles.gameStartTopActionButton} onClick={onOpenJourneyIntro}>
-        Parceiros
-      </button>
-      <div style={styles.gameStartCard}>
-        <div style={styles.gameStartEyebrow}>Entrada</div>
-        <h2 style={styles.gameStartTitle}>Escolha a variante</h2>
-        <div style={styles.gameStartVenue}>
-          {currentCampaignVenue?.name ?? "Campanha concluída"}
-        </div>
-        <div style={styles.gameStartVenueMeta}>
-          {currentCampaignVenue?.districtLabel ?? "Reinicie a campanha para jogar novamente"}
-        </div>
-
-        {debugModeEnabled ? (
-          <div style={styles.gameStartDebugPanel}>
-            <div style={styles.gameStartDebugLabel}>Debug de bar</div>
-            <select
-              value={debugVenueId}
-              onChange={(e) => onChangeDebugVenue(e.target.value)}
-              style={styles.gameStartDebugSelect}
-            >
-              <option value="">Fluxo normal da campanha</option>
-              {debugVenueOptions.map((venue) => (
-                <option key={venue.id} value={venue.id}>
-                  {venue.label}
-                </option>
-              ))}
-            </select>
-            <div style={styles.gameStartDebugHint}>
-              Escolha um bar aqui para testar direto, sem depender do progresso salvo.
-            </div>
-          </div>
-        ) : null}
-
-        <div style={styles.gameStartOptions}>
-          <button
-            style={{
-              ...styles.gameStartOption,
-              ...(activeVariant === "MINEIRO" ? styles.gameStartOptionActive : {}),
-            }}
-            onClick={() => onChangeVariant("MINEIRO")}
-            disabled={variantSelectionDisabled}
-          >
-            Truco Mineiro
-          </button>
-          <button
-            style={{
-              ...styles.gameStartOption,
-              ...(activeVariant === "PAULISTA" ? styles.gameStartOptionActive : {}),
-            }}
-            onClick={() => onChangeVariant("PAULISTA")}
-            disabled={variantSelectionDisabled}
-          >
-            Truco Paulista
-          </button>
-        </div>
-
-        <button
-          style={{
-            ...styles.primaryButton,
-            ...(!currentCampaignVenue ? styles.disabledButton : {}),
-          }}
-          onClick={onStart}
-          disabled={!currentCampaignVenue}
-        >
-          COMEÇAR
-        </button>
-      </div>
-
-      <div style={styles.gameStartActionsStack}>
-        <button
-          style={{
-            ...styles.gameStartLaunchButton,
-            ...(!currentCampaignVenue ? styles.disabledButton : {}),
-            ...(currentCampaignVenue ? {} : styles.gameStartResetButtonCentered),
-          }}
-          onClick={onStart}
-          disabled={!currentCampaignVenue}
-        >
-          COMEÇAR
-        </button>
-
-        <button
-          style={{
-            ...styles.gameStartResetButton,
-            ...(currentCampaignVenue ? {} : styles.gameStartResetButtonCentered),
-          }}
-          onClick={onResetCampaign}
-        >
-          Resetar progresso
-        </button>
-      </div>
+      <img
+        src={startScreenAsset}
+        alt=""
+        aria-hidden="true"
+        style={styles.gameStartBackdrop}
+      />
+      <img
+        src={startScreenAsset}
+        alt="Truco Raiz"
+        style={styles.gameStartImage}
+      />
+      <button
+        aria-label="Começar"
+        title="Começar"
+        style={{
+          ...styles.gameStartHotspot,
+          ...(!currentCampaignVenue ? styles.disabledButton : {}),
+        }}
+        onClick={onStart}
+        disabled={!currentCampaignVenue}
+      />
     </div>
   )
 }
