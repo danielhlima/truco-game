@@ -76,7 +76,13 @@ Status:
   - revela mesa, HUDs, oponentes e cartas com fade curto
   - bloqueia cartas, truco e `MENU` ate terminar
   - foi validada no `Bar do Ze Catinga` e no `Bar Maneco Banguela`
-- o foco imediato recomendado agora e trabalhar a tela inicial definitiva do jogo
+- a tela inicial definitiva foi implementada:
+  - usa `src/assets/start/truco-raiz-start.png`
+  - mostra a arte inteira com preenchimento desfocado nas laterais quando necessario
+  - usa hotspot HTML invisivel sobre o `COMEÇAR` desenhado
+  - removeu debug, reset e variante da primeira tela visivel
+- o `MENU` em partida agora possui `Resetar progresso`, com confirmacao antes de apagar campanha, escolhas de parceira e historico salvo
+- o foco imediato recomendado agora e criar telas de resultado autorais do `Bar Maneco Banguela`
 
 ### Truco e dialogos
 
@@ -142,26 +148,26 @@ Estado atual:
 
 ### Opcao principal
 
-- trabalhar a tela inicial definitiva do jogo
+- criar telas autorais de vitoria/derrota do `Bar Maneco Banguela`
 
 ### Itens para atacar primeiro
 
-- Tela inicial:
-  1. transformar a tela atual de entrada em experiencia final
-  2. usar a captura enviada em 2026-05-25 como referencia do estado atual a melhorar
-  3. preservar `COMEÇAR` como entrada para o fluxo `campanha > capa do bar > escolha de parceira se necessario > jogo`
-  4. manter o debug de bar discreto, se ainda necessario para desenvolvimento
-  5. manter a moldura landscape e o clima visual de boteco
+- Resultados do Maneco:
+  1. criar tela autoral de vitoria
+  2. criar tela autoral de derrota
+  3. preservar fallback generico para bares sem arte propria
+  4. preservar a espera de 1 segundo apos a ultima carta visivel
+  5. preservar o `venueId` do resultado para usar a arte do bar encerrado
 - Validacao:
-  - abrir a tela inicial em tamanhos representativos
-  - confirmar que `COMEÇAR` continua abrindo a campanha
-  - confirmar que o fluxo ate a gameplay continua preservado
+  - abrir o fluxo real ate terminar ou simular resultado do Maneco
+  - confirmar vitoria/derrota com arte propria do Maneco
+  - confirmar que Ze Catinga continua usando suas artes atuais
   - testar em tamanhos representativos da moldura landscape
   - rodar `npm run build`
 
 ### Opcao seguinte depois disso
 
-- criar telas autorais de vitoria/derrota do `Bar Maneco Banguela`
+- expandir capas e telas autorais para outros bares
 
 ## Pendencias abertas
 
@@ -171,7 +177,6 @@ Estado atual:
   - hotspots revisados por estado
 - criar resultado autoral do `Bar Maneco Banguela`
 - refinar a intro de gameplay com entrada escalonada de mesa, HUDs e cartas, caso haja nova decisao visual
-- transformar a tela inicial em tela definitiva do jogo
 - dar mais contexto narrativo aos bares
 - decidir como parceiros gratuitos/pagos entram no fluxo
 - otimizar mais os assets fotograficos grandes, se necessario
@@ -247,22 +252,25 @@ Estado atual:
   - bloqueia cartas, truco e `MENU` ate terminar
   - mantem a intro curta e reutilizavel para qualquer bar
   - validada no `Bar do Ze Catinga` e no `Bar Maneco Banguela`
+- a tela inicial definitiva esta implementada:
+  - arte em `src/assets/start/truco-raiz-start.png`
+  - botao `COMEÇAR` como hotspot HTML invisivel sobre a arte
+  - debug, reset e variante removidos da primeira tela visivel
+- o menu de contexto em partida tem `Resetar progresso`, com confirmacao antes de apagar todo o progresso salvo
 - proximo foco:
-  - trabalhar a tela inicial definitiva do jogo
-  - usar a captura enviada em 2026-05-25 como referencia do estado atual
+  - criar telas autorais de vitoria/derrota do `Bar Maneco Banguela`
   - preservar o fluxo `COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo`
 
 Objetivo deste chat:
-1. transformar a tela inicial atual em uma tela definitiva do jogo
-2. preservar `COMEÇAR` como entrada para a campanha
-3. manter debug de bar discreto, se ainda necessario para desenvolvimento
-4. preservar a capa do bar, a selecao de parceira, a gameplay, a intro curta e as regras de truco
+1. criar telas autorais de resultado do `Bar Maneco Banguela`
+2. preservar a tela inicial definitiva e a intro curta
+3. preservar a capa do bar, a selecao de parceira, a gameplay e as regras de truco
 
 Arquivos provaveis:
 - src/App.tsx
 - src/app/AppSections.tsx
-- src/app/useGameSession.ts
-- possivelmente assets novos para a tela inicial, se a direcao visual pedir
+- src/assets/venues/maneco-banguela/
+- possivelmente assets novos de resultado
 
 Importante:
 - verificar `git status` e preservar mudancas locais existentes
@@ -270,6 +278,7 @@ Importante:
 - nao reabrir a tela de selecao de parceira sem regressao real
 - nao mudar regras de truco, pontuacao ou progressao de campanha
 - nao quebrar a intro cinematografica curta antes da gameplay
+- nao quebrar `Resetar progresso` no menu de contexto
 - nao desmontar a arquitetura atual
 - fazer mudancas incrementais
 - validar visualmente no navegador

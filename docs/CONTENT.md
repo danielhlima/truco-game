@@ -36,6 +36,7 @@ Hoje o projeto ja possui:
 - gameplay escalada como stage logico dentro da moldura landscape
 - telas autorais de vitoria e derrota do `Bar do Ze Catinga`
 - intro cinematografica curta antes da gameplay
+- tela inicial definitiva com arte propria
 
 ## Arquitetura que deve ser preservada
 
@@ -101,6 +102,7 @@ Arquivos principais:
 - a gameplay foi estabilizada como stage logico `1080x500` escalado no wrapper externo
 - a mao do humano e o botao `MENU` foram protegidos dentro da faixa inferior
 - o menu em jogo abre acima da mesa e fecha antes dos modais de confirmacao
+- o menu em jogo agora inclui `Resetar progresso`, com confirmacao especifica antes de apagar campanha, escolhas de parceira e historico salvo
 - as telas de resultado do `Bar do Ze Catinga` agora usam artes proprias para vitoria e derrota
 - a tela de selecao de parceira foi aceita como pronta no estado atual
 - a parceira antes chamada `Ze Catinga` foi renomeada para `Joca do Busão` com id `joca-busao`
@@ -120,7 +122,10 @@ Arquivos principais:
   - validacao visual feita no `Bar do Ze Catinga` e no `Bar Maneco Banguela`
 - `npm run build` passou depois da estabilizacao da gameplay, das telas de resultado, da campanha autoral e da consistencia da parceira renomeada
 - `npm run build` passou depois da intro cinematografica curta
-- o proximo foco recomendado e trabalhar a tela inicial definitiva do jogo
+- a tela inicial definitiva foi implementada com arte propria em `src/assets/start/truco-raiz-start.png`
+- a primeira tela visivel agora mostra somente a arte de capa e um hotspot HTML sobre `COMEÇAR`
+- debug de bar, reset de campanha e seletor de variante foram removidos da tela inicial visivel
+- o proximo foco recomendado e criar telas autorais de resultado do `Bar Maneco Banguela`
 
 ## Estado atual da gameplay screen
 
@@ -251,18 +256,21 @@ Assets em uso:
 
 ## Estado atual da tela inicial
 
-Existe um modo debug para acelerar testes visuais.
+Estado atual:
 
-Comportamento:
-
-- na tela inicial o usuario pode escolher um bar especifico
-- isso ignora momentaneamente o progresso da campanha
-- esse fluxo foi pensado para testes de layout, arte e IA
+- a tela inicial usa a arte `src/assets/start/truco-raiz-start.png`
+- a arte entra inteira dentro do stage, com uma copia desfocada no fundo para preencher laterais sem cortar logo ou botao
+- o botao `COMEÇAR` e um hotspot HTML invisivel posicionado sobre a placa desenhada
+- `COMEÇAR` continua levando para a tela de campanha
+- reset de progresso, debug de bar e selecao de variante nao aparecem mais na primeira tela visivel
+- reset total do progresso fica disponivel durante a partida no `MENU`, com confirmacao
 
 Arquivos principais:
 
 - `src/app/useGameSession.ts`
 - `src/app/AppSections.tsx`
+- `src/App.tsx`
+- `src/assets/start/truco-raiz-start.png`
 
 ## Estado atual da selecao de parceira
 

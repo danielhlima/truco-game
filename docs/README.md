@@ -71,6 +71,10 @@ Estado consolidado:
 - modos internos controlados `regular`, `compact` e `tiny`
 - cartas da mao e botao `MENU` protegidos dentro da faixa inferior
 - popover do `MENU` fica acima da mesa e fecha antes dos modais de confirmacao
+- o `MENU` em partida possui opcoes para:
+  - trocar de parceira
+  - sair da partida
+  - resetar todo o progresso do jogo com confirmacao
 - intro cinematografica curta antes da gameplay:
   - exibe apenas o background do bar por cerca de 1 segundo
   - revela mesa, HUDs, oponentes e cartas com fade curto
@@ -86,6 +90,10 @@ Estado consolidado:
   - `ENTRAR NO BAR`
   - `TROCAR PARCEIRA`
 - a tela de campanha dinamica continua como fallback para outros bares/estados
+- tela inicial definitiva com arte propria:
+  - `src/assets/start/truco-raiz-start.png`
+  - botao `COMEÇAR` como hotspot HTML invisivel sobre a placa da arte
+  - debug, reset e seletor de variante removidos da primeira tela visivel
 - telas autorais de vitoria e derrota do `Bar do Ze Catinga`:
   - `src/assets/venues/ze-catinga/match-result-win.png`
   - `src/assets/venues/ze-catinga/match-result-loss.png`
@@ -93,18 +101,16 @@ Estado consolidado:
 
 ## Prioridade imediata para o proximo chat
 
-No proximo chat, trabalhar a tela inicial definitiva do jogo, usando a tela atual enviada em captura como ponto de partida visual.
+No proximo chat, seguir para as telas autorais de vitoria/derrota do `Bar Maneco Banguela`.
 
 Proximo foco recomendado:
 
-- redesenhar a tela inicial como experiencia final, nao tela temporaria de debug
+- criar artes/estado visual de resultado para vitoria e derrota do Maneco
+- preservar a tela inicial definitiva e a intro curta antes da gameplay
 - preservar o fluxo `COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo`
-- manter debug de bar acessivel apenas de forma discreta, se ainda necessario para desenvolvimento
-- usar a moldura landscape e o clima visual de boteco ja consolidados
 
 Depois disso, seguir para:
 
-- telas autorais de vitoria/derrota do `Bar Maneco Banguela`
 - expansao do modelo da capa para outros bares
 - telas autorais de resultado para os proximos bares
 

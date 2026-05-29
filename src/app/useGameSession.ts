@@ -87,7 +87,7 @@ interface DebugVenueOption {
   label: string
 }
 
-type InGameConfirmationIntent = "swap-partner" | "exit-match"
+type InGameConfirmationIntent = "swap-partner" | "exit-match" | "reset-progress"
 type CharacterSelectReturnScreen = "journey-intro" | "venue-intro"
 type GameplayIntroPhase = "background" | "reveal" | "done"
 
@@ -96,6 +96,7 @@ interface InGameConfirmationState {
   title: string
   message: string
   confirmLabel: string
+  warning: string
 }
 
 export function useGameSession() {
@@ -1186,6 +1187,7 @@ export function useGameSession() {
       title: "Trocar de parceira?",
       message: "Se você trocar de parceira agora, todo o progresso desta partida será perdido.",
       confirmLabel: "Trocar e perder progresso",
+      warning: "Todo o progresso desta partida atual será perdido se você continuar.",
     })
   }
 
@@ -1197,6 +1199,19 @@ export function useGameSession() {
       title: "Sair da partida?",
       message: "Se você sair agora, todo o progresso desta partida será perdido.",
       confirmLabel: "Sair e perder progresso",
+      warning: "Todo o progresso desta partida atual será perdido se você continuar.",
+    })
+  }
+
+  function handleResetProgressFromContextMenu() {
+    if (!handState || !matchState) return
+    setInGameContextMenuOpen(false)
+    setInGameConfirmation({
+      intent: "reset-progress",
+      title: "Resetar todo o progresso?",
+      message: "Isso vai apagar sua campanha, escolhas de parceira e histórico salvo para recomeçar do zero.",
+      confirmLabel: "Resetar tudo",
+      warning: "Esta ação apaga todo o progresso salvo do jogo.",
     })
   }
 
@@ -1209,6 +1224,11 @@ export function useGameSession() {
 
     clearPendingUiTimers()
     showSpeechBubble(null)
+
+    if (inGameConfirmation.intent === "reset-progress") {
+      handleResetCampaign()
+      return
+    }
 
     if (inGameConfirmation.intent === "swap-partner") {
       setMatchResultScreen(null)
@@ -1270,6 +1290,7 @@ export function useGameSession() {
     handleRaiseTruco,
     handleRequestTruco,
     handleResetCampaign,
+    handleResetProgressFromContextMenu,
     handleReturnToJourneyFlow,
     handleRunFromTruco,
     handleSwapPartnerFromContextMenu,

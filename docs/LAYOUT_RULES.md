@@ -108,6 +108,7 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 - A faixa da mao deve manter cartas e botao `MENU` visiveis dentro da moldura.
 - O popover do `MENU` pode sair da faixa da mao, mas deve ficar acima da mesa.
 - Menus de contexto devem fechar antes de abrir modal de confirmacao.
+- O menu de contexto da partida pode conter a acao `Resetar progresso`, mas ela sempre deve abrir confirmacao antes de apagar dados salvos.
 - Nao resolver responsividade movendo elementos isolados com transforms compensatorios quando o problema for escala global da tela.
 
 ## Regras da Intro de Gameplay
@@ -123,11 +124,13 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 
 ## Regras da Tela Inicial
 
-- A tela inicial deve evoluir de tela temporaria/debug para tela definitiva do jogo.
-- A primeira tela deve preservar a moldura landscape e o clima visual de boteco ja consolidado.
+- A tela inicial atual usa arte autoral definitiva em `src/assets/start/truco-raiz-start.png`.
+- A primeira tela preserva a moldura landscape e o clima visual de boteco ja consolidado.
 - `COMEÇAR` deve continuar levando ao fluxo `campanha > capa do bar > escolha de parceira se necessario > jogo`.
 - A tela inicial nao deve substituir a tela de campanha nem a capa do bar; ela e a porta de entrada anterior ao fluxo.
-- O debug de bar pode continuar existindo durante desenvolvimento, mas deve ficar discreto e nao dominar a composicao final.
+- O botao `COMEÇAR` deve ser um controle HTML real sobre a placa desenhada na arte.
+- A arte deve aparecer inteira no stage; se a proporcao nao bater, usar preenchimento visual sem cortar logo ou botao.
+- Debug de bar, reset de progresso e selecao de variante nao devem dominar a primeira tela visivel.
 - Evitar reabrir responsividade da gameplay ou selecao de parceira enquanto a tela inicial estiver sendo trabalhada.
 
 ## Regras das Telas de Resultado

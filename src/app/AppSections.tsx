@@ -415,6 +415,7 @@ interface TableSectionProps {
     title: string
     message: string
     confirmLabel: string
+    warning: string
   } | null
   inGameContextMenuOpen: boolean
   matchState: MatchState | null
@@ -460,6 +461,7 @@ interface TableSectionProps {
   onExitMatchFromContextMenu: () => void
   onOpenInGameContextMenu: () => void
   onRaiseTruco: () => void
+  onResetProgressFromContextMenu: () => void
   onRunFromTruco: () => void
   onSwapPartnerFromContextMenu: () => void
   onPlayCard: (card: Card) => void
@@ -513,6 +515,7 @@ export function TableSection({
   onExitMatchFromContextMenu,
   onOpenInGameContextMenu,
   onRaiseTruco,
+  onResetProgressFromContextMenu,
   onRunFromTruco,
   onSwapPartnerFromContextMenu,
   onPlayCard,
@@ -749,6 +752,7 @@ export function TableSection({
                       onExitMatchFromContextMenu={onExitMatchFromContextMenu}
                       onOpenInGameContextMenu={onOpenInGameContextMenu}
                       onPlayCard={onPlayCard}
+                      onResetProgressFromContextMenu={onResetProgressFromContextMenu}
                       onSwapPartnerFromContextMenu={onSwapPartnerFromContextMenu}
                       gameplayIntroActive={isGameplayIntroActive}
                       styles={styles}
@@ -933,7 +937,7 @@ export function TableSection({
                   <h3 style={styles.inGameConfirmationTitle}>{inGameConfirmation.title}</h3>
                   <p style={styles.inGameConfirmationText}>{inGameConfirmation.message}</p>
                   <div style={styles.inGameConfirmationWarning}>
-                    Todo o progresso desta partida atual será perdido se você continuar.
+                    {inGameConfirmation.warning}
                   </div>
                   <div style={styles.inGameConfirmationActions}>
                     <button
@@ -2320,6 +2324,7 @@ function HumanCardsPanel({
   onExitMatchFromContextMenu,
   onOpenInGameContextMenu,
   onPlayCard,
+  onResetProgressFromContextMenu,
   onSwapPartnerFromContextMenu,
   styles,
 }: {
@@ -2332,6 +2337,7 @@ function HumanCardsPanel({
   onExitMatchFromContextMenu: () => void
   onOpenInGameContextMenu: () => void
   onPlayCard: (card: Card) => void
+  onResetProgressFromContextMenu: () => void
   onSwapPartnerFromContextMenu: () => void
   styles: StyleMap
 }) {
@@ -2411,6 +2417,12 @@ function HumanCardsPanel({
                   onClick={onExitMatchFromContextMenu}
                 >
                   Sair
+                </button>
+                <button
+                  style={styles.inGameContextMenuAction}
+                  onClick={onResetProgressFromContextMenu}
+                >
+                  Resetar progresso
                 </button>
                 <button
                   style={styles.inGameContextMenuActionSecondary}

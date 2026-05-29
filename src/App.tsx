@@ -105,6 +105,7 @@ function App() {
     handleRaiseTruco,
     handleRequestTruco,
     handleResetCampaign,
+    handleResetProgressFromContextMenu,
     handleReturnToJourneyFlow,
     handleRunFromTruco,
     handleSelectNextCharacter,
@@ -406,6 +407,7 @@ function App() {
             onExitMatchFromContextMenu={handleExitMatchFromContextMenu}
             onOpenInGameContextMenu={handleOpenInGameContextMenu}
             onRaiseTruco={handleRaiseTruco}
+            onResetProgressFromContextMenu={handleResetProgressFromContextMenu}
             onRunFromTruco={handleRunFromTruco}
             onSwapPartnerFromContextMenu={handleSwapPartnerFromContextMenu}
             onPlayCard={handlePlayCard}
