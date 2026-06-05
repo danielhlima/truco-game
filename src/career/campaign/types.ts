@@ -1,6 +1,7 @@
 import type { EconomyReward } from "../../economy/types"
 import type { GameVariant } from "../../game/variant"
 import type { AiTrucoPersonalityId } from "../../ai/trucoPersonalities"
+import type { TrucoCharacterId } from "../../content/characters"
 
 export type CampaignTier =
   | "rua"
@@ -30,6 +31,9 @@ export interface CampaignVenue {
   matchesToClear: number
   variant: GameVariant
   difficulty: DifficultyProfile
+  opponentCharacterIds: [TrucoCharacterId, TrucoCharacterId]
+  partnerUnlockCharacterIds: TrucoCharacterId[]
+  minimumVisualState: string
   entryNarrative: string
   reward: EconomyReward
   monetizationHooks?: {

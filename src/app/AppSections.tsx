@@ -10,7 +10,6 @@ import { STORE_PRODUCTS, UNLOCKABLE_ITEMS } from "../economy/catalog"
 import { GameTableScene } from "../three/GameTableScene"
 import { buildTableSceneModel } from "../three/tableSceneModel"
 import scorePadNotebookAsset from "../assets/ui-left/scorepad-notebook-clean-cut.png"
-import avatarYouAsset from "../assets/characters/zeca-viramao.png"
 import actionButtonAsset from "../assets/ui-right/action-button-solid.png"
 import statsPanelWoodAsset from "../assets/ui-right/stats-panel-wood-main.png"
 import manecoBanguelaCampaignJourneyAsset from "../assets/campaign/botecos-rua-maneco-banguela.png"
@@ -30,6 +29,7 @@ import zeCatingaStatsPlaqueAsset from "../assets/venues/ze-catinga/stats-plaque-
 import type { PlayerProfile } from "../profile/playerProfile"
 import type { PartnerAdvice } from "../ai/trucoDecision"
 import type { TrucoCharacterProfile } from "../content/characters"
+import type { PlayerSkinProfile } from "../content/playerSkins"
 import {
   formatCard,
   getBetBadgeLabel,
@@ -425,10 +425,21 @@ interface TableSectionProps {
   dealAnimationNonce: number
   gameplayIntroPhase: GameplayIntroPhase
   hasSelectedPartnerForVenue: boolean
-  menuScreen: "start" | "journey-intro" | "character-select" | "venue-intro" | "match-result"
+  menuScreen:
+    | "start"
+    | "journey-intro"
+    | "player-skin-select"
+    | "character-select"
+    | "venue-intro"
+    | "match-result"
   playerProfile: PlayerProfile
+  selectedPlayerSkin: PlayerSkinProfile
+  selectedPlayerSkinCandidate: PlayerSkinProfile
+  selectedPlayerSkinIndex: number
+  selectablePlayerSkins: PlayerSkinProfile[]
   selectedCharacter: TrucoCharacterProfile | null
   selectedCharacterIndex: number
+  isSelectedCharacterUnlocked: boolean
   selectedPartnerCharacter: TrucoCharacterProfile | null
   selectableCharacters: TrucoCharacterProfile[]
   opponentCharacters: TrucoCharacterProfile[]
@@ -443,14 +454,18 @@ interface TableSectionProps {
   canPlayHumanCard: boolean
   onCloseCharacterSelect: () => void
   onCloseJourneyIntro: () => void
+  onClosePlayerSkinSelect: () => void
   onContinueToCharacterSelect: () => void
   onConfirmCharacterSelect: () => void
+  onConfirmPlayerSkinSelect: () => void
   onEnterVenueFromIntro: () => void
   onLaunchVenue: (venueId: string) => void
   onOpenCharacterSelect: () => void
   onReturnToJourneyFlow: () => void
   onSelectNextCharacter: () => void
   onSelectPreviousCharacter: () => void
+  onSelectNextPlayerSkin: () => void
+  onSelectPreviousPlayerSkin: () => void
   onStart: () => void
   onRequestTruco: () => void
   onAcceptTruco: () => void
@@ -481,8 +496,13 @@ export function TableSection({
   hasSelectedPartnerForVenue,
   menuScreen,
   playerProfile,
+  selectedPlayerSkin,
+  selectedPlayerSkinCandidate,
+  selectedPlayerSkinIndex,
+  selectablePlayerSkins,
   selectedCharacter,
   selectedCharacterIndex,
+  isSelectedCharacterUnlocked,
   selectedPartnerCharacter,
   selectableCharacters,
   opponentCharacters,
@@ -497,14 +517,18 @@ export function TableSection({
   canPlayHumanCard,
   onCloseCharacterSelect,
   onCloseJourneyIntro,
+  onClosePlayerSkinSelect,
   onContinueToCharacterSelect,
   onConfirmCharacterSelect,
+  onConfirmPlayerSkinSelect,
   onEnterVenueFromIntro,
   onLaunchVenue,
   onOpenCharacterSelect,
   onReturnToJourneyFlow,
   onSelectNextCharacter,
   onSelectPreviousCharacter,
+  onSelectNextPlayerSkin,
+  onSelectPreviousPlayerSkin,
   onStart,
   onRequestTruco,
   onAcceptTruco,
@@ -543,10 +567,10 @@ export function TableSection({
     { id: 1, hand: [] },
   ]
   const playerAvatarById: Record<number, string> = {
-    1: avatarYouAsset,
-    2: opponentCharacters[0]?.avatarAsset ?? avatarYouAsset,
-    3: selectedPartnerCharacter?.avatarAsset ?? avatarYouAsset,
-    4: opponentCharacters[1]?.avatarAsset ?? opponentCharacters[0]?.avatarAsset ?? avatarYouAsset,
+    1: selectedPlayerSkin.avatarAsset,
+    2: opponentCharacters[0]?.avatarAsset ?? selectedPlayerSkin.avatarAsset,
+    3: selectedPartnerCharacter?.avatarAsset ?? selectedPlayerSkin.avatarAsset,
+    4: opponentCharacters[1]?.avatarAsset ?? opponentCharacters[0]?.avatarAsset ?? selectedPlayerSkin.avatarAsset,
   }
   const playerNameById: Record<number, string> = {
     1: "Você",
@@ -574,6 +598,7 @@ export function TableSection({
                 hasSelectedPartnerForVenue={hasSelectedPartnerForVenue}
                 opponentCharacters={opponentCharacters}
                 playerProfile={playerProfile}
+                selectedPlayerSkin={selectedPlayerSkin}
                 onOpenCharacterSelect={onOpenCharacterSelect}
                 onStart={onEnterVenueFromIntro}
                 styles={styles}
@@ -608,11 +633,23 @@ export function TableSection({
                     onLaunchVenue={onLaunchVenue}
                     styles={styles}
                   />
+                ) : menuScreen === "player-skin-select" ? (
+                  <PlayerSkinSelectionScreen
+                    selectedPlayerSkin={selectedPlayerSkinCandidate}
+                    selectedPlayerSkinIndex={selectedPlayerSkinIndex}
+                    selectablePlayerSkins={selectablePlayerSkins}
+                    onBack={onClosePlayerSkinSelect}
+                    onConfirm={onConfirmPlayerSkinSelect}
+                    onNext={onSelectNextPlayerSkin}
+                    onPrevious={onSelectPreviousPlayerSkin}
+                    styles={styles}
+                  />
                 ) : menuScreen === "character-select" ? (
                   <CharacterSelectionScreen
                     currentCampaignVenue={currentCampaignVenue}
                     selectedCharacter={selectedCharacter}
                     selectedCharacterIndex={selectedCharacterIndex}
+                    isSelectedCharacterUnlocked={isSelectedCharacterUnlocked}
                     selectedPartnerCharacter={selectedPartnerCharacter}
                     selectableCharacters={selectableCharacters}
                     onBack={onCloseCharacterSelect}
@@ -628,6 +665,7 @@ export function TableSection({
                     hasSelectedPartnerForVenue={hasSelectedPartnerForVenue}
                     opponentCharacters={opponentCharacters}
                     playerProfile={playerProfile}
+                    selectedPlayerSkin={selectedPlayerSkin}
                     onOpenCharacterSelect={onOpenCharacterSelect}
                     onStart={onEnterVenueFromIntro}
                     styles={styles}
@@ -1432,9 +1470,108 @@ function MatchResultScreen({
   )
 }
 
+function PlayerSkinSelectionScreen({
+  selectedPlayerSkin,
+  selectedPlayerSkinIndex,
+  selectablePlayerSkins,
+  onBack,
+  onConfirm,
+  onNext,
+  onPrevious,
+  styles,
+}: {
+  selectedPlayerSkin: PlayerSkinProfile
+  selectedPlayerSkinIndex: number
+  selectablePlayerSkins: PlayerSkinProfile[]
+  onBack: () => void
+  onConfirm: () => void
+  onNext: () => void
+  onPrevious: () => void
+  styles: StyleMap
+}) {
+  const totalSkins = selectablePlayerSkins.length
+  const currentPosition = selectedPlayerSkinIndex >= 0 ? selectedPlayerSkinIndex + 1 : 1
+
+  return (
+    <div style={styles.characterSelectScreen}>
+      <div style={styles.characterSelectHeader}>
+        <div style={styles.characterSelectEyebrow}>Escolha seu protagonista</div>
+        <button style={styles.characterSelectBackButton} onClick={onBack}>
+          Voltar
+        </button>
+      </div>
+
+      <div style={styles.characterSelectBoard}>
+        <div style={styles.characterSelectLeftColumn}>
+          <div style={styles.characterPortraitFrame}>
+            <img
+              src={selectedPlayerSkin.avatarAsset}
+              alt={selectedPlayerSkin.name}
+              style={styles.characterPortraitImage}
+            />
+            <div style={styles.characterPortraitOverlay}>
+              <div style={styles.characterPortraitName}>{selectedPlayerSkin.name}</div>
+              <div style={styles.characterPortraitNickname}>
+                {selectedPlayerSkin.nickname}
+              </div>
+            </div>
+          </div>
+
+          <div style={styles.characterIdentityPanel}>
+            <div style={styles.characterNavigator}>
+              <button style={styles.characterNavButton} onClick={onPrevious}>
+                ←
+              </button>
+              <div style={styles.characterNavDots}>
+                {selectablePlayerSkins.map((skin, index) => {
+                  const active = index === selectedPlayerSkinIndex
+                  return (
+                    <span
+                      key={skin.id}
+                      style={{
+                        ...styles.characterNavDot,
+                        ...(active ? styles.characterNavDotActive : {}),
+                      }}
+                    />
+                  )
+                })}
+              </div>
+              <button style={styles.characterNavButton} onClick={onNext}>
+                →
+              </button>
+            </div>
+
+            <div style={styles.characterNavCounter}>
+              {currentPosition} de {totalSkins}
+            </div>
+          </div>
+        </div>
+
+        <div style={styles.characterSelectRightColumn}>
+          <div style={{ ...styles.characterInfoPanel, ...styles.playerSkinInfoPanel }}>
+            <div style={styles.playerSkinStoryQuote}>
+              “{selectedPlayerSkin.story}”
+            </div>
+
+            <div style={styles.playerSkinActionArea}>
+              <button
+                style={{ ...styles.characterSelectActionButton, ...styles.playerSkinActionButton }}
+                onClick={onConfirm}
+              >
+                Seguir com {selectedPlayerSkin.name}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function CharacterSelectionScreen({
   selectedCharacter,
   selectedCharacterIndex,
+  isSelectedCharacterUnlocked,
   selectedPartnerCharacter,
   selectableCharacters,
   onBack,
@@ -1446,6 +1583,7 @@ function CharacterSelectionScreen({
   currentCampaignVenue: CampaignVenue | null
   selectedCharacter: TrucoCharacterProfile | null
   selectedCharacterIndex: number
+  isSelectedCharacterUnlocked: boolean
   selectedPartnerCharacter: TrucoCharacterProfile | null
   selectableCharacters: TrucoCharacterProfile[]
   onBack: () => void
@@ -1471,9 +1609,17 @@ function CharacterSelectionScreen({
   const totalCharacters = selectableCharacters.length
   const currentPosition = selectedCharacterIndex >= 0 ? selectedCharacterIndex + 1 : 1
   const isSelectedPartner = selectedPartnerCharacter?.id === selectedCharacter.id
+  const unlockVenue = CAMPAIGN_STAGES.flatMap((stage) => stage.venues).find((venue) =>
+    venue.partnerUnlockCharacterIds.includes(selectedCharacter.id)
+  )
   const actionLabel = isSelectedPartner
     ? "Parceira atualmente escolhida"
-    : `Jogar com ${selectedCharacter.name}`
+    : `Escolher ${selectedCharacter.name}`
+  const unlockStatusText = !isSelectedCharacterUnlocked
+    ? unlockVenue
+      ? `Vença ${unlockVenue.name} para liberar esta parceria`
+      : "Avance na campanha para liberar esta parceria"
+    : null
 
   return (
     <div style={styles.characterSelectScreen}>
@@ -1490,11 +1636,31 @@ function CharacterSelectionScreen({
             <img
               src={selectedCharacter.avatarAsset}
               alt={selectedCharacter.name}
-              style={styles.characterPortraitImage}
+              style={{
+                ...styles.characterPortraitImage,
+                ...(!isSelectedCharacterUnlocked ? styles.characterPortraitImageLocked : {}),
+              }}
             />
+            {!isSelectedCharacterUnlocked ? (
+              <div style={styles.characterPortraitLockedLayer} />
+            ) : null}
             <div style={styles.characterPortraitOverlay}>
-              <div style={styles.characterPortraitName}>{selectedCharacter.name}</div>
-              <div style={styles.characterPortraitNickname}>{selectedCharacter.nickname}</div>
+              <div
+                style={{
+                  ...styles.characterPortraitName,
+                  ...(!isSelectedCharacterUnlocked ? styles.characterPortraitTextLocked : {}),
+                }}
+              >
+                {selectedCharacter.name}
+              </div>
+              <div
+                style={{
+                  ...styles.characterPortraitNickname,
+                  ...(!isSelectedCharacterUnlocked ? styles.characterPortraitTextLocked : {}),
+                }}
+              >
+                {selectedCharacter.nickname}
+              </div>
             </div>
           </div>
 
@@ -1574,9 +1740,16 @@ function CharacterSelectionScreen({
             </div>
 
             <div style={styles.characterActionFooter}>
+              {unlockStatusText ? (
+                <div style={styles.characterUnlockHint}>{unlockStatusText}</div>
+              ) : null}
               <button
-                style={styles.characterSelectActionButton}
+                style={{
+                  ...styles.characterSelectActionButton,
+                  ...(!isSelectedCharacterUnlocked ? styles.disabledButton : {}),
+                }}
                 onClick={onConfirm}
+                disabled={!isSelectedCharacterUnlocked}
               >
                 {actionLabel}
               </button>
@@ -1594,6 +1767,7 @@ function VenueIntroScreen({
   hasSelectedPartnerForVenue,
   opponentCharacters,
   playerProfile,
+  selectedPlayerSkin,
   onOpenCharacterSelect,
   onStart,
   styles,
@@ -1603,6 +1777,7 @@ function VenueIntroScreen({
   hasSelectedPartnerForVenue: boolean
   opponentCharacters: TrucoCharacterProfile[]
   playerProfile: PlayerProfile
+  selectedPlayerSkin: PlayerSkinProfile
   onOpenCharacterSelect: () => void
   onStart: () => void
   styles: StyleMap
@@ -1622,9 +1797,9 @@ function VenueIntroScreen({
       {
         id: "you",
         role: "Você",
-        name: "Zeca Viramão",
-        description: "Chega na mesa querendo medir a temperatura do bar no carteado.",
-        avatarAsset: avatarYouAsset,
+        name: selectedPlayerSkin.name,
+        description: selectedPlayerSkin.story,
+        avatarAsset: selectedPlayerSkin.avatarAsset,
       },
       ...opponentCharacters.map((character, index) => ({
         id: character.id,
@@ -1988,7 +2163,7 @@ function VenueIntroScreen({
                     }}
                   >
                     <img
-                      src={character.avatarAsset ?? avatarYouAsset}
+                      src={character.avatarAsset ?? selectedPlayerSkin.avatarAsset}
                       alt={character.name}
                       style={{
                         width: "100%",

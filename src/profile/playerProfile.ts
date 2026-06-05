@@ -5,6 +5,7 @@ export interface CampaignProgress {
   clearedVenueIds: string[]
   completedStageIds: string[]
   venueWinsById: Record<string, number>
+  unlockedPartnerCharacterIds: string[]
   selectedPartnerCharacterIdByVenueId: Record<string, string>
   wins: number
   losses: number
@@ -17,6 +18,7 @@ export interface PlayerProfile {
   campaign: CampaignProgress
   settings: {
     adsRemoved: boolean
+    selectedPlayerSkinId?: string
     selectedTableThemeId?: string
   }
 }
@@ -34,6 +36,7 @@ export function createInitialPlayerProfile(): PlayerProfile {
       clearedVenueIds: [],
       completedStageIds: [],
       venueWinsById: {},
+      unlockedPartnerCharacterIds: [],
       selectedPartnerCharacterIdByVenueId: {},
       wins: 0,
       losses: 0,

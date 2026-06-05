@@ -36,14 +36,18 @@ import {
 import { createInitialPlayerProfile } from "../profile/playerProfile"
 import type { PlayerProfile } from "../profile/playerProfile"
 import {
-  BAR_ROSTER_BY_CAMPAIGN_VENUE_ID,
-  BAR_ROSTERS,
-  STARTER_PARTNER_CHARACTER_IDS,
   TRUCO_CHARACTER_BY_ID,
   TRUCO_CHARACTER_ROSTER,
   type TrucoCharacterId,
   type TrucoCharacterProfile,
 } from "../content/characters"
+import { STARTER_PARTNER_CHARACTER_IDS } from "../content/partnerProgression"
+import {
+  DEFAULT_PLAYER_SKIN_ID,
+  PLAYER_SKINS,
+  getPlayerSkinById,
+  type PlayerSkinId,
+} from "../content/playerSkins"
 import { clearLogs, getLogsAsText, logEvent } from "../utils/logger"
 import {
   DEFAULT_TRUCO_MESSAGE,
@@ -69,7 +73,13 @@ import {
 import { getRuleSet } from "../game/getRuleSet"
 
 const DEBUG_MODE = true
-type MenuScreen = "start" | "journey-intro" | "character-select" | "venue-intro" | "match-result"
+type MenuScreen =
+  | "start"
+  | "journey-intro"
+  | "player-skin-select"
+  | "character-select"
+  | "venue-intro"
+  | "match-result"
 
 interface MatchResultScreenState {
   hostLine: string
@@ -126,6 +136,8 @@ export function useGameSession() {
   const [characterSelectReturnScreen, setCharacterSelectReturnScreen] =
     useState<CharacterSelectReturnScreen>("journey-intro")
   const [launchVenueAfterCharacterSelect, setLaunchVenueAfterCharacterSelect] = useState(false)
+  const [selectedPlayerSkinId, setSelectedPlayerSkinId] =
+    useState<PlayerSkinId>(DEFAULT_PLAYER_SKIN_ID)
   const speechBubbleTimeoutRef = useRef<number | null>(null)
   const followUpSpeechTimeoutRef = useRef<number | null>(null)
   const partnerAdviceTimeoutRef = useRef<number | null>(null)
@@ -178,49 +190,80 @@ export function useGameSession() {
   const currentCampaignVenue = sessionDebugVenue ?? selectedDebugVenue ?? actualCampaignVenue
   const currentCampaignStage = sessionDebugStage ?? selectedDebugStage ?? actualCampaignStage
   const currentCampaignVenueId = currentCampaignVenue?.id ?? null
-  const selectableCharacters = useMemo(
+  const selectedPlayerSkin = useMemo(
+    () => getPlayerSkinById(playerProfile.settings.selectedPlayerSkinId),
+    [playerProfile.settings.selectedPlayerSkinId]
+  )
+  const hasSelectedPlayerSkin = PLAYER_SKINS.some(
+    (skin) => skin.id === playerProfile.settings.selectedPlayerSkinId
+  )
+  const selectedPlayerSkinCandidate =
+    PLAYER_SKINS.find((skin) => skin.id === selectedPlayerSkinId) ?? selectedPlayerSkin
+  const selectedPlayerSkinIndex = PLAYER_SKINS.findIndex(
+    (skin) => skin.id === selectedPlayerSkinCandidate.id
+  )
+  const availablePartnerCharacterIdSet = useMemo(
     () =>
-      STARTER_PARTNER_CHARACTER_IDS.map((characterId) => TRUCO_CHARACTER_BY_ID[characterId]).filter(
-        (character) => !!character.avatarAsset
-      ),
+      new Set<string>([
+        ...STARTER_PARTNER_CHARACTER_IDS,
+        ...playerProfile.campaign.unlockedPartnerCharacterIds,
+      ]),
+    [playerProfile.campaign.unlockedPartnerCharacterIds]
+  )
+  const selectableCharacters = useMemo(
+    () => {
+      const characterIds = new Set<TrucoCharacterId>([
+        ...STARTER_PARTNER_CHARACTER_IDS,
+        ...CAMPAIGN_STAGES.flatMap((stage) =>
+          stage.venues.flatMap((venue) => venue.partnerUnlockCharacterIds)
+        ),
+      ])
+
+      return [...characterIds]
+        .map((characterId) => TRUCO_CHARACTER_BY_ID[characterId])
+        .filter((character) => !!character.avatarAsset)
+    },
     []
   )
-  const [selectedCharacterId, setSelectedCharacterId] = useState<TrucoCharacterId>(
-    () => selectableCharacters[0]?.id ?? "nega-catimbo"
+  const availablePartnerCharacters = useMemo(
+    () =>
+      selectableCharacters.filter((character) =>
+        availablePartnerCharacterIdSet.has(character.id)
+      ),
+    [availablePartnerCharacterIdSet, selectableCharacters]
   )
-  const currentVenuePartnerCharacterId = currentCampaignVenueId
-    ? (playerProfile.campaign.selectedPartnerCharacterIdByVenueId[currentCampaignVenueId] as
-        | TrucoCharacterId
-        | undefined) ?? null
+  const [selectedCharacterId, setSelectedCharacterId] = useState<TrucoCharacterId>(
+    () => availablePartnerCharacters[0]?.id ?? "nega-catimbo"
+  )
+  const savedCurrentVenuePartnerCharacterId = currentCampaignVenueId
+    ? playerProfile.campaign.selectedPartnerCharacterIdByVenueId[currentCampaignVenueId] ?? null
     : null
+  const currentVenuePartnerCharacterId =
+    availablePartnerCharacters.find(
+      (character) => character.id === savedCurrentVenuePartnerCharacterId
+    )?.id ?? null
   const selectedCharacter =
     selectableCharacters.find((character) => character.id === selectedCharacterId) ??
-    selectableCharacters[0] ??
+    availablePartnerCharacters[0] ??
     null
+  const isSelectedCharacterUnlocked =
+    !!selectedCharacter && availablePartnerCharacterIdSet.has(selectedCharacter.id)
   const selectedPartnerCharacter = currentVenuePartnerCharacterId
-    ? TRUCO_CHARACTER_BY_ID[currentVenuePartnerCharacterId] ?? selectableCharacters[0] ?? null
-    : selectableCharacters[0] ?? null
+    ? TRUCO_CHARACTER_BY_ID[currentVenuePartnerCharacterId] ?? availablePartnerCharacters[0] ?? null
+    : availablePartnerCharacters[0] ?? null
   const selectedCharacterIndex = selectedCharacter
     ? selectableCharacters.findIndex((character) => character.id === selectedCharacter.id)
     : -1
   const partnerAiPersonalityId = selectedPartnerCharacter?.personalityId ?? "conservative"
-  const currentBarRoster = useMemo(() => {
-    const rosterId = currentCampaignVenue
-      ? BAR_ROSTER_BY_CAMPAIGN_VENUE_ID[currentCampaignVenue.id]
-      : undefined
-
-    return rosterId ? BAR_ROSTERS[rosterId] : null
-  }, [currentCampaignVenue])
   const opponentCharacters = useMemo<TrucoCharacterProfile[]>(() => {
-    if (!currentBarRoster) {
+    if (!currentCampaignVenue) {
       return TRUCO_CHARACTER_ROSTER.filter((character) => character.role === "opponent").slice(0, 2)
     }
 
-    return currentBarRoster
+    return currentCampaignVenue.opponentCharacterIds
       .map((characterId) => TRUCO_CHARACTER_BY_ID[characterId])
       .filter(Boolean)
-      .slice(0, 2)
-  }, [currentBarRoster])
+  }, [currentCampaignVenue])
   const opponentAiPersonalityId = opponentCharacters[0]?.personalityId ?? "balanced"
   const activeVariant = handState?.variant ?? variant
   const currentVenueWins = currentCampaignVenue
@@ -359,40 +402,18 @@ export function useGameSession() {
   const campaignSummary = buildCampaignSummary(CAMPAIGN_STAGES)
 
   useEffect(() => {
-    if (!selectedCharacter && selectableCharacters[0]) {
-      setSelectedCharacterId(selectableCharacters[0].id)
+    if (!selectedCharacter && availablePartnerCharacters[0]) {
+      setSelectedCharacterId(availablePartnerCharacters[0].id)
     }
-  }, [selectedCharacter, selectableCharacters])
+  }, [availablePartnerCharacters, selectedCharacter])
 
   useEffect(() => {
-    const preferredCharacterId = currentVenuePartnerCharacterId ?? selectableCharacters[0]?.id
+    const preferredCharacterId = currentVenuePartnerCharacterId ?? availablePartnerCharacters[0]?.id
 
     if (preferredCharacterId) {
       setSelectedCharacterId(preferredCharacterId)
     }
-  }, [currentCampaignVenueId, currentVenuePartnerCharacterId, selectableCharacters])
-
-  useEffect(() => {
-    if (
-      handState ||
-      matchState ||
-      !currentCampaignVenue ||
-      currentVenuePartnerCharacterId ||
-      menuScreen === "match-result" ||
-      !!matchResultScreen
-    ) {
-      return
-    }
-
-    setMenuScreen("character-select")
-  }, [
-    currentCampaignVenue,
-    currentVenuePartnerCharacterId,
-    handState,
-    matchResultScreen,
-    matchState,
-    menuScreen,
-  ])
+  }, [availablePartnerCharacters, currentCampaignVenueId, currentVenuePartnerCharacterId])
 
   const syncLogs = useCallback(() => {
     setLogs(getLogsAsText())
@@ -709,14 +730,51 @@ export function useGameSession() {
   function handleStartHand() {
     if (!currentCampaignVenue) return
 
+    if (!hasSelectedPlayerSkin) {
+      setSelectedPlayerSkinId(selectedPlayerSkin.id)
+      setMenuScreen("player-skin-select")
+      return
+    }
+
     setMenuScreen("journey-intro")
+  }
+
+  function handleClosePlayerSkinSelect() {
+    setSelectedPlayerSkinId(selectedPlayerSkin.id)
+    setMenuScreen("start")
+  }
+
+  function handleConfirmPlayerSkinSelect() {
+    setPlayerProfile((currentProfile) => ({
+      ...currentProfile,
+      settings: {
+        ...currentProfile.settings,
+        selectedPlayerSkinId: selectedPlayerSkinCandidate.id,
+      },
+    }))
+    setMenuScreen("journey-intro")
+  }
+
+  function handleSelectNextPlayerSkin() {
+    const currentIndex = PLAYER_SKINS.findIndex((skin) => skin.id === selectedPlayerSkinId)
+    const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % PLAYER_SKINS.length : 0
+    setSelectedPlayerSkinId(PLAYER_SKINS[nextIndex].id)
+  }
+
+  function handleSelectPreviousPlayerSkin() {
+    const currentIndex = PLAYER_SKINS.findIndex((skin) => skin.id === selectedPlayerSkinId)
+    const previousIndex =
+      currentIndex >= 0
+        ? (currentIndex - 1 + PLAYER_SKINS.length) % PLAYER_SKINS.length
+        : 0
+    setSelectedPlayerSkinId(PLAYER_SKINS[previousIndex].id)
   }
 
   function handleEnterVenueFromIntro() {
     if (!currentCampaignVenue) return
 
     if (!currentVenuePartnerCharacterId) {
-      setSelectedCharacterId(selectableCharacters[0]?.id ?? "nega-catimbo")
+      setSelectedCharacterId(availablePartnerCharacters[0]?.id ?? "nega-catimbo")
       setCharacterSelectReturnScreen("venue-intro")
       setLaunchVenueAfterCharacterSelect(true)
       setMenuScreen("character-select")
@@ -737,6 +795,9 @@ export function useGameSession() {
     setInGameContextMenuOpen(false)
     setInGameConfirmation(null)
     setGameplayIntroPhase("done")
+    setSelectedPlayerSkinId(DEFAULT_PLAYER_SKIN_ID)
+    setLaunchVenueAfterCharacterSelect(false)
+    setCharacterSelectReturnScreen("journey-intro")
     setMenuScreen("start")
     setEventMessage("Campanha reiniciada do zero.")
     setTrucoMessage("Tudo pronto para voltar ao primeiro boteco.")
@@ -1088,7 +1149,7 @@ export function useGameSession() {
   function handleOpenCharacterSelect() {
     setInGameContextMenuOpen(false)
     setInGameConfirmation(null)
-    setSelectedCharacterId(currentVenuePartnerCharacterId ?? selectableCharacters[0]?.id ?? "nega-catimbo")
+    setSelectedCharacterId(currentVenuePartnerCharacterId ?? availablePartnerCharacters[0]?.id ?? "nega-catimbo")
     setCharacterSelectReturnScreen("venue-intro")
     setLaunchVenueAfterCharacterSelect(false)
     setMenuScreen("character-select")
@@ -1097,7 +1158,7 @@ export function useGameSession() {
   function handleOpenJourneyIntro() {
     setInGameContextMenuOpen(false)
     setInGameConfirmation(null)
-    setSelectedCharacterId(currentVenuePartnerCharacterId ?? selectableCharacters[0]?.id ?? "nega-catimbo")
+    setSelectedCharacterId(currentVenuePartnerCharacterId ?? availablePartnerCharacters[0]?.id ?? "nega-catimbo")
     setMenuScreen("journey-intro")
   }
 
@@ -1118,13 +1179,13 @@ export function useGameSession() {
   function handleCloseCharacterSelect() {
     setInGameContextMenuOpen(false)
     setInGameConfirmation(null)
-    setSelectedCharacterId(currentVenuePartnerCharacterId ?? selectableCharacters[0]?.id ?? "nega-catimbo")
+    setSelectedCharacterId(currentVenuePartnerCharacterId ?? availablePartnerCharacters[0]?.id ?? "nega-catimbo")
     setLaunchVenueAfterCharacterSelect(false)
     setMenuScreen(characterSelectReturnScreen)
   }
 
   function handleConfirmCharacterSelect() {
-    if (!selectedCharacter || !currentCampaignVenueId) return
+    if (!selectedCharacter || !isSelectedCharacterUnlocked || !currentCampaignVenueId) return
 
     setPlayerProfile((currentProfile) => ({
       ...currentProfile,
@@ -1209,9 +1270,9 @@ export function useGameSession() {
     setInGameConfirmation({
       intent: "reset-progress",
       title: "Resetar todo o progresso?",
-      message: "Isso vai apagar sua campanha, escolhas de parceira e histórico salvo para recomeçar do zero.",
+      message: "Isso vai apagar sua campanha, escolhas de parceira, skin do jogador e histórico salvo para recomeçar do zero.",
       confirmLabel: "Resetar tudo",
-      warning: "Esta ação apaga todo o progresso salvo do jogo.",
+      warning: "A skin do protagonista tambem volta para a escolha inicial.",
     })
   }
 
@@ -1236,7 +1297,7 @@ export function useGameSession() {
       setMatchState(null)
       setInGameContextMenuOpen(false)
       setInGameConfirmation(null)
-      setSelectedCharacterId(currentVenuePartnerCharacterId ?? selectableCharacters[0]?.id ?? "nega-catimbo")
+      setSelectedCharacterId(currentVenuePartnerCharacterId ?? availablePartnerCharacters[0]?.id ?? "nega-catimbo")
       setCharacterSelectReturnScreen("journey-intro")
       setLaunchVenueAfterCharacterSelect(false)
       setMenuScreen("character-select")
@@ -1305,8 +1366,13 @@ export function useGameSession() {
     player3,
     player4,
     playerProfile,
+    selectedPlayerSkin,
+    selectedPlayerSkinCandidate,
+    selectedPlayerSkinIndex,
+    selectablePlayerSkins: PLAYER_SKINS,
     selectedCharacter,
     selectedCharacterIndex,
+    isSelectedCharacterUnlocked,
     selectedPartnerCharacter,
     selectableCharacters,
     setVariant,
@@ -1319,7 +1385,9 @@ export function useGameSession() {
     variantSelectionDisabled,
     opponentCharacters,
     handleCloseCharacterSelect,
+    handleClosePlayerSkinSelect,
     handleConfirmCharacterSelect,
+    handleConfirmPlayerSkinSelect,
     handleLaunchVenue,
     handleOpenCharacterSelect,
     handleOpenJourneyIntro,
@@ -1327,5 +1395,7 @@ export function useGameSession() {
     handleContinueToCharacterSelect,
     handleSelectNextCharacter,
     handleSelectPreviousCharacter,
+    handleSelectNextPlayerSkin,
+    handleSelectPreviousPlayerSkin,
   }
 }

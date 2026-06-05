@@ -43,6 +43,9 @@ export function loadPlayerProfile(): PlayerProfile {
           ...initialProfile.campaign.venueWinsById,
           ...parsed.campaign?.venueWinsById,
         },
+        unlockedPartnerCharacterIds:
+          parsed.campaign?.unlockedPartnerCharacterIds ??
+          initialProfile.campaign.unlockedPartnerCharacterIds,
         selectedPartnerCharacterIdByVenueId: {
           ...initialProfile.campaign.selectedPartnerCharacterIdByVenueId,
           ...parsed.campaign?.selectedPartnerCharacterIdByVenueId,

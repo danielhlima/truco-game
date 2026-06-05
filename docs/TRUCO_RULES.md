@@ -119,6 +119,32 @@ Hoje a força da mão é calculada assim:
 - Este comportamento ainda será rebalanceado futuramente.
 - Por enquanto, este arquivo registra a lógica atual, não a lógica ideal.
 
+## Pendencias de Regras para Implementar
+
+As regras abaixo foram confirmadas como desejadas, mas ainda nao devem ser tratadas como implementadas:
+
+### Mao de nove
+
+- a partir da rodada em que uma dupla atinge `9 pontos`, os dois parceiros dessa dupla podem ver as cartas um do outro
+- depois de ver as cartas, essa dupla pode optar por nao jogar a rodada
+- se a dupla optar por nao jogar, a dupla adversaria recebe `1 ponto`
+- se a dupla optar por jogar e perder, a dupla adversaria recebe `3 pontos`
+- a interface precisa deixar claro quando uma dupla esta em `mao de nove` e, por isso, nao pode pedir truco/aumentar como numa mao comum
+- a indicacao visual deve explicar o bloqueio do botao de aumento para evitar parecer erro de input do jogador
+
+### Carta virada para baixo
+
+- uma rodada continua composta por ate `3 vazas`
+- na segunda e na terceira vaza da rodada, qualquer jogador pode jogar uma carta virada para baixo
+- a identidade da carta virada para baixo nao deve ser revelada nem aos adversarios nem ao parceiro
+- a resolucao correta do valor dessa carta ainda deve ser definida na implementacao e coberta por testes
+
+### Variantes por bar
+
+- a campanha declara bares de `Truco Mineiro` e `Truco Paulista`
+- atualmente, na pratica, as partidas ainda se comportam como `Truco Mineiro`
+- corrigir a aplicacao efetiva da variante configurada por bar e validar a vira/manilha do Paulista no fluxo real
+
 ## Nota de Continuidade
 
 - O ajuste recente do scorepad e a tela autoral de campanha nao mudam regras de truco.

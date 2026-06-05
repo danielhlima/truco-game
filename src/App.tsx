@@ -120,14 +120,23 @@ function App() {
     opponentCharacters,
     player1,
     playerProfile,
+    selectedPlayerSkin,
+    selectedPlayerSkinCandidate,
+    selectedPlayerSkinIndex,
+    selectablePlayerSkins,
     selectedCharacter,
     selectedCharacterIndex,
+    isSelectedCharacterUnlocked,
     selectedPartnerCharacter,
     selectableCharacters,
     speechBubble,
     statusMessage,
     tableByPlayer,
     handleConfirmCharacterSelect,
+    handleClosePlayerSkinSelect,
+    handleConfirmPlayerSkinSelect,
+    handleSelectNextPlayerSkin,
+    handleSelectPreviousPlayerSkin,
   } = useGameSession()
 
   const layoutMode = viewportMetrics.mode
@@ -374,8 +383,13 @@ function App() {
             menuScreen={menuScreen}
             opponentCharacters={opponentCharacters}
             playerProfile={playerProfile}
+            selectedPlayerSkin={selectedPlayerSkin}
+            selectedPlayerSkinCandidate={selectedPlayerSkinCandidate}
+            selectedPlayerSkinIndex={selectedPlayerSkinIndex}
+            selectablePlayerSkins={selectablePlayerSkins}
             selectedCharacter={selectedCharacter}
             selectedCharacterIndex={selectedCharacterIndex}
+            isSelectedCharacterUnlocked={isSelectedCharacterUnlocked}
             selectedPartnerCharacter={selectedPartnerCharacter}
             selectableCharacters={selectableCharacters}
             speechBubble={speechBubble}
@@ -389,7 +403,9 @@ function App() {
             canPlayHumanCard={canPlayHumanCard}
             onCloseCharacterSelect={handleCloseCharacterSelect}
             onCloseJourneyIntro={handleCloseJourneyIntro}
+            onClosePlayerSkinSelect={handleClosePlayerSkinSelect}
             onConfirmCharacterSelect={handleConfirmCharacterSelect}
+            onConfirmPlayerSkinSelect={handleConfirmPlayerSkinSelect}
             onEnterVenueFromIntro={handleEnterVenueFromIntro}
             onOpenCharacterSelect={handleOpenCharacterSelect}
             onContinueToCharacterSelect={handleContinueToCharacterSelect}
@@ -397,6 +413,8 @@ function App() {
             onReturnToJourneyFlow={handleReturnToJourneyFlow}
             onSelectNextCharacter={handleSelectNextCharacter}
             onSelectPreviousCharacter={handleSelectPreviousCharacter}
+            onSelectNextPlayerSkin={handleSelectNextPlayerSkin}
+            onSelectPreviousPlayerSkin={handleSelectPreviousPlayerSkin}
             onStart={handleStartHand}
             onRequestTruco={handleRequestTruco}
             onAcceptTruco={handleAcceptTruco}
@@ -3025,8 +3043,8 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "flex-start",
-    gap: "clamp(8px, 0.75vw, 12px)",
-    padding: "clamp(6px, 0.55vw, 10px) clamp(2px, 0.3vw, 6px) clamp(6px, 0.55vw, 10px) 0",
+    gap: "6px",
+    padding: "4px 2px 4px 0",
     borderRight: "1px solid rgba(205, 160, 95, 0.16)",
     minWidth: 0,
     minHeight: 0,
@@ -3034,7 +3052,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   characterPortraitFrame: {
     position: "relative",
-    width: "min(100%, 236px)",
+    width: "min(100%, 218px)",
     maxWidth: "100%",
     aspectRatio: "3 / 4",
     borderRadius: "22px",
@@ -3051,9 +3069,20 @@ const styles: Record<string, React.CSSProperties> = {
     objectFit: "cover",
     display: "block",
   },
+  characterPortraitImageLocked: {
+    filter: "grayscale(1) brightness(0.68)",
+  },
+  characterPortraitLockedLayer: {
+    position: "absolute",
+    inset: 0,
+    zIndex: 1,
+    background: "rgba(103, 108, 110, 0.22)",
+    pointerEvents: "none",
+  },
   characterPortraitOverlay: {
     position: "absolute",
     inset: "auto 0 0 0",
+    zIndex: 2,
     padding: "14px 12px 12px",
     background:
       "linear-gradient(180deg, rgba(16,10,7,0) 0%, rgba(16,10,7,0.76) 34%, rgba(16,10,7,0.94) 100%)",
@@ -3073,13 +3102,16 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#f4dfbf",
     fontFamily: "Georgia, serif",
   },
+  characterPortraitTextLocked: {
+    color: "#ffffff",
+  },
   characterIdentityPanel: {
-    width: "min(100%, 236px)",
+    width: "min(100%, 218px)",
     maxWidth: "100%",
     display: "flex",
     flexDirection: "column",
-    gap: "clamp(6px, 0.5vw, 10px)",
-    padding: "clamp(8px, 0.62vw, 12px)",
+    gap: "4px",
+    padding: "7px 8px",
     borderRadius: "22px",
     border: "1px solid rgba(205, 160, 95, 0.22)",
     background:
@@ -3113,12 +3145,12 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: "clamp(12px, 1vw, 18px)",
+    gap: "8px",
     width: "100%",
   },
   characterNavButton: {
-    width: "34px",
-    height: "34px",
+    width: "32px",
+    height: "32px",
     borderRadius: "999px",
     border: "1px solid rgba(205, 160, 95, 0.36)",
     background: "linear-gradient(180deg, rgba(85,57,37,0.92) 0%, rgba(43,28,18,0.92) 100%)",
@@ -3135,7 +3167,7 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     justifyContent: "center",
     flexWrap: "wrap",
-    gap: "5px",
+    gap: "4px",
     flex: 1,
     minWidth: 0,
   },
@@ -3267,6 +3299,36 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 800,
     fontFamily: "Georgia, serif",
   },
+  playerSkinInfoPanel: {
+    justifyContent: "center",
+    gap: "clamp(18px, 1.7vw, 30px)",
+    padding: "clamp(16px, 1.35vw, 24px) clamp(18px, 2.1vw, 38px)",
+    boxSizing: "border-box",
+  },
+  playerSkinStoryQuote: {
+    borderLeft: "3px solid rgba(205,160,95,0.72)",
+    paddingLeft: "clamp(14px, 1.2vw, 22px)",
+    paddingRight: "clamp(4px, 0.5vw, 10px)",
+    color: "#e8c07f",
+    fontSize: "clamp(18px, 1.55vw, 26px)",
+    lineHeight: 1.55,
+    fontStyle: "italic",
+    fontFamily: "Georgia, serif",
+    textWrap: "balance",
+    maxWidth: "640px",
+    alignSelf: "center",
+  },
+  playerSkinActionArea: {
+    display: "flex",
+    justifyContent: "center",
+    width: "100%",
+  },
+  playerSkinActionButton: {
+    width: "min(100%, 520px)",
+    padding: "clamp(13px, 1.1vw, 17px) 18px",
+    fontSize: "clamp(13px, 1vw, 17px)",
+    letterSpacing: "0.1em",
+  },
   characterAttributeRow: {
     display: "grid",
     gridTemplateColumns: "max-content minmax(0, 1fr) max-content",
@@ -3310,6 +3372,13 @@ const styles: Record<string, React.CSSProperties> = {
     width: "100%",
     boxSizing: "border-box",
     flexShrink: 0,
+  },
+  characterUnlockHint: {
+    color: "#e3b599",
+    fontSize: "11px",
+    fontWeight: 800,
+    letterSpacing: "0.04em",
+    textTransform: "uppercase",
   },
   characterSelectActionButton: {
     borderRadius: "16px",

@@ -71,6 +71,12 @@ export function applyCampaignWin(
   const nextClearedVenueIds = venueJustCleared && !profile.campaign.clearedVenueIds.includes(currentVenue.id)
     ? [...profile.campaign.clearedVenueIds, currentVenue.id]
     : profile.campaign.clearedVenueIds
+  const nextUnlockedPartnerCharacterIds = venueJustCleared
+    ? dedupe([
+        ...profile.campaign.unlockedPartnerCharacterIds,
+        ...currentVenue.partnerUnlockCharacterIds,
+      ])
+    : profile.campaign.unlockedPartnerCharacterIds
 
   let rewardsApplied: EconomyReward = {}
 
@@ -119,6 +125,7 @@ export function applyCampaignWin(
       clearedVenueIds: nextClearedVenueIds,
       completedStageIds,
       venueWinsById: nextVenueWins,
+      unlockedPartnerCharacterIds: nextUnlockedPartnerCharacterIds,
       currentStageId: nextStageId,
     },
   }

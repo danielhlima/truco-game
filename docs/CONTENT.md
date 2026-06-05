@@ -102,7 +102,7 @@ Arquivos principais:
 - a gameplay foi estabilizada como stage logico `1080x500` escalado no wrapper externo
 - a mao do humano e o botao `MENU` foram protegidos dentro da faixa inferior
 - o menu em jogo abre acima da mesa e fecha antes dos modais de confirmacao
-- o menu em jogo agora inclui `Resetar progresso`, com confirmacao especifica antes de apagar campanha, escolhas de parceira e historico salvo
+- o menu em jogo agora inclui `Resetar progresso`, com confirmacao especifica antes de apagar campanha, escolhas de parceira, skin do jogador e historico salvo
 - as telas de resultado do `Bar do Ze Catinga` agora usam artes proprias para vitoria e derrota
 - a tela de selecao de parceira foi aceita como pronta no estado atual
 - a parceira antes chamada `Ze Catinga` foi renomeada para `Joca do Busão` com id `joca-busao`
@@ -125,7 +125,32 @@ Arquivos principais:
 - a tela inicial definitiva foi implementada com arte propria em `src/assets/start/truco-raiz-start.png`
 - a primeira tela visivel agora mostra somente a arte de capa e um hotspot HTML sobre `COMEÇAR`
 - debug de bar, reset de campanha e seletor de variante foram removidos da tela inicial visivel
-- o proximo foco recomendado e criar telas autorais de resultado do `Bar Maneco Banguela`
+- o proximo foco recomendado e expandir a campanha verticalmente, bar a bar, fechando o caminho principal do jogo antes de voltar para refinamentos finos
+
+## Direcao de produto atual
+
+O projeto esta em bom estado de tela e fluxo para mudar o foco principal de polimento visual para expansao de conteudo.
+
+Decisao atual:
+
+- completar o jogo verticalmente primeiro
+- trabalhar bar a bar, definindo tema, ambiente, dificuldade, variante e personagens
+- fechar o caminho principal da campanha antes de refinamentos extensos
+- usar cada novo bar como pacote jogavel minimo, nao como uma frente de refatoracao
+- depois de fechar a campanha jogavel, voltar para polir artes, balanceamento, falas, animacoes e resultados autorais
+
+Kit minimo recomendado por bar:
+
+- nome e endereco/territorio
+- tema visual e clima do ambiente
+- variante de truco
+- dificuldade pretendida
+- dupla adversaria fixa
+- personalidade/estilo dos adversarios
+- numero de vitorias necessario para passar
+- recompensa ou marco de progressao, quando aplicavel
+- capa/background ou fallback visual aceitavel
+- textos de entrada e resultado, mesmo que sem arte autoral inicial
 
 ## Estado atual da gameplay screen
 
@@ -277,13 +302,14 @@ Arquivos principais:
 Arquivos principais:
 
 - `src/content/characters.ts`
+- `src/content/partnerProgression.ts`
 - `src/app/useGameSession.ts`
 - `src/app/AppSections.tsx`
 - `src/App.tsx`
 
 Ja existe:
 
-- roster de 24 personagens com:
+- roster de 35 personagens com:
   - `id`
   - `name`
   - `nickname`
@@ -298,22 +324,61 @@ Ja existe:
 - escolha real da parceira aplicada ao fluxo
 - persistencia da parceira por `venueId`
 - reoferta automatica da selecao quando o jogador entra em bar sem parceira salva
+- duplas adversarias exclusivas por bar, sem repetir personagens em outro local
+- segundo lote de `11` adversarios integrado com avatares em `src/assets/characters/`
+- catalogo completo navegavel na selecao, com camada cinza sobre personagens ainda indisponiveis
+- desbloqueio persistido da dupla adversaria depois da conquista de cada bar
+- validacao para impedir que uma escolha antiga use como parceira um personagem ainda bloqueado
 
 Starter partners atuais:
 
 - `nega-catimbo`
 - `leninha-lambreta`
-- `rosinha-catraca`
 - `rita-gambiarra`
 - `joca-busao`
 
-Unlockables separados em codigo:
+Regra de desbloqueio:
 
-- `aninha-passarela`
-- `dalva-seringa`
-- `naldo-tramela`
-- `quiteria-mao-torta`
-- `dito-marrua`
+- nenhum starter partner antecipa um adversario futuro
+- ao concluir um bar, os dois adversarios derrotados entram na lista persistida de parceiros disponiveis
+- personagens indisponiveis continuam visiveis na selecao com indicacao do bar necessario para libera-los e botao de escolha desativado
+
+## Estado atual das skins do jogador
+
+Arquivos principais:
+
+- `src/content/playerSkins.ts`
+- `src/profile/playerProfile.ts`
+- `src/platform/storage/profileStorage.ts`
+- `src/app/useGameSession.ts`
+- `src/app/AppSections.tsx`
+
+Ja existe:
+
+- catalogo separado de `11` skins do protagonista:
+  - `Zeca Viramao`
+  - `Lia Virada`
+  - `Bento Seca-Mesa`
+  - `Nara Certeira`
+  - `Gui Meia-Lua`
+  - `Solange Viracao`
+  - `Clara Vira-Folha`
+  - `Dario Sete-Copas`
+  - `Akemi Corte-Certo`
+  - `Kenji Meia-Noite`
+  - `Mei Lin Conta-Fria`
+- `10` novas imagens recebidas, copiadas para `src/assets/characters/` e reduzidas para `256x256`
+- skins do jogador nao entram no roster de parceiras nem nas duplas adversarias
+- quando ainda nao existe skin salva, `COMEÇAR` abre a tela de escolha do protagonista antes da campanha
+- a tela de escolha da skin e cosmetica e simplificada: foto, nome, apelido, frase, aviso discreto e botao; sem coragem, blefe, paciencia ou qualquer atributo mecanico
+- a escolha e salva em `playerProfile.settings.selectedPlayerSkinId`
+- o avatar de `Você` na gameplay usa a skin escolhida
+- as capas dinamicas/fallback tambem usam a skin escolhida para representar o jogador
+- `Resetar progresso` no `MENU` apaga tambem a skin escolhida e devolve o fluxo para a tela inicial
+
+Pendencia:
+
+- decidir se a troca de protagonista tera um atalho permanente depois da primeira escolha
 
 Estado:
 

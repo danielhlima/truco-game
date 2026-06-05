@@ -19,6 +19,21 @@ import norbertoFubaAsset from "../assets/characters/norberto-fuba.png"
 import rosinhaCatracaAsset from "../assets/characters/rosinha-catraca.png"
 import damiaoCoroteAsset from "../assets/characters/damiao-corote.png"
 import leninhaLambretaAsset from "../assets/characters/leninha-lambreta.png"
+import juraPancadaAsset from "../assets/characters/jura-pancada.png"
+import marlenePimentaAsset from "../assets/characters/marlene-pimenta.png"
+import zitoParafusoAsset from "../assets/characters/zito-parafuso.png"
+import creusaRabugentaAsset from "../assets/characters/creusa-rabugenta.png"
+import ivoneVernizAsset from "../assets/characters/ivone-verniz.png"
+import osmarAlfineteAsset from "../assets/characters/osmar-alfinete.png"
+import geraldoMedalhaAsset from "../assets/characters/geraldo-medalha.png"
+import sueliEstopimAsset from "../assets/characters/sueli-estopim.png"
+import ramiroBoleroAsset from "../assets/characters/ramiro-bolero.png"
+import lunaCandelaAsset from "../assets/characters/luna-candela.png"
+import minaCompassoAsset from "../assets/characters/mina-compasso.png"
+import viktorMuralhaAsset from "../assets/characters/viktor-muralha.png"
+import madameVioletaAsset from "../assets/characters/madame-violeta.png"
+import augustoCrupieAsset from "../assets/characters/augusto-crupie.png"
+import cosmeOrbitaAsset from "../assets/characters/cosme-orbita.png"
 
 export type TrucoCharacterId =
   | "zeca-viramao"
@@ -45,6 +60,17 @@ export type TrucoCharacterId =
   | "marlene-pimenta"
   | "zito-parafuso"
   | "creusa-rabugenta"
+  | "ivone-verniz"
+  | "osmar-alfinete"
+  | "geraldo-medalha"
+  | "sueli-estopim"
+  | "ramiro-bolero"
+  | "luna-candela"
+  | "mina-compasso"
+  | "viktor-muralha"
+  | "madame-violeta"
+  | "augusto-crupie"
+  | "cosme-orbita"
 
 export type TrucoCharacterRole = "player" | "partner" | "opponent" | "npc"
 
@@ -399,6 +425,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
       patience: 1,
       bluff: 3,
     },
+    avatarAsset: juraPancadaAsset,
     story:
       "Ele nao tem paciencia nem para o proprio pensamento, entao imagina para o erro dos outros. Uma vez pediu truco tao rapido que o parceiro ainda estava sentando e o adversario ja estava ofendido.",
   },
@@ -414,6 +441,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
       patience: 5,
       bluff: 2,
     },
+    avatarAsset: marlenePimentaAsset,
     story:
       "Ela fala baixo, mas sempre no momento exato em que alguem esta prestes a errar feio. Por isso no bairro existe a expressao 'se Marlene cochichou, ja era'.",
   },
@@ -429,6 +457,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
       patience: 2,
       bluff: 5,
     },
+    avatarAsset: zitoParafusoAsset,
     story:
       "Ele ja trocou uma bicicleta, um radio e um ventilador de teto por informacao de mesa. Ninguem sabe de onde ele tira tanta historia, mas metade deve ser mentira e a outra metade e pior.",
   },
@@ -444,8 +473,185 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
       patience: 5,
       bluff: 1,
     },
+    avatarAsset: creusaRabugentaAsset,
     story:
       "Ela jamais corre de um insulto, mas corre de aposta ruim com a serenidade de quem ja viu quinze gerações perderem por afobacao. Diz que prudencia e a unica fofoca que nunca envelhece.",
+  },
+  {
+    id: "ivone-verniz",
+    name: "Ivone Verniz",
+    nickname: "A Dama do Verniz",
+    personalityId: "disciplined",
+    role: "npc",
+    playStyle: "Elegante, firme, nao se deixa empurrar pela mesa",
+    attributes: {
+      courage: 3,
+      patience: 4,
+      bluff: 3,
+    },
+    avatarAsset: ivoneVernizAsset,
+    story:
+      "Ivone chega arrumada ate em mesa de plastico e trata provocacao como poeira no ombro. Dizem que ela nunca levanta a voz porque prefere deixar o adversario perceber sozinho que perdeu o controle.",
+  },
+  {
+    id: "osmar-alfinete",
+    name: "Osmar Alfinete",
+    nickname: "O Corte Seco",
+    personalityId: "assertive",
+    role: "npc",
+    playStyle: "Preciso, severo, desmonta erro sem desperdiçar fala",
+    attributes: {
+      courage: 4,
+      patience: 3,
+      bluff: 2,
+    },
+    avatarAsset: osmarAlfineteAsset,
+    story:
+      "Osmar ganhou o apelido porque cada comentario dele parece espetar exatamente onde doi. Ele nao discute por muito tempo: espera a brecha, joga a carta e deixa o silencio terminar o servico.",
+  },
+  {
+    id: "geraldo-medalha",
+    name: "Geraldo Medalha",
+    nickname: "O Veterano",
+    personalityId: "disciplined",
+    role: "npc",
+    playStyle: "Tradicional, paciente, quase nunca entrega o ritmo",
+    attributes: {
+      courage: 3,
+      patience: 5,
+      bluff: 2,
+    },
+    avatarAsset: geraldoMedalhaAsset,
+    story:
+      "Geraldo garante que ja jogou final em ginasio com goteira, narrador rouco e luz caindo. Ninguem sabe quantas historias sao verdade, mas todo mundo respeita quando ele encosta na cadeira e começa a contar carta.",
+  },
+  {
+    id: "sueli-estopim",
+    name: "Sueli Estopim",
+    nickname: "A Faisca",
+    personalityId: "aggressive",
+    role: "npc",
+    playStyle: "Eletrica, provocadora, transforma mao morna em pressao",
+    attributes: {
+      courage: 5,
+      patience: 2,
+      bluff: 3,
+    },
+    avatarAsset: sueliEstopimAsset,
+    story:
+      "Sueli aprendeu cedo que a plateia gosta de barulho e usa isso como ferramenta. Quando percebe hesitacao do outro lado, acelera tanto a mesa que ate o parceiro precisa respirar fundo para acompanhar.",
+  },
+  {
+    id: "ramiro-bolero",
+    name: "Ramiro Bolero",
+    nickname: "El Sereno",
+    personalityId: "crafty",
+    role: "npc",
+    playStyle: "Calmo, charmoso, blefa sem alterar o pulso",
+    attributes: {
+      courage: 3,
+      patience: 5,
+      bluff: 4,
+    },
+    avatarAsset: ramiroBoleroAsset,
+    story:
+      "Ramiro conversa como se a partida fosse apenas mais uma noite tranquila. O perigo e que ele mantém o mesmo sorriso com carta boa, carta ruim e truco pedido no momento exato.",
+  },
+  {
+    id: "luna-candela",
+    name: "Luna Candela",
+    nickname: "La Chispa",
+    personalityId: "opportunistic",
+    role: "npc",
+    playStyle: "Rapida, ousada, muda o ritmo quando encontra abertura",
+    attributes: {
+      courage: 4,
+      patience: 2,
+      bluff: 4,
+    },
+    avatarAsset: lunaCandelaAsset,
+    story:
+      "Luna entra na mesa como quem ja ouviu a musica antes de todo mundo. Ela adora uma janela curta para pressionar e costuma sorrir justamente quando o adversario percebe que demorou demais para reagir.",
+  },
+  {
+    id: "mina-compasso",
+    name: "Mina Compasso",
+    nickname: "A Cirurgica",
+    personalityId: "disciplined",
+    role: "npc",
+    playStyle: "Analitica, exata, pune cada desperdicio de carta",
+    attributes: {
+      courage: 3,
+      patience: 5,
+      bluff: 2,
+    },
+    avatarAsset: minaCompassoAsset,
+    story:
+      "Mina observa a mesa com a calma de quem mede distancia antes de cada passo. Dizem que ela lembra de descarte antigo melhor que o proprio jogador que colocou a carta na mesa.",
+  },
+  {
+    id: "viktor-muralha",
+    name: "Viktor Muralha",
+    nickname: "O Imovel",
+    personalityId: "conservative",
+    role: "npc",
+    playStyle: "Solido, intimidador, dificil de arrancar do plano",
+    attributes: {
+      courage: 4,
+      patience: 5,
+      bluff: 1,
+    },
+    avatarAsset: viktorMuralhaAsset,
+    story:
+      "Viktor fala pouco e ocupa a cadeira como se tivesse sido construida ao redor dele. A mesa inteira sabe que empurrar aposta contra sua paciencia costuma terminar em arrependimento.",
+  },
+  {
+    id: "madame-violeta",
+    name: "Madame Violeta",
+    nickname: "A Leitura Fria",
+    personalityId: "ultra_conservative",
+    role: "npc",
+    playStyle: "Refinada, gelada, entra apenas quando a conta fecha",
+    attributes: {
+      courage: 2,
+      patience: 5,
+      bluff: 3,
+    },
+    avatarAsset: madameVioletaAsset,
+    story:
+      "Madame Violeta trata cada lance como uma informacao valiosa demais para ser desperdicada. Ela espera, observa e faz a mesa parecer silenciosa mesmo quando o cassino inteiro esta acordado.",
+  },
+  {
+    id: "augusto-crupie",
+    name: "Augusto Crupie",
+    nickname: "O Ultimo Lance",
+    personalityId: "crafty",
+    role: "npc",
+    playStyle: "Experiente, frio, esconde a pressao atras de boas maneiras",
+    attributes: {
+      courage: 4,
+      patience: 4,
+      bluff: 4,
+    },
+    avatarAsset: augustoCrupieAsset,
+    story:
+      "Augusto parece educado demais para uma mesa decisiva, e talvez esse seja o truque. Ele oferece um aceno discreto antes de cada partida e guarda a crueldade para o instante em que a aposta ja nao tem volta.",
+  },
+  {
+    id: "cosme-orbita",
+    name: "Cosme Orbita",
+    nickname: "O Sem Gravidade",
+    personalityId: "volatile",
+    role: "npc",
+    playStyle: "Imprevisivel, acelerado, joga como se a mesa flutuasse",
+    attributes: {
+      courage: 5,
+      patience: 1,
+      bluff: 5,
+    },
+    avatarAsset: cosmeOrbitaAsset,
+    story:
+      "Cosme afirma que aprendeu truco durante uma pane de energia que durou pouco demais para ser comprovada. Desde entao, muda de ideia no meio da frase e considera isso uma qualidade estrategica.",
   },
 ]
 
@@ -453,29 +659,3 @@ export const TRUCO_CHARACTER_BY_ID: Record<TrucoCharacterId, TrucoCharacterProfi
   Object.fromEntries(
     TRUCO_CHARACTER_ROSTER.map((character) => [character.id, character])
   ) as Record<TrucoCharacterId, TrucoCharacterProfile>
-
-export const STARTER_PARTNER_CHARACTER_IDS: TrucoCharacterId[] = [
-  "nega-catimbo",
-  "leninha-lambreta",
-  "rosinha-catraca",
-  "rita-gambiarra",
-  "joca-busao",
-]
-
-export const UNLOCKABLE_PARTNER_CHARACTER_IDS: TrucoCharacterId[] = [
-  "aninha-passarela",
-  "dalva-seringa",
-  "naldo-tramela",
-  "quiteria-mao-torta",
-  "dito-marrua",
-]
-
-export const BAR_ROSTERS: Record<"bar-1" | "bar-2", TrucoCharacterId[]> = {
-  "bar-1": ["tiao-casca-grossa", "cida-fumaca", "celsinho-breque"],
-  "bar-2": ["tonhao-rasga-lata", "patricia-monique", "mane-banguela"],
-}
-
-export const BAR_ROSTER_BY_CAMPAIGN_VENUE_ID: Partial<Record<string, "bar-1" | "bar-2">> = {
-  "bar-do-ze-catinga": "bar-1",
-  "bar-maneco-banguela": "bar-2",
-}

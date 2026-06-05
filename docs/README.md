@@ -48,6 +48,31 @@ Define o pre-plano vivo:
 - o que esta em andamento
 - o proximo foco recomendado
 
+### `docs/CAMPAIGN_PATH.md`
+
+Registra a expansao vertical da campanha:
+
+- tabela simples do caminho principal
+- dupla adversaria fixa, variante e dificuldade por bar
+- estado visual minimo aceito antes do polimento autoral
+
+### `docs/CHARACTER_AVATAR_PROMPTS.md`
+
+Organiza a expansao externa do roster:
+
+- substituicoes necessarias para eliminar adversarios repetidos
+- nomes e arquivos dos proximos personagens
+- prompts prontos para gerar novos avatares fora do Codex
+
+### `docs/PLAYER_SKIN_PROMPTS.md`
+
+Organiza as skins exclusivas do jogador:
+
+- conjunto inicial planejado com `Zeca Viramao` e mais `10` protagonistas
+- nomes e arquivos das novas skins
+- prompts prontos para geracao externa antes da implementacao da escolha visual
+- estado de integracao das skins recebidas e da escolha inicial do protagonista
+
 ## Estado do foco atual
 
 A responsividade estrutural da gameplay foi estabilizada depois da capa do `Bar do Ze Catinga`.
@@ -81,6 +106,7 @@ Estado consolidado:
   - bloqueia cartas, truco e `MENU` ate terminar
   - validada no `Bar do Ze Catinga` e no `Bar Maneco Banguela`
 - tela de selecao de parceira aceita como pronta no estado atual
+- selecao de parceira agora mostra o catalogo inteiro com bloqueios e libera a dupla derrotada apos cada bar
 - parceira antes chamada `Ze Catinga` renomeada para `Joca do Busão` com id `joca-busao`
 - tela de campanha do primeiro trecho (`Botecos da Rua`) usa artes autorais para os estados atuais:
   - `Bar do Ze Catinga`: `src/assets/campaign/botecos-rua-ze-catinga.png`
@@ -101,16 +127,19 @@ Estado consolidado:
 
 ## Prioridade imediata para o proximo chat
 
-No proximo chat, seguir para as telas autorais de vitoria/derrota do `Bar Maneco Banguela`.
+No proximo chat, iniciar a expansao vertical da campanha, trabalhando bar a bar ate fechar o caminho principal do jogo.
 
 Proximo foco recomendado:
 
-- criar artes/estado visual de resultado para vitoria e derrota do Maneco
+- mapear a campanha em uma tabela simples de bares/fases
+- definir para cada bar: tema, ambiente, dificuldade, variante, dupla adversaria, objetivo para passar e estado visual minimo
+- usar o `Bar Maneco Banguela` como primeiro modelo completo de expansao depois do `Bar do Ze Catinga`
 - preservar a tela inicial definitiva e a intro curta antes da gameplay
 - preservar o fluxo `COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo`
 
 Depois disso, seguir para:
 
+- telas autorais de vitoria/derrota do `Bar Maneco Banguela`
 - expansao do modelo da capa para outros bares
 - telas autorais de resultado para os proximos bares
 

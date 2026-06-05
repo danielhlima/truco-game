@@ -81,8 +81,8 @@ Status:
   - mostra a arte inteira com preenchimento desfocado nas laterais quando necessario
   - usa hotspot HTML invisivel sobre o `COMEÇAR` desenhado
   - removeu debug, reset e variante da primeira tela visivel
-- o `MENU` em partida agora possui `Resetar progresso`, com confirmacao antes de apagar campanha, escolhas de parceira e historico salvo
-- o foco imediato recomendado agora e criar telas de resultado autorais do `Bar Maneco Banguela`
+- o `MENU` em partida agora possui `Resetar progresso`, com confirmacao antes de apagar campanha, escolhas de parceira, skin do jogador e historico salvo
+- o foco imediato recomendado agora e expandir a campanha verticalmente, bar a bar, ate fechar o caminho principal do jogo
 
 ### Truco e dialogos
 
@@ -103,15 +103,18 @@ Ponto critico:
 
 Estado atual:
 
-- apenas as 5 starter partners aparecem
+- `4` starter partners ficam disponiveis desde o inicio
+- o catalogo inteiro aparece na selecao, com camada cinza e botao de escolha desativado para personagens ainda indisponiveis
+- ao concluir um bar, a dupla adversaria derrotada e salva como nova opcao de parceria
+- nenhum starter partner antecipa adversarios de bares futuros
 - a escolha fica salva por bar
 - ao entrar em bar sem escolha salva, a tela reaparece
-- os dois primeiros bares ja tem adversarios fixos
+- escolhas antigas de personagens ainda bloqueados deixam de valer ate a liberacao correta
 
 Decisao atual:
 
 - a tela foi considerada pronta no estado em que esta
-- manter o fluxo e a persistencia por bar
+- manter o fluxo, a persistencia por bar e a persistencia dos desbloqueios
 - nao reabrir acabamento da selecao no proximo chat
 
 ### Capa do Bar do Ze Catinga
@@ -148,29 +151,56 @@ Estado atual:
 
 ### Opcao principal
 
-- criar telas autorais de vitoria/derrota do `Bar Maneco Banguela`
+- expandir a campanha bar a bar e fechar o caminho principal jogavel
 
 ### Itens para atacar primeiro
 
-- Resultados do Maneco:
-  1. criar tela autoral de vitoria
-  2. criar tela autoral de derrota
-  3. preservar fallback generico para bares sem arte propria
-  4. preservar a espera de 1 segundo apos a ultima carta visivel
-  5. preservar o `venueId` do resultado para usar a arte do bar encerrado
+- Campanha vertical:
+  1. montar uma tabela simples com todos os bares/fases do caminho principal
+  2. definir para cada bar: tema, ambiente, variante, dificuldade, dupla adversaria e vitorias necessarias
+  3. usar `Bar Maneco Banguela` como primeiro bar-modelo depois do `Bar do Ze Catinga`
+  4. implementar o minimo jogavel por bar antes de polir telas autorais extras
+  5. preservar fallback visual para locais ainda sem arte propria
 - Validacao:
-  - abrir o fluxo real ate terminar ou simular resultado do Maneco
-  - confirmar vitoria/derrota com arte propria do Maneco
-  - confirmar que Ze Catinga continua usando suas artes atuais
+  - abrir o fluxo real desde `COMEÇAR`
+  - confirmar progressao de bar em bar
+  - confirmar que cada bar carrega adversarios, dificuldade e variante esperados
   - testar em tamanhos representativos da moldura landscape
   - rodar `npm run build`
 
 ### Opcao seguinte depois disso
 
-- expandir capas e telas autorais para outros bares
+- refinar artes autorais, resultados especiais, falas e balanceamento de IA
 
 ## Pendencias abertas
 
+- mapear tabela consolidada da campanha principal
+- definir tema, dificuldade, variante e adversarios de cada bar
+- completar o caminho principal de bares em estado jogavel
+- expandir o roster de personagens antes dos ambientes dos proximos bares:
+  - cada bar deve ter uma dupla adversaria exclusiva
+  - nao repetir adversarios em bares diferentes
+  - avatares cadastrados sem arte concluidos: `jura-pancada`, `marlene-pimenta`, `zito-parafuso` e `creusa-rabugenta`
+  - `11` novos personagens adicionados para eliminar repeticoes nas fases avancadas e no bonus
+  - prompts usados na producao externa preservados em `docs/CHARACTER_AVATAR_PROMPTS.md`
+  - lista de parceiros disponiveis aumenta gradualmente conforme cada bar e conquistado
+  - dupla adversaria derrotada e desbloqueada como parceria depois da conquista do proprio bar
+- escolha da skin/personagem visual do jogador:
+  - `10` novas skins exclusivas foram recebidas, reduzidas e integradas como assets
+  - as skins ficam em catalogo separado em `src/content/playerSkins.ts`
+  - a escolha inicial do protagonista foi implementada antes da campanha quando ainda nao existe skin salva
+  - a tela de escolha da skin e apenas cosmetica e foi simplificada para foto, nome, apelido, frase, aviso discreto e botao; nao mostra atributos como coragem, paciencia ou blefe
+  - a escolha e persistida em `playerProfile.settings.selectedPlayerSkinId`
+  - o avatar de `Você` na gameplay e nas capas dinamicas usa a skin escolhida
+  - `Resetar progresso` no `MENU` apaga tambem a skin escolhida e retorna para a tela inicial
+  - pendencia futura: decidir se a troca de protagonista tera um atalho permanente fora do primeiro fluxo de escolha
+- implementar regras pendentes do truco com cobertura de testes:
+  - mao de nove: parceiros da dupla com `9 pontos` podem ver as cartas um do outro
+  - mao de nove: se essa dupla optar por nao jogar depois da consulta, os adversarios recebem `1 ponto`
+  - mao de nove: se essa dupla optar por jogar e perder, os adversarios recebem `3 pontos`
+  - mao de nove: criar indicacao visual/HUD quando o time estiver em `9 pontos`, explicando que pedir truco/aumentar fica bloqueado pela regra especial
+  - segunda e terceira vazas: permitir jogar carta virada para baixo sem revelar a identidade nem ao parceiro
+  - corrigir a aplicacao efetiva da variante configurada por bar; hoje partidas declaradas como Paulista ainda se comportam como Mineiro
 - expandir o fluxo autoral da campanha:
   - imagem para estados concluidos do primeiro trecho
   - imagem para transicao ao `Circuito do Bairro`
@@ -256,21 +286,25 @@ Estado atual:
   - arte em `src/assets/start/truco-raiz-start.png`
   - botao `COMEÇAR` como hotspot HTML invisivel sobre a arte
   - debug, reset e variante removidos da primeira tela visivel
-- o menu de contexto em partida tem `Resetar progresso`, com confirmacao antes de apagar todo o progresso salvo
+- o menu de contexto em partida tem `Resetar progresso`, com confirmacao antes de apagar todo o progresso salvo, incluindo a skin do jogador
 - proximo foco:
-  - criar telas autorais de vitoria/derrota do `Bar Maneco Banguela`
+  - expandir a campanha verticalmente, bar a bar
+  - definir tematica, dificuldade, ambiente, variante e adversarios dos proximos bares
+  - fechar o caminho principal jogavel antes de voltar ao refinamento fino
   - preservar o fluxo `COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo`
 
 Objetivo deste chat:
-1. criar telas autorais de resultado do `Bar Maneco Banguela`
-2. preservar a tela inicial definitiva e a intro curta
-3. preservar a capa do bar, a selecao de parceira, a gameplay e as regras de truco
+1. planejar e iniciar a expansao vertical da campanha
+2. trabalhar bar a bar, definindo tematica, dificuldade, ambiente, variante e adversarios
+3. completar o caminho principal jogavel antes de refinamentos extensos
+4. preservar a tela inicial definitiva, a intro curta, a capa do bar, a selecao de parceira, a gameplay e as regras de truco
 
 Arquivos provaveis:
-- src/App.tsx
+- src/career/campaign/campaignData.ts
+- src/content/characters.ts
 - src/app/AppSections.tsx
-- src/assets/venues/maneco-banguela/
-- possivelmente assets novos de resultado
+- src/App.tsx
+- possivelmente assets novos por bar, se ja houver direcao visual
 
 Importante:
 - verificar `git status` e preservar mudancas locais existentes

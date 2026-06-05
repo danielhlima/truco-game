@@ -6,6 +6,7 @@ import {
   applyCampaignWin,
   getCurrentCampaignStage,
   getCurrentCampaignVenue,
+  isCampaignCompleted,
 } from "../../src/career/campaign/progression.ts"
 import {
   createInitialPlayerProfile,
@@ -16,6 +17,7 @@ import {
   resetPlayerProfileStorage,
   savePlayerProfile,
 } from "../../src/platform/storage/profileStorage.ts"
+import { STARTER_PARTNER_CHARACTER_IDS } from "../../src/content/partnerProgression.ts"
 import { installWindowLocalStorageMock } from "../helpers/storageMock.ts"
 
 test("a campanha começa no primeiro boteco da rua", () => {
@@ -28,6 +30,40 @@ test("a campanha começa no primeiro boteco da rua", () => {
   assert.equal(venue?.id, "bar-do-ze-catinga")
 })
 
+test("cada local declara dupla adversária fixa e estado visual mínimo", () => {
+  const opponentVenueByCharacterId = new Map<string, string>()
+
+  for (const stage of CAMPAIGN_STAGES) {
+    for (const venue of stage.venues) {
+      assert.equal(venue.opponentCharacterIds.length, 2, venue.id)
+      assert.notEqual(venue.opponentCharacterIds[0], venue.opponentCharacterIds[1], venue.id)
+      assert.deepEqual(venue.partnerUnlockCharacterIds, venue.opponentCharacterIds, venue.id)
+      assert.ok(venue.minimumVisualState.length > 0, venue.id)
+
+      for (const characterId of venue.opponentCharacterIds) {
+        assert.equal(
+          opponentVenueByCharacterId.get(characterId),
+          undefined,
+          `${characterId} não pode se repetir em ${venue.id}`
+        )
+        opponentVenueByCharacterId.set(characterId, venue.id)
+      }
+    }
+  }
+})
+
+test("parceiros iniciais não antecipam adversários de bares futuros", () => {
+  const opponentCharacterIds = new Set(
+    CAMPAIGN_STAGES.flatMap((stage) =>
+      stage.venues.flatMap((venue) => venue.opponentCharacterIds)
+    )
+  )
+
+  for (const characterId of STARTER_PARTNER_CHARACTER_IDS) {
+    assert.equal(opponentCharacterIds.has(characterId), false, characterId)
+  }
+})
+
 test("vitórias parciais contam para o local, mas não o concluem antes da meta", () => {
   let profile = createInitialPlayerProfile()
 
@@ -36,6 +72,7 @@ test("vitórias parciais contam para o local, mas não o concluem antes da meta"
 
   assert.equal(profile.campaign.venueWinsById["bar-do-ze-catinga"], 2)
   assert.deepEqual(profile.campaign.clearedVenueIds, [])
+  assert.deepEqual(profile.campaign.unlockedPartnerCharacterIds, [])
   assert.equal(profile.currencies.coins, 0)
   assert.equal(getCurrentCampaignVenue(profile, CAMPAIGN_STAGES)?.id, "bar-do-ze-catinga")
 })
@@ -50,6 +87,10 @@ test("ao concluir um local, a campanha libera o próximo e aplica a recompensa d
   assert.equal(resolution.clearedVenue?.id, "bar-do-ze-catinga")
   assert.equal(resolution.profile.currencies.coins, 40)
   assert.ok(resolution.profile.campaign.clearedVenueIds.includes("bar-do-ze-catinga"))
+  assert.deepEqual(resolution.profile.campaign.unlockedPartnerCharacterIds, [
+    "tiao-casca-grossa",
+    "cida-fumaca",
+  ])
   assert.equal(getCurrentCampaignVenue(resolution.profile, CAMPAIGN_STAGES)?.id, "bar-maneco-banguela")
 })
 
@@ -104,6 +145,20 @@ test("é possível concluir uma etapa inteira e começar a próxima acumulando v
   assert.equal(getCurrentCampaignVenue(profile, CAMPAIGN_STAGES)?.id, "mercearia-central")
 })
 
+test("o caminho completo avança por todos os locais declarados", () => {
+  let profile = createInitialPlayerProfile()
+  const totalMatches = CAMPAIGN_STAGES.flatMap((stage) => stage.venues)
+    .reduce((sum, venue) => sum + venue.matchesToClear, 0)
+
+  for (let i = 0; i < totalMatches; i++) {
+    profile = applyCampaignWin(profile, CAMPAIGN_STAGES).profile
+  }
+
+  assert.equal(profile.campaign.wins, totalMatches)
+  assert.equal(getCurrentCampaignVenue(profile, CAMPAIGN_STAGES), null)
+  assert.equal(isCampaignCompleted(profile, CAMPAIGN_STAGES), true)
+})
+
 test("storage salva, carrega e reseta o perfil da campanha", () => {
   const { cleanup } = installWindowLocalStorageMock()
 
@@ -111,20 +166,25 @@ test("storage salva, carrega e reseta o perfil da campanha", () => {
     const profile = createInitialPlayerProfile()
     profile.campaign.wins = 7
     profile.campaign.venueWinsById["bar-do-ze-catinga"] = 2
+    profile.campaign.unlockedPartnerCharacterIds = ["cida-fumaca"]
     profile.currencies.coins = 123
+    profile.settings.selectedPlayerSkinId = "akemi-corte-certo"
 
     savePlayerProfile(profile)
 
     const loadedProfile = loadPlayerProfile()
     assert.equal(loadedProfile.campaign.wins, 7)
     assert.equal(loadedProfile.campaign.venueWinsById["bar-do-ze-catinga"], 2)
+    assert.deepEqual(loadedProfile.campaign.unlockedPartnerCharacterIds, ["cida-fumaca"])
     assert.equal(loadedProfile.currencies.coins, 123)
+    assert.equal(loadedProfile.settings.selectedPlayerSkinId, "akemi-corte-certo")
 
     resetPlayerProfileStorage()
 
     const resetProfile = loadPlayerProfile()
     assert.deepEqual(resetProfile.campaign, INITIAL_PLAYER_PROFILE.campaign)
     assert.deepEqual(resetProfile.currencies, INITIAL_PLAYER_PROFILE.currencies)
+    assert.equal(resetProfile.settings.selectedPlayerSkinId, undefined)
   } finally {
     cleanup()
   }
