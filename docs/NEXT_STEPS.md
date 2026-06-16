@@ -156,11 +156,12 @@ Estado atual:
 ### Itens para atacar primeiro
 
 - Campanha vertical:
-  1. montar uma tabela simples com todos os bares/fases do caminho principal
-  2. definir para cada bar: tema, ambiente, variante, dificuldade, dupla adversaria e vitorias necessarias
-  3. usar `Bar Maneco Banguela` como primeiro bar-modelo depois do `Bar do Ze Catinga`
-  4. implementar o minimo jogavel por bar antes de polir telas autorais extras
-  5. preservar fallback visual para locais ainda sem arte propria
+  1. consolidar a tabela do caminho principal em `docs/CAMPAIGN_PATH.md` e comparar com `src/career/campaign/campaignData.ts`
+  2. fechar o `Bar Maneco Banguela` como primeiro bar-modelo completo depois do `Bar do Ze Catinga`
+  3. completar os proximos bares em estado jogavel, com prioridade para `Mercearia Central` e `Arena do Largo`
+  4. validar que nao ha repeticao de personagens entre bares e que parceiros iniciais nao antecipam adversarios futuros
+  5. verificar a variante declarada por bar, mantendo a aplicacao real de Mineiro/Paulista como pendencia separada se nao bloquear a campanha
+  6. garantir fallback visual aceitavel para bares sem arte propria antes de criar novas imagens
 - Validacao:
   - abrir o fluxo real desde `COMEÇAR`
   - confirmar progressao de bar em bar
@@ -177,6 +178,13 @@ Estado atual:
 - mapear tabela consolidada da campanha principal
 - definir tema, dificuldade, variante e adversarios de cada bar
 - completar o caminho principal de bares em estado jogavel
+- executar o passo 3 da expansao vertical nesta ordem:
+  1. consolidar tabela do caminho principal
+  2. fechar `Bar Maneco Banguela` como bar-modelo completo
+  3. completar `Mercearia Central` e `Arena do Largo` como proximos bares jogaveis
+  4. validar exclusividade de personagens por bar
+  5. conferir variantes declaradas sem misturar com a correcao completa das regras Mineiro/Paulista
+  6. manter fallback visual aceitavel para bares sem arte propria
 - expandir o roster de personagens antes dos ambientes dos proximos bares:
   - cada bar deve ter uma dupla adversaria exclusiva
   - nao repetir adversarios em bares diferentes
@@ -245,9 +253,8 @@ Antes de agir, leia nesta ordem:
 Use esses arquivos como fonte de verdade.
 
 Estado atual:
-- a capa do Bar do Ze Catinga foi refinada, limpa, commitada e enviada para origin/main
-- commit da capa: 0f90926 Refine Ze Catinga venue cover
-- commit mais recente conhecido: 7b427d9 Add Maneco Banguela campaign and venue visuals
+- a base atual ja esta commitada e enviada para origin/main antes do proximo chat
+- a capa do Bar do Ze Catinga foi refinada e consolidada
 - o fluxo atual deve ser preservado: COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo
 - o scorepad da coluna esquerda ja foi corrigido:
   - labels `Nos`, `Eles`, `Mao` e `Mao` nao se sobrepoem mais aos numeros
@@ -287,30 +294,39 @@ Estado atual:
   - botao `COMEÇAR` como hotspot HTML invisivel sobre a arte
   - debug, reset e variante removidos da primeira tela visivel
 - o menu de contexto em partida tem `Resetar progresso`, com confirmacao antes de apagar todo o progresso salvo, incluindo a skin do jogador
+- a tela de escolha da skin do jogador foi simplificada para foto, nome, apelido, frase e botao
+- a selecao de parceira teve um ajuste pequeno: o botao so mostra `Parceira atualmente escolhida` quando o bar realmente ja tem parceira salva
 - proximo foco:
-  - expandir a campanha verticalmente, bar a bar
-  - definir tematica, dificuldade, ambiente, variante e adversarios dos proximos bares
-  - fechar o caminho principal jogavel antes de voltar ao refinamento fino
+  - voltar para expansao vertical da campanha
+  - seguir os 6 pontos do passo 3: tabela, Maneco como modelo, proximos bares jogaveis, exclusividade de personagens, variantes declaradas e fallback visual
   - preservar o fluxo `COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo`
 
 Objetivo deste chat:
-1. planejar e iniciar a expansao vertical da campanha
-2. trabalhar bar a bar, definindo tematica, dificuldade, ambiente, variante e adversarios
-3. completar o caminho principal jogavel antes de refinamentos extensos
-4. preservar a tela inicial definitiva, a intro curta, a capa do bar, a selecao de parceira, a gameplay e as regras de truco
+1. retomar a expansao vertical pelo passo 3
+2. comparar `docs/CAMPAIGN_PATH.md` com `src/career/campaign/campaignData.ts`
+3. fechar o `Bar Maneco Banguela` como bar-modelo completo apos o `Bar do Ze Catinga`
+4. preparar `Mercearia Central` e `Arena do Largo` como proximos bares jogaveis minimos
+5. validar exclusividade de personagens, desbloqueio de parceiros e fallback visual
+6. preservar a tela inicial definitiva, a intro curta, a capa do bar, a selecao de parceira, a gameplay e as regras de truco
 
 Arquivos provaveis:
+- docs/CAMPAIGN_PATH.md
 - src/career/campaign/campaignData.ts
+- src/career/campaign/progression.ts
+- src/career/campaign/types.ts
 - src/content/characters.ts
+- src/content/partnerProgression.ts
 - src/app/AppSections.tsx
 - src/App.tsx
-- possivelmente assets novos por bar, se ja houver direcao visual
+- testes em tests/campaign/progression.test.ts
+- evitar assets novos por enquanto; usar fallback visual quando possivel
 
 Importante:
 - verificar `git status` e preservar mudancas locais existentes
 - nao reabrir a responsividade da gameplay sem regressao real
 - nao reabrir a tela de selecao de parceira sem regressao real
 - nao mudar regras de truco, pontuacao ou progressao de campanha
+- nao corrigir a aplicacao Mineiro/Paulista neste passo, salvo se bloquear diretamente o caminho jogavel
 - nao quebrar a intro cinematografica curta antes da gameplay
 - nao quebrar `Resetar progresso` no menu de contexto
 - nao desmontar a arquitetura atual

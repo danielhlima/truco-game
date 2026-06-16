@@ -127,15 +127,16 @@ Estado consolidado:
 
 ## Prioridade imediata para o proximo chat
 
-No proximo chat, iniciar a expansao vertical da campanha, trabalhando bar a bar ate fechar o caminho principal do jogo.
+No proximo chat, retomar a expansao vertical da campanha pelo passo 3, trabalhando bar a bar ate fechar o caminho principal jogavel.
 
 Proximo foco recomendado:
 
-- mapear a campanha em uma tabela simples de bares/fases
-- definir para cada bar: tema, ambiente, dificuldade, variante, dupla adversaria, objetivo para passar e estado visual minimo
-- usar o `Bar Maneco Banguela` como primeiro modelo completo de expansao depois do `Bar do Ze Catinga`
-- preservar a tela inicial definitiva e a intro curta antes da gameplay
-- preservar o fluxo `COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo`
+- consolidar a tabela do caminho principal entre `docs/CAMPAIGN_PATH.md` e `src/career/campaign/campaignData.ts`
+- fechar o `Bar Maneco Banguela` como primeiro modelo completo de expansao depois do `Bar do Ze Catinga`
+- completar `Mercearia Central` e `Arena do Largo` como proximos bares jogaveis minimos
+- validar exclusividade de personagens por bar e desbloqueio da dupla derrotada como parceria
+- conferir variantes declaradas sem misturar com a correcao completa Mineiro/Paulista
+- preservar fallback visual aceitavel para bares sem arte propria
 
 Depois disso, seguir para:
 

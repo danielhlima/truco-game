@@ -647,6 +647,7 @@ export function TableSection({
                 ) : menuScreen === "character-select" ? (
                   <CharacterSelectionScreen
                     currentCampaignVenue={currentCampaignVenue}
+                    hasSelectedPartnerForVenue={hasSelectedPartnerForVenue}
                     selectedCharacter={selectedCharacter}
                     selectedCharacterIndex={selectedCharacterIndex}
                     isSelectedCharacterUnlocked={isSelectedCharacterUnlocked}
@@ -1569,6 +1570,7 @@ function PlayerSkinSelectionScreen({
 }
 
 function CharacterSelectionScreen({
+  hasSelectedPartnerForVenue,
   selectedCharacter,
   selectedCharacterIndex,
   isSelectedCharacterUnlocked,
@@ -1581,6 +1583,7 @@ function CharacterSelectionScreen({
   styles,
 }: {
   currentCampaignVenue: CampaignVenue | null
+  hasSelectedPartnerForVenue: boolean
   selectedCharacter: TrucoCharacterProfile | null
   selectedCharacterIndex: number
   isSelectedCharacterUnlocked: boolean
@@ -1608,7 +1611,8 @@ function CharacterSelectionScreen({
     .filter(Boolean)
   const totalCharacters = selectableCharacters.length
   const currentPosition = selectedCharacterIndex >= 0 ? selectedCharacterIndex + 1 : 1
-  const isSelectedPartner = selectedPartnerCharacter?.id === selectedCharacter.id
+  const isSelectedPartner =
+    hasSelectedPartnerForVenue && selectedPartnerCharacter?.id === selectedCharacter.id
   const unlockVenue = CAMPAIGN_STAGES.flatMap((stage) => stage.venues).find((venue) =>
     venue.partnerUnlockCharacterIds.includes(selectedCharacter.id)
   )

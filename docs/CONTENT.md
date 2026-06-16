@@ -152,6 +152,15 @@ Kit minimo recomendado por bar:
 - capa/background ou fallback visual aceitavel
 - textos de entrada e resultado, mesmo que sem arte autoral inicial
 
+Plano pratico do passo 3 da expansao vertical:
+
+1. consolidar a tabela do caminho principal em `docs/CAMPAIGN_PATH.md` e comparar com `src/career/campaign/campaignData.ts`
+2. fechar o `Bar Maneco Banguela` como primeiro bar-modelo completo depois do `Bar do Ze Catinga`
+3. completar `Mercearia Central` e `Arena do Largo` como proximos bares jogaveis minimos
+4. validar que nao ha repeticao de personagens entre bares e que parceiros iniciais nao antecipam adversarios futuros
+5. verificar a variante declarada por bar, mantendo a correcao Mineiro/Paulista como pendencia separada se nao bloquear o caminho jogavel
+6. garantir fallback visual aceitavel para bares sem arte propria antes de criar novas imagens
+
 ## Estado atual da gameplay screen
 
 ### Composicao geral
@@ -329,6 +338,7 @@ Ja existe:
 - catalogo completo navegavel na selecao, com camada cinza sobre personagens ainda indisponiveis
 - desbloqueio persistido da dupla adversaria depois da conquista de cada bar
 - validacao para impedir que uma escolha antiga use como parceira um personagem ainda bloqueado
+- o botao so mostra `Parceira atualmente escolhida` quando o bar realmente ja tem uma parceira salva
 
 Starter partners atuais:
 

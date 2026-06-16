@@ -13,6 +13,15 @@ Cada bar deve entrar primeiro como pacote jogavel minimo:
 
 O `Bar Maneco Banguela` e o primeiro bar-modelo depois do `Bar do Ze Catinga`: ele ja possui campanha, capa e background autorais, mas continua usando fallback generico para resultado.
 
+## Proximo Plano de Execucao
+
+1. consolidar esta tabela com o codigo em `src/career/campaign/campaignData.ts`
+2. fechar o `Bar Maneco Banguela` como bar-modelo completo depois do `Bar do Ze Catinga`
+3. completar `Mercearia Central` e `Arena do Largo` como proximos bares jogaveis minimos
+4. validar exclusividade de personagens por bar e desbloqueio da dupla derrotada como parceria
+5. conferir variantes declaradas por bar, sem misturar esta frente com a correcao completa da aplicacao Mineiro/Paulista
+6. manter fallback visual aceitavel para bares sem arte propria antes de solicitar novas imagens
+
 ## Progressao de Parceiros
 
 - `4` parceiros iniciais ficam disponiveis antes da primeira conquista:
@@ -66,4 +75,6 @@ Dupla reservada para `Orbita da Lua`:
 
 Proxima frente:
 
-- implementar depois a escolha da skin visual do jogador
+- retomar a expansao vertical pelo `Bar Maneco Banguela`
+- avancar em seguida para `Mercearia Central` e `Arena do Largo`
+- manter novas artes como etapa posterior, usando fallback visual enquanto o caminho principal ainda estiver sendo fechado
