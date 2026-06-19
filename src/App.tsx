@@ -3,9 +3,14 @@ import { useGameSession } from "./app/useGameSession"
 import botecoSceneBgAsset from "./assets/boteco/boteco-scene-bg.png"
 import cardFaceAgedPaperAsset from "./assets/cards/card-face-aged-paper.png"
 import manecoBanguelaSceneBgAsset from "./assets/venues/maneco-banguela/background.png"
+import tremDoJacaSceneBgAsset from "./assets/venues/trem-do-jaca/background.png"
 
 const GAMEPLAY_STAGE_WIDTH = 1080
 const GAMEPLAY_STAGE_HEIGHT = 500
+const GAMEPLAY_BACKGROUND_ASSET_BY_VENUE_ID: Record<string, string> = {
+  "bar-maneco-banguela": manecoBanguelaSceneBgAsset,
+  "trem-do-jaca": tremDoJacaSceneBgAsset,
+}
 
 const TableSection = lazy(async () => {
   const mod = await import("./app/AppSections")
@@ -99,6 +104,7 @@ function App() {
     handleEnterVenueFromIntro,
     handleExitMatchFromContextMenu,
     handleLaunchVenue,
+    handleLoseMatchFromContextMenu,
     handleOpenInGameContextMenu,
     handleOpenCharacterSelect,
     handlePlayCard,
@@ -112,6 +118,7 @@ function App() {
     handleSelectPreviousCharacter,
     handleStartHand,
     handleSwapPartnerFromContextMenu,
+    handleWinMatchFromContextMenu,
     lastPlayedPlayerId,
     logs,
     matchScoreLabel,
@@ -144,8 +151,8 @@ function App() {
   const isCompactLayout = layoutMode !== "regular"
   const isTinyLayout = layoutMode === "tiny"
   const useTightSidebar = layoutMode !== "regular"
-  const gameplayBackgroundAsset = currentCampaignVenue?.id === "bar-maneco-banguela"
-    ? manecoBanguelaSceneBgAsset
+  const gameplayBackgroundAsset = currentCampaignVenue?.id
+    ? GAMEPLAY_BACKGROUND_ASSET_BY_VENUE_ID[currentCampaignVenue.id] ?? botecoSceneBgAsset
     : botecoSceneBgAsset
 
   const responsiveStyles = useMemo<Record<string, React.CSSProperties>>(
@@ -423,11 +430,13 @@ function App() {
             onCloseInGameContextMenu={handleCloseInGameContextMenu}
             onConfirmInGameConfirmation={handleConfirmInGameConfirmation}
             onExitMatchFromContextMenu={handleExitMatchFromContextMenu}
+            onLoseMatchFromContextMenu={handleLoseMatchFromContextMenu}
             onOpenInGameContextMenu={handleOpenInGameContextMenu}
             onRaiseTruco={handleRaiseTruco}
             onResetProgressFromContextMenu={handleResetProgressFromContextMenu}
             onRunFromTruco={handleRunFromTruco}
             onSwapPartnerFromContextMenu={handleSwapPartnerFromContextMenu}
+            onWinMatchFromContextMenu={handleWinMatchFromContextMenu}
             onPlayCard={handlePlayCard}
             styles={responsiveStyles}
           />
@@ -2706,15 +2715,28 @@ const styles: Record<string, React.CSSProperties> = {
     gridColumn: "1 / -1",
     width: "100%",
     height: "100%",
+    display: "grid",
+    placeItems: "center",
     position: "relative",
     overflow: "hidden",
     borderRadius: "22px",
     background: "#080604",
   },
+  matchResultImageFrame: {
+    position: "relative",
+    height: "100%",
+    width: "82.35%",
+    maxWidth: "100%",
+    maxHeight: "100%",
+    aspectRatio: "1672 / 941",
+    alignSelf: "center",
+    justifySelf: "center",
+    flexShrink: 0,
+  },
   matchResultImage: {
     width: "100%",
     height: "100%",
-    objectFit: "cover",
+    objectFit: "contain",
     display: "block",
   },
   matchResultImageCta: {

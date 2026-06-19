@@ -108,6 +108,7 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 - A faixa da mao deve manter cartas e botao `MENU` visiveis dentro da moldura.
 - O popover do `MENU` pode sair da faixa da mao, mas deve ficar acima da mesa.
 - Menus de contexto devem fechar antes de abrir modal de confirmacao.
+- O menu de contexto da partida pode conter as acoes `Vencer esta partida` e `Perder esta partida` como atalhos de validacao de resultado/progressao.
 - O menu de contexto da partida pode conter a acao `Resetar progresso`, mas ela sempre deve abrir confirmacao antes de apagar dados salvos.
 - Nao resolver responsividade movendo elementos isolados com transforms compensatorios quando o problema for escala global da tela.
 
@@ -155,7 +156,7 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 ## Regras da Tela de Campanha
 
 - A tela de campanha acontece antes da capa do bar.
-- Para os estados atuais do `Bar do Ze Catinga` e do `Bar Maneco Banguela`, usar artes autorais em `src/assets/campaign/`.
+- Para os estados atuais do `Bar do Ze Catinga`, do `Bar Maneco Banguela` e do `Trem do Jaça`, usar artes autorais em `src/assets/campaign/`.
 - A arte autoral pode conter textos, placas e ilustrações ja renderizados.
 - Controles de fluxo sobre arte autoral devem ser botoes HTML invisiveis posicionados por percentual.
 - Os hotspots atuais sao `VOLTAR`, `ENTRAR NO BAR` e `TROCAR PARCEIRA`.

@@ -98,6 +98,8 @@ Estado consolidado:
 - popover do `MENU` fica acima da mesa e fecha antes dos modais de confirmacao
 - o `MENU` em partida possui opcoes para:
   - trocar de parceira
+  - vencer esta partida, para validar progressao sem jogar a partida inteira
+  - perder esta partida, para validar a tela de derrota
   - sair da partida
   - resetar todo o progresso do jogo com confirmacao
 - intro cinematografica curta antes da gameplay:
@@ -111,6 +113,8 @@ Estado consolidado:
 - tela de campanha do primeiro trecho (`Botecos da Rua`) usa artes autorais para os estados atuais:
   - `Bar do Ze Catinga`: `src/assets/campaign/botecos-rua-ze-catinga.png`
   - `Bar Maneco Banguela`: `src/assets/campaign/botecos-rua-maneco-banguela.png`
+- tela de campanha do `Campeonato da Vila Naná` usa arte autoral para o estado atual:
+  - `Trem do Jaça`: `src/assets/campaign/campeonato-vila-nana-trem-do-jaca.png`
 - os botoes da campanha autoral sao areas HTML invisiveis sobre a imagem:
   - `VOLTAR`
   - `ENTRAR NO BAR`
@@ -123,6 +127,12 @@ Estado consolidado:
 - telas autorais de vitoria e derrota do `Bar do Ze Catinga`:
   - `src/assets/venues/ze-catinga/match-result-win.png`
   - `src/assets/venues/ze-catinga/match-result-loss.png`
+- telas autorais de vitoria e derrota do `Bar Maneco Banguela`:
+  - `src/assets/venues/maneco-banguela/match-result-win.png`
+  - `src/assets/venues/maneco-banguela/match-result-loss.png`
+- telas autorais de vitoria e derrota do `Trem do Jaça`:
+  - `src/assets/venues/trem-do-jaca/match-result-win.png`
+  - `src/assets/venues/trem-do-jaca/match-result-loss.png`
 - a tela de resultado so aparece depois da ultima carta visivel na mesa, com atraso de 1 segundo para leitura humana
 
 ## Prioridade imediata para o proximo chat
@@ -132,15 +142,14 @@ No proximo chat, retomar a expansao vertical da campanha pelo passo 3, trabalhan
 Proximo foco recomendado:
 
 - consolidar a tabela do caminho principal entre `docs/CAMPAIGN_PATH.md` e `src/career/campaign/campaignData.ts`
-- fechar o `Bar Maneco Banguela` como primeiro modelo completo de expansao depois do `Bar do Ze Catinga`
-- completar `Mercearia Central` e `Arena do Largo` como proximos bares jogaveis minimos
+- manter `Bar Maneco Banguela` e `Trem do Jaça` como modelos completos de expansao ja integrados
+- completar `Adega do Juca Bigode` como proximo bar jogavel minimo
 - validar exclusividade de personagens por bar e desbloqueio da dupla derrotada como parceria
 - conferir variantes declaradas sem misturar com a correcao completa Mineiro/Paulista
 - preservar fallback visual aceitavel para bares sem arte propria
 
 Depois disso, seguir para:
 
-- telas autorais de vitoria/derrota do `Bar Maneco Banguela`
 - expansao do modelo da capa para outros bares
 - telas autorais de resultado para os proximos bares
 

@@ -9,12 +9,20 @@ import { CAMPAIGN_STAGES } from "../career/campaign/campaignData"
 import { STORE_PRODUCTS, UNLOCKABLE_ITEMS } from "../economy/catalog"
 import { GameTableScene } from "../three/GameTableScene"
 import { buildTableSceneModel } from "../three/tableSceneModel"
+import { getTableTheme } from "../three/tableTheme"
 import scorePadNotebookAsset from "../assets/ui-left/scorepad-notebook-clean-cut.png"
 import actionButtonAsset from "../assets/ui-right/action-button-solid.png"
 import statsPanelWoodAsset from "../assets/ui-right/stats-panel-wood-main.png"
+import tremDoJacaCampaignJourneyAsset from "../assets/campaign/campeonato-vila-nana-trem-do-jaca.png"
+import tremDoJacaBackgroundAsset from "../assets/venues/trem-do-jaca/background.png"
+import tremDoJacaHostAsset from "../assets/venues/trem-do-jaca/host-trem-do-jaca.png"
+import tremDoJacaMatchResultLossAsset from "../assets/venues/trem-do-jaca/match-result-loss.png"
+import tremDoJacaMatchResultWinAsset from "../assets/venues/trem-do-jaca/match-result-win.png"
 import manecoBanguelaCampaignJourneyAsset from "../assets/campaign/botecos-rua-maneco-banguela.png"
 import manecoBanguelaBackgroundAsset from "../assets/venues/maneco-banguela/background.png"
 import manecoBanguelaHostAsset from "../assets/venues/maneco-banguela/host-maneco-banguela.png"
+import manecoBanguelaMatchResultLossAsset from "../assets/venues/maneco-banguela/match-result-loss.png"
+import manecoBanguelaMatchResultWinAsset from "../assets/venues/maneco-banguela/match-result-win.png"
 import startScreenAsset from "../assets/start/truco-raiz-start.png"
 import zeCatingaCampaignJourneyAsset from "../assets/campaign/botecos-rua-ze-catinga.png"
 import zeCatingaBackgroundAsset from "../assets/venues/ze-catinga/background.png"
@@ -100,12 +108,34 @@ const VENUE_COVER_CONFIG_BY_ID: Record<string, VenueCoverConfig> = {
     dividerAsset: zeCatingaDividerAsset,
     statsPlaqueAsset: zeCatingaStatsPlaqueAsset,
   },
+  "trem-do-jaca": {
+    hostName: "Jaça",
+    hostRole: "Dono da Mercearia",
+    hostQuote: "Aqui fiado é difícil. Ganhar truco assim, mais difícil ainda.",
+    leadText: "Mercearia de vila, balcão gasto e truco jogado no olho da prateleira.",
+    description: "No Trem do Jaça, a luz entra pela porta e a cobrança vem pela mesa.",
+    backgroundAsset: tremDoJacaBackgroundAsset,
+    hostPortraitAsset: tremDoJacaHostAsset,
+    quoteBoardAsset: zeCatingaQuoteBoardAsset,
+    ctaPlaqueAsset: zeCatingaCtaPlaqueAsset,
+    difficultyBottleAsset: zeCatingaDifficultyBottleAsset,
+    dividerAsset: zeCatingaDividerAsset,
+    statsPlaqueAsset: zeCatingaStatsPlaqueAsset,
+  },
 }
 
 const MATCH_RESULT_ASSET_BY_VENUE_ID: Record<string, { loss?: string; win?: string }> = {
   "bar-do-ze-catinga": {
     loss: zeCatingaMatchResultLossAsset,
     win: zeCatingaMatchResultWinAsset,
+  },
+  "bar-maneco-banguela": {
+    loss: manecoBanguelaMatchResultLossAsset,
+    win: manecoBanguelaMatchResultWinAsset,
+  },
+  "trem-do-jaca": {
+    loss: tremDoJacaMatchResultLossAsset,
+    win: tremDoJacaMatchResultWinAsset,
   },
 }
 
@@ -474,11 +504,13 @@ interface TableSectionProps {
   onCloseInGameContextMenu: () => void
   onConfirmInGameConfirmation: () => void
   onExitMatchFromContextMenu: () => void
+  onLoseMatchFromContextMenu: () => void
   onOpenInGameContextMenu: () => void
   onRaiseTruco: () => void
   onResetProgressFromContextMenu: () => void
   onRunFromTruco: () => void
   onSwapPartnerFromContextMenu: () => void
+  onWinMatchFromContextMenu: () => void
   onPlayCard: (card: Card) => void
   styles: StyleMap
 }
@@ -537,11 +569,13 @@ export function TableSection({
   onCloseInGameContextMenu,
   onConfirmInGameConfirmation,
   onExitMatchFromContextMenu,
+  onLoseMatchFromContextMenu,
   onOpenInGameContextMenu,
   onRaiseTruco,
   onResetProgressFromContextMenu,
   onRunFromTruco,
   onSwapPartnerFromContextMenu,
+  onWinMatchFromContextMenu,
   onPlayCard,
   styles,
 }: TableSectionProps) {
@@ -789,10 +823,12 @@ export function TableSection({
                       canPlayHumanCard={canPlayHumanCard}
                       onCloseInGameContextMenu={onCloseInGameContextMenu}
                       onExitMatchFromContextMenu={onExitMatchFromContextMenu}
+                      onLoseMatchFromContextMenu={onLoseMatchFromContextMenu}
                       onOpenInGameContextMenu={onOpenInGameContextMenu}
                       onPlayCard={onPlayCard}
                       onResetProgressFromContextMenu={onResetProgressFromContextMenu}
                       onSwapPartnerFromContextMenu={onSwapPartnerFromContextMenu}
+                      onWinMatchFromContextMenu={onWinMatchFromContextMenu}
                       gameplayIntroActive={isGameplayIntroActive}
                       styles={styles}
                     />
@@ -1374,6 +1410,31 @@ const authoredCampaignScreens: Record<
       borderRadius: "8px",
     },
   },
+  "trem-do-jaca": {
+    asset: tremDoJacaCampaignJourneyAsset,
+    alt: "Jornada de campanha do Campeonato da Vila Nana com Trem do Jaca atual",
+    backHotspot: {
+      left: "84.4%",
+      top: "3.4%",
+      width: "11.1%",
+      height: "6.9%",
+      borderRadius: "8px",
+    },
+    enterHotspot: {
+      left: "38.1%",
+      top: "69.1%",
+      width: "25.2%",
+      height: "10.3%",
+      borderRadius: "8px",
+    },
+    partnerHotspot: {
+      left: "39.6%",
+      top: "84.4%",
+      width: "23.5%",
+      height: "8.2%",
+      borderRadius: "8px",
+    },
+  },
 }
 
 function isCampaignVenueCleared(playerProfile: PlayerProfile, venue: CampaignVenue) {
@@ -1411,16 +1472,18 @@ function MatchResultScreen({
   if (resultAsset) {
     return (
       <div style={styles.matchResultImageScreen}>
-        <img
-          src={resultAsset}
-          alt={result?.title ?? "Vitória na mesa"}
-          style={styles.matchResultImage}
-        />
-        <button
-          aria-label="Voltar ao fluxo de bares"
-          style={styles.matchResultImageCta}
-          onClick={onContinue}
-        />
+        <div style={styles.matchResultImageFrame}>
+          <img
+            src={resultAsset}
+            alt={result?.title ?? "Vitória na mesa"}
+            style={styles.matchResultImage}
+          />
+          <button
+            aria-label="Voltar ao fluxo de bares"
+            style={styles.matchResultImageCta}
+            onClick={onContinue}
+          />
+        </div>
       </div>
     )
   }
@@ -1797,6 +1860,15 @@ function VenueIntroScreen({
   const challengeDifficulty = currentCampaignVenue?.difficulty.aiLevel ?? 1
 
   if (!coverConfig) {
+    const fallbackTheme = getTableTheme(currentCampaignVenue?.visualTheme)
+    const fallbackIntroStyle: React.CSSProperties = {
+      ...styles.venueIntroScreen,
+      background:
+        `radial-gradient(circle at 24% 18%, ${fallbackTheme.accentColor}42 0%, transparent 34%), ` +
+        `radial-gradient(circle at 76% 68%, ${fallbackTheme.railColor}55 0%, transparent 36%), ` +
+        `linear-gradient(135deg, ${fallbackTheme.backgroundColor} 0%, #120d0a 100%)`,
+      boxShadow: "inset 0 0 90px rgba(0,0,0,0.42)",
+    }
     const participants = [
       {
         id: "you",
@@ -1815,7 +1887,7 @@ function VenueIntroScreen({
     ]
 
     return (
-      <div style={styles.venueIntroScreen}>
+      <div style={fallbackIntroStyle}>
         <div style={styles.venueIntroHeader}>
           <div>
             <div style={styles.venueIntroEyebrow}>Chegada no bar</div>
@@ -1852,6 +1924,12 @@ function VenueIntroScreen({
                 <div style={styles.venueIntroFactLabel}>Meta do bar</div>
                 <strong style={styles.venueIntroFactValue}>
                   {currentCampaignVenue?.matchesToClear ?? 0} vitórias
+                </strong>
+              </div>
+              <div style={styles.venueIntroFactCard}>
+                <div style={styles.venueIntroFactLabel}>Dificuldade</div>
+                <strong style={styles.venueIntroFactValue}>
+                  {challengeDifficulty}/5
                 </strong>
               </div>
             </div>
@@ -1933,6 +2011,9 @@ function VenueIntroScreen({
               alignItems: "flex-end",
               justifyContent: "center",
               overflow: "hidden",
+              borderRadius: 10,
+              background: "linear-gradient(180deg, rgba(32,19,12,0.62) 0%, rgba(11,7,5,0.78) 100%)",
+              boxShadow: "inset 0 0 0 1px rgba(231,188,103,0.18)",
             }}
           >
             <img
@@ -1943,8 +2024,8 @@ function VenueIntroScreen({
                 height: "100%",
                 objectFit: "contain",
                 objectPosition: "center bottom",
-                filter: "drop-shadow(0 22px 26px rgba(0,0,0,0.42))",
-                mixBlendMode: "screen",
+                filter: "contrast(1.04) saturate(0.96) drop-shadow(0 22px 26px rgba(0,0,0,0.42))",
+                opacity: 1,
               }}
             />
           </div>
@@ -2501,10 +2582,12 @@ function HumanCardsPanel({
   gameplayIntroActive,
   onCloseInGameContextMenu,
   onExitMatchFromContextMenu,
+  onLoseMatchFromContextMenu,
   onOpenInGameContextMenu,
   onPlayCard,
   onResetProgressFromContextMenu,
   onSwapPartnerFromContextMenu,
+  onWinMatchFromContextMenu,
   styles,
 }: {
   handState: HandState | null
@@ -2514,10 +2597,12 @@ function HumanCardsPanel({
   gameplayIntroActive: boolean
   onCloseInGameContextMenu: () => void
   onExitMatchFromContextMenu: () => void
+  onLoseMatchFromContextMenu: () => void
   onOpenInGameContextMenu: () => void
   onPlayCard: (card: Card) => void
   onResetProgressFromContextMenu: () => void
   onSwapPartnerFromContextMenu: () => void
+  onWinMatchFromContextMenu: () => void
   styles: StyleMap
 }) {
   return (
@@ -2590,6 +2675,18 @@ function HumanCardsPanel({
                   onClick={onSwapPartnerFromContextMenu}
                 >
                   Trocar de parceira
+                </button>
+                <button
+                  style={styles.inGameContextMenuAction}
+                  onClick={onWinMatchFromContextMenu}
+                >
+                  Vencer esta partida
+                </button>
+                <button
+                  style={styles.inGameContextMenuAction}
+                  onClick={onLoseMatchFromContextMenu}
+                >
+                  Perder esta partida
                 </button>
                 <button
                   style={styles.inGameContextMenuAction}

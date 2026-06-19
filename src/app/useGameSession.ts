@@ -598,9 +598,8 @@ export function useGameSession() {
           setTrucoMessage("Partida de teste finalizada. O progresso da campanha não foi alterado.")
         } else if (nextState.winner === "A") {
           const resolution = applyCampaignWin(playerProfile, CAMPAIGN_STAGES)
-          setPlayerProfile(resolution.profile)
-          setEventMessage(getCampaignWinMessage(finalScore, resolution))
-          setTrucoMessage(getCampaignTrucoSummary(resolution))
+          const nextEventMessage = getCampaignWinMessage(finalScore, resolution)
+          const nextTrucoMessage = getCampaignTrucoSummary(resolution)
 
           if (resolution.campaignCompleted) {
             matchResultState = {
@@ -635,6 +634,21 @@ export function useGameSession() {
               progressionText: `Vocês concluíram ${resolution.clearedVenue.name} e seguiram adiante na campanha.`,
             }
           }
+
+          matchResultRevealTimeoutRef.current = window.setTimeout(() => {
+            setSpeechBubble(null)
+            setHandState(null)
+            setMatchState(null)
+            setInGameContextMenuOpen(false)
+            setMatchResultScreen(matchResultState)
+            setMenuScreen("match-result")
+            setPlayerProfile(resolution.profile)
+            setEventMessage(nextEventMessage)
+            setTrucoMessage(nextTrucoMessage)
+            matchResultRevealTimeoutRef.current = null
+          }, MATCH_RESULT_REVEAL_DELAY_MS)
+          syncLogs()
+          return
         } else {
           const resolution = applyCampaignLoss(playerProfile, CAMPAIGN_STAGES)
           setPlayerProfile(resolution.profile)
@@ -1240,6 +1254,165 @@ export function useGameSession() {
     setInGameContextMenuOpen(false)
   }
 
+  function handleWinMatchFromContextMenu() {
+    if (!handState || !matchState) return
+
+    clearPendingUiTimers()
+    showSpeechBubble(null)
+    setInGameContextMenuOpen(false)
+    setInGameConfirmation(null)
+
+    const resultVenue = sessionDebugVenue ?? currentCampaignVenue
+    const resultVenueName = resultVenue?.name ?? "o bar"
+    const finalScore = {
+      A: 12,
+      B: matchState.score.B,
+    }
+    const finishedMatchState: MatchState = {
+      ...matchState,
+      score: finalScore,
+      finished: true,
+      winner: "A",
+    }
+    let matchResultState: MatchResultScreenState = {
+      outcome: "win",
+      title: "Vocês levaram essa",
+      subtitle: `Vitória manual registrada para validar o avanço em ${resultVenueName}.`,
+      hostLine: `O dono do ${resultVenueName} resmunga: "Ganharam hoje porque a sorte sentou com vocês. Quero ver repetir essa coragem."`,
+      venueId: resultVenue?.id,
+      venueName: resultVenueName,
+    }
+
+    setMatchState(finishedMatchState)
+    logEvent(`Vitória manual registrada em ${resultVenueName}.`)
+
+    if (sessionDebugVenueId) {
+      const debugVenueName = sessionDebugVenue?.name ?? currentCampaignVenue?.name ?? "local de debug"
+      setEventMessage(`Vitória manual no modo debug em ${debugVenueName}.`)
+      setTrucoMessage("Partida de teste finalizada. O progresso da campanha não foi alterado.")
+    } else {
+      const resolution = applyCampaignWin(playerProfile, CAMPAIGN_STAGES)
+      const nextEventMessage = getCampaignWinMessage(finalScore, resolution)
+      const nextTrucoMessage = getCampaignTrucoSummary(resolution)
+
+      if (resolution.campaignCompleted) {
+        matchResultState = {
+          ...matchResultState,
+          title: "Campanha concluída",
+          subtitle: `Vocês fecharam a campanha disponível inteira e não deixaram dúvida no ${resultVenueName}.`,
+          progressionTitle: "Jornada encerrada",
+          progressionText: "Toda a campanha disponível foi concluída. Agora dá para revisitar os bares ou esperar os próximos desafios.",
+        }
+      } else if (resolution.clearedStage && resolution.unlockedStage) {
+        matchResultState = {
+          ...matchResultState,
+          title: `${resolution.clearedStage.name} concluída`,
+          subtitle: `Vocês fecharam ${resultVenueName} e abriram caminho para ${resolution.unlockedStage.name}.`,
+          progressionTitle: "Nova fase liberada",
+          progressionText:
+            resolution.unlockedStage.cutsceneIntro ??
+            `A próxima etapa agora é ${resolution.unlockedStage.name}.`,
+        }
+      } else if (resolution.clearedVenue && resolution.currentVenue) {
+        matchResultState = {
+          ...matchResultState,
+          title: `${resolution.clearedVenue.name} conquistado`,
+          subtitle: "Vocês encerraram a fase deste bar e avançaram no circuito.",
+          progressionTitle: "Próximo bar liberado",
+          progressionText: `Vocês passaram de fase. O próximo destino agora é ${resolution.currentVenue.name}.`,
+        }
+      } else if (resolution.clearedVenue) {
+        matchResultState = {
+          ...matchResultState,
+          progressionTitle: "Bar concluído",
+          progressionText: `Vocês concluíram ${resolution.clearedVenue.name} e seguiram adiante na campanha.`,
+        }
+      }
+
+      matchResultRevealTimeoutRef.current = window.setTimeout(() => {
+        setSpeechBubble(null)
+        setHandState(null)
+        setMatchState(null)
+        setMatchResultScreen(matchResultState)
+        setMenuScreen("match-result")
+        setPlayerProfile(resolution.profile)
+        setEventMessage(nextEventMessage)
+        setTrucoMessage(nextTrucoMessage)
+        matchResultRevealTimeoutRef.current = null
+      }, MATCH_RESULT_REVEAL_DELAY_MS)
+      syncLogs()
+      return
+    }
+
+    matchResultRevealTimeoutRef.current = window.setTimeout(() => {
+      setSpeechBubble(null)
+      setHandState(null)
+      setMatchState(null)
+      setMatchResultScreen(matchResultState)
+      setMenuScreen("match-result")
+      matchResultRevealTimeoutRef.current = null
+    }, MATCH_RESULT_REVEAL_DELAY_MS)
+    syncLogs()
+  }
+
+  function handleLoseMatchFromContextMenu() {
+    if (!handState || !matchState) return
+
+    clearPendingUiTimers()
+    showSpeechBubble(null)
+    setInGameContextMenuOpen(false)
+    setInGameConfirmation(null)
+
+    const resultVenue = sessionDebugVenue ?? currentCampaignVenue
+    const resultVenueName = resultVenue?.name ?? "o bar"
+    const finalScore = {
+      A: matchState.score.A,
+      B: 12,
+    }
+    const finishedMatchState: MatchState = {
+      ...matchState,
+      score: finalScore,
+      finished: true,
+      winner: "B",
+    }
+    const matchResultState: MatchResultScreenState = {
+      outcome: "loss",
+      title: "A casa falou mais alto",
+      subtitle: "Derrota manual registrada para validar a tela de perda.",
+      hostLine: `O dono do ${resultVenueName} abre um sorriso torto: "Aqui é assim. Quem entra achando que vai mandar sai escutando a conversa do balcão."`,
+      venueId: resultVenue?.id,
+      venueName: resultVenueName,
+    }
+
+    setMatchState(finishedMatchState)
+    logEvent(`Derrota manual registrada em ${resultVenueName}.`)
+
+    if (sessionDebugVenueId) {
+      const debugVenueName = sessionDebugVenue?.name ?? currentCampaignVenue?.name ?? "local de debug"
+      setEventMessage(`Derrota manual no modo debug em ${debugVenueName}.`)
+      setTrucoMessage("Partida de teste finalizada. O progresso da campanha não foi alterado.")
+    } else {
+      const resolution = applyCampaignLoss(playerProfile, CAMPAIGN_STAGES)
+      setPlayerProfile(resolution.profile)
+      setEventMessage(getMatchEndMessage("B", finalScore))
+      setTrucoMessage(
+        resolution.currentVenue
+          ? `Derrota no local ${resolution.currentVenue.name}. Você pode tentar novamente.`
+          : "Derrota registrada na campanha."
+      )
+    }
+
+    matchResultRevealTimeoutRef.current = window.setTimeout(() => {
+      setSpeechBubble(null)
+      setHandState(null)
+      setMatchState(null)
+      setMatchResultScreen(matchResultState)
+      setMenuScreen("match-result")
+      matchResultRevealTimeoutRef.current = null
+    }, MATCH_RESULT_REVEAL_DELAY_MS)
+    syncLogs()
+  }
+
   function handleSwapPartnerFromContextMenu() {
     if (!handState || !matchState) return
     setInGameContextMenuOpen(false)
@@ -1345,6 +1518,7 @@ export function useGameSession() {
     handleCopyLogs,
     handleEnterVenueFromIntro,
     handleExitMatchFromContextMenu,
+    handleLoseMatchFromContextMenu,
     handleOpenInGameContextMenu,
     handlePlayCard,
     handlePartnerAdvice,
@@ -1356,6 +1530,7 @@ export function useGameSession() {
     handleRunFromTruco,
     handleSwapPartnerFromContextMenu,
     handleStartHand,
+    handleWinMatchFromContextMenu,
     lastPlayedPlayerId,
     logs,
     matchScoreLabel,

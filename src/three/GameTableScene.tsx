@@ -6,10 +6,19 @@ import cardBackAgedPhotoUrl from "../assets/cards/card-back-aged-photo.png"
 import tableTopGhibliishUrl from "../assets/boteco/table-top-ghibliish.png"
 import tableTopManecoWoodUrl from "../assets/boteco/table-top-maneco-wood.png"
 import tableTopSteelPatioUrl from "../assets/boteco/table-top-steel-patio.png"
+import tableTopTremJacaUrl from "../assets/boteco/table-top-trem-jaca.png"
 import tableTopWoodStreetUrl from "../assets/boteco/table-top-wood-street.png"
 import tableTopZeCatingaPhotoUrl from "../assets/boteco/table-top-ze-catinga-photo.png"
 import type { SpeechBubbleState } from "../app/gameSessionHelpers"
 import type { TableSceneModel } from "./tableSceneModel"
+
+const ILLUSTRATED_TABLE_ASSET_URLS: Record<string, string> = {
+  "ze-catinga-photo": tableTopZeCatingaPhotoUrl,
+  "maneco-wood": tableTopManecoWoodUrl,
+  "trem-jaca": tableTopTremJacaUrl,
+  "wood-street": tableTopWoodStreetUrl,
+  "steel-patio": tableTopSteelPatioUrl,
+}
 
 interface GameTableSceneProps {
   model: TableSceneModel
@@ -55,16 +64,9 @@ export function GameTableScene({
   const usesIllustratedTable = tableKind === "steel"
   const usesSteelPatioTable = illustratedTableAsset === "steel-patio"
   const usesPhotoTable = illustratedTableAsset === "ze-catinga-photo"
-  const illustratedTableUrl =
-    illustratedTableAsset === "ze-catinga-photo"
-      ? tableTopZeCatingaPhotoUrl
-      : illustratedTableAsset === "maneco-wood"
-      ? tableTopManecoWoodUrl
-      : illustratedTableAsset === "wood-street"
-        ? tableTopWoodStreetUrl
-        : illustratedTableAsset === "steel-patio"
-          ? tableTopSteelPatioUrl
-          : tableTopGhibliishUrl
+  const illustratedTableUrl = illustratedTableAsset
+    ? ILLUSTRATED_TABLE_ASSET_URLS[illustratedTableAsset] ?? tableTopGhibliishUrl
+    : tableTopGhibliishUrl
   const tableScale = illustratedTableScale ?? 1
   const tableOffsetX = illustratedTableOffsetX ?? 0
   const tableOffsetY = illustratedTableOffsetY ?? 0

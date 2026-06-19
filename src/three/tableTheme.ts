@@ -12,6 +12,7 @@ export interface TableTheme {
     | "rust-classic"
     | "ze-catinga-photo"
     | "maneco-wood"
+    | "trem-jaca"
     | "wood-street"
     | "steel-patio"
   illustratedTableScale?: number
@@ -69,20 +70,20 @@ const STREET_CLEAN_THEME: TableTheme = {
   sceneVignetteStrength: 0.22,
 }
 
-const WOOD_STREET_THEME: TableTheme = {
-  backgroundColor: "#2f231c",
-  tableColor: "#78614d",
-  railColor: "#4f3727",
-  badgeColor: "#7c2d12",
-  emptySlotColor: "#ead9c2",
-  activeSlotColor: "#f59e0b",
-  accentColor: "#9a3412",
+const TREM_JACA_THEME: TableTheme = {
+  backgroundColor: "#3d2b1d",
+  tableColor: "#b8792e",
+  railColor: "#6b4728",
+  badgeColor: "#8f4d17",
+  emptySlotColor: "#f4e1bd",
+  activeSlotColor: "#facc15",
+  accentColor: "#b7791f",
   tableKind: "steel",
-  rustColor: "#6f4b34",
-  illustratedTableAsset: "wood-street",
-  illustratedTableScale: 1.03,
-  sceneWarmGlowStrength: 0.14,
-  sceneVignetteStrength: 0.28,
+  rustColor: "#8a5a2c",
+  illustratedTableAsset: "trem-jaca",
+  illustratedTableScale: 1,
+  sceneWarmGlowStrength: 0.16,
+  sceneVignetteStrength: 0.2,
 }
 
 const STEEL_PATIO_THEME: TableTheme = {
@@ -139,7 +140,7 @@ export function getTableTheme(visualTheme?: string): TableTheme {
   }
 
   if (visualTheme.includes("madeira-suja")) {
-    return WOOD_STREET_THEME
+    return TREM_JACA_THEME
   }
 
   if (visualTheme.includes("metal-patio")) {
@@ -152,7 +153,7 @@ export function getTableTheme(visualTheme?: string): TableTheme {
 
   if (
     visualTheme.includes("premium") ||
-    visualTheme.includes("cassino") ||
+    visualTheme.includes("casino") ||
     visualTheme.includes("mundial")
   ) {
     return PREMIUM_THEME

@@ -11,13 +11,13 @@ Cada bar deve entrar primeiro como pacote jogavel minimo:
 - campanha, capa e resultado genericos aceitos como fallback
 - tema de mesa reaproveitado quando ainda nao houver arte propria
 
-O `Bar Maneco Banguela` e o primeiro bar-modelo depois do `Bar do Ze Catinga`: ele ja possui campanha, capa e background autorais, mas continua usando fallback generico para resultado.
+O `Bar Maneco Banguela` e o `Trem do Jaça` sao os modelos completos ja integrados depois do `Bar do Ze Catinga`: eles possuem campanha, capa, background e resultado autorais, e o `Trem do Jaça` tambem possui mesa propria.
 
 ## Proximo Plano de Execucao
 
-1. consolidar esta tabela com o codigo em `src/career/campaign/campaignData.ts`
-2. fechar o `Bar Maneco Banguela` como bar-modelo completo depois do `Bar do Ze Catinga`
-3. completar `Mercearia Central` e `Arena do Largo` como proximos bares jogaveis minimos
+1. usar `Bar Maneco Banguela` e `Trem do Jaça` como modelos completos ja integrados
+2. completar `Adega do Juca Bigode` como proximo bar jogavel minimo
+3. consolidar a entrada da Adega com o codigo em `src/career/campaign/campaignData.ts`
 4. validar exclusividade de personagens por bar e desbloqueio da dupla derrotada como parceria
 5. conferir variantes declaradas por bar, sem misturar esta frente com a correcao completa da aplicacao Mineiro/Paulista
 6. manter fallback visual aceitavel para bares sem arte propria antes de solicitar novas imagens
@@ -38,19 +38,19 @@ O `Bar Maneco Banguela` e o primeiro bar-modelo depois do `Bar do Ze Catinga`: e
 | Fase / circuito | Bar / fase | Tema visual | Ambiente | Variante | Dificuldade | Dupla adversaria | Vitorias | Estado visual minimo |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Botecos da Rua | Bar do Ze Catinga | Boteco raiz fotografico | Paredes gastas, piso engordurado e TV velha | Mineiro | 1/5 | Tiao Casca Grossa + Cida Fumaca | 3 | Campanha, capa, background e resultado autorais |
-| Botecos da Rua | Bar Maneco Banguela | Boteco raiz claro | Metal, copos batendo e domino | Paulista | 1/5 | Tonhao Rasga-Lata + Patricia Monique | 4 | Campanha, capa e background autorais; resultado em fallback |
-| Circuito do Bairro | Mercearia Central | Madeira suja | Mercearia organizada com provocacao antiga | Mineiro | 2/5 | Naldo Tramela + Dalva Seringa | 5 | Fallback com mesa tematica de madeira |
-| Circuito do Bairro | Arena do Largo | Metal de patio | Luz improvisada, musica e plateia apertada | Paulista | 2/5 | Biu Caolho + Aninha Passarela | 6 | Fallback com mesa tematica de patio |
-| Conquista das Zonas | Garage Norte | Industrial | Ferro, concreto e fumaca | Mineiro | 3/5 | Dito Marrua + Celsinho Breque | 4 | Fallback industrial |
+| Botecos da Rua | Bar Maneco Banguela | Boteco raiz claro | Metal, copos batendo e domino | Paulista | 1/5 | Tonhao Rasga-Lata + Patricia Monique | 4 | Campanha, capa, background e resultado autorais |
+| Campeonato da Vila Naná | Trem do Jaça | Madeira suja | Trem de vila com provocacao antiga | Mineiro | 2/5 | Naldo Tramela + Dalva Seringa | 5 | Campanha, capa, background, mesa e resultado autorais |
+| Campeonato da Vila Naná | Adega do Juca Bigode | Metal de patio | Luz improvisada, balcão de metal e plateia apertada | Paulista | 2/5 | Biu Caolho + Aninha Passarela | 6 | Fallback com mesa tematica de patio |
+| Conquista das Zonas | Garagem Norte | Industrial | Ferro, concreto e fumaca | Mineiro | 3/5 | Dito Marrua + Celsinho Breque | 4 | Fallback industrial |
 | Conquista das Zonas | Quintal da Leste | Festival de rua | Partida cheia e conversa alta | Paulista | 3/5 | Rosinha Catraca + Damiao Corote | 5 | Fallback noturno de festival |
 | Conquista das Zonas | Subsolo do Centro | Underground | Bar escondido e calculista | Mineiro | 3/5 | Norberto Fuba + Quiteria Mao-Torta | 6 | Fallback underground |
 | Conquista das Zonas | Salao da Sul | Premium de esquina | Boteco arrumado com malandragem local | Paulista | 3/5 | Ivone Verniz + Marlene Pimenta | 5 | Fallback premium |
-| Campeonato da Cidade | Centro de Convencoes Urbano | Evento urbano | Publico maior e rivais conhecidos | Paulista | 4/5 | Jura Pancada + Osmar Alfinete | 6 | Fallback de evento urbano |
-| Campeonato Estadual | Ginasio Estadual | Classico regional | Evento organizado e narrador local | Paulista | 4/5 | Geraldo Medalha + Zito Parafuso | 6 | Fallback classico de campeonato |
+| Campeonato Municipal | Centro de Convenções da Prefeitura | Evento urbano | Publico maior e rivais conhecidos | Paulista | 4/5 | Jura Pancada + Osmar Alfinete | 6 | Fallback de evento urbano |
+| Campeonato Estadual | Ginásio Estadual Maneco Filé | Classico regional | Evento organizado e narrador local | Paulista | 4/5 | Geraldo Medalha + Zito Parafuso | 6 | Fallback classico de campeonato |
 | Campeonato Nacional | Arena Nacional | Arena com transmissao | Plateia grande e pressao publica | Paulista | 4/5 | Sueli Estopim + Creusa Rabugenta | 7 | Fallback de arena com transmissao |
-| Circuito Panamericano | Centro Panamericano | Show continental | Producao moderna e estilos diferentes | Mineiro | 4/5 | Ramiro Bolero + Luna Candela | 5 | Fallback de evento continental |
-| Jogos Mundiais | Arena das Delegacoes | Esportivo cerimonial | Bandeiras, delegacoes e tensao maxima | Paulista | 5/5 | Mina Compasso + Viktor Muralha | 4 | Fallback cerimonial esportivo |
-| Mundial do Cassino | Mesa Principal | Cassino de luxo | Veludo, lustres e silencio tenso | Paulista | 5/5 | Madame Violeta + Augusto Crupie | 5 | Fallback de cassino |
+| Circuito Panamericano | Centro Americano Truqueiro de Medelin. | Show continental | Producao moderna e estilos diferentes | Mineiro | 4/5 | Ramiro Bolero + Luna Candela | 5 | Fallback de evento continental |
+| Jogos Mundiais | Hotel Truco de Segóvia, Espanha | Esportivo cerimonial | Bandeiras, delegacoes e tensao maxima | Paulista | 5/5 | Mina Compasso + Viktor Muralha | 4 | Fallback cerimonial esportivo |
+| Mundial | Casino Mé Maior | Casino de luxo | Veludo, lustres e silencio tenso | Paulista | 5/5 | Madame Violeta + Augusto Crupie | 5 | Fallback de casino |
 
 ## Pos-Campanha Reservado
 
@@ -76,5 +76,5 @@ Dupla reservada para `Orbita da Lua`:
 Proxima frente:
 
 - retomar a expansao vertical pelo `Bar Maneco Banguela`
-- avancar em seguida para `Mercearia Central` e `Arena do Largo`
+- avancar em seguida para `Adega do Juca Bigode`
 - manter novas artes como etapa posterior, usando fallback visual enquanto o caminho principal ainda estiver sendo fechado

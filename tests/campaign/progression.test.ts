@@ -52,6 +52,69 @@ test("cada local declara dupla adversária fixa e estado visual mínimo", () => 
   }
 })
 
+test("os quatro primeiros bares seguem o caminho vertical planejado", () => {
+  const route = CAMPAIGN_STAGES.flatMap((stage) =>
+    stage.venues.map((venue) => ({
+      stage: stage.name,
+      venue,
+    }))
+  )
+
+  const firstPlayableVenues = route.slice(0, 4).map(({ stage, venue }) => ({
+    stage,
+    id: venue.id,
+    name: venue.name,
+    visualTheme: venue.visualTheme,
+    variant: venue.variant,
+    difficulty: venue.difficulty.aiLevel,
+    opponents: venue.opponentCharacterIds,
+    wins: venue.matchesToClear,
+  }))
+
+  assert.deepEqual(firstPlayableVenues, [
+    {
+      stage: "Botecos da Rua",
+      id: "bar-do-ze-catinga",
+      name: "Bar do Zé Catinga",
+      visualTheme: "boteco-raiz-ze-catinga-photo",
+      variant: "MINEIRO",
+      difficulty: 1,
+      opponents: ["tiao-casca-grossa", "cida-fumaca"],
+      wins: 3,
+    },
+    {
+      stage: "Botecos da Rua",
+      id: "bar-maneco-banguela",
+      name: "Bar Maneco Banguela",
+      visualTheme: "boteco-raiz-claro",
+      variant: "PAULISTA",
+      difficulty: 1,
+      opponents: ["tonhao-rasga-lata", "patricia-monique"],
+      wins: 4,
+    },
+    {
+      stage: "Campeonato da Vila Naná",
+      id: "trem-do-jaca",
+      name: "Trem do Jaça",
+      visualTheme: "bairro-madeira-suja",
+      variant: "MINEIRO",
+      difficulty: 2,
+      opponents: ["naldo-tramela", "dalva-seringa"],
+      wins: 5,
+    },
+    {
+      stage: "Campeonato da Vila Naná",
+      id: "adega-do-juca-bigode",
+      name: "Adega do Juca Bigode",
+      visualTheme: "bairro-metal-patio",
+      variant: "PAULISTA",
+      difficulty: 2,
+      opponents: ["biu-caolho", "aninha-passarela"],
+      wins: 6,
+    },
+  ])
+})
+
 test("parceiros iniciais não antecipam adversários de bares futuros", () => {
   const opponentCharacterIds = new Set(
     CAMPAIGN_STAGES.flatMap((stage) =>
@@ -108,8 +171,8 @@ test("ao concluir todos os locais da etapa, a próxima etapa é liberada com rec
   }
 
   assert.equal(resolution?.clearedStage?.id, "rua-periferia")
-  assert.equal(resolution?.unlockedStage?.id, "circuito-bairro")
-  assert.equal(profile.campaign.currentStageId, "circuito-bairro")
+  assert.equal(resolution?.unlockedStage?.id, "campeonato-vila-nana")
+  assert.equal(profile.campaign.currentStageId, "campeonato-vila-nana")
   assert.ok(profile.campaign.completedStageIds.includes("rua-periferia"))
   assert.equal(profile.currencies.coins, 40 + 55 + 150)
 })
@@ -140,9 +203,9 @@ test("é possível concluir uma etapa inteira e começar a próxima acumulando v
     profile = applyCampaignWin(profile, CAMPAIGN_STAGES).profile
   }
 
-  assert.equal(profile.campaign.currentStageId, "circuito-bairro")
+  assert.equal(profile.campaign.currentStageId, "campeonato-vila-nana")
   assert.ok(profile.campaign.completedStageIds.includes("rua-periferia"))
-  assert.equal(getCurrentCampaignVenue(profile, CAMPAIGN_STAGES)?.id, "mercearia-central")
+  assert.equal(getCurrentCampaignVenue(profile, CAMPAIGN_STAGES)?.id, "trem-do-jaca")
 })
 
 test("o caminho completo avança por todos os locais declarados", () => {

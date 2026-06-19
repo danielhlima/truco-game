@@ -9,10 +9,10 @@ export const UNLOCKABLE_ITEMS: UnlockableItem[] = [
     rarity: "common",
   },
   {
-    id: "table-cassino-mundial",
+    id: "table-casino-me-maior",
     category: "table-theme",
     name: "Mesa do Mundial",
-    description: "Tema premium da reta final com acabamento luxuoso.",
+    description: "Tema premium do Casino Mé Maior com acabamento luxuoso.",
     rarity: "epic",
   },
   {

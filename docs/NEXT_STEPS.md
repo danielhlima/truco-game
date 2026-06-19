@@ -81,7 +81,10 @@ Status:
   - mostra a arte inteira com preenchimento desfocado nas laterais quando necessario
   - usa hotspot HTML invisivel sobre o `COMEÇAR` desenhado
   - removeu debug, reset e variante da primeira tela visivel
-- o `MENU` em partida agora possui `Resetar progresso`, com confirmacao antes de apagar campanha, escolhas de parceira, skin do jogador e historico salvo
+- o `MENU` em partida agora possui:
+  - `Vencer esta partida`, para validar progressao sem jogar a partida inteira
+  - `Perder esta partida`, para validar a tela de derrota
+  - `Resetar progresso`, com confirmacao antes de apagar campanha, escolhas de parceira, skin do jogador e historico salvo
 - o foco imediato recomendado agora e expandir a campanha verticalmente, bar a bar, ate fechar o caminho principal do jogo
 
 ### Truco e dialogos
@@ -142,10 +145,32 @@ Estado atual:
 
 - vitoria usa `src/assets/venues/ze-catinga/match-result-win.png`
 - derrota usa `src/assets/venues/ze-catinga/match-result-loss.png`
-- as artes ocupam a tela de resultado inteira dentro da moldura
+- as artes cabem inteiras dentro da moldura, sem cortar a placa `VOLTAR AO FLUXO DE BARES`
 - `VOLTAR AO FLUXO DE BARES` fica clicavel por area real sobre a placa desenhada
 - o resultado guarda `venueId` para continuar usando a arte do bar encerrado quando a campanha avanca
 - placares numericos foram removidos dos textos autorais de resultado
+
+### Resultados do Bar Maneco Banguela
+
+Estado atual:
+
+- vitoria usa `src/assets/venues/maneco-banguela/match-result-win.png`
+- derrota usa `src/assets/venues/maneco-banguela/match-result-loss.png`
+- as artes cabem inteiras dentro da moldura, sem cortar a placa `VOLTAR AO FLUXO DE BARES`
+- `VOLTAR AO FLUXO DE BARES` fica clicavel por area real sobre a placa desenhada
+
+### Trem do Jaça
+
+Estado atual:
+
+- campanha usa `src/assets/campaign/campeonato-vila-nana-trem-do-jaca.png`
+- background usa `src/assets/venues/trem-do-jaca/background.png`
+- host usa `src/assets/venues/trem-do-jaca/host-trem-do-jaca.png`
+- mesa usa `src/assets/boteco/table-top-trem-jaca.png`
+- vitoria usa `src/assets/venues/trem-do-jaca/match-result-win.png`
+- derrota usa `src/assets/venues/trem-do-jaca/match-result-loss.png`
+- capa do bar reaproveita o sistema visual do Ze Catinga/Maneco com textos proprios do Jaça
+- resultado autoral preserva a arte inteira no stage, aceitando respiro lateral quando necessario
 
 ## Proximo foco recomendado
 
@@ -156,9 +181,9 @@ Estado atual:
 ### Itens para atacar primeiro
 
 - Campanha vertical:
-  1. consolidar a tabela do caminho principal em `docs/CAMPAIGN_PATH.md` e comparar com `src/career/campaign/campaignData.ts`
-  2. fechar o `Bar Maneco Banguela` como primeiro bar-modelo completo depois do `Bar do Ze Catinga`
-  3. completar os proximos bares em estado jogavel, com prioridade para `Mercearia Central` e `Arena do Largo`
+  1. usar `Bar Maneco Banguela` e `Trem do Jaça` como modelos completos ja integrados
+  2. completar o proximo bar em estado jogavel, com prioridade para `Adega do Juca Bigode`
+  3. comparar a nova entrada da Adega com `docs/CAMPAIGN_PATH.md` e `src/career/campaign/campaignData.ts`
   4. validar que nao ha repeticao de personagens entre bares e que parceiros iniciais nao antecipam adversarios futuros
   5. verificar a variante declarada por bar, mantendo a aplicacao real de Mineiro/Paulista como pendencia separada se nao bloquear a campanha
   6. garantir fallback visual aceitavel para bares sem arte propria antes de criar novas imagens
@@ -181,7 +206,7 @@ Estado atual:
 - executar o passo 3 da expansao vertical nesta ordem:
   1. consolidar tabela do caminho principal
   2. fechar `Bar Maneco Banguela` como bar-modelo completo
-  3. completar `Mercearia Central` e `Arena do Largo` como proximos bares jogaveis
+  3. completar `Adega do Juca Bigode` como proximo bar jogavel
   4. validar exclusividade de personagens por bar
   5. conferir variantes declaradas sem misturar com a correcao completa das regras Mineiro/Paulista
   6. manter fallback visual aceitavel para bares sem arte propria
@@ -211,9 +236,8 @@ Estado atual:
   - corrigir a aplicacao efetiva da variante configurada por bar; hoje partidas declaradas como Paulista ainda se comportam como Mineiro
 - expandir o fluxo autoral da campanha:
   - imagem para estados concluidos do primeiro trecho
-  - imagem para transicao ao `Circuito do Bairro`
+  - imagem para transicao ao `Campeonato da Vila Naná`
   - hotspots revisados por estado
-- criar resultado autoral do `Bar Maneco Banguela`
 - refinar a intro de gameplay com entrada escalonada de mesa, HUDs e cartas, caso haja nova decisao visual
 - dar mais contexto narrativo aos bares
 - decidir como parceiros gratuitos/pagos entram no fluxo
@@ -298,14 +322,14 @@ Estado atual:
 - a selecao de parceira teve um ajuste pequeno: o botao so mostra `Parceira atualmente escolhida` quando o bar realmente ja tem parceira salva
 - proximo foco:
   - voltar para expansao vertical da campanha
-  - seguir os 6 pontos do passo 3: tabela, Maneco como modelo, proximos bares jogaveis, exclusividade de personagens, variantes declaradas e fallback visual
+  - seguir os 6 pontos do passo 3: tabela, Maneco e Trem do Jaça como modelos, proximo bar jogavel, exclusividade de personagens, variantes declaradas e fallback visual
   - preservar o fluxo `COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo`
 
 Objetivo deste chat:
 1. retomar a expansao vertical pelo passo 3
 2. comparar `docs/CAMPAIGN_PATH.md` com `src/career/campaign/campaignData.ts`
 3. fechar o `Bar Maneco Banguela` como bar-modelo completo apos o `Bar do Ze Catinga`
-4. preparar `Mercearia Central` e `Arena do Largo` como proximos bares jogaveis minimos
+4. preparar `Adega do Juca Bigode` como proximo bar jogavel minimo
 5. validar exclusividade de personagens, desbloqueio de parceiros e fallback visual
 6. preservar a tela inicial definitiva, a intro curta, a capa do bar, a selecao de parceira, a gameplay e as regras de truco
 
@@ -319,7 +343,7 @@ Arquivos provaveis:
 - src/app/AppSections.tsx
 - src/App.tsx
 - testes em tests/campaign/progression.test.ts
-- evitar assets novos por enquanto; usar fallback visual quando possivel
+- evitar solicitar novos assets sem necessidade; usar fallback visual quando possivel
 
 Importante:
 - verificar `git status` e preservar mudancas locais existentes

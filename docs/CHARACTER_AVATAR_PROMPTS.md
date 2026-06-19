@@ -22,15 +22,15 @@ Regras de exportacao:
 | Bar | Personagem repetido substituido | Novo personagem | Arquivo |
 | --- | --- | --- | --- |
 | Salao da Sul | Aninha Passarela | Ivone Verniz | `ivone-verniz.png` |
-| Centro de Convencoes Urbano | Marlene Pimenta | Osmar Alfinete | `osmar-alfinete.png` |
-| Ginasio Estadual | Dalva Seringa | Geraldo Medalha | `geraldo-medalha.png` |
+| Centro de Convenções da Prefeitura | Marlene Pimenta | Osmar Alfinete | `osmar-alfinete.png` |
+| Ginásio Estadual Maneco Filé | Dalva Seringa | Geraldo Medalha | `geraldo-medalha.png` |
 | Arena Nacional | Zito Parafuso | Sueli Estopim | `sueli-estopim.png` |
-| Centro Panamericano | Quiteria Mao-Torta | Ramiro Bolero | `ramiro-bolero.png` |
-| Centro Panamericano | Jura Pancada | Luna Candela | `luna-candela.png` |
-| Arena das Delegacoes | Creusa Rabugenta | Mina Compasso | `mina-compasso.png` |
-| Arena das Delegacoes | Dito Marrua | Viktor Muralha | `viktor-muralha.png` |
-| Mesa Principal | Norberto Fuba | Madame Violeta | `madame-violeta.png` |
-| Mesa Principal | Rosinha Catraca | Augusto Crupie | `augusto-crupie.png` |
+| Centro Americano Truqueiro de Medelin. | Quiteria Mao-Torta | Ramiro Bolero | `ramiro-bolero.png` |
+| Centro Americano Truqueiro de Medelin. | Jura Pancada | Luna Candela | `luna-candela.png` |
+| Hotel Truco de Segóvia, Espanha | Creusa Rabugenta | Mina Compasso | `mina-compasso.png` |
+| Hotel Truco de Segóvia, Espanha | Dito Marrua | Viktor Muralha | `viktor-muralha.png` |
+| Casino Mé Maior | Norberto Fuba | Madame Violeta | `madame-violeta.png` |
+| Casino Mé Maior | Rosinha Catraca | Augusto Crupie | `augusto-crupie.png` |
 | Orbita da Lua | Biu Caolho | Cosme Orbita | `cosme-orbita.png` |
 
 ## 1. Ivone Verniz
