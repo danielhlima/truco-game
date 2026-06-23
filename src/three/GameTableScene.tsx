@@ -5,6 +5,7 @@ import cardFaceAgedPaperUrl from "../assets/cards/card-face-aged-paper.png"
 import cardBackAgedPhotoUrl from "../assets/cards/card-back-aged-photo.png"
 import tableTopAdegaJucaBigodeUrl from "../assets/boteco/table-top-adega-juca-bigode.png"
 import tableTopGhibliishUrl from "../assets/boteco/table-top-ghibliish.png"
+import tableTopGaragemNorteUrl from "../assets/boteco/table-top-garagem-norte.png"
 import tableTopManecoWoodUrl from "../assets/boteco/table-top-maneco-wood.png"
 import tableTopSteelPatioUrl from "../assets/boteco/table-top-steel-patio.png"
 import tableTopTremJacaUrl from "../assets/boteco/table-top-trem-jaca.png"
@@ -18,6 +19,7 @@ const ILLUSTRATED_TABLE_ASSET_URLS: Record<string, string> = {
   "maneco-wood": tableTopManecoWoodUrl,
   "trem-jaca": tableTopTremJacaUrl,
   "adega-juca-bigode": tableTopAdegaJucaBigodeUrl,
+  "garagem-norte": tableTopGaragemNorteUrl,
   "wood-street": tableTopWoodStreetUrl,
   "steel-patio": tableTopSteelPatioUrl,
 }

@@ -11,13 +11,13 @@ Cada bar deve entrar primeiro como pacote jogavel minimo:
 - campanha, capa e resultado genericos aceitos como fallback
 - tema de mesa reaproveitado quando ainda nao houver arte propria
 
-O `Bar Maneco Banguela`, o `Trem do Jaça` e a `Adega do Juca Bigode` sao os modelos completos ja integrados depois do `Bar do Ze Catinga`: eles possuem campanha, capa, background e resultado autorais, e `Trem do Jaça` e `Adega do Juca Bigode` tambem possuem mesa propria.
+O `Bar Maneco Banguela`, o `Trem do Jaça`, a `Adega do Juca Bigode` e a `Garagem Norte` sao os modelos completos ja integrados depois do `Bar do Ze Catinga`: eles possuem campanha, capa, background e resultado autorais, e `Trem do Jaça`, `Adega do Juca Bigode` e `Garagem Norte` tambem possuem mesa propria.
 
 ## Proximo Plano de Execucao
 
-1. usar `Bar Maneco Banguela`, `Trem do Jaça` e `Adega do Juca Bigode` como modelos completos ja integrados
-2. validar a `Adega do Juca Bigode` no fluxo real antes de avancar
-3. preparar `Garagem Norte` como proximo bar jogavel minimo
+1. usar `Bar Maneco Banguela`, `Trem do Jaça`, `Adega do Juca Bigode` e `Garagem Norte` como modelos completos ja integrados
+2. validar a `Garagem Norte` no fluxo real antes de avancar
+3. preparar `Quintal da Leste` como proximo bar jogavel minimo
 4. validar exclusividade de personagens por bar e desbloqueio da dupla derrotada como parceria
 5. conferir variantes declaradas por bar, sem misturar esta frente com a correcao completa da aplicacao Mineiro/Paulista
 6. manter fallback visual aceitavel para bares sem arte propria antes de solicitar novas imagens
@@ -41,7 +41,7 @@ O `Bar Maneco Banguela`, o `Trem do Jaça` e a `Adega do Juca Bigode` sao os mod
 | Botecos da Rua | Bar Maneco Banguela | Boteco raiz claro | Metal, copos batendo e domino | Paulista | 1/5 | Tonhao Rasga-Lata + Patricia Monique | 4 | Campanha, capa, background e resultado autorais |
 | Campeonato da Vila Naná | Trem do Jaça | Madeira suja | Trem de vila com provocacao antiga | Mineiro | 2/5 | Naldo Tramela + Dalva Seringa | 5 | Campanha, capa, background, mesa e resultado autorais |
 | Campeonato da Vila Naná | Adega do Juca Bigode | Metal de patio | Luz improvisada, balcão de metal e plateia apertada | Paulista | 2/5 | Biu Caolho + Aninha Passarela | 6 | Campanha, capa, background, mesa e resultado autorais |
-| Conquista das Zonas | Garagem Norte | Industrial | Ferro, concreto e fumaca | Mineiro | 3/5 | Dito Marrua + Celsinho Breque | 4 | Fallback industrial |
+| Conquista das Zonas | Garagem Norte | Industrial | Ferro, concreto e fumaca | Mineiro | 3/5 | Dito Marrua + Celsinho Breque | 4 | Campanha, capa, background, mesa e resultado autorais |
 | Conquista das Zonas | Quintal da Leste | Festival de rua | Partida cheia e conversa alta | Paulista | 3/5 | Rosinha Catraca + Damiao Corote | 5 | Fallback noturno de festival |
 | Conquista das Zonas | Subsolo do Centro | Underground | Bar escondido e calculista | Mineiro | 3/5 | Norberto Fuba + Quiteria Mao-Torta | 6 | Fallback underground |
 | Conquista das Zonas | Salao da Sul | Premium de esquina | Boteco arrumado com malandragem local | Paulista | 3/5 | Ivone Verniz + Marlene Pimenta | 5 | Fallback premium |
@@ -75,6 +75,6 @@ Dupla reservada para `Orbita da Lua`:
 
 Proxima frente:
 
-- validar a `Adega do Juca Bigode` no fluxo real
-- avancar em seguida para `Garagem Norte`
+- validar a `Garagem Norte` no fluxo real
+- avancar em seguida para `Quintal da Leste`
 - manter novas artes como etapa posterior, usando fallback visual enquanto o caminho principal ainda estiver sendo fechado

@@ -13,6 +13,11 @@ import { getTableTheme } from "../three/tableTheme"
 import scorePadNotebookAsset from "../assets/ui-left/scorepad-notebook-clean-cut.png"
 import actionButtonAsset from "../assets/ui-right/action-button-solid.png"
 import statsPanelWoodAsset from "../assets/ui-right/stats-panel-wood-main.png"
+import zonaNorteGaragemCampaignJourneyAsset from "../assets/campaign/conquista-zonas-garagem-norte.png"
+import zonaNorteGaragemBackgroundAsset from "../assets/venues/zona-norte-garagem/background.png"
+import zonaNorteGaragemHostAsset from "../assets/venues/zona-norte-garagem/host-zona-norte-garagem.png"
+import zonaNorteGaragemMatchResultLossAsset from "../assets/venues/zona-norte-garagem/match-result-loss.png"
+import zonaNorteGaragemMatchResultWinAsset from "../assets/venues/zona-norte-garagem/match-result-win.png"
 import adegaJucaBigodeCampaignJourneyAsset from "../assets/campaign/campeonato-vila-nana-adega-do-juca-bigode.png"
 import adegaJucaBigodeBackgroundAsset from "../assets/venues/adega-do-juca-bigode/background.png"
 import adegaJucaBigodeHostAsset from "../assets/venues/adega-do-juca-bigode/host-adega-do-juca-bigode.png"
@@ -141,6 +146,20 @@ const VENUE_COVER_CONFIG_BY_ID: Record<string, VenueCoverConfig> = {
     dividerAsset: zeCatingaDividerAsset,
     statsPlaqueAsset: zeCatingaStatsPlaqueAsset,
   },
+  "zona-norte-garagem": {
+    hostName: "Hugo da Garagem",
+    hostRole: "Dono da Garagem",
+    hostQuote: "Aqui motor falha, mas truco não pode falhar.",
+    leadText: "Concreto claro, ferramenta na parede e truco firme na Zona Norte.",
+    description: "Na Garagem Norte, a mesa abre com portão levantado e pressão de oficina.",
+    backgroundAsset: zonaNorteGaragemBackgroundAsset,
+    hostPortraitAsset: zonaNorteGaragemHostAsset,
+    quoteBoardAsset: zeCatingaQuoteBoardAsset,
+    ctaPlaqueAsset: zeCatingaCtaPlaqueAsset,
+    difficultyBottleAsset: zeCatingaDifficultyBottleAsset,
+    dividerAsset: zeCatingaDividerAsset,
+    statsPlaqueAsset: zeCatingaStatsPlaqueAsset,
+  },
 }
 
 const MATCH_RESULT_ASSET_BY_VENUE_ID: Record<string, { loss?: string; win?: string }> = {
@@ -159,6 +178,10 @@ const MATCH_RESULT_ASSET_BY_VENUE_ID: Record<string, { loss?: string; win?: stri
   "adega-do-juca-bigode": {
     loss: adegaJucaBigodeMatchResultLossAsset,
     win: adegaJucaBigodeMatchResultWinAsset,
+  },
+  "zona-norte-garagem": {
+    loss: zonaNorteGaragemMatchResultLossAsset,
+    win: zonaNorteGaragemMatchResultWinAsset,
   },
 }
 
@@ -1480,6 +1503,31 @@ const authoredCampaignScreens: Record<
       top: "84.4%",
       width: "23.6%",
       height: "8.3%",
+      borderRadius: "8px",
+    },
+  },
+  "zona-norte-garagem": {
+    asset: zonaNorteGaragemCampaignJourneyAsset,
+    alt: "Jornada de campanha da Conquista das Zonas com Garagem Norte atual",
+    backHotspot: {
+      left: "81.6%",
+      top: "2.8%",
+      width: "13.3%",
+      height: "12%",
+      borderRadius: "8px",
+    },
+    enterHotspot: {
+      left: "30.1%",
+      top: "79.5%",
+      width: "39.8%",
+      height: "11.8%",
+      borderRadius: "8px",
+    },
+    partnerHotspot: {
+      left: "38.4%",
+      top: "92.5%",
+      width: "23.3%",
+      height: "5.8%",
       borderRadius: "8px",
     },
   },

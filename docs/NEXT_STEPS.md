@@ -185,6 +185,19 @@ Estado atual:
 - capa do bar reaproveita o sistema visual do Ze Catinga/Maneco/Trem com textos proprios da Adega
 - resultado autoral preserva a arte inteira no stage
 
+### Garagem Norte
+
+Estado atual:
+
+- campanha usa `src/assets/campaign/conquista-zonas-garagem-norte.png`
+- background usa `src/assets/venues/zona-norte-garagem/background.png`
+- host usa `src/assets/venues/zona-norte-garagem/host-zona-norte-garagem.png`
+- mesa usa `src/assets/boteco/table-top-garagem-norte.png`
+- vitoria usa `src/assets/venues/zona-norte-garagem/match-result-win.png`
+- derrota usa `src/assets/venues/zona-norte-garagem/match-result-loss.png`
+- capa do bar reaproveita o sistema visual do Ze Catinga/Maneco/Trem/Adega com textos proprios da Garagem
+- resultado autoral preserva a arte inteira no stage
+
 ## Proximo foco recomendado
 
 ### Opcao principal
@@ -194,9 +207,9 @@ Estado atual:
 ### Itens para atacar primeiro
 
 - Campanha vertical:
-  1. usar `Bar Maneco Banguela`, `Trem do Jaça` e `Adega do Juca Bigode` como modelos completos ja integrados
-  2. validar a `Adega do Juca Bigode` no fluxo real
-  3. preparar `Garagem Norte` como proximo bar jogavel minimo
+  1. usar `Bar Maneco Banguela`, `Trem do Jaça`, `Adega do Juca Bigode` e `Garagem Norte` como modelos completos ja integrados
+  2. validar a `Garagem Norte` no fluxo real
+  3. preparar `Quintal da Leste` como proximo bar jogavel minimo
   4. validar que nao ha repeticao de personagens entre bares e que parceiros iniciais nao antecipam adversarios futuros
   5. verificar a variante declarada por bar, mantendo a aplicacao real de Mineiro/Paulista como pendencia separada se nao bloquear a campanha
   6. garantir fallback visual aceitavel para bares sem arte propria antes de criar novas imagens
@@ -218,8 +231,8 @@ Estado atual:
 - completar o caminho principal de bares em estado jogavel
 - executar o passo 3 da expansao vertical nesta ordem:
   1. consolidar tabela do caminho principal
-  2. usar `Bar Maneco Banguela`, `Trem do Jaça` e `Adega do Juca Bigode` como bares-modelo completos
-  3. preparar `Garagem Norte` como proximo bar jogavel
+  2. usar `Bar Maneco Banguela`, `Trem do Jaça`, `Adega do Juca Bigode` e `Garagem Norte` como bares-modelo completos
+  3. preparar `Quintal da Leste` como proximo bar jogavel
   4. validar exclusividade de personagens por bar
   5. conferir variantes declaradas sem misturar com a correcao completa das regras Mineiro/Paulista
   6. manter fallback visual aceitavel para bares sem arte propria
@@ -335,14 +348,14 @@ Estado atual:
 - a selecao de parceira teve um ajuste pequeno: o botao so mostra `Parceira atualmente escolhida` quando o bar realmente ja tem parceira salva
 - proximo foco:
   - voltar para expansao vertical da campanha
-  - seguir os 6 pontos do passo 3: tabela, Maneco, Trem do Jaça e Adega como modelos, proximo bar jogavel, exclusividade de personagens, variantes declaradas e fallback visual
+  - seguir os 6 pontos do passo 3: tabela, Maneco, Trem do Jaça, Adega e Garagem como modelos, proximo bar jogavel, exclusividade de personagens, variantes declaradas e fallback visual
   - preservar o fluxo `COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo`
 
 Objetivo deste chat:
 1. retomar a expansao vertical pelo passo 3
 2. comparar `docs/CAMPAIGN_PATH.md` com `src/career/campaign/campaignData.ts`
-3. manter `Bar Maneco Banguela`, `Trem do Jaça` e `Adega do Juca Bigode` como bares-modelo completos
-4. preparar `Garagem Norte` como proximo bar jogavel minimo
+3. manter `Bar Maneco Banguela`, `Trem do Jaça`, `Adega do Juca Bigode` e `Garagem Norte` como bares-modelo completos
+4. preparar `Quintal da Leste` como proximo bar jogavel minimo
 5. validar exclusividade de personagens, desbloqueio de parceiros e fallback visual
 6. preservar a tela inicial definitiva, a intro curta, a capa do bar, a selecao de parceira, a gameplay e as regras de truco
 

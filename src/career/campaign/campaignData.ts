@@ -109,7 +109,7 @@ export const CAMPAIGN_STAGES: CampaignStage[] = [
         difficulty: { aiLevel: 3, aggression: 3, trucoDiscipline: 2 },
         opponentCharacterIds: ["dito-marrua", "celsinho-breque"],
         partnerUnlockCharacterIds: ["dito-marrua", "celsinho-breque"],
-        minimumVisualState: "Fallback visual industrial.",
+        minimumVisualState: "Campanha, capa, background, mesa e resultado autorais.",
         entryNarrative: "Na Zona Norte, a intimidação faz parte do ritual.",
         reward: { coins: 110 },
       },

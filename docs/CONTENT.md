@@ -115,6 +115,7 @@ Arquivos principais:
   - `src/assets/campaign/botecos-rua-maneco-banguela.png`
   - `src/assets/campaign/campeonato-vila-nana-trem-do-jaca.png`
   - `src/assets/campaign/campeonato-vila-nana-adega-do-juca-bigode.png`
+  - `src/assets/campaign/conquista-zonas-garagem-norte.png`
 - os controles `VOLTAR`, `ENTRAR NO BAR` e `TROCAR PARCEIRA` sao hotspots HTML invisiveis sobre a imagem
 - a tela de campanha dinamica continua como fallback para bares/estados sem arte propria
 - a tela de resultado preserva a ultima mesa visivel e espera 1 segundo antes de exibir vitoria/derrota
@@ -260,6 +261,7 @@ Assets principais:
 - `src/assets/boteco/table-top-maneco-wood.png`
 - `src/assets/boteco/table-top-trem-jaca.png`
 - `src/assets/boteco/table-top-adega-juca-bigode.png`
+- `src/assets/boteco/table-top-garagem-norte.png`
 - `src/assets/boteco/table-top-wood-street.png`
 - `src/assets/boteco/table-top-steel-patio.png`
 - `src/assets/cards/card-back-aged-photo.png`
@@ -297,6 +299,9 @@ Assets em uso:
 - `Adega do Juca Bigode` tem artes proprias para:
   - vitoria: `src/assets/venues/adega-do-juca-bigode/match-result-win.png`
   - derrota: `src/assets/venues/adega-do-juca-bigode/match-result-loss.png`
+- `Garagem Norte` tem artes proprias para:
+  - vitoria: `src/assets/venues/zona-norte-garagem/match-result-win.png`
+  - derrota: `src/assets/venues/zona-norte-garagem/match-result-loss.png`
 - a arte de resultado deve caber inteira dentro da moldura do stage, sem cortar a placa `VOLTAR AO FLUXO DE BARES`
 - quando a arte autoral for menos larga que o stage logico `1080x500`, aceitar respiro lateral em vez de cortar topo ou rodape
 - a placa `VOLTAR AO FLUXO DE BARES` da arte recebe uma area clicavel invisivel por cima
@@ -431,9 +436,11 @@ Observacoes:
 - o `Bar Maneco Banguela` ja possui capa propria reaproveitando os HUDs/placas existentes e trocando host/background
 - o `Trem do Jaça` ja possui capa propria reaproveitando os HUDs/placas existentes e trocando host/background
 - a `Adega do Juca Bigode` ja possui capa propria reaproveitando os HUDs/placas existentes e trocando host/background
+- a `Garagem Norte` ja possui capa propria reaproveitando os HUDs/placas existentes e trocando host/background
 - a gameplay do `Bar Maneco Banguela` usa o mesmo background da entrada do bar
 - a gameplay do `Trem do Jaça` usa o mesmo background da entrada do bar e mesa autoral propria
 - a gameplay da `Adega do Juca Bigode` usa o mesmo background da entrada do bar e mesa autoral propria
+- a gameplay da `Garagem Norte` usa o mesmo background da entrada do bar e mesa autoral propria
 - outros bares ainda podem cair em fallback generico
 
 ### Capas autorais dos primeiros bares
@@ -447,6 +454,7 @@ Arquivos principais:
 - `src/assets/venues/maneco-banguela/`
 - `src/assets/venues/trem-do-jaca/`
 - `src/assets/venues/adega-do-juca-bigode/`
+- `src/assets/venues/zona-norte-garagem/`
 
 Assets atuais:
 
@@ -463,6 +471,8 @@ Assets atuais:
 - `src/assets/venues/trem-do-jaca/host-trem-do-jaca.png`
 - `src/assets/venues/adega-do-juca-bigode/background.png`
 - `src/assets/venues/adega-do-juca-bigode/host-adega-do-juca-bigode.png`
+- `src/assets/venues/zona-norte-garagem/background.png`
+- `src/assets/venues/zona-norte-garagem/host-zona-norte-garagem.png`
 
 Estado visual atual:
 
@@ -474,6 +484,8 @@ Estado visual atual:
 - Trem do Jaça tambem usa `src/assets/venues/trem-do-jaca/background.png` como background da gameplay
 - Adega do Juca Bigode usa o mesmo sistema de layout, HUD, placa de fala, CTA, divisor, dificuldade e placa de estatisticas do Ze Catinga
 - Adega do Juca Bigode tambem usa `src/assets/venues/adega-do-juca-bigode/background.png` como background da gameplay
+- Garagem Norte usa o mesmo sistema de layout, HUD, placa de fala, CTA, divisor, dificuldade e placa de estatisticas do Ze Catinga
+- Garagem Norte tambem usa `src/assets/venues/zona-norte-garagem/background.png` como background da gameplay
 - coluna direita mostra estatisticas em placa propria e botao de entrada centralizados
 - a frase `Proximo desafio` foi removida da capa
 - a placa `ENTRAR NO BAR` e a lousa do dono seguem protegidas contra estouro de texto
@@ -483,13 +495,14 @@ Estado visual atual:
 
 ### Estado atual da tela de campanha
 
-- para os estados atuais do `Bar do Ze Catinga`, do `Bar Maneco Banguela`, do `Trem do Jaça` e da `Adega do Juca Bigode`, a campanha usa arte autoral completa
+- para os estados atuais do `Bar do Ze Catinga`, do `Bar Maneco Banguela`, do `Trem do Jaça`, da `Adega do Juca Bigode` e da `Garagem Norte`, a campanha usa arte autoral completa
 - as artes mostram o circuito atual, o bar atual, o progresso anterior e a etapa seguinte
 - as imagens ficam em:
   - `src/assets/campaign/botecos-rua-ze-catinga.png`
   - `src/assets/campaign/botecos-rua-maneco-banguela.png`
   - `src/assets/campaign/campeonato-vila-nana-trem-do-jaca.png`
   - `src/assets/campaign/campeonato-vila-nana-adega-do-juca-bigode.png`
+  - `src/assets/campaign/conquista-zonas-garagem-norte.png`
 - o React posiciona areas clicaveis invisiveis sobre:
   - `VOLTAR`
   - `ENTRAR NO BAR`
@@ -531,6 +544,16 @@ Estado visual atual:
   - background: `src/assets/venues/adega-do-juca-bigode/background.png`
   - host: `src/assets/venues/adega-do-juca-bigode/host-adega-do-juca-bigode.png`
   - mesa: `src/assets/boteco/table-top-adega-juca-bigode.png`
+
+### Conquista das Zonas
+
+- `Garagem Norte`
+  - id: `zona-norte-garagem`
+  - visualTheme: `zona-norte-industrial`
+  - campanha: `src/assets/campaign/conquista-zonas-garagem-norte.png`
+  - background: `src/assets/venues/zona-norte-garagem/background.png`
+  - host: `src/assets/venues/zona-norte-garagem/host-zona-norte-garagem.png`
+  - mesa: `src/assets/boteco/table-top-garagem-norte.png`
 
 Regra importante:
 

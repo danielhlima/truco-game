@@ -14,6 +14,7 @@ export interface TableTheme {
     | "maneco-wood"
     | "trem-jaca"
     | "adega-juca-bigode"
+    | "garagem-norte"
     | "wood-street"
     | "steel-patio"
   illustratedTableScale?: number
@@ -119,6 +120,22 @@ const ADEGA_JUCA_BIGODE_THEME: TableTheme = {
   sceneVignetteStrength: 0.2,
 }
 
+const GARAGEM_NORTE_THEME: TableTheme = {
+  backgroundColor: "#2e2c27",
+  tableColor: "#c4b9aa",
+  railColor: "#3f3a34",
+  badgeColor: "#7c3f1d",
+  emptySlotColor: "#f1eadc",
+  activeSlotColor: "#facc15",
+  accentColor: "#b45309",
+  tableKind: "steel",
+  rustColor: "#77452b",
+  illustratedTableAsset: "garagem-norte",
+  illustratedTableScale: 1,
+  sceneWarmGlowStrength: 0.14,
+  sceneVignetteStrength: 0.18,
+}
+
 const NEON_THEME: TableTheme = {
   backgroundColor: "#111827",
   tableColor: "#0f766e",
@@ -166,6 +183,10 @@ export function getTableTheme(visualTheme?: string): TableTheme {
 
   if (visualTheme.includes("metal-patio")) {
     return ADEGA_JUCA_BIGODE_THEME
+  }
+
+  if (visualTheme.includes("industrial")) {
+    return GARAGEM_NORTE_THEME
   }
 
   if (visualTheme.includes("claro")) {

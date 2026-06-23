@@ -3,6 +3,7 @@ import { useGameSession } from "./app/useGameSession"
 import botecoSceneBgAsset from "./assets/boteco/boteco-scene-bg.png"
 import cardFaceAgedPaperAsset from "./assets/cards/card-face-aged-paper.png"
 import adegaJucaBigodeSceneBgAsset from "./assets/venues/adega-do-juca-bigode/background.png"
+import zonaNorteGaragemSceneBgAsset from "./assets/venues/zona-norte-garagem/background.png"
 import manecoBanguelaSceneBgAsset from "./assets/venues/maneco-banguela/background.png"
 import tremDoJacaSceneBgAsset from "./assets/venues/trem-do-jaca/background.png"
 
@@ -12,6 +13,7 @@ const GAMEPLAY_BACKGROUND_ASSET_BY_VENUE_ID: Record<string, string> = {
   "bar-maneco-banguela": manecoBanguelaSceneBgAsset,
   "trem-do-jaca": tremDoJacaSceneBgAsset,
   "adega-do-juca-bigode": adegaJucaBigodeSceneBgAsset,
+  "zona-norte-garagem": zonaNorteGaragemSceneBgAsset,
 }
 
 const TableSection = lazy(async () => {

@@ -116,6 +116,8 @@ Estado consolidado:
 - tela de campanha do `Campeonato da Vila Naná` usa arte autoral para o estado atual:
   - `Trem do Jaça`: `src/assets/campaign/campeonato-vila-nana-trem-do-jaca.png`
   - `Adega do Juca Bigode`: `src/assets/campaign/campeonato-vila-nana-adega-do-juca-bigode.png`
+- tela de campanha da `Conquista das Zonas` usa arte autoral para o estado atual:
+  - `Garagem Norte`: `src/assets/campaign/conquista-zonas-garagem-norte.png`
 - os botoes da campanha autoral sao areas HTML invisiveis sobre a imagem:
   - `VOLTAR`
   - `ENTRAR NO BAR`
@@ -137,6 +139,9 @@ Estado consolidado:
 - telas autorais de vitoria e derrota da `Adega do Juca Bigode`:
   - `src/assets/venues/adega-do-juca-bigode/match-result-win.png`
   - `src/assets/venues/adega-do-juca-bigode/match-result-loss.png`
+- telas autorais de vitoria e derrota da `Garagem Norte`:
+  - `src/assets/venues/zona-norte-garagem/match-result-win.png`
+  - `src/assets/venues/zona-norte-garagem/match-result-loss.png`
 - a tela de resultado so aparece depois da ultima carta visivel na mesa, com atraso de 1 segundo para leitura humana
 
 ## Prioridade imediata para o proximo chat
@@ -146,8 +151,8 @@ No proximo chat, retomar a expansao vertical da campanha pelo passo 3, trabalhan
 Proximo foco recomendado:
 
 - consolidar a tabela do caminho principal entre `docs/CAMPAIGN_PATH.md` e `src/career/campaign/campaignData.ts`
-- manter `Bar Maneco Banguela`, `Trem do Jaça` e `Adega do Juca Bigode` como modelos completos de expansao ja integrados
-- validar a `Adega do Juca Bigode` no fluxo real e preparar `Garagem Norte` como proximo bar jogavel minimo
+- manter `Bar Maneco Banguela`, `Trem do Jaça`, `Adega do Juca Bigode` e `Garagem Norte` como modelos completos de expansao ja integrados
+- validar a `Garagem Norte` no fluxo real e preparar `Quintal da Leste` como proximo bar jogavel minimo
 - validar exclusividade de personagens por bar e desbloqueio da dupla derrotada como parceria
 - conferir variantes declaradas sem misturar com a correcao completa Mineiro/Paulista
 - preservar fallback visual aceitavel para bares sem arte propria
