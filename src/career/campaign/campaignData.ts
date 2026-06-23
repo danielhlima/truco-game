@@ -81,7 +81,7 @@ export const CAMPAIGN_STAGES: CampaignStage[] = [
         difficulty: { aiLevel: 2, aggression: 3, trucoDiscipline: 2 },
         opponentCharacterIds: ["biu-caolho", "aninha-passarela"],
         partnerUnlockCharacterIds: ["biu-caolho", "aninha-passarela"],
-        minimumVisualState: "Fallback de campanha, capa e resultado; mesa temática de pátio.",
+        minimumVisualState: "Campanha, capa, background, mesa e resultado autorais.",
         entryNarrative: "Na Adega do Juca Bigode, o jogo esquenta antes da primeira carta cair.",
         reward: { coins: 100 },
       },

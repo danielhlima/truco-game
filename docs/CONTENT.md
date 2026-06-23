@@ -110,10 +110,11 @@ Arquivos principais:
 - a tela de selecao de parceira foi aceita como pronta no estado atual
 - a parceira antes chamada `Ze Catinga` foi renomeada para `Joca do Busão` com id `joca-busao`
 - a persistencia antiga do perfil foi invalidada depois da mudanca de id
-- a tela de campanha do primeiro trecho agora tem artes autorais para `Bar do Ze Catinga` e `Bar Maneco Banguela`
-- as artes de campanha ficam em:
+- as telas de campanha autorais atuais ficam em:
   - `src/assets/campaign/botecos-rua-ze-catinga.png`
   - `src/assets/campaign/botecos-rua-maneco-banguela.png`
+  - `src/assets/campaign/campeonato-vila-nana-trem-do-jaca.png`
+  - `src/assets/campaign/campeonato-vila-nana-adega-do-juca-bigode.png`
 - os controles `VOLTAR`, `ENTRAR NO BAR` e `TROCAR PARCEIRA` sao hotspots HTML invisiveis sobre a imagem
 - a tela de campanha dinamica continua como fallback para bares/estados sem arte propria
 - a tela de resultado preserva a ultima mesa visivel e espera 1 segundo antes de exibir vitoria/derrota
@@ -159,7 +160,7 @@ Plano pratico do passo 3 da expansao vertical:
 
 1. consolidar a tabela do caminho principal em `docs/CAMPAIGN_PATH.md` e comparar com `src/career/campaign/campaignData.ts`
 2. fechar o `Bar Maneco Banguela` como primeiro bar-modelo completo depois do `Bar do Ze Catinga`
-3. completar `Adega do Juca Bigode` como proximo bar jogavel minimo apos o `Trem do Jaça`
+3. validar `Adega do Juca Bigode` no fluxo real apos integracao do pacote visual autoral
 4. validar que nao ha repeticao de personagens entre bares e que parceiros iniciais nao antecipam adversarios futuros
 5. verificar a variante declarada por bar, mantendo a correcao Mineiro/Paulista como pendencia separada se nao bloquear o caminho jogavel
 6. garantir fallback visual aceitavel para bares sem arte propria antes de criar novas imagens
@@ -258,6 +259,7 @@ Assets principais:
 - `src/assets/boteco/table-top-ze-catinga-photo.png`
 - `src/assets/boteco/table-top-maneco-wood.png`
 - `src/assets/boteco/table-top-trem-jaca.png`
+- `src/assets/boteco/table-top-adega-juca-bigode.png`
 - `src/assets/boteco/table-top-wood-street.png`
 - `src/assets/boteco/table-top-steel-patio.png`
 - `src/assets/cards/card-back-aged-photo.png`
@@ -292,6 +294,9 @@ Assets em uso:
 - `Trem do Jaça` tem artes proprias para:
   - vitoria: `src/assets/venues/trem-do-jaca/match-result-win.png`
   - derrota: `src/assets/venues/trem-do-jaca/match-result-loss.png`
+- `Adega do Juca Bigode` tem artes proprias para:
+  - vitoria: `src/assets/venues/adega-do-juca-bigode/match-result-win.png`
+  - derrota: `src/assets/venues/adega-do-juca-bigode/match-result-loss.png`
 - a arte de resultado deve caber inteira dentro da moldura do stage, sem cortar a placa `VOLTAR AO FLUXO DE BARES`
 - quando a arte autoral for menos larga que o stage logico `1080x500`, aceitar respiro lateral em vez de cortar topo ou rodape
 - a placa `VOLTAR AO FLUXO DE BARES` da arte recebe uma area clicavel invisivel por cima
@@ -425,8 +430,10 @@ Observacoes:
 - o `Bar do Ze Catinga` ja possui uma primeira capa autoral
 - o `Bar Maneco Banguela` ja possui capa propria reaproveitando os HUDs/placas existentes e trocando host/background
 - o `Trem do Jaça` ja possui capa propria reaproveitando os HUDs/placas existentes e trocando host/background
+- a `Adega do Juca Bigode` ja possui capa propria reaproveitando os HUDs/placas existentes e trocando host/background
 - a gameplay do `Bar Maneco Banguela` usa o mesmo background da entrada do bar
 - a gameplay do `Trem do Jaça` usa o mesmo background da entrada do bar e mesa autoral propria
+- a gameplay da `Adega do Juca Bigode` usa o mesmo background da entrada do bar e mesa autoral propria
 - outros bares ainda podem cair em fallback generico
 
 ### Capas autorais dos primeiros bares
@@ -439,6 +446,7 @@ Arquivos principais:
 - `src/assets/venues/ze-catinga/`
 - `src/assets/venues/maneco-banguela/`
 - `src/assets/venues/trem-do-jaca/`
+- `src/assets/venues/adega-do-juca-bigode/`
 
 Assets atuais:
 
@@ -453,6 +461,8 @@ Assets atuais:
 - `src/assets/venues/maneco-banguela/host-maneco-banguela.png`
 - `src/assets/venues/trem-do-jaca/background.png`
 - `src/assets/venues/trem-do-jaca/host-trem-do-jaca.png`
+- `src/assets/venues/adega-do-juca-bigode/background.png`
+- `src/assets/venues/adega-do-juca-bigode/host-adega-do-juca-bigode.png`
 
 Estado visual atual:
 
@@ -462,6 +472,8 @@ Estado visual atual:
 - Maneco tambem usa `src/assets/venues/maneco-banguela/background.png` como background da gameplay
 - Trem do Jaça usa o mesmo sistema de layout, HUD, placa de fala, CTA, divisor, dificuldade e placa de estatisticas do Ze Catinga
 - Trem do Jaça tambem usa `src/assets/venues/trem-do-jaca/background.png` como background da gameplay
+- Adega do Juca Bigode usa o mesmo sistema de layout, HUD, placa de fala, CTA, divisor, dificuldade e placa de estatisticas do Ze Catinga
+- Adega do Juca Bigode tambem usa `src/assets/venues/adega-do-juca-bigode/background.png` como background da gameplay
 - coluna direita mostra estatisticas em placa propria e botao de entrada centralizados
 - a frase `Proximo desafio` foi removida da capa
 - a placa `ENTRAR NO BAR` e a lousa do dono seguem protegidas contra estouro de texto
@@ -471,12 +483,13 @@ Estado visual atual:
 
 ### Estado atual da tela de campanha
 
-- para os estados atuais do `Bar do Ze Catinga`, do `Bar Maneco Banguela` e do `Trem do Jaça`, a campanha usa arte autoral completa
+- para os estados atuais do `Bar do Ze Catinga`, do `Bar Maneco Banguela`, do `Trem do Jaça` e da `Adega do Juca Bigode`, a campanha usa arte autoral completa
 - as artes mostram o circuito atual, o bar atual, o progresso anterior e a etapa seguinte
 - as imagens ficam em:
   - `src/assets/campaign/botecos-rua-ze-catinga.png`
   - `src/assets/campaign/botecos-rua-maneco-banguela.png`
   - `src/assets/campaign/campeonato-vila-nana-trem-do-jaca.png`
+  - `src/assets/campaign/campeonato-vila-nana-adega-do-juca-bigode.png`
 - o React posiciona areas clicaveis invisiveis sobre:
   - `VOLTAR`
   - `ENTRAR NO BAR`
@@ -514,6 +527,10 @@ Estado visual atual:
 
 - `Adega do Juca Bigode`
   - visualTheme: `bairro-metal-patio`
+  - campanha: `src/assets/campaign/campeonato-vila-nana-adega-do-juca-bigode.png`
+  - background: `src/assets/venues/adega-do-juca-bigode/background.png`
+  - host: `src/assets/venues/adega-do-juca-bigode/host-adega-do-juca-bigode.png`
+  - mesa: `src/assets/boteco/table-top-adega-juca-bigode.png`
 
 Regra importante:
 

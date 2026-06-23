@@ -13,6 +13,7 @@ export interface TableTheme {
     | "ze-catinga-photo"
     | "maneco-wood"
     | "trem-jaca"
+    | "adega-juca-bigode"
     | "wood-street"
     | "steel-patio"
   illustratedTableScale?: number
@@ -102,6 +103,22 @@ const STEEL_PATIO_THEME: TableTheme = {
   sceneVignetteStrength: 0.18,
 }
 
+const ADEGA_JUCA_BIGODE_THEME: TableTheme = {
+  backgroundColor: "#202a2b",
+  tableColor: "#7f8680",
+  railColor: "#3f342d",
+  badgeColor: "#8a3f18",
+  emptySlotColor: "#e2e8f0",
+  activeSlotColor: "#facc15",
+  accentColor: "#b45309",
+  tableKind: "steel",
+  rustColor: "#7a4225",
+  illustratedTableAsset: "adega-juca-bigode",
+  illustratedTableScale: 1,
+  sceneWarmGlowStrength: 0.12,
+  sceneVignetteStrength: 0.2,
+}
+
 const NEON_THEME: TableTheme = {
   backgroundColor: "#111827",
   tableColor: "#0f766e",
@@ -143,8 +160,12 @@ export function getTableTheme(visualTheme?: string): TableTheme {
     return TREM_JACA_THEME
   }
 
-  if (visualTheme.includes("metal-patio")) {
+  if (visualTheme.includes("steel-patio")) {
     return STEEL_PATIO_THEME
+  }
+
+  if (visualTheme.includes("metal-patio")) {
+    return ADEGA_JUCA_BIGODE_THEME
   }
 
   if (visualTheme.includes("claro")) {

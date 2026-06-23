@@ -13,6 +13,11 @@ import { getTableTheme } from "../three/tableTheme"
 import scorePadNotebookAsset from "../assets/ui-left/scorepad-notebook-clean-cut.png"
 import actionButtonAsset from "../assets/ui-right/action-button-solid.png"
 import statsPanelWoodAsset from "../assets/ui-right/stats-panel-wood-main.png"
+import adegaJucaBigodeCampaignJourneyAsset from "../assets/campaign/campeonato-vila-nana-adega-do-juca-bigode.png"
+import adegaJucaBigodeBackgroundAsset from "../assets/venues/adega-do-juca-bigode/background.png"
+import adegaJucaBigodeHostAsset from "../assets/venues/adega-do-juca-bigode/host-adega-do-juca-bigode.png"
+import adegaJucaBigodeMatchResultLossAsset from "../assets/venues/adega-do-juca-bigode/match-result-loss.png"
+import adegaJucaBigodeMatchResultWinAsset from "../assets/venues/adega-do-juca-bigode/match-result-win.png"
 import tremDoJacaCampaignJourneyAsset from "../assets/campaign/campeonato-vila-nana-trem-do-jaca.png"
 import tremDoJacaBackgroundAsset from "../assets/venues/trem-do-jaca/background.png"
 import tremDoJacaHostAsset from "../assets/venues/trem-do-jaca/host-trem-do-jaca.png"
@@ -122,6 +127,20 @@ const VENUE_COVER_CONFIG_BY_ID: Record<string, VenueCoverConfig> = {
     dividerAsset: zeCatingaDividerAsset,
     statsPlaqueAsset: zeCatingaStatsPlaqueAsset,
   },
+  "adega-do-juca-bigode": {
+    hostName: "Juca Bigode",
+    hostRole: "Dono da Adega",
+    hostQuote: "Aqui o balcão é frio, mas a mesa esquenta rápido.",
+    leadText: "Adega apertada, metal gasto e truco com plateia espremida.",
+    description: "Na Adega do Juca Bigode, a conversa sobe antes da primeira carta cair.",
+    backgroundAsset: adegaJucaBigodeBackgroundAsset,
+    hostPortraitAsset: adegaJucaBigodeHostAsset,
+    quoteBoardAsset: zeCatingaQuoteBoardAsset,
+    ctaPlaqueAsset: zeCatingaCtaPlaqueAsset,
+    difficultyBottleAsset: zeCatingaDifficultyBottleAsset,
+    dividerAsset: zeCatingaDividerAsset,
+    statsPlaqueAsset: zeCatingaStatsPlaqueAsset,
+  },
 }
 
 const MATCH_RESULT_ASSET_BY_VENUE_ID: Record<string, { loss?: string; win?: string }> = {
@@ -136,6 +155,10 @@ const MATCH_RESULT_ASSET_BY_VENUE_ID: Record<string, { loss?: string; win?: stri
   "trem-do-jaca": {
     loss: tremDoJacaMatchResultLossAsset,
     win: tremDoJacaMatchResultWinAsset,
+  },
+  "adega-do-juca-bigode": {
+    loss: adegaJucaBigodeMatchResultLossAsset,
+    win: adegaJucaBigodeMatchResultWinAsset,
   },
 }
 
@@ -1432,6 +1455,31 @@ const authoredCampaignScreens: Record<
       top: "84.4%",
       width: "23.5%",
       height: "8.2%",
+      borderRadius: "8px",
+    },
+  },
+  "adega-do-juca-bigode": {
+    asset: adegaJucaBigodeCampaignJourneyAsset,
+    alt: "Jornada de campanha do Campeonato da Vila Nana com Adega do Juca Bigode atual",
+    backHotspot: {
+      left: "83.3%",
+      top: "3.3%",
+      width: "11.5%",
+      height: "7.3%",
+      borderRadius: "8px",
+    },
+    enterHotspot: {
+      left: "37.2%",
+      top: "69.4%",
+      width: "26.6%",
+      height: "10.9%",
+      borderRadius: "8px",
+    },
+    partnerHotspot: {
+      left: "39.6%",
+      top: "84.4%",
+      width: "23.6%",
+      height: "8.3%",
       borderRadius: "8px",
     },
   },
