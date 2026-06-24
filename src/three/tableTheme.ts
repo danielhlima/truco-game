@@ -15,6 +15,9 @@ export interface TableTheme {
     | "trem-jaca"
     | "adega-juca-bigode"
     | "garagem-norte"
+    | "quintal-da-leste"
+    | "subsolo-do-centro"
+    | "salao-da-sul"
     | "wood-street"
     | "steel-patio"
   illustratedTableScale?: number
@@ -136,6 +139,54 @@ const GARAGEM_NORTE_THEME: TableTheme = {
   sceneVignetteStrength: 0.18,
 }
 
+const QUINTAL_LESTE_THEME: TableTheme = {
+  backgroundColor: "#3a2f1f",
+  tableColor: "#d4bc89",
+  railColor: "#6b4a2b",
+  badgeColor: "#9a3412",
+  emptySlotColor: "#f8e6bf",
+  activeSlotColor: "#facc15",
+  accentColor: "#d97706",
+  tableKind: "steel",
+  rustColor: "#8a4b28",
+  illustratedTableAsset: "quintal-da-leste",
+  illustratedTableScale: 1,
+  sceneWarmGlowStrength: 0.13,
+  sceneVignetteStrength: 0.16,
+}
+
+const SUBSOLO_CENTRO_THEME: TableTheme = {
+  backgroundColor: "#201916",
+  tableColor: "#6f4424",
+  railColor: "#2f2925",
+  badgeColor: "#7f1d1d",
+  emptySlotColor: "#ead7b3",
+  activeSlotColor: "#facc15",
+  accentColor: "#b45309",
+  tableKind: "steel",
+  rustColor: "#6f3f24",
+  illustratedTableAsset: "subsolo-do-centro",
+  illustratedTableScale: 1,
+  sceneWarmGlowStrength: 0.1,
+  sceneVignetteStrength: 0.22,
+}
+
+const SALAO_SUL_THEME: TableTheme = {
+  backgroundColor: "#2d2118",
+  tableColor: "#8a5324",
+  railColor: "#4b3422",
+  badgeColor: "#8f4d17",
+  emptySlotColor: "#f4e1bd",
+  activeSlotColor: "#facc15",
+  accentColor: "#d97706",
+  tableKind: "steel",
+  rustColor: "#7c4a26",
+  illustratedTableAsset: "salao-da-sul",
+  illustratedTableScale: 1,
+  sceneWarmGlowStrength: 0.14,
+  sceneVignetteStrength: 0.16,
+}
+
 const NEON_THEME: TableTheme = {
   backgroundColor: "#111827",
   tableColor: "#0f766e",
@@ -187,6 +238,18 @@ export function getTableTheme(visualTheme?: string): TableTheme {
 
   if (visualTheme.includes("industrial")) {
     return GARAGEM_NORTE_THEME
+  }
+
+  if (visualTheme.includes("zona-leste") || visualTheme.includes("festival")) {
+    return QUINTAL_LESTE_THEME
+  }
+
+  if (visualTheme.includes("centro") || visualTheme.includes("underground")) {
+    return SUBSOLO_CENTRO_THEME
+  }
+
+  if (visualTheme.includes("zona-sul")) {
+    return SALAO_SUL_THEME
   }
 
   if (visualTheme.includes("claro")) {

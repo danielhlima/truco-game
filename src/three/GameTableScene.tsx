@@ -7,7 +7,10 @@ import tableTopAdegaJucaBigodeUrl from "../assets/boteco/table-top-adega-juca-bi
 import tableTopGhibliishUrl from "../assets/boteco/table-top-ghibliish.png"
 import tableTopGaragemNorteUrl from "../assets/boteco/table-top-garagem-norte.png"
 import tableTopManecoWoodUrl from "../assets/boteco/table-top-maneco-wood.png"
+import tableTopQuintalDaLesteUrl from "../assets/boteco/table-top-quintal-da-leste.png"
+import tableTopSalaoDaSulUrl from "../assets/boteco/table-top-salao-da-sul.png"
 import tableTopSteelPatioUrl from "../assets/boteco/table-top-steel-patio.png"
+import tableTopSubsoloDoCentroUrl from "../assets/boteco/table-top-subsolo-do-centro.png"
 import tableTopTremJacaUrl from "../assets/boteco/table-top-trem-jaca.png"
 import tableTopWoodStreetUrl from "../assets/boteco/table-top-wood-street.png"
 import tableTopZeCatingaPhotoUrl from "../assets/boteco/table-top-ze-catinga-photo.png"
@@ -20,6 +23,9 @@ const ILLUSTRATED_TABLE_ASSET_URLS: Record<string, string> = {
   "trem-jaca": tableTopTremJacaUrl,
   "adega-juca-bigode": tableTopAdegaJucaBigodeUrl,
   "garagem-norte": tableTopGaragemNorteUrl,
+  "quintal-da-leste": tableTopQuintalDaLesteUrl,
+  "subsolo-do-centro": tableTopSubsoloDoCentroUrl,
+  "salao-da-sul": tableTopSalaoDaSulUrl,
   "wood-street": tableTopWoodStreetUrl,
   "steel-patio": tableTopSteelPatioUrl,
 }

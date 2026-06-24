@@ -148,6 +148,8 @@ Estado atual:
 - as artes cabem inteiras dentro da moldura, sem cortar a placa `VOLTAR AO FLUXO DE BARES`
 - `VOLTAR AO FLUXO DE BARES` fica clicavel por area real sobre a placa desenhada
 - o resultado guarda `venueId` para continuar usando a arte do bar encerrado quando a campanha avanca
+- vitorias definitivas de bar/circuito ficam em `src/assets/campaign-victories/`
+- ao completar um bar, a tela definitiva do bar substitui a vitoria normal; ao completar o ultimo bar do circuito, ela entra antes da tela definitiva do circuito
 - placares numericos foram removidos dos textos autorais de resultado
 
 ### Resultados do Bar Maneco Banguela
@@ -198,6 +200,45 @@ Estado atual:
 - capa do bar reaproveita o sistema visual do Ze Catinga/Maneco/Trem/Adega com textos proprios da Garagem
 - resultado autoral preserva a arte inteira no stage
 
+### Quintal da Leste
+
+Estado atual:
+
+- campanha usa `src/assets/campaign/conquista-zonas-quintal-da-leste.png`
+- background usa `src/assets/venues/zona-leste-quintal/background.png`
+- host usa `src/assets/venues/zona-leste-quintal/host-zona-leste-quintal.png`
+- mesa usa `src/assets/boteco/table-top-quintal-da-leste.png`
+- vitoria usa `src/assets/venues/zona-leste-quintal/match-result-win.png`
+- derrota usa `src/assets/venues/zona-leste-quintal/match-result-loss.png`
+- capa do bar reaproveita o sistema visual do Ze Catinga/Maneco/Trem/Adega/Garagem com textos proprios do Quintal
+- resultado autoral preserva a arte inteira no stage
+
+### Subsolo do Centro
+
+Estado atual:
+
+- campanha usa `src/assets/campaign/conquista-zonas-subsolo-do-centro.png`
+- background usa `src/assets/venues/centro-subsolo/background.png`
+- host usa `src/assets/venues/centro-subsolo/host-centro-subsolo.png`
+- mesa usa `src/assets/boteco/table-top-subsolo-do-centro.png`
+- vitoria usa `src/assets/venues/centro-subsolo/match-result-win.png`
+- derrota usa `src/assets/venues/centro-subsolo/match-result-loss.png`
+- capa do bar reaproveita o sistema visual do Ze Catinga/Maneco/Trem/Adega/Garagem/Quintal com textos proprios do Subsolo
+- resultado autoral preserva a arte inteira no stage
+
+### Salao da Sul
+
+Estado atual:
+
+- campanha usa `src/assets/campaign/conquista-zonas-salao-da-sul.png`
+- background usa `src/assets/venues/zona-sul-salao/background.png`
+- host usa `src/assets/venues/zona-sul-salao/host-zona-sul-salao.png`
+- mesa usa `src/assets/boteco/table-top-salao-da-sul.png`
+- vitoria usa `src/assets/venues/zona-sul-salao/match-result-win.png`
+- derrota usa `src/assets/venues/zona-sul-salao/match-result-loss.png`
+- capa do bar reaproveita o sistema visual do Ze Catinga/Maneco/Trem/Adega/Garagem/Quintal/Subsolo com textos proprios do Salao
+- resultado autoral preserva a arte inteira no stage
+
 ## Proximo foco recomendado
 
 ### Opcao principal
@@ -207,9 +248,9 @@ Estado atual:
 ### Itens para atacar primeiro
 
 - Campanha vertical:
-  1. usar `Bar Maneco Banguela`, `Trem do Jaça`, `Adega do Juca Bigode` e `Garagem Norte` como modelos completos ja integrados
-  2. validar a `Garagem Norte` no fluxo real
-  3. preparar `Quintal da Leste` como proximo bar jogavel minimo
+  1. usar `Bar Maneco Banguela`, `Trem do Jaça`, `Adega do Juca Bigode`, `Garagem Norte`, `Quintal da Leste`, `Subsolo do Centro` e `Salao da Sul` como modelos completos ja integrados
+  2. validar a `Conquista das Zonas` no fluxo real
+  3. preparar `Centro de Convenções da Prefeitura` como proximo bar jogavel minimo
   4. validar que nao ha repeticao de personagens entre bares e que parceiros iniciais nao antecipam adversarios futuros
   5. verificar a variante declarada por bar, mantendo a aplicacao real de Mineiro/Paulista como pendencia separada se nao bloquear a campanha
   6. garantir fallback visual aceitavel para bares sem arte propria antes de criar novas imagens
@@ -231,8 +272,8 @@ Estado atual:
 - completar o caminho principal de bares em estado jogavel
 - executar o passo 3 da expansao vertical nesta ordem:
   1. consolidar tabela do caminho principal
-  2. usar `Bar Maneco Banguela`, `Trem do Jaça`, `Adega do Juca Bigode` e `Garagem Norte` como bares-modelo completos
-  3. preparar `Quintal da Leste` como proximo bar jogavel
+  2. usar `Bar Maneco Banguela`, `Trem do Jaça`, `Adega do Juca Bigode`, `Garagem Norte`, `Quintal da Leste`, `Subsolo do Centro` e `Salao da Sul` como bares-modelo completos
+  3. preparar `Centro de Convenções da Prefeitura` como proximo bar jogavel
   4. validar exclusividade de personagens por bar
   5. conferir variantes declaradas sem misturar com a correcao completa das regras Mineiro/Paulista
   6. manter fallback visual aceitavel para bares sem arte propria
@@ -348,14 +389,14 @@ Estado atual:
 - a selecao de parceira teve um ajuste pequeno: o botao so mostra `Parceira atualmente escolhida` quando o bar realmente ja tem parceira salva
 - proximo foco:
   - voltar para expansao vertical da campanha
-  - seguir os 6 pontos do passo 3: tabela, Maneco, Trem do Jaça, Adega e Garagem como modelos, proximo bar jogavel, exclusividade de personagens, variantes declaradas e fallback visual
+  - seguir os 6 pontos do passo 3: tabela, Maneco, Trem do Jaça, Adega, Garagem, Quintal, Subsolo e Salao como modelos, proximo bar jogavel, exclusividade de personagens, variantes declaradas e fallback visual
   - preservar o fluxo `COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo`
 
 Objetivo deste chat:
 1. retomar a expansao vertical pelo passo 3
 2. comparar `docs/CAMPAIGN_PATH.md` com `src/career/campaign/campaignData.ts`
-3. manter `Bar Maneco Banguela`, `Trem do Jaça`, `Adega do Juca Bigode` e `Garagem Norte` como bares-modelo completos
-4. preparar `Quintal da Leste` como proximo bar jogavel minimo
+3. manter `Bar Maneco Banguela`, `Trem do Jaça`, `Adega do Juca Bigode`, `Garagem Norte`, `Quintal da Leste`, `Subsolo do Centro` e `Salao da Sul` como bares-modelo completos
+4. preparar `Centro de Convenções da Prefeitura` como proximo bar jogavel minimo
 5. validar exclusividade de personagens, desbloqueio de parceiros e fallback visual
 6. preservar a tela inicial definitiva, a intro curta, a capa do bar, a selecao de parceira, a gameplay e as regras de truco
 

@@ -4,6 +4,9 @@ import botecoSceneBgAsset from "./assets/boteco/boteco-scene-bg.png"
 import cardFaceAgedPaperAsset from "./assets/cards/card-face-aged-paper.png"
 import adegaJucaBigodeSceneBgAsset from "./assets/venues/adega-do-juca-bigode/background.png"
 import zonaNorteGaragemSceneBgAsset from "./assets/venues/zona-norte-garagem/background.png"
+import zonaLesteQuintalSceneBgAsset from "./assets/venues/zona-leste-quintal/background.png"
+import centroSubsoloSceneBgAsset from "./assets/venues/centro-subsolo/background.png"
+import zonaSulSalaoSceneBgAsset from "./assets/venues/zona-sul-salao/background.png"
 import manecoBanguelaSceneBgAsset from "./assets/venues/maneco-banguela/background.png"
 import tremDoJacaSceneBgAsset from "./assets/venues/trem-do-jaca/background.png"
 
@@ -14,6 +17,9 @@ const GAMEPLAY_BACKGROUND_ASSET_BY_VENUE_ID: Record<string, string> = {
   "trem-do-jaca": tremDoJacaSceneBgAsset,
   "adega-do-juca-bigode": adegaJucaBigodeSceneBgAsset,
   "zona-norte-garagem": zonaNorteGaragemSceneBgAsset,
+  "zona-leste-quintal": zonaLesteQuintalSceneBgAsset,
+  "centro-subsolo": centroSubsoloSceneBgAsset,
+  "zona-sul-salao": zonaSulSalaoSceneBgAsset,
 }
 
 const TableSection = lazy(async () => {
@@ -82,6 +88,7 @@ function App() {
     canPlayHumanCard,
     canRequestTruco,
     campaignCompleted,
+    campaignVictoryScreen,
     campaignSummary,
     currentCampaignStage,
     currentCampaignVenue,
@@ -386,6 +393,7 @@ function App() {
             inGameContextMenuOpen={inGameContextMenuOpen}
             matchState={matchState}
             matchResultScreen={matchResultScreen}
+            campaignVictoryScreen={campaignVictoryScreen}
             currentCampaignVenue={currentCampaignVenue}
             currentVenueWins={currentVenueWins}
             dealAnimationNonce={dealAnimationNonce}

@@ -118,6 +118,9 @@ Estado consolidado:
   - `Adega do Juca Bigode`: `src/assets/campaign/campeonato-vila-nana-adega-do-juca-bigode.png`
 - tela de campanha da `Conquista das Zonas` usa arte autoral para o estado atual:
   - `Garagem Norte`: `src/assets/campaign/conquista-zonas-garagem-norte.png`
+  - `Quintal da Leste`: `src/assets/campaign/conquista-zonas-quintal-da-leste.png`
+  - `Subsolo do Centro`: `src/assets/campaign/conquista-zonas-subsolo-do-centro.png`
+  - `Salao da Sul`: `src/assets/campaign/conquista-zonas-salao-da-sul.png`
 - os botoes da campanha autoral sao areas HTML invisiveis sobre a imagem:
   - `VOLTAR`
   - `ENTRAR NO BAR`
@@ -142,6 +145,18 @@ Estado consolidado:
 - telas autorais de vitoria e derrota da `Garagem Norte`:
   - `src/assets/venues/zona-norte-garagem/match-result-win.png`
   - `src/assets/venues/zona-norte-garagem/match-result-loss.png`
+- telas autorais de vitoria e derrota do `Quintal da Leste`:
+  - `src/assets/venues/zona-leste-quintal/match-result-win.png`
+  - `src/assets/venues/zona-leste-quintal/match-result-loss.png`
+- telas autorais de vitoria e derrota do `Subsolo do Centro`:
+  - `src/assets/venues/centro-subsolo/match-result-win.png`
+  - `src/assets/venues/centro-subsolo/match-result-loss.png`
+- telas autorais de vitoria e derrota do `Salao da Sul`:
+  - `src/assets/venues/zona-sul-salao/match-result-win.png`
+  - `src/assets/venues/zona-sul-salao/match-result-loss.png`
+- telas definitivas de conquista ficam em `src/assets/campaign-victories/`
+- ao completar as vitorias requeridas de um bar, o jogo exibe a tela definitiva do bar no lugar da vitoria normal da partida
+- se o bar completado for o ultimo do circuito, o jogo mostra a tela definitiva do bar e em seguida a tela definitiva do circuito
 - a tela de resultado so aparece depois da ultima carta visivel na mesa, com atraso de 1 segundo para leitura humana
 
 ## Prioridade imediata para o proximo chat
@@ -151,8 +166,8 @@ No proximo chat, retomar a expansao vertical da campanha pelo passo 3, trabalhan
 Proximo foco recomendado:
 
 - consolidar a tabela do caminho principal entre `docs/CAMPAIGN_PATH.md` e `src/career/campaign/campaignData.ts`
-- manter `Bar Maneco Banguela`, `Trem do Jaça`, `Adega do Juca Bigode` e `Garagem Norte` como modelos completos de expansao ja integrados
-- validar a `Garagem Norte` no fluxo real e preparar `Quintal da Leste` como proximo bar jogavel minimo
+- manter `Bar Maneco Banguela`, `Trem do Jaça`, `Adega do Juca Bigode`, `Garagem Norte`, `Quintal da Leste`, `Subsolo do Centro` e `Salao da Sul` como modelos completos de expansao ja integrados
+- validar a `Conquista das Zonas` no fluxo real e preparar o `Centro de Convenções da Prefeitura` como proximo bar jogavel minimo
 - validar exclusividade de personagens por bar e desbloqueio da dupla derrotada como parceria
 - conferir variantes declaradas sem misturar com a correcao completa Mineiro/Paulista
 - preservar fallback visual aceitavel para bares sem arte propria

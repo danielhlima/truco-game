@@ -11,6 +11,7 @@ import {
   getCurrentCampaignStage,
   getCurrentCampaignVenue,
   isCampaignCompleted,
+  type CampaignResolution,
 } from "../career/campaign/progression"
 import { buildCampaignSummary } from "../career/campaign/summary"
 import type { CampaignStage, CampaignVenue } from "../career/campaign/types"
@@ -79,6 +80,7 @@ type MenuScreen =
   | "player-skin-select"
   | "character-select"
   | "venue-intro"
+  | "campaign-victory"
   | "match-result"
 
 interface MatchResultScreenState {
@@ -90,6 +92,59 @@ interface MatchResultScreenState {
   subtitle: string
   venueId?: string
   venueName: string
+}
+
+interface CampaignVictoryScreenState {
+  id: string
+  kind: "stage" | "venue"
+  title: string
+}
+
+const DEFINITIVE_VICTORY_VENUE_IDS = new Set([
+  "bar-do-ze-catinga",
+  "bar-maneco-banguela",
+  "trem-do-jaca",
+  "adega-do-juca-bigode",
+  "zona-norte-garagem",
+  "zona-leste-quintal",
+  "centro-subsolo",
+  "zona-sul-salao",
+])
+
+const DEFINITIVE_VICTORY_STAGE_IDS = new Set([
+  "rua-periferia",
+  "campeonato-vila-nana",
+  "zonas-da-cidade",
+])
+
+function buildCampaignVictoryScreens(
+  resolution: CampaignResolution
+): CampaignVictoryScreenState[] {
+  const screens: CampaignVictoryScreenState[] = []
+
+  if (
+    resolution.clearedVenue &&
+    DEFINITIVE_VICTORY_VENUE_IDS.has(resolution.clearedVenue.id)
+  ) {
+    screens.push({
+      id: resolution.clearedVenue.id,
+      kind: "venue",
+      title: `${resolution.clearedVenue.name} conquistado`,
+    })
+  }
+
+  if (
+    resolution.clearedStage &&
+    DEFINITIVE_VICTORY_STAGE_IDS.has(resolution.clearedStage.id)
+  ) {
+    screens.push({
+      id: resolution.clearedStage.id,
+      kind: "stage",
+      title: `${resolution.clearedStage.name} concluído`,
+    })
+  }
+
+  return screens
 }
 
 interface DebugVenueOption {
@@ -130,6 +185,9 @@ export function useGameSession() {
   const [sessionDebugVenueId, setSessionDebugVenueId] = useState<string | null>(null)
   const [menuScreen, setMenuScreen] = useState<MenuScreen>("start")
   const [matchResultScreen, setMatchResultScreen] = useState<MatchResultScreenState | null>(null)
+  const [campaignVictoryScreen, setCampaignVictoryScreen] =
+    useState<CampaignVictoryScreenState | null>(null)
+  const [campaignVictoryQueue, setCampaignVictoryQueue] = useState<CampaignVictoryScreenState[]>([])
   const [inGameContextMenuOpen, setInGameContextMenuOpen] = useState(false)
   const [inGameConfirmation, setInGameConfirmation] = useState<InGameConfirmationState | null>(null)
   const [gameplayIntroPhase, setGameplayIntroPhase] = useState<GameplayIntroPhase>("done")
@@ -600,6 +658,10 @@ export function useGameSession() {
           const resolution = applyCampaignWin(playerProfile, CAMPAIGN_STAGES)
           const nextEventMessage = getCampaignWinMessage(finalScore, resolution)
           const nextTrucoMessage = getCampaignTrucoSummary(resolution)
+          const [
+            nextCampaignVictoryScreen,
+            ...nextCampaignVictoryQueue
+          ] = buildCampaignVictoryScreens(resolution)
 
           if (resolution.campaignCompleted) {
             matchResultState = {
@@ -640,8 +702,17 @@ export function useGameSession() {
             setHandState(null)
             setMatchState(null)
             setInGameContextMenuOpen(false)
-            setMatchResultScreen(matchResultState)
-            setMenuScreen("match-result")
+            if (nextCampaignVictoryScreen) {
+              setMatchResultScreen(null)
+              setCampaignVictoryScreen(nextCampaignVictoryScreen)
+              setCampaignVictoryQueue(nextCampaignVictoryQueue)
+              setMenuScreen("campaign-victory")
+            } else {
+              setCampaignVictoryScreen(null)
+              setCampaignVictoryQueue([])
+              setMatchResultScreen(matchResultState)
+              setMenuScreen("match-result")
+            }
             setPlayerProfile(resolution.profile)
             setEventMessage(nextEventMessage)
             setTrucoMessage(nextTrucoMessage)
@@ -665,6 +736,8 @@ export function useGameSession() {
           setSpeechBubble(null)
           setHandState(null)
           setMatchState(null)
+          setCampaignVictoryScreen(null)
+          setCampaignVictoryQueue([])
           setMatchResultScreen(matchResultState)
           setMenuScreen("match-result")
           matchResultRevealTimeoutRef.current = null
@@ -697,6 +770,9 @@ export function useGameSession() {
     setVariant(variantToStart)
     setMatchState(createMatchState(variantToStart, firstPlayerId))
     setSessionDebugVenueId(shouldUseSessionDebugVenue ? targetVenue.id : null)
+    setMatchResultScreen(null)
+    setCampaignVictoryScreen(null)
+    setCampaignVictoryQueue([])
     setMenuScreen("start")
     setInGameContextMenuOpen(false)
     setInGameConfirmation(null)
@@ -721,6 +797,9 @@ export function useGameSession() {
       DEBUG_MODE && (!!debugVenueId || targetVenue.id !== actualVenueId)
 
     setSessionDebugVenueId(shouldUseSessionDebugVenue ? targetVenue.id : null)
+    setMatchResultScreen(null)
+    setCampaignVictoryScreen(null)
+    setCampaignVictoryQueue([])
     setMenuScreen("venue-intro")
     setInGameContextMenuOpen(false)
     setInGameConfirmation(null)
@@ -734,6 +813,19 @@ export function useGameSession() {
     setHandState(null)
     setMatchState(null)
     setMatchResultScreen(null)
+    if (campaignVictoryQueue.length > 0) {
+      const [nextCampaignVictoryScreen, ...remainingCampaignVictoryQueue] = campaignVictoryQueue
+      setCampaignVictoryScreen(nextCampaignVictoryScreen)
+      setCampaignVictoryQueue(remainingCampaignVictoryQueue)
+      setSessionDebugVenueId(null)
+      setInGameContextMenuOpen(false)
+      setInGameConfirmation(null)
+      setGameplayIntroPhase("done")
+      setMenuScreen("campaign-victory")
+      return
+    }
+    setCampaignVictoryScreen(null)
+    setCampaignVictoryQueue([])
     setSessionDebugVenueId(null)
     setInGameContextMenuOpen(false)
     setInGameConfirmation(null)
@@ -818,6 +910,8 @@ export function useGameSession() {
     showSpeechBubble(null)
     setShownPartnerAdviceKey(null)
     setMatchResultScreen(null)
+    setCampaignVictoryScreen(null)
+    setCampaignVictoryQueue([])
     syncLogs()
   }
 
@@ -1294,6 +1388,10 @@ export function useGameSession() {
       const resolution = applyCampaignWin(playerProfile, CAMPAIGN_STAGES)
       const nextEventMessage = getCampaignWinMessage(finalScore, resolution)
       const nextTrucoMessage = getCampaignTrucoSummary(resolution)
+      const [
+        nextCampaignVictoryScreen,
+        ...nextCampaignVictoryQueue
+      ] = buildCampaignVictoryScreens(resolution)
 
       if (resolution.campaignCompleted) {
         matchResultState = {
@@ -1333,8 +1431,17 @@ export function useGameSession() {
         setSpeechBubble(null)
         setHandState(null)
         setMatchState(null)
-        setMatchResultScreen(matchResultState)
-        setMenuScreen("match-result")
+        if (nextCampaignVictoryScreen) {
+          setMatchResultScreen(null)
+          setCampaignVictoryScreen(nextCampaignVictoryScreen)
+          setCampaignVictoryQueue(nextCampaignVictoryQueue)
+          setMenuScreen("campaign-victory")
+        } else {
+          setCampaignVictoryScreen(null)
+          setCampaignVictoryQueue([])
+          setMatchResultScreen(matchResultState)
+          setMenuScreen("match-result")
+        }
         setPlayerProfile(resolution.profile)
         setEventMessage(nextEventMessage)
         setTrucoMessage(nextTrucoMessage)
@@ -1348,6 +1455,8 @@ export function useGameSession() {
       setSpeechBubble(null)
       setHandState(null)
       setMatchState(null)
+      setCampaignVictoryScreen(null)
+      setCampaignVictoryQueue([])
       setMatchResultScreen(matchResultState)
       setMenuScreen("match-result")
       matchResultRevealTimeoutRef.current = null
@@ -1406,6 +1515,8 @@ export function useGameSession() {
       setSpeechBubble(null)
       setHandState(null)
       setMatchState(null)
+      setCampaignVictoryScreen(null)
+      setCampaignVictoryQueue([])
       setMatchResultScreen(matchResultState)
       setMenuScreen("match-result")
       matchResultRevealTimeoutRef.current = null
@@ -1466,6 +1577,8 @@ export function useGameSession() {
 
     if (inGameConfirmation.intent === "swap-partner") {
       setMatchResultScreen(null)
+      setCampaignVictoryScreen(null)
+      setCampaignVictoryQueue([])
       setHandState(null)
       setMatchState(null)
       setInGameContextMenuOpen(false)
@@ -1480,6 +1593,8 @@ export function useGameSession() {
     setHandState(null)
     setMatchState(null)
     setMatchResultScreen(null)
+    setCampaignVictoryScreen(null)
+    setCampaignVictoryQueue([])
     setSessionDebugVenueId(null)
     setInGameContextMenuOpen(false)
     setInGameConfirmation(null)
@@ -1494,6 +1609,7 @@ export function useGameSession() {
     canHumanRaiseTruco,
     canRequestTruco,
     campaignCompleted,
+    campaignVictoryScreen,
     campaignSummary,
     currentCampaignStage,
     currentCampaignVenue,

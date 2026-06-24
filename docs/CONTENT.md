@@ -116,6 +116,9 @@ Arquivos principais:
   - `src/assets/campaign/campeonato-vila-nana-trem-do-jaca.png`
   - `src/assets/campaign/campeonato-vila-nana-adega-do-juca-bigode.png`
   - `src/assets/campaign/conquista-zonas-garagem-norte.png`
+  - `src/assets/campaign/conquista-zonas-quintal-da-leste.png`
+  - `src/assets/campaign/conquista-zonas-subsolo-do-centro.png`
+  - `src/assets/campaign/conquista-zonas-salao-da-sul.png`
 - os controles `VOLTAR`, `ENTRAR NO BAR` e `TROCAR PARCEIRA` sao hotspots HTML invisiveis sobre a imagem
 - a tela de campanha dinamica continua como fallback para bares/estados sem arte propria
 - a tela de resultado preserva a ultima mesa visivel e espera 1 segundo antes de exibir vitoria/derrota
@@ -302,6 +305,20 @@ Assets em uso:
 - `Garagem Norte` tem artes proprias para:
   - vitoria: `src/assets/venues/zona-norte-garagem/match-result-win.png`
   - derrota: `src/assets/venues/zona-norte-garagem/match-result-loss.png`
+- `Quintal da Leste` tem artes proprias para:
+  - vitoria: `src/assets/venues/zona-leste-quintal/match-result-win.png`
+  - derrota: `src/assets/venues/zona-leste-quintal/match-result-loss.png`
+- `Subsolo do Centro` tem artes proprias para:
+  - vitoria: `src/assets/venues/centro-subsolo/match-result-win.png`
+  - derrota: `src/assets/venues/centro-subsolo/match-result-loss.png`
+- `Salao da Sul` tem artes proprias para:
+  - vitoria: `src/assets/venues/zona-sul-salao/match-result-win.png`
+  - derrota: `src/assets/venues/zona-sul-salao/match-result-loss.png`
+- vitorias definitivas de bar e circuito ficam em `src/assets/campaign-victories/`
+- quando uma vitoria completa o bar, a tela normal de vitoria da partida nao aparece; entra a vitoria definitiva daquele bar
+- quando o bar completo tambem fecha o circuito, a sequencia e: vitoria definitiva do bar, depois vitoria definitiva do circuito, depois fluxo de bares
+- vitorias definitivas de bar cadastradas: `Bar do Ze Catinga`, `Bar Maneco Banguela`, `Trem do Jaça`, `Adega do Juca Bigode`, `Garagem Norte`, `Quintal da Leste`, `Subsolo do Centro` e `Salao da Sul`
+- vitorias definitivas de circuito cadastradas: `Botecos da Rua`, `Campeonato da Vila Naná` e `Conquista das Zonas`
 - a arte de resultado deve caber inteira dentro da moldura do stage, sem cortar a placa `VOLTAR AO FLUXO DE BARES`
 - quando a arte autoral for menos larga que o stage logico `1080x500`, aceitar respiro lateral em vez de cortar topo ou rodape
 - a placa `VOLTAR AO FLUXO DE BARES` da arte recebe uma area clicavel invisivel por cima
@@ -495,7 +512,7 @@ Estado visual atual:
 
 ### Estado atual da tela de campanha
 
-- para os estados atuais do `Bar do Ze Catinga`, do `Bar Maneco Banguela`, do `Trem do Jaça`, da `Adega do Juca Bigode` e da `Garagem Norte`, a campanha usa arte autoral completa
+- para os estados atuais do `Bar do Ze Catinga`, do `Bar Maneco Banguela`, do `Trem do Jaça`, da `Adega do Juca Bigode`, da `Garagem Norte`, do `Quintal da Leste`, do `Subsolo do Centro` e do `Salao da Sul`, a campanha usa arte autoral completa
 - as artes mostram o circuito atual, o bar atual, o progresso anterior e a etapa seguinte
 - as imagens ficam em:
   - `src/assets/campaign/botecos-rua-ze-catinga.png`
@@ -503,6 +520,9 @@ Estado visual atual:
   - `src/assets/campaign/campeonato-vila-nana-trem-do-jaca.png`
   - `src/assets/campaign/campeonato-vila-nana-adega-do-juca-bigode.png`
   - `src/assets/campaign/conquista-zonas-garagem-norte.png`
+  - `src/assets/campaign/conquista-zonas-quintal-da-leste.png`
+  - `src/assets/campaign/conquista-zonas-subsolo-do-centro.png`
+  - `src/assets/campaign/conquista-zonas-salao-da-sul.png`
 - o React posiciona areas clicaveis invisiveis sobre:
   - `VOLTAR`
   - `ENTRAR NO BAR`
@@ -554,6 +574,27 @@ Estado visual atual:
   - background: `src/assets/venues/zona-norte-garagem/background.png`
   - host: `src/assets/venues/zona-norte-garagem/host-zona-norte-garagem.png`
   - mesa: `src/assets/boteco/table-top-garagem-norte.png`
+- `Quintal da Leste`
+  - id: `zona-leste-quintal`
+  - visualTheme: `zona-leste-festival`
+  - campanha: `src/assets/campaign/conquista-zonas-quintal-da-leste.png`
+  - background: `src/assets/venues/zona-leste-quintal/background.png`
+  - host: `src/assets/venues/zona-leste-quintal/host-zona-leste-quintal.png`
+  - mesa: `src/assets/boteco/table-top-quintal-da-leste.png`
+- `Subsolo do Centro`
+  - id: `centro-subsolo`
+  - visualTheme: `centro-underground`
+  - campanha: `src/assets/campaign/conquista-zonas-subsolo-do-centro.png`
+  - background: `src/assets/venues/centro-subsolo/background.png`
+  - host: `src/assets/venues/centro-subsolo/host-centro-subsolo.png`
+  - mesa: `src/assets/boteco/table-top-subsolo-do-centro.png`
+- `Salao da Sul`
+  - id: `zona-sul-salao`
+  - visualTheme: `zona-sul-premium`
+  - campanha: `src/assets/campaign/conquista-zonas-salao-da-sul.png`
+  - background: `src/assets/venues/zona-sul-salao/background.png`
+  - host: `src/assets/venues/zona-sul-salao/host-zona-sul-salao.png`
+  - mesa: `src/assets/boteco/table-top-salao-da-sul.png`
 
 Regra importante:
 

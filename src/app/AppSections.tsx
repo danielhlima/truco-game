@@ -18,6 +18,32 @@ import zonaNorteGaragemBackgroundAsset from "../assets/venues/zona-norte-garagem
 import zonaNorteGaragemHostAsset from "../assets/venues/zona-norte-garagem/host-zona-norte-garagem.png"
 import zonaNorteGaragemMatchResultLossAsset from "../assets/venues/zona-norte-garagem/match-result-loss.png"
 import zonaNorteGaragemMatchResultWinAsset from "../assets/venues/zona-norte-garagem/match-result-win.png"
+import zonaLesteQuintalCampaignJourneyAsset from "../assets/campaign/conquista-zonas-quintal-da-leste.png"
+import zonaLesteQuintalBackgroundAsset from "../assets/venues/zona-leste-quintal/background.png"
+import zonaLesteQuintalHostAsset from "../assets/venues/zona-leste-quintal/host-zona-leste-quintal.png"
+import zonaLesteQuintalMatchResultLossAsset from "../assets/venues/zona-leste-quintal/match-result-loss.png"
+import zonaLesteQuintalMatchResultWinAsset from "../assets/venues/zona-leste-quintal/match-result-win.png"
+import centroSubsoloCampaignJourneyAsset from "../assets/campaign/conquista-zonas-subsolo-do-centro.png"
+import centroSubsoloBackgroundAsset from "../assets/venues/centro-subsolo/background.png"
+import centroSubsoloHostAsset from "../assets/venues/centro-subsolo/host-centro-subsolo.png"
+import centroSubsoloMatchResultLossAsset from "../assets/venues/centro-subsolo/match-result-loss.png"
+import centroSubsoloMatchResultWinAsset from "../assets/venues/centro-subsolo/match-result-win.png"
+import zonaSulSalaoCampaignJourneyAsset from "../assets/campaign/conquista-zonas-salao-da-sul.png"
+import zonaSulSalaoBackgroundAsset from "../assets/venues/zona-sul-salao/background.png"
+import zonaSulSalaoHostAsset from "../assets/venues/zona-sul-salao/host-zona-sul-salao.png"
+import zonaSulSalaoMatchResultLossAsset from "../assets/venues/zona-sul-salao/match-result-loss.png"
+import zonaSulSalaoMatchResultWinAsset from "../assets/venues/zona-sul-salao/match-result-win.png"
+import victoryStageCampeonatoVilaNanaAsset from "../assets/campaign-victories/stage-campeonato-vila-nana.png"
+import victoryStageRuaPeriferiaAsset from "../assets/campaign-victories/stage-rua-periferia.png"
+import victoryStageZonasCidadeAsset from "../assets/campaign-victories/stage-zonas-da-cidade.png"
+import victoryVenueAdegaJucaBigodeAsset from "../assets/campaign-victories/venue-adega-do-juca-bigode.png"
+import victoryVenueBarDoZeCatingaAsset from "../assets/campaign-victories/venue-bar-do-ze-catinga.png"
+import victoryVenueBarManecoBanguelaAsset from "../assets/campaign-victories/venue-bar-maneco-banguela.png"
+import victoryVenueCentroSubsoloAsset from "../assets/campaign-victories/venue-centro-subsolo.png"
+import victoryVenueTremDoJacaAsset from "../assets/campaign-victories/venue-trem-do-jaca.png"
+import victoryVenueZonaLesteQuintalAsset from "../assets/campaign-victories/venue-zona-leste-quintal.png"
+import victoryVenueZonaNorteGaragemAsset from "../assets/campaign-victories/venue-zona-norte-garagem.png"
+import victoryVenueZonaSulSalaoAsset from "../assets/campaign-victories/venue-zona-sul-salao.png"
 import adegaJucaBigodeCampaignJourneyAsset from "../assets/campaign/campeonato-vila-nana-adega-do-juca-bigode.png"
 import adegaJucaBigodeBackgroundAsset from "../assets/venues/adega-do-juca-bigode/background.png"
 import adegaJucaBigodeHostAsset from "../assets/venues/adega-do-juca-bigode/host-adega-do-juca-bigode.png"
@@ -71,6 +97,11 @@ type MatchResultScreenState = {
   subtitle: string
   venueId?: string
   venueName: string
+}
+type CampaignVictoryScreenState = {
+  id: string
+  kind: "stage" | "venue"
+  title: string
 }
 type GameplayIntroPhase = "background" | "reveal" | "done"
 
@@ -160,6 +191,48 @@ const VENUE_COVER_CONFIG_BY_ID: Record<string, VenueCoverConfig> = {
     dividerAsset: zeCatingaDividerAsset,
     statsPlaqueAsset: zeCatingaStatsPlaqueAsset,
   },
+  "zona-leste-quintal": {
+    hostName: "Rubão da Leste",
+    hostRole: "Dono do Quintal",
+    hostQuote: "Na Leste, quem aguenta a zoeira ganha respeito.",
+    leadText: "Quintal aberto, resenha solta e truco com barulho de rua.",
+    description: "No Quintal da Leste, a partida parece festa. Mas ninguém alivia.",
+    backgroundAsset: zonaLesteQuintalBackgroundAsset,
+    hostPortraitAsset: zonaLesteQuintalHostAsset,
+    quoteBoardAsset: zeCatingaQuoteBoardAsset,
+    ctaPlaqueAsset: zeCatingaCtaPlaqueAsset,
+    difficultyBottleAsset: zeCatingaDifficultyBottleAsset,
+    dividerAsset: zeCatingaDividerAsset,
+    statsPlaqueAsset: zeCatingaStatsPlaqueAsset,
+  },
+  "centro-subsolo": {
+    hostName: "Nestor do Subsolo",
+    hostRole: "Dono do Subsolo",
+    hostQuote: "No Centro, quem pensa duas vezes ganha antes da carta cair.",
+    leadText: "Concreto, silêncio e truco frio no bar escondido do Centro.",
+    description: "No Subsolo do Centro, pressa vira erro e cada chamada pesa.",
+    backgroundAsset: centroSubsoloBackgroundAsset,
+    hostPortraitAsset: centroSubsoloHostAsset,
+    quoteBoardAsset: zeCatingaQuoteBoardAsset,
+    ctaPlaqueAsset: zeCatingaCtaPlaqueAsset,
+    difficultyBottleAsset: zeCatingaDifficultyBottleAsset,
+    dividerAsset: zeCatingaDividerAsset,
+    statsPlaqueAsset: zeCatingaStatsPlaqueAsset,
+  },
+  "zona-sul-salao": {
+    hostName: "Sérgio do Salão",
+    hostRole: "Dono do Salão",
+    hostQuote: "Aqui a casa é arrumada, mas a mesa não perdoa.",
+    leadText: "Salão de esquina, postura bonita e truco afiado na Zona Sul.",
+    description: "No Salão da Sul, o visual é mais fino, mas a malandragem continua.",
+    backgroundAsset: zonaSulSalaoBackgroundAsset,
+    hostPortraitAsset: zonaSulSalaoHostAsset,
+    quoteBoardAsset: zeCatingaQuoteBoardAsset,
+    ctaPlaqueAsset: zeCatingaCtaPlaqueAsset,
+    difficultyBottleAsset: zeCatingaDifficultyBottleAsset,
+    dividerAsset: zeCatingaDividerAsset,
+    statsPlaqueAsset: zeCatingaStatsPlaqueAsset,
+  },
 }
 
 const MATCH_RESULT_ASSET_BY_VENUE_ID: Record<string, { loss?: string; win?: string }> = {
@@ -183,6 +256,35 @@ const MATCH_RESULT_ASSET_BY_VENUE_ID: Record<string, { loss?: string; win?: stri
     loss: zonaNorteGaragemMatchResultLossAsset,
     win: zonaNorteGaragemMatchResultWinAsset,
   },
+  "zona-leste-quintal": {
+    loss: zonaLesteQuintalMatchResultLossAsset,
+    win: zonaLesteQuintalMatchResultWinAsset,
+  },
+  "centro-subsolo": {
+    loss: centroSubsoloMatchResultLossAsset,
+    win: centroSubsoloMatchResultWinAsset,
+  },
+  "zona-sul-salao": {
+    loss: zonaSulSalaoMatchResultLossAsset,
+    win: zonaSulSalaoMatchResultWinAsset,
+  },
+}
+
+const CAMPAIGN_VICTORY_ASSET_BY_VENUE_ID: Record<string, string> = {
+  "bar-do-ze-catinga": victoryVenueBarDoZeCatingaAsset,
+  "bar-maneco-banguela": victoryVenueBarManecoBanguelaAsset,
+  "trem-do-jaca": victoryVenueTremDoJacaAsset,
+  "adega-do-juca-bigode": victoryVenueAdegaJucaBigodeAsset,
+  "zona-norte-garagem": victoryVenueZonaNorteGaragemAsset,
+  "zona-leste-quintal": victoryVenueZonaLesteQuintalAsset,
+  "centro-subsolo": victoryVenueCentroSubsoloAsset,
+  "zona-sul-salao": victoryVenueZonaSulSalaoAsset,
+}
+
+const CAMPAIGN_VICTORY_ASSET_BY_STAGE_ID: Record<string, string> = {
+  "rua-periferia": victoryStageRuaPeriferiaAsset,
+  "campeonato-vila-nana": victoryStageCampeonatoVilaNanaAsset,
+  "zonas-da-cidade": victoryStageZonasCidadeAsset,
 }
 
 interface ControlsPanelProps {
@@ -496,6 +598,7 @@ interface TableSectionProps {
   inGameContextMenuOpen: boolean
   matchState: MatchState | null
   matchResultScreen: MatchResultScreenState | null
+  campaignVictoryScreen: CampaignVictoryScreenState | null
   currentCampaignVenue: CampaignVenue | null
   currentVenueWins: number
   dealAnimationNonce: number
@@ -507,6 +610,7 @@ interface TableSectionProps {
     | "player-skin-select"
     | "character-select"
     | "venue-intro"
+    | "campaign-victory"
     | "match-result"
   playerProfile: PlayerProfile
   selectedPlayerSkin: PlayerSkinProfile
@@ -567,6 +671,7 @@ export function TableSection({
   inGameContextMenuOpen,
   matchState,
   matchResultScreen,
+  campaignVictoryScreen,
   currentCampaignVenue,
   currentVenueWins,
   dealAnimationNonce,
@@ -697,7 +802,13 @@ export function TableSection({
           <div style={styles.gameViewportFrame}>
             <div style={styles.gameViewport}>
               {isMenuMode ? (
-                menuScreen === "match-result" ? (
+                menuScreen === "campaign-victory" ? (
+                  <CampaignVictoryScreen
+                    victory={campaignVictoryScreen}
+                    onContinue={onReturnToJourneyFlow}
+                    styles={styles}
+                  />
+                ) : menuScreen === "match-result" ? (
                   <MatchResultScreen
                     currentCampaignVenue={currentCampaignVenue}
                     result={matchResultScreen}
@@ -1531,6 +1642,81 @@ const authoredCampaignScreens: Record<
       borderRadius: "8px",
     },
   },
+  "zona-leste-quintal": {
+    asset: zonaLesteQuintalCampaignJourneyAsset,
+    alt: "Jornada de campanha da Conquista das Zonas com Quintal da Leste atual",
+    backHotspot: {
+      left: "0%",
+      top: "78.8%",
+      width: "17.1%",
+      height: "16.1%",
+      borderRadius: "8px",
+    },
+    enterHotspot: {
+      left: "29.6%",
+      top: "79.9%",
+      width: "31.6%",
+      height: "12.1%",
+      borderRadius: "8px",
+    },
+    partnerHotspot: {
+      left: "62.8%",
+      top: "80.7%",
+      width: "25.3%",
+      height: "11.8%",
+      borderRadius: "8px",
+    },
+  },
+  "centro-subsolo": {
+    asset: centroSubsoloCampaignJourneyAsset,
+    alt: "Jornada de campanha da Conquista das Zonas com Subsolo do Centro atual",
+    backHotspot: {
+      left: "0%",
+      top: "82.9%",
+      width: "18.2%",
+      height: "14.8%",
+      borderRadius: "8px",
+    },
+    enterHotspot: {
+      left: "25.2%",
+      top: "80.2%",
+      width: "34.7%",
+      height: "13.2%",
+      borderRadius: "8px",
+    },
+    partnerHotspot: {
+      left: "61%",
+      top: "80.6%",
+      width: "24.7%",
+      height: "12.6%",
+      borderRadius: "8px",
+    },
+  },
+  "zona-sul-salao": {
+    asset: zonaSulSalaoCampaignJourneyAsset,
+    alt: "Jornada de campanha da Conquista das Zonas com Salao da Sul atual",
+    backHotspot: {
+      left: "15.3%",
+      top: "84.1%",
+      width: "16.6%",
+      height: "11.9%",
+      borderRadius: "8px",
+    },
+    enterHotspot: {
+      left: "33.5%",
+      top: "84.1%",
+      width: "33.2%",
+      height: "12.2%",
+      borderRadius: "8px",
+    },
+    partnerHotspot: {
+      left: "68.1%",
+      top: "84%",
+      width: "21.9%",
+      height: "12%",
+      borderRadius: "8px",
+    },
+  },
 }
 
 function isCampaignVenueCleared(playerProfile: PlayerProfile, venue: CampaignVenue) {
@@ -1544,6 +1730,57 @@ function currentCampaignStageLabel(currentCampaignVenue: CampaignVenue) {
   return (
     CAMPAIGN_STAGES.find((stage) => stage.venues.some((venue) => venue.id === currentCampaignVenue.id))
       ?.name ?? "sua etapa atual"
+  )
+}
+
+function CampaignVictoryScreen({
+  victory,
+  onContinue,
+  styles,
+}: {
+  victory: CampaignVictoryScreenState | null
+  onContinue: () => void
+  styles: StyleMap
+}) {
+  const victoryAsset =
+    victory?.kind === "stage"
+      ? CAMPAIGN_VICTORY_ASSET_BY_STAGE_ID[victory.id] ?? null
+      : victory?.id
+        ? CAMPAIGN_VICTORY_ASSET_BY_VENUE_ID[victory.id] ?? null
+        : null
+
+  if (victoryAsset) {
+    return (
+      <div style={styles.matchResultImageScreen}>
+        <div style={styles.matchResultImageFrame}>
+          <img
+            src={victoryAsset}
+            alt={victory?.title ?? "Conquista definitiva"}
+            style={styles.matchResultImage}
+          />
+          <button
+            aria-label="Voltar ao fluxo de bares"
+            style={styles.matchResultImageCta}
+            onClick={onContinue}
+          />
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div style={styles.matchResultScreen}>
+      <div style={{ ...styles.matchResultCard, ...styles.matchResultCardWin }}>
+        <div style={styles.matchResultEyebrow}>Conquista definitiva</div>
+        <h2 style={styles.matchResultTitle}>{victory?.title ?? "Bar conquistado"}</h2>
+        <p style={styles.matchResultSubtitle}>
+          A campanha avançou. Volte ao fluxo de bares para ver o próximo passo.
+        </p>
+        <button style={styles.gameStartLaunchButton} onClick={onContinue}>
+          VOLTAR AO FLUXO DE BARES
+        </button>
+      </div>
+    </div>
   )
 }
 
