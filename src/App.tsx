@@ -6,6 +6,7 @@ import adegaJucaBigodeSceneBgAsset from "./assets/venues/adega-do-juca-bigode/ba
 import zonaNorteGaragemSceneBgAsset from "./assets/venues/zona-norte-garagem/background.png"
 import zonaLesteQuintalSceneBgAsset from "./assets/venues/zona-leste-quintal/background.png"
 import centroSubsoloSceneBgAsset from "./assets/venues/centro-subsolo/background.png"
+import centroConvencoesPrefeituraSceneBgAsset from "./assets/venues/centro-convencoes-prefeitura/background.png"
 import zonaSulSalaoSceneBgAsset from "./assets/venues/zona-sul-salao/background.png"
 import manecoBanguelaSceneBgAsset from "./assets/venues/maneco-banguela/background.png"
 import tremDoJacaSceneBgAsset from "./assets/venues/trem-do-jaca/background.png"
@@ -20,6 +21,7 @@ const GAMEPLAY_BACKGROUND_ASSET_BY_VENUE_ID: Record<string, string> = {
   "zona-leste-quintal": zonaLesteQuintalSceneBgAsset,
   "centro-subsolo": centroSubsoloSceneBgAsset,
   "zona-sul-salao": zonaSulSalaoSceneBgAsset,
+  "centro-convencoes-prefeitura": centroConvencoesPrefeituraSceneBgAsset,
 }
 
 const TableSection = lazy(async () => {

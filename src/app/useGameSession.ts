@@ -109,6 +109,7 @@ const DEFINITIVE_VICTORY_VENUE_IDS = new Set([
   "zona-leste-quintal",
   "centro-subsolo",
   "zona-sul-salao",
+  "centro-convencoes-prefeitura",
 ])
 
 const DEFINITIVE_VICTORY_STAGE_IDS = new Set([

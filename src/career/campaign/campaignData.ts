@@ -183,7 +183,7 @@ export const CAMPAIGN_STAGES: CampaignStage[] = [
         difficulty: { aiLevel: 4, aggression: 3, trucoDiscipline: 4 },
         opponentCharacterIds: ["jura-pancada", "osmar-alfinete"],
         partnerUnlockCharacterIds: ["jura-pancada", "osmar-alfinete"],
-        minimumVisualState: "Fallback visual de evento urbano.",
+        minimumVisualState: "Campanha, capa, background, mesa e resultado autorais.",
         entryNarrative: "A cidade quer saber se você era moda passageira ou nome de verdade.",
         reward: { coins: 180 },
       },

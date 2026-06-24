@@ -28,6 +28,11 @@ import centroSubsoloBackgroundAsset from "../assets/venues/centro-subsolo/backgr
 import centroSubsoloHostAsset from "../assets/venues/centro-subsolo/host-centro-subsolo.png"
 import centroSubsoloMatchResultLossAsset from "../assets/venues/centro-subsolo/match-result-loss.png"
 import centroSubsoloMatchResultWinAsset from "../assets/venues/centro-subsolo/match-result-win.png"
+import centroConvencoesPrefeituraCampaignJourneyAsset from "../assets/campaign/campeonato-municipal-centro-convencoes-prefeitura.png"
+import centroConvencoesPrefeituraBackgroundAsset from "../assets/venues/centro-convencoes-prefeitura/background.png"
+import centroConvencoesPrefeituraHostAsset from "../assets/venues/centro-convencoes-prefeitura/host-centro-convencoes-prefeitura.png"
+import centroConvencoesPrefeituraMatchResultLossAsset from "../assets/venues/centro-convencoes-prefeitura/match-result-loss.png"
+import centroConvencoesPrefeituraMatchResultWinAsset from "../assets/venues/centro-convencoes-prefeitura/match-result-win.png"
 import zonaSulSalaoCampaignJourneyAsset from "../assets/campaign/conquista-zonas-salao-da-sul.png"
 import zonaSulSalaoBackgroundAsset from "../assets/venues/zona-sul-salao/background.png"
 import zonaSulSalaoHostAsset from "../assets/venues/zona-sul-salao/host-zona-sul-salao.png"
@@ -39,6 +44,7 @@ import victoryStageZonasCidadeAsset from "../assets/campaign-victories/stage-zon
 import victoryVenueAdegaJucaBigodeAsset from "../assets/campaign-victories/venue-adega-do-juca-bigode.png"
 import victoryVenueBarDoZeCatingaAsset from "../assets/campaign-victories/venue-bar-do-ze-catinga.png"
 import victoryVenueBarManecoBanguelaAsset from "../assets/campaign-victories/venue-bar-maneco-banguela.png"
+import victoryVenueCentroConvencoesPrefeituraAsset from "../assets/campaign-victories/venue-centro-convencoes-prefeitura.png"
 import victoryVenueCentroSubsoloAsset from "../assets/campaign-victories/venue-centro-subsolo.png"
 import victoryVenueTremDoJacaAsset from "../assets/campaign-victories/venue-trem-do-jaca.png"
 import victoryVenueZonaLesteQuintalAsset from "../assets/campaign-victories/venue-zona-leste-quintal.png"
@@ -111,7 +117,7 @@ type VenueCoverConfig = {
   hostQuote: string
   leadText: string
   description: string
-  backgroundAsset: string
+  backgroundAsset?: string
   hostPortraitAsset: string
   quoteBoardAsset: string
   ctaPlaqueAsset: string
@@ -233,6 +239,20 @@ const VENUE_COVER_CONFIG_BY_ID: Record<string, VenueCoverConfig> = {
     dividerAsset: zeCatingaDividerAsset,
     statsPlaqueAsset: zeCatingaStatsPlaqueAsset,
   },
+  "centro-convencoes-prefeitura": {
+    hostName: "Célia da Comissão",
+    hostRole: "Organizadora do Evento",
+    hostQuote: "Aqui é campeonato, meu filho. Truco alto e respeito na mesa.",
+    leadText: "Salão municipal, mesa oficial e cidade inteira querendo ver quem aguenta.",
+    description: "No Centro de Convenções, o truco sai do boteco e entra na ata da prefeitura.",
+    backgroundAsset: centroConvencoesPrefeituraBackgroundAsset,
+    hostPortraitAsset: centroConvencoesPrefeituraHostAsset,
+    quoteBoardAsset: zeCatingaQuoteBoardAsset,
+    ctaPlaqueAsset: zeCatingaCtaPlaqueAsset,
+    difficultyBottleAsset: zeCatingaDifficultyBottleAsset,
+    dividerAsset: zeCatingaDividerAsset,
+    statsPlaqueAsset: zeCatingaStatsPlaqueAsset,
+  },
 }
 
 const MATCH_RESULT_ASSET_BY_VENUE_ID: Record<string, { loss?: string; win?: string }> = {
@@ -268,6 +288,10 @@ const MATCH_RESULT_ASSET_BY_VENUE_ID: Record<string, { loss?: string; win?: stri
     loss: zonaSulSalaoMatchResultLossAsset,
     win: zonaSulSalaoMatchResultWinAsset,
   },
+  "centro-convencoes-prefeitura": {
+    loss: centroConvencoesPrefeituraMatchResultLossAsset,
+    win: centroConvencoesPrefeituraMatchResultWinAsset,
+  },
 }
 
 const CAMPAIGN_VICTORY_ASSET_BY_VENUE_ID: Record<string, string> = {
@@ -279,6 +303,7 @@ const CAMPAIGN_VICTORY_ASSET_BY_VENUE_ID: Record<string, string> = {
   "zona-leste-quintal": victoryVenueZonaLesteQuintalAsset,
   "centro-subsolo": victoryVenueCentroSubsoloAsset,
   "zona-sul-salao": victoryVenueZonaSulSalaoAsset,
+  "centro-convencoes-prefeitura": victoryVenueCentroConvencoesPrefeituraAsset,
 }
 
 const CAMPAIGN_VICTORY_ASSET_BY_STAGE_ID: Record<string, string> = {
@@ -1717,6 +1742,31 @@ const authoredCampaignScreens: Record<
       borderRadius: "8px",
     },
   },
+  "centro-convencoes-prefeitura": {
+    asset: centroConvencoesPrefeituraCampaignJourneyAsset,
+    alt: "Jornada de campanha do Campeonato Municipal com Centro de Convencoes da Prefeitura atual",
+    backHotspot: {
+      left: "4.2%",
+      top: "87.4%",
+      width: "14.8%",
+      height: "10.4%",
+      borderRadius: "8px",
+    },
+    enterHotspot: {
+      left: "31.2%",
+      top: "74.2%",
+      width: "39.6%",
+      height: "12.8%",
+      borderRadius: "8px",
+    },
+    partnerHotspot: {
+      left: "31.1%",
+      top: "89%",
+      width: "33.5%",
+      height: "9.5%",
+      borderRadius: "8px",
+    },
+  },
 }
 
 function isCampaignVenueCleared(playerProfile: PlayerProfile, venue: CampaignVenue) {
@@ -2300,6 +2350,8 @@ function VenueIntroScreen({
     )
   }
 
+  const coverTheme = getTableTheme(currentCampaignVenue?.visualTheme)
+
   return (
     <div
       style={{
@@ -2310,7 +2362,10 @@ function VenueIntroScreen({
         padding: 8,
         color: "#f6e7c4",
         boxSizing: "border-box",
-        backgroundImage: `linear-gradient(180deg, rgba(11, 7, 4, 0.34) 0%, rgba(11, 7, 4, 0.72) 100%), url(${coverConfig.backgroundAsset})`,
+        backgroundColor: coverTheme.backgroundColor,
+        backgroundImage: coverConfig.backgroundAsset
+          ? `linear-gradient(180deg, rgba(11, 7, 4, 0.34) 0%, rgba(11, 7, 4, 0.72) 100%), url(${coverConfig.backgroundAsset})`
+          : `radial-gradient(circle at 24% 18%, ${coverTheme.accentColor}40 0%, transparent 34%), radial-gradient(circle at 76% 68%, ${coverTheme.railColor}55 0%, transparent 36%), linear-gradient(135deg, ${coverTheme.backgroundColor} 0%, #120d0a 100%)`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",

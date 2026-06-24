@@ -18,6 +18,7 @@ export interface TableTheme {
     | "quintal-da-leste"
     | "subsolo-do-centro"
     | "salao-da-sul"
+    | "centro-convencoes-prefeitura"
     | "wood-street"
     | "steel-patio"
   illustratedTableScale?: number
@@ -187,6 +188,22 @@ const SALAO_SUL_THEME: TableTheme = {
   sceneVignetteStrength: 0.16,
 }
 
+const CENTRO_CONVENCOES_PREFEITURA_THEME: TableTheme = {
+  backgroundColor: "#25383a",
+  tableColor: "#d6c8a8",
+  railColor: "#6c6960",
+  badgeColor: "#8b2f24",
+  emptySlotColor: "#f3ead7",
+  activeSlotColor: "#facc15",
+  accentColor: "#b45309",
+  tableKind: "steel",
+  rustColor: "#7a5430",
+  illustratedTableAsset: "centro-convencoes-prefeitura",
+  illustratedTableScale: 1,
+  sceneWarmGlowStrength: 0.08,
+  sceneVignetteStrength: 0.12,
+}
+
 const NEON_THEME: TableTheme = {
   backgroundColor: "#111827",
   tableColor: "#0f766e",
@@ -250,6 +267,10 @@ export function getTableTheme(visualTheme?: string): TableTheme {
 
   if (visualTheme.includes("zona-sul")) {
     return SALAO_SUL_THEME
+  }
+
+  if (visualTheme.includes("cidade-evento")) {
+    return CENTRO_CONVENCOES_PREFEITURA_THEME
   }
 
   if (visualTheme.includes("claro")) {
