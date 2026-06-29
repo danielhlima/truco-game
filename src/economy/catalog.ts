@@ -12,7 +12,7 @@ export const UNLOCKABLE_ITEMS: UnlockableItem[] = [
     id: "table-casino-me-maior",
     category: "table-theme",
     name: "Mesa do Mundial",
-    description: "Tema premium do Casino Mé Maior com acabamento luxuoso.",
+    description: "Tema premium do Cassino Mé Maior com acabamento luxuoso.",
     rarity: "epic",
   },
   {

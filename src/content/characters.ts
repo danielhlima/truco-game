@@ -619,7 +619,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: madameVioletaAsset,
     story:
-      "Madame Violeta trata cada lance como uma informacao valiosa demais para ser desperdicada. Ela espera, observa e faz a mesa parecer silenciosa mesmo quando o Casino Mé Maior inteiro esta acordado.",
+      "Madame Violeta trata cada lance como uma informacao valiosa demais para ser desperdicada. Ela espera, observa e faz a mesa parecer silenciosa mesmo quando o Cassino Mé Maior inteiro esta acordado.",
   },
   {
     id: "augusto-crupie",

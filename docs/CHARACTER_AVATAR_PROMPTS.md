@@ -29,8 +29,8 @@ Regras de exportacao:
 | Centro Americano Truqueiro de Medelin. | Jura Pancada | Luna Candela | `luna-candela.png` |
 | Hotel Truco de Segóvia, Espanha | Creusa Rabugenta | Mina Compasso | `mina-compasso.png` |
 | Hotel Truco de Segóvia, Espanha | Dito Marrua | Viktor Muralha | `viktor-muralha.png` |
-| Casino Mé Maior | Norberto Fuba | Madame Violeta | `madame-violeta.png` |
-| Casino Mé Maior | Rosinha Catraca | Augusto Crupie | `augusto-crupie.png` |
+| Cassino Mé Maior | Norberto Fuba | Madame Violeta | `madame-violeta.png` |
+| Cassino Mé Maior | Rosinha Catraca | Augusto Crupie | `augusto-crupie.png` |
 | Orbita da Lua | Biu Caolho | Cosme Orbita | `cosme-orbita.png` |
 
 ## 1. Ivone Verniz

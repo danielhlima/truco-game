@@ -7,7 +7,10 @@ Antes de agir, leia nesta ordem:
 1. `docs/CONTENT.md`
 2. `docs/LAYOUT_RULES.md`
 3. `docs/TRUCO_RULES.md`
-4. `docs/NEXT_STEPS.md`
+4. `docs/IMAGE_PROMPT_STANDARDS.md`
+5. `docs/NEXT_STEPS.md`
+6. `docs/CAMPAIGN_PATH.md`
+7. `docs/NEXT_CHAT_PROMPT.md`
 
 Esses arquivos sao a fonte de verdade do estado atual do projeto.
 
@@ -37,6 +40,8 @@ Hoje o projeto ja possui:
 - telas autorais de vitoria e derrota do `Bar do Ze Catinga`
 - intro cinematografica curta antes da gameplay
 - tela inicial definitiva com arte propria
+- caminho principal com pacote visual autoral integrado ate o `Cassino Mé Maior`
+- proxima frente definida: prompts e assets do nivel bonus `Circuito Intergaláctico` / `Órbita da Lua`
 
 ## Arquitetura que deve ser preservada
 
@@ -61,6 +66,7 @@ Arquivos principais da UI atual:
 - `src/app/useGameSession.ts`
 - `src/three/GameTableScene.tsx`
 - `src/three/tableTheme.ts`
+- `docs/IMAGE_PROMPT_STANDARDS.md`
 
 ### IA de truco
 
@@ -133,7 +139,9 @@ Arquivos principais:
 - a tela inicial definitiva foi implementada com arte propria em `src/assets/start/truco-raiz-start.png`
 - a primeira tela visivel agora mostra somente a arte de capa e um hotspot HTML sobre `COMEÇAR`
 - debug de bar, reset de campanha e seletor de variante foram removidos da tela inicial visivel
-- o proximo foco recomendado e expandir a campanha verticalmente, bar a bar, fechando o caminho principal do jogo antes de voltar para refinamentos finos
+- o caminho principal foi expandido visualmente ate o `Cassino Mé Maior`
+- o proximo foco recomendado e gerar prompts para o pacote bonus `Circuito Intergaláctico` / `Órbita da Lua`
+- antes de implementar novos assets autorais, gerar prompts seguindo `docs/IMAGE_PROMPT_STANDARDS.md`
 
 ## Direcao de produto atual
 
@@ -141,11 +149,12 @@ O projeto esta em bom estado de tela e fluxo para mudar o foco principal de poli
 
 Decisao atual:
 
-- completar o jogo verticalmente primeiro
-- trabalhar bar a bar, definindo tema, ambiente, dificuldade, variante e personagens
-- fechar o caminho principal da campanha antes de refinamentos extensos
-- usar cada novo bar como pacote jogavel minimo, nao como uma frente de refatoracao
-- depois de fechar a campanha jogavel, voltar para polir artes, balanceamento, falas, animacoes e resultados autorais
+- tratar o caminho principal como visualmente integrado ate o `Cassino Mé Maior`
+- seguir para o bonus pos-campanha antes de mexer em regras complexas
+- gerar prompts do bonus antes de implementar imagens
+- alem dos 8 assets de costume, gerar imagens pequenas dos adversarios do bonus
+- manter o bonus divertido e cosmico, sem ETs assustadores, monstros, horror, gore ou criaturas grotescas
+- depois do pacote bonus, voltar para regras, tutorial, balanceamento, falas e refinamentos
 
 Kit minimo recomendado por bar:
 
@@ -160,14 +169,15 @@ Kit minimo recomendado por bar:
 - capa/background ou fallback visual aceitavel
 - textos de entrada e resultado, mesmo que sem arte autoral inicial
 
-Plano pratico do passo 3 da expansao vertical:
+Plano pratico da proxima frente:
 
-1. consolidar a tabela do caminho principal em `docs/CAMPAIGN_PATH.md` e comparar com `src/career/campaign/campaignData.ts`
-2. fechar o `Bar Maneco Banguela` como primeiro bar-modelo completo depois do `Bar do Ze Catinga`
-3. validar `Adega do Juca Bigode` no fluxo real apos integracao do pacote visual autoral
-4. validar que nao ha repeticao de personagens entre bares e que parceiros iniciais nao antecipam adversarios futuros
-5. verificar a variante declarada por bar, mantendo a correcao Mineiro/Paulista como pendencia separada se nao bloquear o caminho jogavel
-6. garantir fallback visual aceitavel para bares sem arte propria antes de criar novas imagens
+1. ler `docs/IMAGE_PROMPT_STANDARDS.md`
+2. gerar prompts para `Órbita da Lua`
+3. incluir prompts dos 8 assets padrao e das imagens pequenas dos adversarios
+4. aguardar o usuario trazer as imagens aprovadas
+5. integrar os assets do bonus no mesmo padrao dos locais recentes
+6. rodar `npm run build`
+7. depois disso, retomar pendencias de regra/produto em `docs/NEXT_STEPS.md`
 
 ## Estado atual da gameplay screen
 

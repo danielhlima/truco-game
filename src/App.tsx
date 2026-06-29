@@ -7,6 +7,11 @@ import zonaNorteGaragemSceneBgAsset from "./assets/venues/zona-norte-garagem/bac
 import zonaLesteQuintalSceneBgAsset from "./assets/venues/zona-leste-quintal/background.png"
 import centroSubsoloSceneBgAsset from "./assets/venues/centro-subsolo/background.png"
 import centroConvencoesPrefeituraSceneBgAsset from "./assets/venues/centro-convencoes-prefeitura/background.png"
+import ginasioEstadualManecoFileSceneBgAsset from "./assets/venues/ginasio-estadual-maneco-file/background.png"
+import arenaNacionalSceneBgAsset from "./assets/venues/arena-nacional/background.png"
+import centroAmericanoTruqueiroMedelinSceneBgAsset from "./assets/venues/centro-americano-truqueiro-medelin/background.png"
+import hotelTrucoSegoviaEspanhaSceneBgAsset from "./assets/venues/hotel-truco-segovia-espanha/background.png"
+import casinoMeMaiorSceneBgAsset from "./assets/venues/casino-me-maior/background.png"
 import zonaSulSalaoSceneBgAsset from "./assets/venues/zona-sul-salao/background.png"
 import manecoBanguelaSceneBgAsset from "./assets/venues/maneco-banguela/background.png"
 import tremDoJacaSceneBgAsset from "./assets/venues/trem-do-jaca/background.png"
@@ -22,6 +27,11 @@ const GAMEPLAY_BACKGROUND_ASSET_BY_VENUE_ID: Record<string, string> = {
   "centro-subsolo": centroSubsoloSceneBgAsset,
   "zona-sul-salao": zonaSulSalaoSceneBgAsset,
   "centro-convencoes-prefeitura": centroConvencoesPrefeituraSceneBgAsset,
+  "ginasio-estadual-maneco-file": ginasioEstadualManecoFileSceneBgAsset,
+  "arena-nacional": arenaNacionalSceneBgAsset,
+  "centro-americano-truqueiro-medelin": centroAmericanoTruqueiroMedelinSceneBgAsset,
+  "hotel-truco-segovia-espanha": hotelTrucoSegoviaEspanhaSceneBgAsset,
+  "casino-me-maior": casinoMeMaiorSceneBgAsset,
 }
 
 const TableSection = lazy(async () => {
@@ -781,8 +791,8 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 700,
   },
   disabledButton: {
-    opacity: 0.72,
-    filter: "saturate(0.82)",
+    opacity: 1,
+    filter: "saturate(0.68) brightness(0.76)",
     cursor: "not-allowed",
   },
   helpBox: {
@@ -1989,7 +1999,7 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "clamp(6px, 0.5vw, 8px) clamp(11px, 0.96vw, 14px)",
     borderRadius: "12px",
     border: "none",
-    backgroundColor: "transparent",
+    backgroundColor: "#563520",
     color: "#fff",
     cursor: "pointer",
     fontSize: "clamp(10px, 0.88vw, 11px)",
@@ -2010,7 +2020,7 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "clamp(6px, 0.5vw, 8px) clamp(11px, 0.96vw, 14px)",
     borderRadius: "12px",
     border: "none",
-    backgroundColor: "transparent",
+    backgroundColor: "#563520",
     color: "#f7efe0",
     cursor: "pointer",
     fontSize: "clamp(10px, 0.88vw, 11px)",

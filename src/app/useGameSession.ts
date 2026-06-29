@@ -110,12 +110,22 @@ const DEFINITIVE_VICTORY_VENUE_IDS = new Set([
   "centro-subsolo",
   "zona-sul-salao",
   "centro-convencoes-prefeitura",
+  "ginasio-estadual-maneco-file",
+  "arena-nacional",
+  "centro-americano-truqueiro-medelin",
+  "hotel-truco-segovia-espanha",
+  "casino-me-maior",
 ])
 
 const DEFINITIVE_VICTORY_STAGE_IDS = new Set([
   "rua-periferia",
   "campeonato-vila-nana",
   "zonas-da-cidade",
+  "campeonato-estadual",
+  "campeonato-nacional",
+  "circuito-panamericano",
+  "jogos-mundiais",
+  "mundial",
 ])
 
 function buildCampaignVictoryScreens(

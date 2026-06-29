@@ -4,9 +4,14 @@ import * as THREE from "three"
 import cardFaceAgedPaperUrl from "../assets/cards/card-face-aged-paper.png"
 import cardBackAgedPhotoUrl from "../assets/cards/card-back-aged-photo.png"
 import tableTopAdegaJucaBigodeUrl from "../assets/boteco/table-top-adega-juca-bigode.png"
+import tableTopArenaNacionalUrl from "../assets/boteco/table-top-arena-nacional.png"
+import tableTopCasinoMeMaiorUrl from "../assets/boteco/table-top-casino-me-maior.png"
 import tableTopCentroConvencoesPrefeituraUrl from "../assets/boteco/table-top-centro-convencoes-prefeitura.png"
+import tableTopCentroAmericanoTruqueiroMedelinUrl from "../assets/boteco/table-top-centro-americano-truqueiro-medelin.png"
 import tableTopGhibliishUrl from "../assets/boteco/table-top-ghibliish.png"
 import tableTopGaragemNorteUrl from "../assets/boteco/table-top-garagem-norte.png"
+import tableTopGinasioEstadualManecoFileUrl from "../assets/boteco/table-top-ginasio-estadual-maneco-file.png"
+import tableTopHotelTrucoSegoviaEspanhaUrl from "../assets/boteco/table-top-hotel-truco-segovia-espanha.png"
 import tableTopManecoWoodUrl from "../assets/boteco/table-top-maneco-wood.png"
 import tableTopQuintalDaLesteUrl from "../assets/boteco/table-top-quintal-da-leste.png"
 import tableTopSalaoDaSulUrl from "../assets/boteco/table-top-salao-da-sul.png"
@@ -23,11 +28,16 @@ const ILLUSTRATED_TABLE_ASSET_URLS: Record<string, string> = {
   "maneco-wood": tableTopManecoWoodUrl,
   "trem-jaca": tableTopTremJacaUrl,
   "adega-juca-bigode": tableTopAdegaJucaBigodeUrl,
+  "arena-nacional": tableTopArenaNacionalUrl,
+  "casino-me-maior": tableTopCasinoMeMaiorUrl,
+  "centro-americano-truqueiro-medelin": tableTopCentroAmericanoTruqueiroMedelinUrl,
+  "hotel-truco-segovia-espanha": tableTopHotelTrucoSegoviaEspanhaUrl,
   "garagem-norte": tableTopGaragemNorteUrl,
   "quintal-da-leste": tableTopQuintalDaLesteUrl,
   "subsolo-do-centro": tableTopSubsoloDoCentroUrl,
   "salao-da-sul": tableTopSalaoDaSulUrl,
   "centro-convencoes-prefeitura": tableTopCentroConvencoesPrefeituraUrl,
+  "ginasio-estadual-maneco-file": tableTopGinasioEstadualManecoFileUrl,
   "wood-street": tableTopWoodStreetUrl,
   "steel-patio": tableTopSteelPatioUrl,
 }
@@ -76,6 +86,13 @@ export function GameTableScene({
   const usesIllustratedTable = tableKind === "steel"
   const usesSteelPatioTable = illustratedTableAsset === "steel-patio"
   const usesPhotoTable = illustratedTableAsset === "ze-catinga-photo"
+  const usesTransparentTableCutout =
+    illustratedTableAsset === "ze-catinga-photo" ||
+    illustratedTableAsset === "ginasio-estadual-maneco-file" ||
+    illustratedTableAsset === "arena-nacional" ||
+    illustratedTableAsset === "casino-me-maior" ||
+    illustratedTableAsset === "centro-americano-truqueiro-medelin" ||
+    illustratedTableAsset === "hotel-truco-segovia-espanha"
   const illustratedTableUrl = illustratedTableAsset
     ? ILLUSTRATED_TABLE_ASSET_URLS[illustratedTableAsset] ?? tableTopGhibliishUrl
     : tableTopGhibliishUrl
@@ -467,7 +484,9 @@ export function GameTableScene({
           borderRadius: "20px",
           overflow: "hidden",
           background: usesIllustratedTable
-            ? usesSteelPatioTable
+            ? usesTransparentTableCutout
+              ? "transparent"
+              : usesSteelPatioTable
               ? "#3b2a1f"
               : "#d1d5db"
             : backgroundColor,

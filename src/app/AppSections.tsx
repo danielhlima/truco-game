@@ -33,19 +33,54 @@ import centroConvencoesPrefeituraBackgroundAsset from "../assets/venues/centro-c
 import centroConvencoesPrefeituraHostAsset from "../assets/venues/centro-convencoes-prefeitura/host-centro-convencoes-prefeitura.png"
 import centroConvencoesPrefeituraMatchResultLossAsset from "../assets/venues/centro-convencoes-prefeitura/match-result-loss.png"
 import centroConvencoesPrefeituraMatchResultWinAsset from "../assets/venues/centro-convencoes-prefeitura/match-result-win.png"
+import ginasioEstadualManecoFileCampaignJourneyAsset from "../assets/campaign/campeonato-estadual-ginasio-estadual-maneco-file.png"
+import ginasioEstadualManecoFileBackgroundAsset from "../assets/venues/ginasio-estadual-maneco-file/background.png"
+import ginasioEstadualManecoFileHostAsset from "../assets/venues/ginasio-estadual-maneco-file/host-ginasio-estadual-maneco-file.png"
+import ginasioEstadualManecoFileMatchResultLossAsset from "../assets/venues/ginasio-estadual-maneco-file/match-result-loss.png"
+import ginasioEstadualManecoFileMatchResultWinAsset from "../assets/venues/ginasio-estadual-maneco-file/match-result-win.png"
+import arenaNacionalCampaignJourneyAsset from "../assets/campaign/campeonato-nacional-arena-nacional.png"
+import arenaNacionalBackgroundAsset from "../assets/venues/arena-nacional/background.png"
+import arenaNacionalHostAsset from "../assets/venues/arena-nacional/host-arena-nacional.png"
+import arenaNacionalMatchResultLossAsset from "../assets/venues/arena-nacional/match-result-loss.png"
+import arenaNacionalMatchResultWinAsset from "../assets/venues/arena-nacional/match-result-win.png"
+import centroAmericanoTruqueiroMedelinCampaignJourneyAsset from "../assets/campaign/circuito-panamericano-centro-americano-truqueiro-medelin.png"
+import centroAmericanoTruqueiroMedelinBackgroundAsset from "../assets/venues/centro-americano-truqueiro-medelin/background.png"
+import centroAmericanoTruqueiroMedelinHostAsset from "../assets/venues/centro-americano-truqueiro-medelin/host-centro-americano-truqueiro-medelin.png"
+import centroAmericanoTruqueiroMedelinMatchResultLossAsset from "../assets/venues/centro-americano-truqueiro-medelin/match-result-loss.png"
+import centroAmericanoTruqueiroMedelinMatchResultWinAsset from "../assets/venues/centro-americano-truqueiro-medelin/match-result-win.png"
+import hotelTrucoSegoviaEspanhaCampaignJourneyAsset from "../assets/campaign/jogos-mundiais-hotel-truco-segovia-espanha.png"
+import hotelTrucoSegoviaEspanhaBackgroundAsset from "../assets/venues/hotel-truco-segovia-espanha/background.png"
+import hotelTrucoSegoviaEspanhaHostAsset from "../assets/venues/hotel-truco-segovia-espanha/host-hotel-truco-segovia-espanha.png"
+import hotelTrucoSegoviaEspanhaMatchResultLossAsset from "../assets/venues/hotel-truco-segovia-espanha/match-result-loss.png"
+import hotelTrucoSegoviaEspanhaMatchResultWinAsset from "../assets/venues/hotel-truco-segovia-espanha/match-result-win.png"
+import casinoMeMaiorCampaignJourneyAsset from "../assets/campaign/mundial-casino-me-maior.png"
+import casinoMeMaiorBackgroundAsset from "../assets/venues/casino-me-maior/background.png"
+import casinoMeMaiorHostAsset from "../assets/venues/casino-me-maior/host-casino-me-maior.png"
+import casinoMeMaiorMatchResultLossAsset from "../assets/venues/casino-me-maior/match-result-loss.png"
+import casinoMeMaiorMatchResultWinAsset from "../assets/venues/casino-me-maior/match-result-win.png"
 import zonaSulSalaoCampaignJourneyAsset from "../assets/campaign/conquista-zonas-salao-da-sul.png"
 import zonaSulSalaoBackgroundAsset from "../assets/venues/zona-sul-salao/background.png"
 import zonaSulSalaoHostAsset from "../assets/venues/zona-sul-salao/host-zona-sul-salao.png"
 import zonaSulSalaoMatchResultLossAsset from "../assets/venues/zona-sul-salao/match-result-loss.png"
 import zonaSulSalaoMatchResultWinAsset from "../assets/venues/zona-sul-salao/match-result-win.png"
 import victoryStageCampeonatoVilaNanaAsset from "../assets/campaign-victories/stage-campeonato-vila-nana.png"
+import victoryStageCampeonatoEstadualAsset from "../assets/campaign-victories/stage-campeonato-estadual.png"
+import victoryStageCampeonatoNacionalAsset from "../assets/campaign-victories/stage-campeonato-nacional.png"
+import victoryStageCircuitoPanamericanoAsset from "../assets/campaign-victories/stage-circuito-panamericano.png"
+import victoryStageJogosMundiaisAsset from "../assets/campaign-victories/stage-jogos-mundiais.png"
+import victoryStageMundialAsset from "../assets/campaign-victories/stage-mundial.png"
 import victoryStageRuaPeriferiaAsset from "../assets/campaign-victories/stage-rua-periferia.png"
 import victoryStageZonasCidadeAsset from "../assets/campaign-victories/stage-zonas-da-cidade.png"
 import victoryVenueAdegaJucaBigodeAsset from "../assets/campaign-victories/venue-adega-do-juca-bigode.png"
+import victoryVenueArenaNacionalAsset from "../assets/campaign-victories/venue-arena-nacional.png"
 import victoryVenueBarDoZeCatingaAsset from "../assets/campaign-victories/venue-bar-do-ze-catinga.png"
 import victoryVenueBarManecoBanguelaAsset from "../assets/campaign-victories/venue-bar-maneco-banguela.png"
 import victoryVenueCentroConvencoesPrefeituraAsset from "../assets/campaign-victories/venue-centro-convencoes-prefeitura.png"
+import victoryVenueCentroAmericanoTruqueiroMedelinAsset from "../assets/campaign-victories/venue-centro-americano-truqueiro-medelin.png"
 import victoryVenueCentroSubsoloAsset from "../assets/campaign-victories/venue-centro-subsolo.png"
+import victoryVenueGinasioEstadualManecoFileAsset from "../assets/campaign-victories/venue-ginasio-estadual-maneco-file.png"
+import victoryVenueHotelTrucoSegoviaEspanhaAsset from "../assets/campaign-victories/venue-hotel-truco-segovia-espanha.png"
+import victoryVenueCasinoMeMaiorAsset from "../assets/campaign-victories/venue-casino-me-maior.png"
 import victoryVenueTremDoJacaAsset from "../assets/campaign-victories/venue-trem-do-jaca.png"
 import victoryVenueZonaLesteQuintalAsset from "../assets/campaign-victories/venue-zona-leste-quintal.png"
 import victoryVenueZonaNorteGaragemAsset from "../assets/campaign-victories/venue-zona-norte-garagem.png"
@@ -253,6 +288,76 @@ const VENUE_COVER_CONFIG_BY_ID: Record<string, VenueCoverConfig> = {
     dividerAsset: zeCatingaDividerAsset,
     statsPlaqueAsset: zeCatingaStatsPlaqueAsset,
   },
+  "ginasio-estadual-maneco-file": {
+    hostName: "Governador Evaristo",
+    hostRole: "Governador do Estado",
+    hostQuote: "Interessante. Você não tremeu.",
+    leadText: "Ginásio estadual, luz alta e truco com peso de tradição.",
+    description: "No Maneco Filé, a mesa já parece grande antes da primeira carta cair.",
+    backgroundAsset: ginasioEstadualManecoFileBackgroundAsset,
+    hostPortraitAsset: ginasioEstadualManecoFileHostAsset,
+    quoteBoardAsset: zeCatingaQuoteBoardAsset,
+    ctaPlaqueAsset: zeCatingaCtaPlaqueAsset,
+    difficultyBottleAsset: zeCatingaDifficultyBottleAsset,
+    dividerAsset: zeCatingaDividerAsset,
+    statsPlaqueAsset: zeCatingaStatsPlaqueAsset,
+  },
+  "arena-nacional": {
+    hostName: "Helena Nogueira",
+    hostRole: "Apresentadora Nacional",
+    hostQuote: "No Nacional, até silêncio vira replay.",
+    leadText: "Arena lotada, transmissão ao vivo e truco com o país inteiro olhando.",
+    description: "Na Arena Nacional, cada chamada pesa mais porque todo mundo viu.",
+    backgroundAsset: arenaNacionalBackgroundAsset,
+    hostPortraitAsset: arenaNacionalHostAsset,
+    quoteBoardAsset: zeCatingaQuoteBoardAsset,
+    ctaPlaqueAsset: zeCatingaCtaPlaqueAsset,
+    difficultyBottleAsset: zeCatingaDifficultyBottleAsset,
+    dividerAsset: zeCatingaDividerAsset,
+    statsPlaqueAsset: zeCatingaStatsPlaqueAsset,
+  },
+  "centro-americano-truqueiro-medelin": {
+    hostName: "Valéria Montoya",
+    hostRole: "Mestre de Cerimônias",
+    hostQuote: "No Panamericano, blefe também precisa passaporte.",
+    leadText: "Show continental, luz colorida e truco atravessando as Américas.",
+    description: "Em Medelin, a tradição local encontra a mesa grande do circuito panamericano.",
+    backgroundAsset: centroAmericanoTruqueiroMedelinBackgroundAsset,
+    hostPortraitAsset: centroAmericanoTruqueiroMedelinHostAsset,
+    quoteBoardAsset: zeCatingaQuoteBoardAsset,
+    ctaPlaqueAsset: zeCatingaCtaPlaqueAsset,
+    difficultyBottleAsset: zeCatingaDifficultyBottleAsset,
+    dividerAsset: zeCatingaDividerAsset,
+    statsPlaqueAsset: zeCatingaStatsPlaqueAsset,
+  },
+  "hotel-truco-segovia-espanha": {
+    hostName: "Isabel Valcárcel",
+    hostRole: "Diretora Cerimonial",
+    hostQuote: "O mundo viu. A mesa confirmou.",
+    leadText: "Salão histórico, delegações em silêncio e truco com peso mundial.",
+    description: "Em Segóvia, cada chamada parece ata oficial diante do mundo inteiro.",
+    backgroundAsset: hotelTrucoSegoviaEspanhaBackgroundAsset,
+    hostPortraitAsset: hotelTrucoSegoviaEspanhaHostAsset,
+    quoteBoardAsset: zeCatingaQuoteBoardAsset,
+    ctaPlaqueAsset: zeCatingaCtaPlaqueAsset,
+    difficultyBottleAsset: zeCatingaDifficultyBottleAsset,
+    dividerAsset: zeCatingaDividerAsset,
+    statsPlaqueAsset: zeCatingaStatsPlaqueAsset,
+  },
+  "casino-me-maior": {
+    hostName: "Dante Maior",
+    hostRole: "Dono do Cassino",
+    hostQuote: "Elegante. E perigoso.",
+    leadText: "Luxo silencioso, mesa final e cada blefe parecendo contrato.",
+    description: "No Cassino Mé Maior, a casa sorri baixo antes de cobrar caro.",
+    backgroundAsset: casinoMeMaiorBackgroundAsset,
+    hostPortraitAsset: casinoMeMaiorHostAsset,
+    quoteBoardAsset: zeCatingaQuoteBoardAsset,
+    ctaPlaqueAsset: zeCatingaCtaPlaqueAsset,
+    difficultyBottleAsset: zeCatingaDifficultyBottleAsset,
+    dividerAsset: zeCatingaDividerAsset,
+    statsPlaqueAsset: zeCatingaStatsPlaqueAsset,
+  },
 }
 
 const MATCH_RESULT_ASSET_BY_VENUE_ID: Record<string, { loss?: string; win?: string }> = {
@@ -292,6 +397,26 @@ const MATCH_RESULT_ASSET_BY_VENUE_ID: Record<string, { loss?: string; win?: stri
     loss: centroConvencoesPrefeituraMatchResultLossAsset,
     win: centroConvencoesPrefeituraMatchResultWinAsset,
   },
+  "ginasio-estadual-maneco-file": {
+    loss: ginasioEstadualManecoFileMatchResultLossAsset,
+    win: ginasioEstadualManecoFileMatchResultWinAsset,
+  },
+  "arena-nacional": {
+    loss: arenaNacionalMatchResultLossAsset,
+    win: arenaNacionalMatchResultWinAsset,
+  },
+  "centro-americano-truqueiro-medelin": {
+    loss: centroAmericanoTruqueiroMedelinMatchResultLossAsset,
+    win: centroAmericanoTruqueiroMedelinMatchResultWinAsset,
+  },
+  "hotel-truco-segovia-espanha": {
+    loss: hotelTrucoSegoviaEspanhaMatchResultLossAsset,
+    win: hotelTrucoSegoviaEspanhaMatchResultWinAsset,
+  },
+  "casino-me-maior": {
+    loss: casinoMeMaiorMatchResultLossAsset,
+    win: casinoMeMaiorMatchResultWinAsset,
+  },
 }
 
 const CAMPAIGN_VICTORY_ASSET_BY_VENUE_ID: Record<string, string> = {
@@ -304,12 +429,22 @@ const CAMPAIGN_VICTORY_ASSET_BY_VENUE_ID: Record<string, string> = {
   "centro-subsolo": victoryVenueCentroSubsoloAsset,
   "zona-sul-salao": victoryVenueZonaSulSalaoAsset,
   "centro-convencoes-prefeitura": victoryVenueCentroConvencoesPrefeituraAsset,
+  "ginasio-estadual-maneco-file": victoryVenueGinasioEstadualManecoFileAsset,
+  "arena-nacional": victoryVenueArenaNacionalAsset,
+  "centro-americano-truqueiro-medelin": victoryVenueCentroAmericanoTruqueiroMedelinAsset,
+  "hotel-truco-segovia-espanha": victoryVenueHotelTrucoSegoviaEspanhaAsset,
+  "casino-me-maior": victoryVenueCasinoMeMaiorAsset,
 }
 
 const CAMPAIGN_VICTORY_ASSET_BY_STAGE_ID: Record<string, string> = {
   "rua-periferia": victoryStageRuaPeriferiaAsset,
   "campeonato-vila-nana": victoryStageCampeonatoVilaNanaAsset,
   "zonas-da-cidade": victoryStageZonasCidadeAsset,
+  "campeonato-estadual": victoryStageCampeonatoEstadualAsset,
+  "campeonato-nacional": victoryStageCampeonatoNacionalAsset,
+  "circuito-panamericano": victoryStageCircuitoPanamericanoAsset,
+  "jogos-mundiais": victoryStageJogosMundiaisAsset,
+  mundial: victoryStageMundialAsset,
 }
 
 interface ControlsPanelProps {
@@ -1764,6 +1899,131 @@ const authoredCampaignScreens: Record<
       top: "89%",
       width: "33.5%",
       height: "9.5%",
+      borderRadius: "8px",
+    },
+  },
+  "ginasio-estadual-maneco-file": {
+    asset: ginasioEstadualManecoFileCampaignJourneyAsset,
+    alt: "Jornada de campanha do Campeonato Estadual com Ginasio Estadual Maneco File atual",
+    backHotspot: {
+      left: "12.1%",
+      top: "89.4%",
+      width: "14.3%",
+      height: "8.8%",
+      borderRadius: "8px",
+    },
+    enterHotspot: {
+      left: "31.2%",
+      top: "85.9%",
+      width: "35.9%",
+      height: "12.1%",
+      borderRadius: "8px",
+    },
+    partnerHotspot: {
+      left: "68.8%",
+      top: "88.6%",
+      width: "22.9%",
+      height: "9.2%",
+      borderRadius: "8px",
+    },
+  },
+  "arena-nacional": {
+    asset: arenaNacionalCampaignJourneyAsset,
+    alt: "Jornada de campanha do Campeonato Nacional com Arena Nacional atual",
+    backHotspot: {
+      left: "2.7%",
+      top: "83.8%",
+      width: "20.3%",
+      height: "9.2%",
+      borderRadius: "8px",
+    },
+    enterHotspot: {
+      left: "28.7%",
+      top: "74.9%",
+      width: "43.8%",
+      height: "12.1%",
+      borderRadius: "8px",
+    },
+    partnerHotspot: {
+      left: "32.4%",
+      top: "87.7%",
+      width: "36.8%",
+      height: "9.8%",
+      borderRadius: "8px",
+    },
+  },
+  "centro-americano-truqueiro-medelin": {
+    asset: centroAmericanoTruqueiroMedelinCampaignJourneyAsset,
+    alt: "Jornada de campanha do Circuito Panamericano com Centro Americano Truqueiro de Medelin atual",
+    backHotspot: {
+      left: "2%",
+      top: "87.6%",
+      width: "14.3%",
+      height: "9.4%",
+      borderRadius: "8px",
+    },
+    enterHotspot: {
+      left: "30.7%",
+      top: "81.5%",
+      width: "41.8%",
+      height: "14.8%",
+      borderRadius: "8px",
+    },
+    partnerHotspot: {
+      left: "72.2%",
+      top: "80.9%",
+      width: "23.4%",
+      height: "15.4%",
+      borderRadius: "8px",
+    },
+  },
+  "hotel-truco-segovia-espanha": {
+    asset: hotelTrucoSegoviaEspanhaCampaignJourneyAsset,
+    alt: "Jornada de campanha dos Jogos Mundiais com Hotel Truco de Segóvia atual",
+    backHotspot: {
+      left: "1.4%",
+      top: "87.6%",
+      width: "13.2%",
+      height: "8.8%",
+      borderRadius: "8px",
+    },
+    enterHotspot: {
+      left: "31.5%",
+      top: "74.8%",
+      width: "36%",
+      height: "12.6%",
+      borderRadius: "8px",
+    },
+    partnerHotspot: {
+      left: "37%",
+      top: "89%",
+      width: "25.6%",
+      height: "8%",
+      borderRadius: "8px",
+    },
+  },
+  "casino-me-maior": {
+    asset: casinoMeMaiorCampaignJourneyAsset,
+    alt: "Jornada de campanha do Mundial com Cassino Mé Maior atual",
+    backHotspot: {
+      left: "0.4%",
+      top: "88.2%",
+      width: "18.8%",
+      height: "9.1%",
+      borderRadius: "8px",
+    },
+    enterHotspot: {
+      left: "29.4%",
+      top: "75.2%",
+      width: "41%",
+      height: "11.4%",
+      borderRadius: "8px",
+    },
+    partnerHotspot: {
+      left: "34%",
+      top: "88.7%",
+      width: "31.8%",
+      height: "8.9%",
       borderRadius: "8px",
     },
   },

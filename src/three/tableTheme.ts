@@ -19,6 +19,11 @@ export interface TableTheme {
     | "subsolo-do-centro"
     | "salao-da-sul"
     | "centro-convencoes-prefeitura"
+    | "ginasio-estadual-maneco-file"
+    | "arena-nacional"
+    | "casino-me-maior"
+    | "centro-americano-truqueiro-medelin"
+    | "hotel-truco-segovia-espanha"
     | "wood-street"
     | "steel-patio"
   illustratedTableScale?: number
@@ -204,6 +209,86 @@ const CENTRO_CONVENCOES_PREFEITURA_THEME: TableTheme = {
   sceneVignetteStrength: 0.12,
 }
 
+const GINASIO_ESTADUAL_MANECO_FILE_THEME: TableTheme = {
+  backgroundColor: "#162d24",
+  tableColor: "#0f4a2d",
+  railColor: "#64533c",
+  badgeColor: "#8b2f24",
+  emptySlotColor: "#e8ddc3",
+  activeSlotColor: "#facc15",
+  accentColor: "#d4a13f",
+  tableKind: "steel",
+  rustColor: "#755234",
+  illustratedTableAsset: "ginasio-estadual-maneco-file",
+  illustratedTableScale: 1,
+  sceneWarmGlowStrength: 0.1,
+  sceneVignetteStrength: 0.12,
+}
+
+const ARENA_NACIONAL_THEME: TableTheme = {
+  backgroundColor: "#071822",
+  tableColor: "#06351f",
+  railColor: "#8a6730",
+  badgeColor: "#0f2f4a",
+  emptySlotColor: "#f4e6c2",
+  activeSlotColor: "#fbbf24",
+  accentColor: "#d4af37",
+  tableKind: "steel",
+  rustColor: "#8b6b2f",
+  illustratedTableAsset: "arena-nacional",
+  illustratedTableScale: 1,
+  sceneWarmGlowStrength: 0.08,
+  sceneVignetteStrength: 0.1,
+}
+
+const CENTRO_AMERICANO_TRUQUEIRO_MEDELIN_THEME: TableTheme = {
+  backgroundColor: "#061b1c",
+  tableColor: "#063d3d",
+  railColor: "#8b5e2b",
+  badgeColor: "#9d174d",
+  emptySlotColor: "#f5e7c5",
+  activeSlotColor: "#22d3ee",
+  accentColor: "#f0b83e",
+  tableKind: "steel",
+  rustColor: "#8a5c2f",
+  illustratedTableAsset: "centro-americano-truqueiro-medelin",
+  illustratedTableScale: 1,
+  sceneWarmGlowStrength: 0.08,
+  sceneVignetteStrength: 0.1,
+}
+
+const HOTEL_TRUCO_SEGOVIA_ESPANHA_THEME: TableTheme = {
+  backgroundColor: "#1f1712",
+  tableColor: "#05352a",
+  railColor: "#8b6830",
+  badgeColor: "#7f1d1d",
+  emptySlotColor: "#f4e7c8",
+  activeSlotColor: "#f5c542",
+  accentColor: "#d7a946",
+  tableKind: "steel",
+  rustColor: "#8a5c2f",
+  illustratedTableAsset: "hotel-truco-segovia-espanha",
+  illustratedTableScale: 1,
+  sceneWarmGlowStrength: 0.09,
+  sceneVignetteStrength: 0.1,
+}
+
+const CASINO_ME_MAIOR_THEME: TableTheme = {
+  backgroundColor: "#080706",
+  tableColor: "#052f20",
+  railColor: "#6f5122",
+  badgeColor: "#3f1212",
+  emptySlotColor: "#f0dfbd",
+  activeSlotColor: "#d4af37",
+  accentColor: "#c79b3b",
+  tableKind: "steel",
+  rustColor: "#70512a",
+  illustratedTableAsset: "casino-me-maior",
+  illustratedTableScale: 1,
+  sceneWarmGlowStrength: 0.07,
+  sceneVignetteStrength: 0.1,
+}
+
 const NEON_THEME: TableTheme = {
   backgroundColor: "#111827",
   tableColor: "#0f766e",
@@ -271,6 +356,26 @@ export function getTableTheme(visualTheme?: string): TableTheme {
 
   if (visualTheme.includes("cidade-evento")) {
     return CENTRO_CONVENCOES_PREFEITURA_THEME
+  }
+
+  if (visualTheme.includes("estadual-classico")) {
+    return GINASIO_ESTADUAL_MANECO_FILE_THEME
+  }
+
+  if (visualTheme.includes("nacional-broadcast")) {
+    return ARENA_NACIONAL_THEME
+  }
+
+  if (visualTheme.includes("panamericano-show")) {
+    return CENTRO_AMERICANO_TRUQUEIRO_MEDELIN_THEME
+  }
+
+  if (visualTheme.includes("mundial-esportivo")) {
+    return HOTEL_TRUCO_SEGOVIA_ESPANHA_THEME
+  }
+
+  if (visualTheme.includes("casino-luxo")) {
+    return CASINO_ME_MAIOR_THEME
   }
 
   if (visualTheme.includes("claro")) {

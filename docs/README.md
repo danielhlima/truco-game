@@ -7,7 +7,10 @@ Para continuar o projeto em qualquer chat novo do Codex, leia nesta ordem:
 1. `docs/CONTENT.md`
 2. `docs/LAYOUT_RULES.md`
 3. `docs/TRUCO_RULES.md`
-4. `docs/NEXT_STEPS.md`
+4. `docs/IMAGE_PROMPT_STANDARDS.md`
+5. `docs/NEXT_STEPS.md`
+6. `docs/CAMPAIGN_PATH.md`
+7. `docs/NEXT_CHAT_PROMPT.md`
 
 ## Papel de cada arquivo
 
@@ -48,6 +51,15 @@ Define o pre-plano vivo:
 - o que esta em andamento
 - o proximo foco recomendado
 
+### `docs/IMAGE_PROMPT_STANDARDS.md`
+
+Define os padroes de prompts de imagem que funcionaram melhor:
+
+- estrutura obrigatoria para prompts de mesa, background, host, campanha e resultado
+- restricoes negativas para evitar artes inutilizaveis
+- lembrete de que mesa de gameplay nao pode ter fundo/cenario
+- direcao visual por tipo de asset e orientacoes para o proximo pacote bonus
+
 ### `docs/CAMPAIGN_PATH.md`
 
 Registra a expansao vertical da campanha:
@@ -55,6 +67,16 @@ Registra a expansao vertical da campanha:
 - tabela simples do caminho principal
 - dupla adversaria fixa, variante e dificuldade por bar
 - estado visual minimo aceito antes do polimento autoral
+
+### `docs/NEXT_CHAT_PROMPT.md`
+
+Entrega um prompt pronto para abrir um chat novo:
+
+- arquivos que devem ser lidos primeiro
+- estado atual da campanha principal
+- objetivo do proximo chat
+- restricoes criativas do nivel bonus
+- pendencias de regras e produto que devem ser tratadas depois dos prompts/assets
 
 ### `docs/CHARACTER_AVATAR_PROMPTS.md`
 
@@ -158,24 +180,38 @@ Estado consolidado:
 - ao completar as vitorias requeridas de um bar, o jogo exibe a tela definitiva do bar no lugar da vitoria normal da partida
 - se o bar completado for o ultimo do circuito, o jogo mostra a tela definitiva do bar e em seguida a tela definitiva do circuito
 - a tela de resultado so aparece depois da ultima carta visivel na mesa, com atraso de 1 segundo para leitura humana
+- caminho principal da campanha agora tem pacote visual autoral integrado ate o `Cassino Mé Maior`:
+  - `Centro de Convenções da Prefeitura`
+  - `Ginásio Estadual Maneco Filé`
+  - `Arena Nacional`
+  - `Centro Americano Truqueiro de Medelin`
+  - `Hotel Truco de Segóvia, Espanha`
+  - `Cassino Mé Maior`
+- os pacotes recentes incluem campanha, background de gameplay, host, mesa, vitoria/derrota normal e conquistas definitivas de local/circuito
 
 ## Prioridade imediata para o proximo chat
 
-No proximo chat, retomar a expansao vertical da campanha pelo passo 3, trabalhando bar a bar ate fechar o caminho principal jogavel.
+No proximo chat, retomar pelo conteudo bonus pos-campanha.
 
 Proximo foco recomendado:
 
-- consolidar a tabela do caminho principal entre `docs/CAMPAIGN_PATH.md` e `src/career/campaign/campaignData.ts`
-- manter `Bar Maneco Banguela`, `Trem do Jaça`, `Adega do Juca Bigode`, `Garagem Norte`, `Quintal da Leste`, `Subsolo do Centro` e `Salao da Sul` como modelos completos de expansao ja integrados
-- validar a `Conquista das Zonas` no fluxo real e preparar o `Centro de Convenções da Prefeitura` como proximo bar jogavel minimo
-- validar exclusividade de personagens por bar e desbloqueio da dupla derrotada como parceria
-- conferir variantes declaradas sem misturar com a correcao completa Mineiro/Paulista
-- preservar fallback visual aceitavel para bares sem arte propria
+- usar `docs/NEXT_CHAT_PROMPT.md` como briefing inicial copiavel
+- gerar primeiro os prompts do nivel bonus `Circuito Intergaláctico` / `Órbita da Lua`
+- alem dos 8 assets de costume, gerar tambem prompts para imagens pequenas dos adversarios do bonus
+- manter a direcao bonus divertida, cosmica, autoral e truqueira, sem monstros, ETs assustadores, horror, gore ou criaturas grotescas
+- nao implementar assets antes de o usuario trazer as imagens aprovadas
+- depois dos prompts/assets do bonus, retomar pendencias de produto e regra:
+  - ver cartas na mao especial de 9/dez pontos, confirmando a nomenclatura desejada antes de implementar
+  - opcao para escolher ou nao a variante `ponto acima`
+  - tutorial jogavel
+  - aplicacao efetiva das variantes Mineiro/Paulista
+  - carta virada para baixo na segunda e terceira vazas
 
 Depois disso, seguir para:
 
-- expansao do modelo da capa para outros bares
-- telas autorais de resultado para os proximos bares
+- integracao do pacote bonus aprovado
+- testes de progressao pos-campanha
+- refinamento de regras, tutorial e escolhas de variante
 
 ## Regra de continuidade
 

@@ -123,14 +123,26 @@ Hoje a força da mão é calculada assim:
 
 As regras abaixo foram confirmadas como desejadas, mas ainda nao devem ser tratadas como implementadas:
 
-### Mao de nove
+### Mao de nove / mao de dez pontos
 
-- a partir da rodada em que uma dupla atinge `9 pontos`, os dois parceiros dessa dupla podem ver as cartas um do outro
+- a documentacao historica registra esta regra como `mao de nove`, com gatilho em `9 pontos`
+- em conversa posterior, a pendencia foi citada como "ver cartas na mao de dez pontos"
+- antes de implementar, confirmar a nomenclatura e o gatilho desejado: manter `9 pontos`, trocar para `10 pontos`, ou oferecer isso como variante configuravel
+- a partir da rodada especial confirmada, os dois parceiros dessa dupla podem ver as cartas um do outro
 - depois de ver as cartas, essa dupla pode optar por nao jogar a rodada
 - se a dupla optar por nao jogar, a dupla adversaria recebe `1 ponto`
 - se a dupla optar por jogar e perder, a dupla adversaria recebe `3 pontos`
-- a interface precisa deixar claro quando uma dupla esta em `mao de nove` e, por isso, nao pode pedir truco/aumentar como numa mao comum
+- a interface precisa deixar claro quando uma dupla esta nessa mao especial e, por isso, nao pode pedir truco/aumentar como numa mao comum
 - a indicacao visual deve explicar o bloqueio do botao de aumento para evitar parecer erro de input do jogador
+
+### Ponto acima
+
+- existe uma decisao de produto pendente para permitir escolher se a partida usa ou nao a versao `ponto acima`
+- antes de implementar, definir onde essa escolha vive:
+  - configuracao global antes da campanha
+  - configuracao por bar/circuito
+  - opcao avancada fora da primeira tela visivel
+- a escolha precisa ser persistida e refletida claramente na tela de campanha ou na entrada da partida
 
 ### Carta virada para baixo
 
