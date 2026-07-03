@@ -13,6 +13,7 @@ import tableTopGaragemNorteUrl from "../assets/boteco/table-top-garagem-norte.pn
 import tableTopGinasioEstadualManecoFileUrl from "../assets/boteco/table-top-ginasio-estadual-maneco-file.png"
 import tableTopHotelTrucoSegoviaEspanhaUrl from "../assets/boteco/table-top-hotel-truco-segovia-espanha.png"
 import tableTopManecoWoodUrl from "../assets/boteco/table-top-maneco-wood.png"
+import tableTopOrbitaDaLuaUrl from "../assets/boteco/table-top-orbita-da-lua.png"
 import tableTopQuintalDaLesteUrl from "../assets/boteco/table-top-quintal-da-leste.png"
 import tableTopSalaoDaSulUrl from "../assets/boteco/table-top-salao-da-sul.png"
 import tableTopSteelPatioUrl from "../assets/boteco/table-top-steel-patio.png"
@@ -32,6 +33,7 @@ const ILLUSTRATED_TABLE_ASSET_URLS: Record<string, string> = {
   "casino-me-maior": tableTopCasinoMeMaiorUrl,
   "centro-americano-truqueiro-medelin": tableTopCentroAmericanoTruqueiroMedelinUrl,
   "hotel-truco-segovia-espanha": tableTopHotelTrucoSegoviaEspanhaUrl,
+  "orbita-da-lua": tableTopOrbitaDaLuaUrl,
   "garagem-norte": tableTopGaragemNorteUrl,
   "quintal-da-leste": tableTopQuintalDaLesteUrl,
   "subsolo-do-centro": tableTopSubsoloDoCentroUrl,
@@ -92,7 +94,8 @@ export function GameTableScene({
     illustratedTableAsset === "arena-nacional" ||
     illustratedTableAsset === "casino-me-maior" ||
     illustratedTableAsset === "centro-americano-truqueiro-medelin" ||
-    illustratedTableAsset === "hotel-truco-segovia-espanha"
+    illustratedTableAsset === "hotel-truco-segovia-espanha" ||
+    illustratedTableAsset === "orbita-da-lua"
   const illustratedTableUrl = illustratedTableAsset
     ? ILLUSTRATED_TABLE_ASSET_URLS[illustratedTableAsset] ?? tableTopGhibliishUrl
     : tableTopGhibliishUrl

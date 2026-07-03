@@ -126,6 +126,7 @@ const DEFINITIVE_VICTORY_STAGE_IDS = new Set([
   "circuito-panamericano",
   "jogos-mundiais",
   "mundial",
+  "intergalactico",
 ])
 
 function buildCampaignVictoryScreens(

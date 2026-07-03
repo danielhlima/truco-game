@@ -143,11 +143,11 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
   },
   {
     id: "mane-banguela",
-    name: "Mane Banguela",
-    nickname: "O Bigode Nervoso",
+    name: "Mané Banguela",
+    nickname: "O Sorriso Lunar",
     personalityId: "reckless",
     role: "opponent",
-    playStyle: "Explosivo, impulsivo, sobe aposta no susto",
+    playStyle: "Espalhafatoso, provocador, sobe aposta sorrindo",
     attributes: {
       courage: 5,
       patience: 1,
@@ -155,7 +155,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: maneBanguelaAsset,
     story:
-      "Reza a lenda que ele ja ficou tao bravo com um parceiro ruim que ganhou a mao so no odio. No bairro, contam que o bigode dele se move um milimetro para cima sempre que alguem esta prestes a cometer uma burrice historica.",
+      "Mané jura que blefe em gravidade baixa dura mais tempo no ar. Ri antes de pedir truco, ri quando corre e ri mais ainda quando alguem acredita que ele esta distraido.",
   },
   {
     id: "joca-busao",
@@ -639,11 +639,11 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
   },
   {
     id: "cosme-orbita",
-    name: "Cosme Orbita",
+    name: "Cosme Órbita",
     nickname: "O Sem Gravidade",
     personalityId: "volatile",
     role: "npc",
-    playStyle: "Imprevisivel, acelerado, joga como se a mesa flutuasse",
+    playStyle: "Imprevisivel, acelerado, comenta a propria malicia",
     attributes: {
       courage: 5,
       patience: 1,
@@ -651,7 +651,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: cosmeOrbitaAsset,
     story:
-      "Cosme afirma que aprendeu truco durante uma pane de energia que durou pouco demais para ser comprovada. Desde entao, muda de ideia no meio da frase e considera isso uma qualidade estrategica.",
+      "Cosme opera a transmissao orbital e ainda arruma tempo para confundir a mesa. Muda de ideia no meio da frase, chama isso de estrategia e aumenta a aposta antes do microfone esfriar.",
   },
 ]
 

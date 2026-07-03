@@ -24,6 +24,7 @@ export interface TableTheme {
     | "casino-me-maior"
     | "centro-americano-truqueiro-medelin"
     | "hotel-truco-segovia-espanha"
+    | "orbita-da-lua"
     | "wood-street"
     | "steel-patio"
   illustratedTableScale?: number
@@ -289,6 +290,22 @@ const CASINO_ME_MAIOR_THEME: TableTheme = {
   sceneVignetteStrength: 0.1,
 }
 
+const LUNAR_ORBIT_THEME: TableTheme = {
+  backgroundColor: "#07111f",
+  tableColor: "#0f766e",
+  railColor: "#3b2568",
+  badgeColor: "#be185d",
+  emptySlotColor: "#e0f2fe",
+  activeSlotColor: "#f9a8d4",
+  accentColor: "#22d3ee",
+  tableKind: "steel",
+  rustColor: "#8b5cf6",
+  illustratedTableAsset: "orbita-da-lua",
+  illustratedTableScale: 1,
+  sceneWarmGlowStrength: 0.12,
+  sceneVignetteStrength: 0.18,
+}
+
 const NEON_THEME: TableTheme = {
   backgroundColor: "#111827",
   tableColor: "#0f766e",
@@ -376,6 +393,14 @@ export function getTableTheme(visualTheme?: string): TableTheme {
 
   if (visualTheme.includes("casino-luxo")) {
     return CASINO_ME_MAIOR_THEME
+  }
+
+  if (
+    visualTheme.includes("sci-fi") ||
+    visualTheme.includes("lunar") ||
+    visualTheme.includes("intergalactico")
+  ) {
+    return LUNAR_ORBIT_THEME
   }
 
   if (visualTheme.includes("claro")) {

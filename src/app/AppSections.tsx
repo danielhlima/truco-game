@@ -58,6 +58,11 @@ import casinoMeMaiorBackgroundAsset from "../assets/venues/casino-me-maior/backg
 import casinoMeMaiorHostAsset from "../assets/venues/casino-me-maior/host-casino-me-maior.png"
 import casinoMeMaiorMatchResultLossAsset from "../assets/venues/casino-me-maior/match-result-loss.png"
 import casinoMeMaiorMatchResultWinAsset from "../assets/venues/casino-me-maior/match-result-win.png"
+import orbitaDaLuaCampaignJourneyAsset from "../assets/campaign/circuito-intergalactico-orbita-da-lua.png"
+import orbitaDaLuaBackgroundAsset from "../assets/venues/orbita-da-lua/background.png"
+import orbitaDaLuaHostAsset from "../assets/venues/orbita-da-lua/host-orbita-da-lua.png"
+import orbitaDaLuaMatchResultLossAsset from "../assets/venues/orbita-da-lua/match-result-loss.png"
+import orbitaDaLuaMatchResultWinAsset from "../assets/venues/orbita-da-lua/match-result-win.png"
 import zonaSulSalaoCampaignJourneyAsset from "../assets/campaign/conquista-zonas-salao-da-sul.png"
 import zonaSulSalaoBackgroundAsset from "../assets/venues/zona-sul-salao/background.png"
 import zonaSulSalaoHostAsset from "../assets/venues/zona-sul-salao/host-zona-sul-salao.png"
@@ -67,6 +72,7 @@ import victoryStageCampeonatoVilaNanaAsset from "../assets/campaign-victories/st
 import victoryStageCampeonatoEstadualAsset from "../assets/campaign-victories/stage-campeonato-estadual.png"
 import victoryStageCampeonatoNacionalAsset from "../assets/campaign-victories/stage-campeonato-nacional.png"
 import victoryStageCircuitoPanamericanoAsset from "../assets/campaign-victories/stage-circuito-panamericano.png"
+import victoryStageIntergalacticoAsset from "../assets/campaign-victories/stage-intergalactico.png"
 import victoryStageJogosMundiaisAsset from "../assets/campaign-victories/stage-jogos-mundiais.png"
 import victoryStageMundialAsset from "../assets/campaign-victories/stage-mundial.png"
 import victoryStageRuaPeriferiaAsset from "../assets/campaign-victories/stage-rua-periferia.png"
@@ -358,6 +364,20 @@ const VENUE_COVER_CONFIG_BY_ID: Record<string, VenueCoverConfig> = {
     dividerAsset: zeCatingaDividerAsset,
     statsPlaqueAsset: zeCatingaStatsPlaqueAsset,
   },
+  "orbita-da-lua": {
+    hostName: "Cosme Órbita",
+    hostRole: "Operador da Transmissão Orbital",
+    hostQuote: "Sem gravidade, mas com malícia.",
+    leadText: "Bônus final. Truco em órbita, resenha lunar e blefe transmitido ao vivo.",
+    description: "Na Órbita da Lua, o mundo ficou pequeno e a mesa resolveu desafiar o espaço.",
+    backgroundAsset: orbitaDaLuaBackgroundAsset,
+    hostPortraitAsset: orbitaDaLuaHostAsset,
+    quoteBoardAsset: zeCatingaQuoteBoardAsset,
+    ctaPlaqueAsset: zeCatingaCtaPlaqueAsset,
+    difficultyBottleAsset: zeCatingaDifficultyBottleAsset,
+    dividerAsset: zeCatingaDividerAsset,
+    statsPlaqueAsset: zeCatingaStatsPlaqueAsset,
+  },
 }
 
 const MATCH_RESULT_ASSET_BY_VENUE_ID: Record<string, { loss?: string; win?: string }> = {
@@ -417,6 +437,10 @@ const MATCH_RESULT_ASSET_BY_VENUE_ID: Record<string, { loss?: string; win?: stri
     loss: casinoMeMaiorMatchResultLossAsset,
     win: casinoMeMaiorMatchResultWinAsset,
   },
+  "orbita-da-lua": {
+    loss: orbitaDaLuaMatchResultLossAsset,
+    win: orbitaDaLuaMatchResultWinAsset,
+  },
 }
 
 const CAMPAIGN_VICTORY_ASSET_BY_VENUE_ID: Record<string, string> = {
@@ -445,6 +469,7 @@ const CAMPAIGN_VICTORY_ASSET_BY_STAGE_ID: Record<string, string> = {
   "circuito-panamericano": victoryStageCircuitoPanamericanoAsset,
   "jogos-mundiais": victoryStageJogosMundiaisAsset,
   mundial: victoryStageMundialAsset,
+  intergalactico: victoryStageIntergalacticoAsset,
 }
 
 interface ControlsPanelProps {
@@ -2024,6 +2049,31 @@ const authoredCampaignScreens: Record<
       top: "88.7%",
       width: "31.8%",
       height: "8.9%",
+      borderRadius: "8px",
+    },
+  },
+  "orbita-da-lua": {
+    asset: orbitaDaLuaCampaignJourneyAsset,
+    alt: "Jornada bonus final do Circuito Intergalactico com Orbita da Lua atual",
+    backHotspot: {
+      left: "28.8%",
+      top: "88.5%",
+      width: "42.5%",
+      height: "9.6%",
+      borderRadius: "8px",
+    },
+    enterHotspot: {
+      left: "49.4%",
+      top: "68.6%",
+      width: "25.2%",
+      height: "17%",
+      borderRadius: "8px",
+    },
+    partnerHotspot: {
+      left: "25.7%",
+      top: "68.7%",
+      width: "22.5%",
+      height: "16.8%",
       borderRadius: "8px",
     },
   },

@@ -12,6 +12,7 @@ import arenaNacionalSceneBgAsset from "./assets/venues/arena-nacional/background
 import centroAmericanoTruqueiroMedelinSceneBgAsset from "./assets/venues/centro-americano-truqueiro-medelin/background.png"
 import hotelTrucoSegoviaEspanhaSceneBgAsset from "./assets/venues/hotel-truco-segovia-espanha/background.png"
 import casinoMeMaiorSceneBgAsset from "./assets/venues/casino-me-maior/background.png"
+import orbitaDaLuaSceneBgAsset from "./assets/venues/orbita-da-lua/background.png"
 import zonaSulSalaoSceneBgAsset from "./assets/venues/zona-sul-salao/background.png"
 import manecoBanguelaSceneBgAsset from "./assets/venues/maneco-banguela/background.png"
 import tremDoJacaSceneBgAsset from "./assets/venues/trem-do-jaca/background.png"
@@ -32,6 +33,7 @@ const GAMEPLAY_BACKGROUND_ASSET_BY_VENUE_ID: Record<string, string> = {
   "centro-americano-truqueiro-medelin": centroAmericanoTruqueiroMedelinSceneBgAsset,
   "hotel-truco-segovia-espanha": hotelTrucoSegoviaEspanhaSceneBgAsset,
   "casino-me-maior": casinoMeMaiorSceneBgAsset,
+  "orbita-da-lua": orbitaDaLuaSceneBgAsset,
 }
 
 const TableSection = lazy(async () => {
