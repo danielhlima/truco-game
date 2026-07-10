@@ -69,6 +69,19 @@ test("respondToTruco com raise aceita o valor atual e propõe o próximo", () =>
 test("stepHand permite que a IA aceite e peça aumento quando a mão for forte", () => {
   const state = createHandStateFixture({
     currentBet: 1,
+    players: [
+      { id: 1, hand: [] },
+      {
+        id: 2,
+        hand: [
+          { rank: "3", suit: "copas" },
+          { rank: "2", suit: "paus" },
+          { rank: "Q", suit: "ouros" },
+        ],
+      },
+      { id: 3, hand: [] },
+      { id: 4, hand: [] },
+    ],
     truco: {
       phase: "awaiting-response",
       requestedByPlayerId: 1,

@@ -7,51 +7,81 @@ import {
   respondToRaise,
   shouldRaiseBet,
 } from "../../src/ai/trucoDecision.ts"
+import { getAiTrucoPersonalityIdForDifficulty } from "../../src/ai/trucoPersonalities.ts"
 import { getRuleSet } from "../../src/game/getRuleSet.ts"
 import { createCard } from "../helpers/gameFixtures.ts"
 
 const ruleSet = getRuleSet("MINEIRO")
 
-test("perfil conservador pede truco menos que o balanced com mão média", () => {
+test("perfil balanced só abre truco inicial com mão firme", () => {
+  const mediumHand = [
+    createCard("A", "copas"),
+    createCard("K", "espada"),
+    createCard("Q", "ouros"),
+  ]
+  const firmHand = [
+    createCard("2", "copas"),
+    createCard("K", "espada"),
+    createCard("Q", "ouros"),
+  ]
+
+  assert.equal(shouldRaiseBet(ruleSet, mediumHand, 1, undefined, "balanced"), false)
+  assert.equal(shouldRaiseBet(ruleSet, firmHand, 1, undefined, "balanced"), true)
+})
+
+test("perfil balanced corre de truco com mão fraca e aceita com duas honras", () => {
+  const weakishHand = [
+    createCard("A", "copas"),
+    createCard("7", "espada"),
+    createCard("4", "ouros"),
+  ]
+  const playableHand = [
+    createCard("A", "copas"),
+    createCard("K", "espada"),
+    createCard("4", "ouros"),
+  ]
+
+  assert.equal(respondToRaise(ruleSet, weakishHand, 3, undefined, "balanced"), "run")
+  assert.equal(respondToRaise(ruleSet, playableHand, 3, undefined, "balanced"), "accept")
+})
+
+test("perfil balanced aceita, mas não contra-aumenta, com mão só razoável", () => {
+  const teamHands = [
+    [createCard("2", "ouros"), createCard("K", "espada"), createCard("Q", "copas")],
+    [createCard("7", "paus"), createCard("6", "espada"), createCard("4", "copas")],
+  ]
+
+  assert.equal(getTeamTrucoDecision(ruleSet, teamHands, 3, undefined, "balanced"), "accept")
+})
+
+test("perfil balanced contra-aumenta quando a dupla tem uma mão forte", () => {
+  const teamHands = [
+    [createCard("3", "ouros"), createCard("2", "espada"), createCard("Q", "copas")],
+    [createCard("7", "paus"), createCard("6", "espada"), createCard("4", "copas")],
+  ]
+
+  assert.equal(getTeamTrucoDecision(ruleSet, teamHands, 3, undefined, "balanced"), "raise")
+})
+
+test("perfil agressivo só passa do balanced em mão média por blefe controlado", () => {
   const mediumHand = [
     createCard("A", "copas"),
     createCard("K", "espada"),
     createCard("Q", "ouros"),
   ]
 
-  assert.equal(shouldRaiseBet(ruleSet, mediumHand, 1, undefined, "balanced"), true)
-  assert.equal(shouldRaiseBet(ruleSet, mediumHand, 1, undefined, "conservative"), false)
+  assert.equal(shouldRaiseBet(ruleSet, mediumHand, 1, undefined, "balanced"), false)
+  assert.equal(shouldRaiseBet(ruleSet, mediumHand, 1, undefined, "aggressive", () => 0.01), true)
+  assert.equal(shouldRaiseBet(ruleSet, mediumHand, 1, undefined, "aggressive", () => 0.95), false)
 })
 
-test("perfil conservador corre de truco com mão fraca onde o balanced aceitaria", () => {
-  const weakishHand = [
-    createCard("A", "copas"),
-    createCard("7", "espada"),
-    createCard("4", "ouros"),
-  ]
-
-  assert.equal(respondToRaise(ruleSet, weakishHand, 3, undefined, "balanced"), "accept")
-  assert.equal(respondToRaise(ruleSet, weakishHand, 3, undefined, "conservative"), "run")
-})
-
-test("perfil conservador evita contra-aumento com dupla só razoável", () => {
-  const teamHands = [
-    [createCard("2", "ouros"), createCard("K", "espada"), createCard("Q", "copas")],
-    [createCard("7", "paus"), createCard("6", "espada"), createCard("4", "copas")],
-  ]
-
-  assert.equal(getTeamTrucoDecision(ruleSet, teamHands, 3, undefined, "balanced"), "raise")
-  assert.equal(getTeamTrucoDecision(ruleSet, teamHands, 3, undefined, "conservative"), "accept")
-})
-
-test("perfil conservador orienta correr onde o balanced ainda vê jogo", () => {
+test("conselho da parceira manda correr quando a dupla só tem uma honra", () => {
   const teamHands = [
     [createCard("A", "copas"), createCard("7", "espada"), createCard("4", "ouros")],
     [createCard("7", "paus"), createCard("6", "espada"), createCard("4", "copas")],
   ]
 
-  assert.equal(getTeamPartnerAdvice(ruleSet, teamHands, 3, undefined, "balanced"), "CÊ QUE SABE!")
-  assert.equal(getTeamPartnerAdvice(ruleSet, teamHands, 3, undefined, "conservative"), "MELHOR CORRER!")
+  assert.equal(getTeamPartnerAdvice(ruleSet, teamHands, 3, undefined, "balanced"), "MELHOR CORRER!")
 })
 
 test("perfil ultra conservador pede menos que o conservador com mão boa, mas não ótima", () => {
@@ -65,9 +95,9 @@ test("perfil ultra conservador pede menos que o conservador com mão boa, mas n�
   assert.equal(shouldRaiseBet(ruleSet, goodHand, 1, undefined, "ultra_conservative"), false)
 })
 
-test("perfil agressivo pede truco com mais facilidade que o balanced", () => {
+test("perfil agressivo aumenta com mão firme onde o balanced só aceita", () => {
   const mediumHand = [
-    createCard("A", "copas"),
+    createCard("2", "copas"),
     createCard("K", "espada"),
     createCard("Q", "ouros"),
   ]
@@ -149,8 +179,8 @@ test("MELHOR CORRER! pesa de verdade e pode derrubar o aceite da dupla", () => {
     createCard("4", "ouros"),
   ]
   const partnerHand = [
-    createCard("K", "paus"),
-    createCard("6", "espada"),
+    createCard("2", "espada"),
+    createCard("6", "paus"),
     createCard("4", "copas"),
   ]
 
@@ -194,7 +224,7 @@ test("conselho da parceira cobre BORA!, CÊ QUE SABE! e MELHOR CORRER!", () => {
       ruleSet,
       [
         [createCard("A", "copas"), createCard("7", "espada"), createCard("4", "ouros")],
-        [createCard("A", "paus"), createCard("K", "copas"), createCard("4", "espada")],
+        [createCard("A", "paus"), createCard("K", "copas"), createCard("K", "espada")],
       ],
       6
     ),
@@ -211,5 +241,24 @@ test("conselho da parceira cobre BORA!, CÊ QUE SABE! e MELHOR CORRER!", () => {
       6
     ),
     "MELHOR CORRER!"
+  )
+})
+
+test("dificuldade máxima disciplinada usa blefe controlado em vez de reckless", () => {
+  assert.equal(
+    getAiTrucoPersonalityIdForDifficulty({
+      aiLevel: 5,
+      aggression: 5,
+      trucoDiscipline: 5,
+    }),
+    "trickster"
+  )
+  assert.equal(
+    getAiTrucoPersonalityIdForDifficulty({
+      aiLevel: 5,
+      aggression: 5,
+      trucoDiscipline: 2,
+    }),
+    "reckless"
   )
 })
