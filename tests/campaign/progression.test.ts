@@ -115,6 +115,15 @@ test("os quatro primeiros bares seguem o caminho vertical planejado", () => {
   ])
 })
 
+test("reta mundial da campanha usa Truco Mineiro", () => {
+  const venuesById = new Map(
+    CAMPAIGN_STAGES.flatMap((stage) => stage.venues).map((venue) => [venue.id, venue])
+  )
+
+  assert.equal(venuesById.get("hotel-truco-segovia-espanha")?.variant, "MINEIRO")
+  assert.equal(venuesById.get("casino-me-maior")?.variant, "MINEIRO")
+})
+
 test("parceiros iniciais não antecipam adversários de bares futuros", () => {
   const opponentCharacterIds = new Set(
     CAMPAIGN_STAGES.flatMap((stage) =>

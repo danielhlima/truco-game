@@ -19,6 +19,36 @@ test("IA não queima copilha depois do zap no Mineiro quando não pode ganhar a 
   assert.deepEqual(chooseCard(getRuleSet("MINEIRO"), 4, hand, table), createCard("6", "paus"))
 })
 
+test("IA descarta a menor carta quando nenhuma carta da mão pode ganhar", () => {
+  const table = [
+    { playerId: 1, card: createCard("4", "paus") },
+    { playerId: 2, card: createCard("2", "espada") },
+    { playerId: 3, card: createCard("K", "ouros") },
+  ]
+  const hand = [
+    createCard("3", "copas"),
+    createCard("2", "paus"),
+    createCard("5", "espada"),
+  ]
+
+  assert.deepEqual(chooseCard(getRuleSet("MINEIRO"), 4, hand, table), createCard("5", "espada"))
+})
+
+test("IA usa a menor carta que ganha quando ainda pode vencer a vaza", () => {
+  const table = [
+    { playerId: 1, card: createCard("K", "ouros") },
+    { playerId: 2, card: createCard("Q", "espada") },
+    { playerId: 3, card: createCard("J", "copas") },
+  ]
+  const hand = [
+    createCard("3", "copas"),
+    createCard("2", "paus"),
+    createCard("5", "espada"),
+  ]
+
+  assert.deepEqual(chooseCard(getRuleSet("MINEIRO"), 4, hand, table), createCard("2", "paus"))
+})
+
 test("IA descarta a menor carta quando a parceira já está ganhando no Paulista", () => {
   const table = [
     { playerId: 1, card: createCard("Q", "espada") },

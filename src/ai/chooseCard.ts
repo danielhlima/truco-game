@@ -29,15 +29,23 @@ export function chooseCard(
     return getLowestCard(ruleSet, hand, vira)
   }
 
-  const winningCards = hand.filter(card =>
-    compareCards(ruleSet, card, best.card, vira) > 0
-  )
+  const winningCards = getWinningCards(ruleSet, hand, best.card, vira)
 
   if (winningCards.length > 0) {
     return getLowestCard(ruleSet, winningCards, vira)
   }
 
+  // If the trick is already unwinnable, preserve every stronger card and throw the cheapest one.
   return getLowestCard(ruleSet, hand, vira)
+}
+
+function getWinningCards(
+  ruleSet: RuleSet,
+  cards: Card[],
+  bestTableCard: Card,
+  vira?: Card
+): Card[] {
+  return cards.filter((card) => compareCards(ruleSet, card, bestTableCard, vira) > 0)
 }
 
 function getLowestCard(
