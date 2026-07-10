@@ -29,6 +29,7 @@ import {
   applyCompletedHandToMatch,
   type MatchState,
 } from "../game/matchState"
+import { decideNineHand, isNineHandAwaitingDecision } from "../game/nineHand"
 import { playHumanCard } from "../game/playHumanCard"
 import { requestTruco } from "../game/requestTruco"
 import { respondToTruco } from "../game/respondToTruco"
@@ -447,12 +448,21 @@ export function useGameSession() {
 
   const canHumanAdvisePartner =
     !isGameplayIntroActive && shouldPartnerConsultHuman(handState)
+  const canHumanDecideNineHand =
+    !!handState &&
+    !isGameplayIntroActive &&
+    !handState.finished &&
+    handState.nineHand?.team === "A" &&
+    handState.nineHand.phase === "awaiting-decision" &&
+    !inGameContextMenuOpen &&
+    !inGameConfirmation
 
   const canRequestTruco =
     !!handState &&
     !!matchState &&
     !isGameplayIntroActive &&
     !handState.finished &&
+    !handState.nineHand &&
     handState.currentPlayerId === 1 &&
     handState.table.length < 4 &&
     handState.truco.phase === "idle" &&
@@ -467,6 +477,7 @@ export function useGameSession() {
     !!handState &&
     !!matchState &&
     canHumanRespondToTruco &&
+    !handState.nineHand &&
     canTeamAskForTruco(matchState.score, "A") &&
     getNextRaiseValueFromPendingTruco(handState) !== null
 
@@ -474,6 +485,7 @@ export function useGameSession() {
     !!handState &&
     !handState.finished &&
     !isGameplayIntroActive &&
+    !isNineHandAwaitingDecision(handState) &&
     handState.currentPlayerId === 1 &&
     handState.table.length < 4 &&
     handState.truco.phase === "idle"
@@ -1098,6 +1110,28 @@ export function useGameSession() {
     })
   }
 
+  function handlePlayNineHand() {
+    if (!handState || !canHumanDecideNineHand) return
+
+    const nextState = decideNineHand(handState, "play")
+
+    applyHandState(nextState, {
+      eventMessage: "Vocês decidiram jogar a mão de 9.",
+      trucoMessage: "Mão de 9: as cartas da parceira estão abertas para vocês. A mão vale 3 pontos e não permite truco.",
+    })
+  }
+
+  function handleFoldNineHand() {
+    if (!handState || !canHumanDecideNineHand) return
+
+    const nextState = decideNineHand(handState, "fold")
+
+    applyHandState(nextState, {
+      eventMessage: "Vocês não jogaram a mão de 9. Eles recebem 1 ponto.",
+      trucoMessage: "Mão de 9 recusada. A dupla adversária recebeu 1 ponto.",
+    })
+  }
+
   function handleRaiseTruco() {
     if (!handState || isGameplayIntroActive || !canHumanRaiseTruco || inGameContextMenuOpen || inGameConfirmation) return
 
@@ -1186,7 +1220,12 @@ export function useGameSession() {
       return
     }
 
-    if (canHumanRespondToTruco || canHumanAdvisePartner || canPlayHumanCard) {
+    if (
+      canHumanRespondToTruco ||
+      canHumanAdvisePartner ||
+      canHumanDecideNineHand ||
+      canPlayHumanCard
+    ) {
       return
     }
 
@@ -1211,7 +1250,9 @@ export function useGameSession() {
         getHandRuleContextLogLines(nextState).forEach((line) => logEvent(line))
         applyHandState(nextState, {
           eventMessage: `Mão ${nextHandNumber} iniciada.`,
-          trucoMessage: DEFAULT_TRUCO_MESSAGE,
+          trucoMessage: nextState.nineHand
+            ? "Mão de 9: a dupla em 9 vê as cartas da parceria e decide se joga."
+            : DEFAULT_TRUCO_MESSAGE,
           speechBubble: null,
         })
         return
@@ -1233,6 +1274,7 @@ export function useGameSession() {
   }, [
     applyHandState,
     canHumanAdvisePartner,
+    canHumanDecideNineHand,
     canHumanRespondToTruco,
     canPlayHumanCard,
     canPlayCoveredCard,
@@ -1472,6 +1514,29 @@ export function useGameSession() {
 
   function handleCloseInGameContextMenu() {
     setInGameContextMenuOpen(false)
+  }
+
+  function handleAddEightPointsFromContextMenu() {
+    if (!handState || !matchState || matchState.finished) return
+
+    const nextScore = {
+      ...matchState.score,
+      A: Math.min(11, matchState.score.A + 8),
+    }
+
+    setMatchState({
+      ...matchState,
+      score: nextScore,
+    })
+    setInGameContextMenuOpen(false)
+    setEventMessage(`Atalho de teste: nós fomos para ${nextScore.A} ponto(s).`)
+    setTrucoMessage(
+      nextScore.A >= 9
+        ? "Atalho aplicado. A próxima mão nossa deve abrir a Mão de 9."
+        : "Atalho aplicado. Ganhe mais ponto(s) para abrir a Mão de 9."
+    )
+    logEvent("Atalho de teste: nosso time ganhou 8 ponto(s).")
+    syncLogs()
   }
 
   function handleWinMatchFromContextMenu() {
@@ -1788,6 +1853,7 @@ export function useGameSession() {
 
   return {
     activeVariant,
+    canHumanDecideNineHand,
     canHumanRespondToTruco,
     canHumanAdvisePartner,
     canPlayHumanCard,
@@ -1815,6 +1881,7 @@ export function useGameSession() {
     inGameContextMenuOpen,
     matchResultScreen,
     handleAcceptTruco,
+    handleAddEightPointsFromContextMenu,
     handleCancelInGameConfirmation,
     handleCloseInGameContextMenu,
     handleCloseFreePlayStage,
@@ -1827,6 +1894,8 @@ export function useGameSession() {
     handleOpenInGameContextMenu,
     handlePlayCard,
     handlePartnerAdvice,
+    handlePlayNineHand,
+    handleFoldNineHand,
     handleRaiseTruco,
     handleRequestTruco,
     handleResetCampaign,

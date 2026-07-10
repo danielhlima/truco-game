@@ -22,6 +22,11 @@ export interface TrucoState {
   nextRaiseByTeam?: TeamId
 }
 
+export interface NineHandState {
+  team: TeamId
+  phase: "awaiting-decision" | "playing"
+}
+
 export interface HandState {
   variant: GameVariant
   vira?: Card
@@ -38,4 +43,5 @@ export interface HandState {
   finished: boolean
   winner?: TeamId
   truco: TrucoState
+  nineHand?: NineHandState
 }

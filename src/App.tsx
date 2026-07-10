@@ -97,6 +97,7 @@ function App() {
   const {
     activeVariant,
     canHumanAdvisePartner,
+    canHumanDecideNineHand,
     canHumanRaiseTruco,
     canHumanRespondToTruco,
     canPlayHumanCard,
@@ -120,6 +121,7 @@ function App() {
     inGameContextMenuOpen,
     matchResultScreen,
     handleAcceptTruco,
+    handleAddEightPointsFromContextMenu,
     handleCancelInGameConfirmation,
     handleCloseFreePlayStage,
     handleCloseInGameContextMenu,
@@ -137,6 +139,8 @@ function App() {
     handleOpenInGameContextMenu,
     handleOpenCharacterSelect,
     handlePlayCard,
+    handlePlayNineHand,
+    handleFoldNineHand,
     handleRaiseTruco,
     handleRequestTruco,
     handleResetCampaign,
@@ -155,6 +159,7 @@ function App() {
     menuScreen,
     opponentCharacters,
     player1,
+    player3,
     playerProfile,
     selectedPlayerSkin,
     selectedPlayerSkinCandidate,
@@ -434,8 +439,10 @@ function App() {
             tableByPlayer={tableByPlayer}
             lastPlayedPlayerId={lastPlayedPlayerId}
             player1={player1}
+            player3={player3}
             canRequestTruco={canRequestTruco}
             canHumanAdvisePartner={canHumanAdvisePartner}
+            canHumanDecideNineHand={canHumanDecideNineHand}
             canHumanRaiseTruco={canHumanRaiseTruco}
             canHumanRespondToTruco={canHumanRespondToTruco}
             canPlayHumanCard={canPlayHumanCard}
@@ -447,6 +454,8 @@ function App() {
             onConfirmPlayerSkinSelect={handleConfirmPlayerSkinSelect}
             onEnterVenueFromIntro={handleEnterVenueFromIntro}
             onOpenCharacterSelect={handleOpenCharacterSelect}
+            onPlayNineHand={handlePlayNineHand}
+            onFoldNineHand={handleFoldNineHand}
             onContinueToCharacterSelect={handleContinueToCharacterSelect}
             onLaunchVenue={handleLaunchVenue}
             onReturnToJourneyFlow={handleReturnToJourneyFlow}
@@ -458,6 +467,7 @@ function App() {
             onStart={handleStartHand}
             onRequestTruco={handleRequestTruco}
             onAcceptTruco={handleAcceptTruco}
+            onAddEightPointsFromContextMenu={handleAddEightPointsFromContextMenu}
             onAdvisePartner={handlePartnerAdvice}
             onCancelInGameConfirmation={handleCancelInGameConfirmation}
             onCloseFreePlayStage={handleCloseFreePlayStage}
@@ -1950,6 +1960,86 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "clamp(6px, 0.55vw, 7px)",
     fontSize: "clamp(8px, 0.72vw, 9px)",
     lineHeight: 1.45,
+  },
+  nineHandDecisionPanel: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "clamp(7px, 0.62vw, 9px)",
+    width: "100%",
+    alignItems: "stretch",
+    position: "relative",
+  },
+  nineHandDecisionTooltip: {
+    borderRadius: "10px",
+    background: "linear-gradient(180deg, rgba(255,247,237,0.98) 0%, rgba(254,215,170,0.98) 100%)",
+    border: "1px solid rgba(251,191,36,0.88)",
+    color: "#431407",
+    boxShadow: "0 8px 18px rgba(0,0,0,0.34)",
+    padding: "7px 9px",
+    boxSizing: "border-box",
+    display: "flex",
+    flexDirection: "column",
+    gap: "2px",
+    width: "100%",
+  },
+  nineHandDecisionTooltipTitle: {
+    fontSize: "9px",
+    fontWeight: 900,
+    lineHeight: 1,
+    textTransform: "uppercase",
+    color: "#7c2d12",
+    textAlign: "center",
+  },
+  nineHandDecisionTooltipText: {
+    fontSize: "9px",
+    fontWeight: 800,
+    lineHeight: 1.15,
+    color: "#431407",
+    textAlign: "center",
+  },
+  nineHandDecisionTitle: {
+    color: "#fff7ed",
+    fontSize: "clamp(11px, 0.94vw, 13px)",
+    fontWeight: 900,
+    lineHeight: 1,
+    textAlign: "center",
+    textShadow: "0 1px 2px rgba(0,0,0,0.72)",
+  },
+  nineHandDecisionText: {
+    color: "rgba(255,247,237,0.82)",
+    fontSize: "clamp(8px, 0.72vw, 9px)",
+    fontWeight: 800,
+    lineHeight: 1.1,
+    textAlign: "center",
+  },
+  nineHandPartnerCards: {
+    display: "flex",
+    justifyContent: "center",
+    gap: "clamp(4px, 0.38vw, 6px)",
+    minWidth: 0,
+  },
+  nineHandPartnerCard: {
+    width: "clamp(28px, 2.55vw, 34px)",
+    minWidth: "clamp(28px, 2.55vw, 34px)",
+    height: "clamp(42px, 3.65vw, 48px)",
+    borderRadius: "6px",
+    background: `center / cover no-repeat url(${cardFaceAgedPaperAsset})`,
+    border: "1px solid #d9c7a8",
+    boxShadow: "0 4px 8px rgba(0,0,0,0.22)",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "2px",
+  },
+  nineHandPartnerRank: {
+    fontSize: "clamp(12px, 1vw, 14px)",
+    fontWeight: 900,
+    lineHeight: 1,
+  },
+  nineHandPartnerSuit: {
+    fontSize: "clamp(12px, 1vw, 14px)",
+    lineHeight: 1,
   },
   mobileCardButton: {
     width: "clamp(40px, 3.6vw, 50px)",

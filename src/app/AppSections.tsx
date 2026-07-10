@@ -819,8 +819,10 @@ interface TableSectionProps {
   tableByPlayer: Record<number, TableCard | undefined>
   lastPlayedPlayerId: number | null
   player1: Player | null
+  player3: Player | null
   canRequestTruco: boolean
   canHumanAdvisePartner: boolean
+  canHumanDecideNineHand: boolean
   canHumanRaiseTruco: boolean
   canHumanRespondToTruco: boolean
   canPlayHumanCard: boolean
@@ -836,6 +838,8 @@ interface TableSectionProps {
   onLaunchVenue: (venueId: string) => void
   onOpenFreePlayStage: (stageId: string) => void
   onOpenCharacterSelect: () => void
+  onPlayNineHand: () => void
+  onFoldNineHand: () => void
   onReturnToJourneyFlow: () => void
   onResetCampaign: () => void
   onSelectNextCharacter: () => void
@@ -845,6 +849,7 @@ interface TableSectionProps {
   onStart: () => void
   onRequestTruco: () => void
   onAcceptTruco: () => void
+  onAddEightPointsFromContextMenu: () => void
   onAdvisePartner: (advice: PartnerAdvice) => void
   onCancelInGameConfirmation: () => void
   onCloseInGameContextMenu: () => void
@@ -890,8 +895,10 @@ export function TableSection({
   tableByPlayer,
   lastPlayedPlayerId,
   player1,
+  player3,
   canRequestTruco,
   canHumanAdvisePartner,
+  canHumanDecideNineHand,
   canHumanRaiseTruco,
   canHumanRespondToTruco,
   canPlayHumanCard,
@@ -907,6 +914,8 @@ export function TableSection({
   onLaunchVenue,
   onOpenFreePlayStage,
   onOpenCharacterSelect,
+  onPlayNineHand,
+  onFoldNineHand,
   onReturnToJourneyFlow,
   onResetCampaign,
   onSelectNextCharacter,
@@ -916,6 +925,7 @@ export function TableSection({
   onStart,
   onRequestTruco,
   onAcceptTruco,
+  onAddEightPointsFromContextMenu,
   onAdvisePartner,
   onCancelInGameConfirmation,
   onCloseInGameContextMenu,
@@ -931,12 +941,22 @@ export function TableSection({
   onPlayCard,
   styles,
 }: TableSectionProps) {
+  const [nineHandHintDismissed, setNineHandHintDismissed] = useState(false)
   const tableSceneModel = buildTableSceneModel(
     handState,
     tableByPlayer,
     lastPlayedPlayerId,
     currentCampaignVenue
   )
+  const showNineHandHint = canHumanDecideNineHand && !nineHandHintDismissed
+  const handlePlayNineHandClick = () => {
+    setNineHandHintDismissed(true)
+    onPlayNineHand()
+  }
+  const handleFoldNineHandClick = () => {
+    setNineHandHintDismissed(true)
+    onFoldNineHand()
+  }
   const isMenuMode = !handState
   const isGameplayIntroActive = gameplayIntroPhase !== "done"
   const gameplayIntroContentStyle =
@@ -1181,6 +1201,7 @@ export function TableSection({
                       canPlayHumanCard={canPlayHumanCard}
                       canPlayCoveredCard={canPlayCoveredCard}
                       onCloseInGameContextMenu={onCloseInGameContextMenu}
+                      onAddEightPointsFromContextMenu={onAddEightPointsFromContextMenu}
                       onExitMatchFromContextMenu={onExitMatchFromContextMenu}
                       onLoseMatchFromContextMenu={onLoseMatchFromContextMenu}
                       onOpenInGameContextMenu={onOpenInGameContextMenu}
@@ -1231,7 +1252,69 @@ export function TableSection({
                         padding: 0,
                       }}
                     >
-                      {canHumanAdvisePartner ? (
+                      {canHumanDecideNineHand ? (
+                        <div style={styles.nineHandDecisionPanel}>
+                          {showNineHandHint ? (
+                            <div style={styles.nineHandDecisionTooltip}>
+                              <strong style={styles.nineHandDecisionTooltipTitle}>Mão de 9</strong>
+                              <span style={styles.nineHandDecisionTooltipText}>
+                                veja as cartas da parceira aqui
+                              </span>
+                            </div>
+                          ) : null}
+                          <div style={styles.nineHandDecisionTitle}>Mão de 9</div>
+                          <div style={styles.nineHandDecisionText}>
+                            Cartas da parceira
+                          </div>
+                          <div style={styles.nineHandPartnerCards}>
+                            {player3?.hand.map((card, index) => (
+                              <div
+                                key={`${card.rank}-${card.suit}-${index}`}
+                                style={styles.nineHandPartnerCard}
+                              >
+                                <span style={{ ...styles.nineHandPartnerRank, color: getSuitColor(card.suit) }}>
+                                  {card.rank}
+                                </span>
+                                <span style={{ ...styles.nineHandPartnerSuit, color: getSuitColor(card.suit) }}>
+                                  {getSuitSymbol(card.suit)}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                          <div style={styles.inGameActionsGrid}>
+                            <button
+                              style={{
+                                ...styles.trucoSecondaryButton,
+                                backgroundImage: `url(${actionButtonAsset})`,
+                                backgroundSize: "100% 100%",
+                                backgroundPosition: "center",
+                                backgroundRepeat: "no-repeat",
+                                border: "none",
+                                color: "#f7efe0",
+                                boxShadow: "none",
+                              }}
+                              onClick={handlePlayNineHandClick}
+                            >
+                              Jogar
+                            </button>
+                            <button
+                              style={{
+                                ...styles.trucoSecondaryButton,
+                                backgroundImage: `url(${actionButtonAsset})`,
+                                backgroundSize: "100% 100%",
+                                backgroundPosition: "center",
+                                backgroundRepeat: "no-repeat",
+                                border: "none",
+                                color: "#f7efe0",
+                                boxShadow: "none",
+                              }}
+                              onClick={handleFoldNineHandClick}
+                            >
+                              Correr
+                            </button>
+                          </div>
+                        </div>
+                      ) : canHumanAdvisePartner ? (
                         <div style={styles.inGameActionsGrid}>
                           <button
                             style={{
@@ -3473,6 +3556,7 @@ function HumanCardsPanel({
   canPlayCoveredCard,
   gameplayIntroActive,
   onCloseInGameContextMenu,
+  onAddEightPointsFromContextMenu,
   onExitMatchFromContextMenu,
   onLoseMatchFromContextMenu,
   onOpenInGameContextMenu,
@@ -3489,6 +3573,7 @@ function HumanCardsPanel({
   canPlayCoveredCard: boolean
   gameplayIntroActive: boolean
   onCloseInGameContextMenu: () => void
+  onAddEightPointsFromContextMenu: () => void
   onExitMatchFromContextMenu: () => void
   onLoseMatchFromContextMenu: () => void
   onOpenInGameContextMenu: () => void
@@ -3629,6 +3714,12 @@ function HumanCardsPanel({
                   onClick={onWinMatchFromContextMenu}
                 >
                   Vencer esta partida
+                </button>
+                <button
+                  style={styles.inGameContextMenuAction}
+                  onClick={onAddEightPointsFromContextMenu}
+                >
+                  Ganhar 8 pontos
                 </button>
                 <button
                   style={styles.inGameContextMenuAction}

@@ -469,6 +469,22 @@ test("próxima mão usa a variante da partida e mantém vira no Paulista", () =>
   assert.equal(nextHandState.currentPlayerId, 3)
 })
 
+test("próxima mão entra em modo mão de 9 quando um time chega a 9 pontos", () => {
+  const mineiroVenue = getCampaignVenueFixture("bar-do-ze-catinga")
+  const { matchState } = createVenueMatchState(mineiroVenue, 1)
+
+  const nextHandState = createNextHandStateForMatch({
+    ...matchState,
+    score: { A: 9, B: 4 },
+    handNumber: 4,
+    startingPlayerId: 2,
+  })
+
+  assert.deepEqual(nextHandState.nineHand, { team: "A", phase: "awaiting-decision" })
+  assert.equal(nextHandState.currentBet, 3)
+  assert.equal(nextHandState.currentPlayerId, 2)
+})
+
 test("parceira só consulta o humano no pedido inicial adversário", () => {
   const initialRequestOnPartner = createHandStateFixture({
     truco: {

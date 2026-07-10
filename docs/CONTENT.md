@@ -778,6 +778,12 @@ Hoje esta assim:
 - ajuste de escolha de carta aplicado:
   - quando nao consegue ganhar a vaza, a IA joga a menor carta disponivel
   - quando consegue ganhar a vaza, a IA usa a menor carta vencedora
+- mao de 9 implementada:
+  - gatilho em `9`, `10` ou `11` pontos
+  - dupla em 9 ve cartas da parceria antes de decidir
+  - se correr, adversarios recebem `1 ponto`
+  - se jogar, a mao vale `3 pontos`
+  - truco/aumento ficam bloqueados nessa mao especial
   - existe cobertura em `tests/ai/chooseCard.test.ts`
 - proximas mudancas de thresholds, blefes, aceite, corrida, raises e conselho/consulta devem continuar vindo com testes antes da mudanca de comportamento
 

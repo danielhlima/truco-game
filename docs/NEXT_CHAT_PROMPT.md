@@ -69,14 +69,16 @@ Prioridade recomendada:
    - UI mobile minima e clara
 7. Rodar npm test e npm run build antes de concluir.
 
-Problema conhecido:
-- Carta coberta ainda nao esta implementada.
-- A regra desejada e permitir carta coberta a partir da segunda vaza da mao/rodada.
-- A carta coberta nao disputa a vaza; funciona como descarte sem forca.
-- A identidade real da carta coberta nao deve ser revelada durante a partida.
+Estado recente:
+- Carta coberta ja esta implementada a partir da segunda vaza.
+- Mao de 9 ja esta implementada:
+  - gatilho em `9`, `10` ou `11` pontos
+  - dupla em 9 ve cartas da parceria
+  - `Correr` entrega `1 ponto` aos adversarios
+  - `Jogar` deixa a mao valendo `3 pontos`
+  - truco/aumento ficam bloqueados nessa mao especial.
 
 Pendencias que continuam abertas, mas nao sao a primeira prioridade deste chat:
-- Mao especial de 9/dez pontos.
 - Opcao de escolher ou nao a versao ponto acima.
 - Tutorial jogavel.
 - Segunda rodada fina de IA, apenas se novos testes em jogo apontarem comportamento ruim.

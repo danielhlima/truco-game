@@ -22,12 +22,13 @@ export function playAiTurn(state: HandState): HandState {
 
   const ruleSet = getRuleSet(state.variant)
   const player = getPlayerById(state.players, state.currentPlayerId)
+  const uncoveredTable = state.table.filter((entry) => !entry.covered)
 
   const chosen = chooseCard(
     ruleSet,
     player.id,
     player.hand,
-    state.table,
+    uncoveredTable,
     state.vira
   )
   const playCovered = shouldPlayCoveredCard(state, player.id, chosen)
@@ -80,7 +81,7 @@ function shouldPlayCoveredCard(state: HandState, playerId: number, chosenCard: T
 
   const best = getBestUncoveredTableCard(state)
   if (!best) {
-    return true
+    return false
   }
 
   if (isTeammate(playerId, best.playerId)) {

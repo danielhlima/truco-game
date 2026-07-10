@@ -1,4 +1,4 @@
-import { getTeamTrucoDecision, shouldRaiseBet } from "../ai/trucoDecision"
+import { evaluateHandStrength, getTeamTrucoDecision, shouldRaiseBet } from "../ai/trucoDecision"
 import type { AiTrucoPersonalityId } from "../ai/trucoPersonalities"
 import { getRuleSet } from "./getRuleSet"
 import type { HandState } from "./handState"
@@ -6,6 +6,7 @@ import { playAiTurn } from "./playAiTurn"
 import { requestTruco } from "./requestTruco"
 import { resolveTrick } from "./resolveTrick"
 import { respondToTruco } from "./respondToTruco"
+import { decideNineHand, isNineHandAwaitingDecision } from "./nineHand"
 import { getTeam } from "./teams"
 import { canTeamAskForTruco, type MatchScore } from "./truco"
 
@@ -24,6 +25,14 @@ export function stepHand(
 ): HandState {
   if (state.finished) {
     return state
+  }
+
+  if (isNineHandAwaitingDecision(state)) {
+    if (state.nineHand?.team === "A") {
+      return state
+    }
+
+    return decideNineHand(state, shouldAiPlayNineHand(state) ? "play" : "fold")
   }
 
   if (state.truco.phase === "awaiting-response") {
@@ -81,6 +90,7 @@ export function stepHand(
     const canAskForTruco = canTeamAskForTruco(matchScore, currentTeam)
 
     const shouldAskForTruco =
+      !state.nineHand &&
       canAskForTruco &&
       canRaiseNow &&
       shouldRaiseBet(
@@ -103,4 +113,20 @@ export function stepHand(
   }
 
   return state
+}
+
+function shouldAiPlayNineHand(state: HandState): boolean {
+  if (!state.nineHand) {
+    return false
+  }
+
+  const ruleSet = getRuleSet(state.variant)
+  const teamPlayers = state.players.filter((player) => getTeam(player.id) === state.nineHand?.team)
+  const strengths = teamPlayers.map((player) =>
+    evaluateHandStrength(ruleSet, player.hand, state.vira)
+  )
+  const totalStrength = strengths.reduce((sum, strength) => sum + strength, 0)
+  const bestStrength = strengths.length > 0 ? Math.max(...strengths) : 0
+
+  return totalStrength >= 5 || bestStrength >= 4
 }

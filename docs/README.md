@@ -236,12 +236,9 @@ Estado pos-bonus:
 Proximo foco recomendado:
 
 - usar `docs/NEXT_CHAT_PROMPT.md` como briefing inicial copiavel
-- implementar carta virada para baixo com testes antes de mexer na UI
-- tratar a carta coberta como descarte sem forca, equivalente a uma carta sem valor para vencer a vaza
-- permitir a acao apenas a partir da segunda vaza da mao/rodada, preservando a primeira vaza sempre aberta
-- desenhar a interacao para celular com affordance clara e sem poluir a mesa
-- depois disso, retomar pendencias de produto/regras:
-  - mao especial de 9/dez pontos
+- carta coberta ja esta implementada a partir da segunda vaza
+- mao de 9 ja esta implementada com decisao `Jogar`/`Correr`
+- proximas pendencias de produto/regras:
   - opcao de escolher ou nao a versao `ponto acima`
   - tutorial jogavel
   - segunda rodada fina de IA apenas se novos testes em jogo apontarem regressao real

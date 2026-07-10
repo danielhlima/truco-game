@@ -21,7 +21,12 @@ export function requestTruco(
     return state
   }
 
-    const requestingTeam = getTeam(playerId)
+  if (state.nineHand) {
+    logEvent("Pedido de truco ignorado: mão de 9 não permite aumento.")
+    return state
+  }
+
+  const requestingTeam = getTeam(playerId)
 
   if (
     state.currentBet > 1 &&

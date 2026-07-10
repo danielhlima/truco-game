@@ -94,21 +94,18 @@ Estado apos a primeira rodada:
 - os dialogos e raises ja ganharam cobertura unitaria inicial
 - as variantes por bar ja passaram a ser aplicadas na criacao de partida
 - `Jogos Mundiais` e `Mundial` usam Truco Mineiro
+- mao de 9 implementada:
+  - gatilho em `9`, `10` ou `11` pontos
+  - dupla em 9 ve cartas da parceria antes de decidir
+  - `Correr` entrega `1 ponto` aos adversarios
+  - `Jogar` deixa a mao valendo `3 pontos`
+  - truco/aumento bloqueados nessa mao especial
 - novas rodadas de ajuste devem continuar usando testes antes de mudar comportamento
 
 ## Pendencias De Produto E Regras
 
 Frentes ainda pendentes, em prioridade menor que carta coberta:
 
-- mao especial de 9/dez pontos:
-  - documentacao antiga registra `mao de nove`
-  - conversa posterior citou "ver cartas na mao de dez pontos"
-  - confirmar nomenclatura e gatilho antes de implementar
-  - permitir que parceiros vejam as cartas um do outro nessa mao especial
-  - permitir que a dupla escolha jogar ou nao jogar depois de ver as cartas
-  - se a dupla optar por nao jogar, adversarios recebem `1 ponto`
-  - se a dupla optar por jogar e perder, adversarios recebem `3 pontos`
-  - explicar visualmente por que pedir truco/aumentar fica bloqueado
 - opcao de usar ou nao a variante `ponto acima`
 - tutorial jogavel:
   - ensinar fluxo basico de rodada, mao e vaza

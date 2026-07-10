@@ -147,21 +147,27 @@ Observacao:
 - O log de inicio de mao registra a regra ativa; em Paulista, registra tambem vira e manilha.
 - Se a implementacao visual da vira/manilha do Paulista for alterada, validar novamente no fluxo real e em testes.
 
+## Regras Especiais Implementadas
+
+### Mao de nove
+
+- gatilho confirmado em `9`, `10` ou `11` pontos
+- quando uma dupla chega a `9` ou passa direto para `10`/`11`, a proxima mao nasce como `mao de 9`
+- a mao de 9 fica pausada antes da primeira jogada para a dupla em ponto de mao decidir
+- os parceiros dessa dupla podem ver as cartas um do outro antes de decidir
+- se a dupla optar por nao jogar, a dupla adversaria recebe `1 ponto`
+- se a dupla optar por jogar, a mao segue valendo `3 pontos`
+- se a dupla jogar e perder, a dupla adversaria recebe `3 pontos`
+- nao e permitido pedir truco/aumentar durante a mao de 9
+- quando a mao de 9 e nossa, a UI mostra as cartas da parceira e os botoes `Jogar` e `Correr`
+- quando a mao de 9 e deles, a IA decide automaticamente se joga ou entrega `1 ponto`
+- cobertura atual:
+  - `tests/game/nine-hand.test.ts`
+  - `tests/game/gameSessionHelpers.test.ts`
+
 ## Pendencias de Regras para Implementar
 
 As regras abaixo foram confirmadas como desejadas, mas ainda nao devem ser tratadas como implementadas:
-
-### Mao de nove / mao de dez pontos
-
-- a documentacao historica registra esta regra como `mao de nove`, com gatilho em `9 pontos`
-- em conversa posterior, a pendencia foi citada como "ver cartas na mao de dez pontos"
-- antes de implementar, confirmar a nomenclatura e o gatilho desejado: manter `9 pontos`, trocar para `10 pontos`, ou oferecer isso como variante configuravel
-- a partir da rodada especial confirmada, os dois parceiros dessa dupla podem ver as cartas um do outro
-- depois de ver as cartas, essa dupla pode optar por nao jogar a rodada
-- se a dupla optar por nao jogar, a dupla adversaria recebe `1 ponto`
-- se a dupla optar por jogar e perder, a dupla adversaria recebe `3 pontos`
-- a interface precisa deixar claro quando uma dupla esta nessa mao especial e, por isso, nao pode pedir truco/aumentar como numa mao comum
-- a indicacao visual deve explicar o bloqueio do botao de aumento para evitar parecer erro de input do jogador
 
 ### Ponto acima
 

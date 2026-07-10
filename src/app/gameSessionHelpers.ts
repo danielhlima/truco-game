@@ -7,6 +7,7 @@ import type { Card } from "../game/card"
 import { createHandState } from "../game/createHandState"
 import type { HandState, TeamId } from "../game/handState"
 import { createMatchState, type MatchState } from "../game/matchState"
+import { applyNineHandRules } from "../game/nineHand"
 import { getNextPlayerClockwise as getClockwisePlayerId } from "../game/trucoTarget"
 import { getBetCallLabel, getNextBet } from "../game/truco"
 
@@ -32,16 +33,25 @@ export function formatCard(card: Card): string {
 }
 
 export function getHandRuleContextLogLines(handState: HandState): string[] {
-  if (handState.variant === "MINEIRO") {
-    return [
-      "Regra da mão: Truco Mineiro.",
-      "Manilhas fixas: 4 de paus (zap), 7 de copas, A de espada, 7 de ouros.",
-    ]
+  const variantLines =
+    handState.variant === "MINEIRO"
+      ? [
+          "Regra da mão: Truco Mineiro.",
+          "Manilhas fixas: 4 de paus (zap), 7 de copas, A de espada, 7 de ouros.",
+        ]
+      : [
+          "Regra da mão: Truco Paulista.",
+          `Vira: ${handState.vira ? formatCard(handState.vira) : "sem vira"}. Manilha: ${getManilhaLabel(handState)}.`,
+        ]
+
+  if (!handState.nineHand) {
+    return variantLines
   }
 
   return [
-    "Regra da mão: Truco Paulista.",
-    `Vira: ${handState.vira ? formatCard(handState.vira) : "sem vira"}. Manilha: ${getManilhaLabel(handState)}.`,
+    ...variantLines,
+    `Mão de 9: time ${handState.nineHand.team} decide se joga vendo as cartas da parceria.`,
+    "Se correr, adversários recebem 1 ponto. Se jogar e perder, adversários recebem 3 pontos.",
   ]
 }
 
@@ -50,19 +60,27 @@ export function createVenueMatchState(
   firstPlayerId = 1
 ): VenueMatchState {
   const variant = targetVenue.variant
+  const matchState = createMatchState(variant, firstPlayerId)
 
   return {
-    handState: createHandState(variant, firstPlayerId),
-    matchState: createMatchState(variant, firstPlayerId),
+    handState: applyNineHandRules(createHandState(variant, firstPlayerId), matchState.score),
+    matchState,
   }
 }
 
 export function createNextHandStateForMatch(matchState: MatchState): HandState {
-  return createHandState(matchState.variant, matchState.startingPlayerId)
+  return applyNineHandRules(
+    createHandState(matchState.variant, matchState.startingPlayerId),
+    matchState.score
+  )
 }
 
 export function getCurrentTurnLabel(handState: HandState | null): string {
   if (!handState) return "—"
+
+  if (handState.nineHand?.phase === "awaiting-decision") {
+    return handState.nineHand.team === "A" ? "Decisão da nossa dupla" : "Decisão deles"
+  }
 
   if (handState.truco.phase === "awaiting-response") {
     return getPlayerLabel(getTrucoTargetPlayerId(handState))
@@ -95,6 +113,12 @@ export function getStatusMessage(handState: HandState | null): string {
 
   if (handState.finished) {
     return getWinnerLabel(handState.winner)
+  }
+
+  if (handState.nineHand?.phase === "awaiting-decision") {
+    return handState.nineHand.team === "A"
+      ? "Mão de 9: veja as cartas da parceira e escolha jogar ou correr."
+      : "Mão de 9 deles: aguardando a decisão da dupla adversária."
   }
 
   if (handState.truco.phase === "awaiting-response") {
