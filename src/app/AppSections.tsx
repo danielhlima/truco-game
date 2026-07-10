@@ -1,6 +1,7 @@
 import { useState } from "react"
 import type React from "react"
 import type { CampaignStage, CampaignVenue } from "../career/campaign/types"
+import type { FreePlayRunState } from "../career/campaign/freePlayProgression"
 import type { Card } from "../game/card"
 import type { HandState } from "../game/handState"
 import type { Player } from "../game/gameState"
@@ -791,6 +792,7 @@ interface TableSectionProps {
   currentCampaignVenue: CampaignVenue | null
   currentVenueWins: number
   dealAnimationNonce: number
+  freePlayRun: FreePlayRunState | null
   gameplayIntroPhase: GameplayIntroPhase
   hasSelectedPartnerForVenue: boolean
   menuScreen:
@@ -822,6 +824,7 @@ interface TableSectionProps {
   canHumanRespondToTruco: boolean
   canPlayHumanCard: boolean
   onCloseCharacterSelect: () => void
+  onCloseFreePlayStage: () => void
   onCloseJourneyIntro: () => void
   onClosePlayerSkinSelect: () => void
   onContinueToCharacterSelect: () => void
@@ -829,6 +832,7 @@ interface TableSectionProps {
   onConfirmPlayerSkinSelect: () => void
   onEnterVenueFromIntro: () => void
   onLaunchVenue: (venueId: string) => void
+  onOpenFreePlayStage: (stageId: string) => void
   onOpenCharacterSelect: () => void
   onReturnToJourneyFlow: () => void
   onResetCampaign: () => void
@@ -865,6 +869,7 @@ export function TableSection({
   currentCampaignVenue,
   currentVenueWins,
   dealAnimationNonce,
+  freePlayRun,
   gameplayIntroPhase,
   hasSelectedPartnerForVenue,
   menuScreen,
@@ -889,6 +894,7 @@ export function TableSection({
   canHumanRespondToTruco,
   canPlayHumanCard,
   onCloseCharacterSelect,
+  onCloseFreePlayStage,
   onCloseJourneyIntro,
   onClosePlayerSkinSelect,
   onContinueToCharacterSelect,
@@ -896,6 +902,7 @@ export function TableSection({
   onConfirmPlayerSkinSelect,
   onEnterVenueFromIntro,
   onLaunchVenue,
+  onOpenFreePlayStage,
   onOpenCharacterSelect,
   onReturnToJourneyFlow,
   onResetCampaign,
@@ -1009,10 +1016,13 @@ export function TableSection({
                 ) : menuScreen === "journey-intro" ? (
                   <JourneyIntroScreen
                     currentCampaignVenue={currentCampaignVenue}
+                    freePlayRun={freePlayRun}
                     playerProfile={playerProfile}
                     onBack={onCloseJourneyIntro}
+                    onCloseFreePlayStage={onCloseFreePlayStage}
                     onContinueToCharacterSelect={onContinueToCharacterSelect}
                     onLaunchVenue={onLaunchVenue}
+                    onOpenFreePlayStage={onOpenFreePlayStage}
                     onResetCampaign={onResetCampaign}
                     styles={styles}
                   />
@@ -1536,37 +1546,46 @@ function PostCampaignFreePlayScreen({
 
 function JourneyIntroScreen({
   currentCampaignVenue,
+  freePlayRun,
   playerProfile,
   onBack,
+  onCloseFreePlayStage,
   onContinueToCharacterSelect,
   onLaunchVenue,
+  onOpenFreePlayStage,
   onResetCampaign,
   styles,
 }: {
   currentCampaignVenue: CampaignVenue | null
+  freePlayRun: FreePlayRunState | null
   playerProfile: PlayerProfile
   onBack: () => void
+  onCloseFreePlayStage: () => void
   onContinueToCharacterSelect: () => void
   onLaunchVenue: (venueId: string) => void
+  onOpenFreePlayStage: (stageId: string) => void
   onResetCampaign: () => void
   styles: StyleMap
 }) {
-  const [freePlayStageId, setFreePlayStageId] = useState<string | null>(null)
   const campaignVenues = CAMPAIGN_STAGES.flatMap((stage) => stage.venues)
   const campaignVenueCount = campaignVenues.length
   const clearedCampaignVenueCount = campaignVenues.filter((venue) =>
     isCampaignVenueCleared(playerProfile, venue)
   ).length
-  const campaignComplete = !currentCampaignVenue && clearedCampaignVenueCount === campaignVenueCount
+  const campaignComplete = clearedCampaignVenueCount === campaignVenueCount
+  const freePlayStageId = freePlayRun?.stageId ?? null
   const freePlayStage =
     campaignComplete && freePlayStageId
       ? CAMPAIGN_STAGES.find((stage) => stage.id === freePlayStageId) ?? null
       : null
-  const freePlayCurrentVenue = freePlayStage?.venues[0] ?? null
+  const freePlayCurrentVenue =
+    freePlayStage && freePlayRun
+      ? freePlayStage.venues.find((venue) => venue.id === freePlayRun.currentVenueId) ?? null
+      : null
   const viewedCampaignVenue = freePlayCurrentVenue ?? currentCampaignVenue
   const viewedStages = freePlayStage ? [freePlayStage] : CAMPAIGN_STAGES
   const viewedPlayerProfile = freePlayStage
-    ? createFreePlayStagePreviewProfile(playerProfile)
+    ? createFreePlayStagePreviewProfile(playerProfile, freePlayRun)
     : playerProfile
   const hasCurrentVenue = !!viewedCampaignVenue
   const activeStageIndex = viewedCampaignVenue
@@ -1610,7 +1629,7 @@ function JourneyIntroScreen({
             ...styles.authoredCampaignHotspot,
             ...authoredCampaign.backHotspot,
           }}
-          onClick={freePlayStage ? () => setFreePlayStageId(null) : onBack}
+          onClick={freePlayStage ? onCloseFreePlayStage : onBack}
         />
         <button
           aria-label={`Abrir capa do ${viewedCampaignVenue.name}`}
@@ -1638,7 +1657,7 @@ function JourneyIntroScreen({
     return (
       <PostCampaignFreePlayScreen
         onBack={onBack}
-        onOpenStage={setFreePlayStageId}
+        onOpenStage={onOpenFreePlayStage}
         onResetCampaign={onResetCampaign}
         styles={styles}
       />
@@ -1657,13 +1676,13 @@ function JourneyIntroScreen({
           </h2>
           <p style={styles.journeyIntroText}>
             {freePlayStage
-              ? "Revisite este circuito pelo primeiro local disponível. Os próximos bares aparecem como percurso bloqueado."
+              ? "Vença este circuito no Modo Livre. Cada bar concluído leva ao próximo sem alterar a campanha salva."
               : "Leia o percurso completo, veja o que já ficou para trás e avance pelo bar destacado agora. Locais vencidos continuam abertos para revisita."}
           </p>
         </div>
         <button
           style={styles.characterSelectBackButton}
-          onClick={freePlayStage ? () => setFreePlayStageId(null) : onBack}
+          onClick={freePlayStage ? onCloseFreePlayStage : onBack}
         >
           Voltar
         </button>
@@ -2241,14 +2260,17 @@ function isCampaignVenueCleared(playerProfile: PlayerProfile, venue: CampaignVen
   )
 }
 
-function createFreePlayStagePreviewProfile(playerProfile: PlayerProfile): PlayerProfile {
+function createFreePlayStagePreviewProfile(
+  playerProfile: PlayerProfile,
+  freePlayRun: FreePlayRunState | null
+): PlayerProfile {
   return {
     ...playerProfile,
     campaign: {
       ...playerProfile.campaign,
       completedStageIds: [],
-      clearedVenueIds: [],
-      venueWinsById: {},
+      clearedVenueIds: freePlayRun?.completedVenueIds ?? [],
+      venueWinsById: freePlayRun?.venueWinsById ?? {},
     },
   }
 }

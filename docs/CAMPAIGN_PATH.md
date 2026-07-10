@@ -24,8 +24,11 @@ O caminho principal ja esta integrado com pacotes visuais autorais ate o `Cassin
 - depois da campanha concluida, `COMEÇAR` abre o `Modo Livre`
 - o `Modo Livre` usa `src/assets/campaign/free-play-circuit-hub.png`
 - cada circuito no hub e um hotspot invisivel
-- clicar em um circuito abre a tela autoral de campanha do primeiro bar daquele circuito, quando houver arte cadastrada
-- o `Voltar` da tela autoral retorna ao hub do `Modo Livre`
+- clicar em um circuito inicia uma run temporaria daquele circuito
+- a run temporaria começa no primeiro bar e avanca para o proximo bar ao cumprir as vitorias do local
+- concluir o ultimo bar do circuito livre retorna ao hub do `Modo Livre`
+- o `Voltar` da tela autoral retorna ao hub do `Modo Livre` e encerra a run temporaria
+- a run temporaria nao altera progresso, recompensas ou desbloqueios da campanha principal ja concluida
 - `Recomeçar campanha` usa confirmacao interna do jogo
 - a proxima frente deve ser balanceamento de IA com testes, conforme `docs/NEXT_STEPS.md`
 

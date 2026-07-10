@@ -26,8 +26,11 @@ Contexto atual:
 - Depois da campanha concluida, COMEÇAR abre o Modo Livre.
 - O Modo Livre usa src/assets/campaign/free-play-circuit-hub.png.
 - No Modo Livre, cada circuito e um hotspot invisivel.
-- Clicar em um circuito abre a tela autoral de campanha do primeiro bar daquele circuito, quando existe arte cadastrada.
-- O Voltar da tela autoral retorna ao hub do Modo Livre.
+- Clicar em um circuito inicia uma run temporaria daquele circuito.
+- A run temporaria comeca no primeiro bar e avanca para o proximo bar ao cumprir as vitorias do local.
+- Concluir o ultimo bar do circuito livre retorna ao hub do Modo Livre.
+- O Voltar da tela autoral retorna ao hub do Modo Livre e encerra a run temporaria.
+- A run temporaria nao altera progresso, recompensas ou desbloqueios da campanha principal ja concluida.
 - Recomeçar campanha usa confirmacao interna do jogo, nao alerta nativo do navegador.
 - O fluxo atual deve ser preservado: COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo.
 - A gameplay usa stage logico 1080x500.
@@ -55,8 +58,8 @@ Prioridade recomendada:
 6. Rodar npm test e npm run build antes de concluir.
 
 Problema conhecido:
-- A IA atual ainda tende a trucar com pouco.
-- Evitar ajustar tudo por tentativa e erro; mexer em thresholds, blefes e perfis com testes pequenos e objetivos.
+- A primeira rodada de rebalanceamento ja subiu cortes do perfil balanced, reduziu blefes e corrigiu dificuldade maxima disciplinada para trickster.
+- Evitar ajustar tudo por tentativa e erro; qualquer nova mudanca em thresholds, blefes e perfis deve vir com testes pequenos e objetivos.
 
 Pendencias que continuam abertas, mas nao sao a primeira prioridade deste chat:
 - Mao especial de 9/dez pontos.

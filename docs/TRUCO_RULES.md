@@ -106,18 +106,33 @@ Hoje a força da mão é calculada assim:
 - `A` = `1`
 - `K` = `1`
 
-## Cortes Atuais de Aceite da IA
+## Cortes Atuais do Perfil `balanced`
 
-- truco (`3`) -> corte `1`
-- seis -> corte `2`
-- nove -> corte `3`
-- doze -> corte `4`
+Pedido ou aumento, por valor atual da rodada:
+
+- valendo `1`, pedir `TRUCO!` -> corte `3`
+- valendo `3`, pedir `SEIS!` -> corte `4`
+- valendo `6`, pedir `NOVE!` -> corte `4`
+- valendo `9`, pedir `DOZE!` -> corte `5`
+
+Aceite, por valor proposto:
+
+- truco (`3`) -> corte `2`
+- seis (`6`) -> corte `3`
+- nove (`9`) -> corte `4`
+- doze (`12`) -> corte `5`
+
+Observacao:
+
+- perfis agressivos, malandros e imprevisiveis possuem cortes proprios
+- blefes continuam existindo, mas com probabilidades menores e margem controlada
+- dificuldade alta com disciplina alta passa a usar perfil `trickster`, nao `reckless`
 
 ## Observação Importante
 
-- Já foi identificado que a IA atual está `trucando com pouco`.
-- Este comportamento deve ser o proximo foco de balanceamento.
-- Por enquanto, este arquivo registra a lógica atual, não a lógica ideal.
+- A primeira rodada de rebalanceamento reduziu a tendencia da IA de `trucar com pouco`.
+- O perfil `balanced` agora exige mao mais firme para pedir, aceitar e contra-aumentar.
+- Este arquivo registra a logica atual apos essa primeira rodada, nao um equilibrio final definitivo.
 - Qualquer ajuste em thresholds, blefes, aceite, corrida ou raise deve ser acompanhado por testes.
 
 ## Variantes Por Bar

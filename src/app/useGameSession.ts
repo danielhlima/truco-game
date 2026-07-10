@@ -13,6 +13,13 @@ import {
   isCampaignCompleted,
   type CampaignResolution,
 } from "../career/campaign/progression"
+import {
+  applyFreePlayRunWin,
+  createFreePlayRun,
+  getFreePlayRunCurrentVenue,
+  getFreePlayRunStage,
+  type FreePlayRunState,
+} from "../career/campaign/freePlayProgression"
 import { buildCampaignSummary } from "../career/campaign/summary"
 import type { CampaignStage, CampaignVenue } from "../career/campaign/types"
 import type { Card } from "../game/card"
@@ -201,6 +208,7 @@ export function useGameSession() {
   const [campaignVictoryScreen, setCampaignVictoryScreen] =
     useState<CampaignVictoryScreenState | null>(null)
   const [campaignVictoryQueue, setCampaignVictoryQueue] = useState<CampaignVictoryScreenState[]>([])
+  const [freePlayRun, setFreePlayRun] = useState<FreePlayRunState | null>(null)
   const [inGameContextMenuOpen, setInGameContextMenuOpen] = useState(false)
   const [inGameConfirmation, setInGameConfirmation] = useState<InGameConfirmationState | null>(null)
   const [gameplayIntroPhase, setGameplayIntroPhase] = useState<GameplayIntroPhase>("done")
@@ -258,8 +266,12 @@ export function useGameSession() {
   const sessionDebugStage = sessionDebugVenueId
     ? debugVenueLookup.get(sessionDebugVenueId)?.stage ?? null
     : null
-  const currentCampaignVenue = sessionDebugVenue ?? selectedDebugVenue ?? actualCampaignVenue
-  const currentCampaignStage = sessionDebugStage ?? selectedDebugStage ?? actualCampaignStage
+  const freePlayCurrentStage = getFreePlayRunStage(freePlayRun, CAMPAIGN_STAGES)
+  const freePlayCurrentVenue = getFreePlayRunCurrentVenue(freePlayRun, CAMPAIGN_STAGES)
+  const currentCampaignVenue =
+    sessionDebugVenue ?? selectedDebugVenue ?? freePlayCurrentVenue ?? actualCampaignVenue
+  const currentCampaignStage =
+    sessionDebugStage ?? selectedDebugStage ?? freePlayCurrentStage ?? actualCampaignStage
   const currentCampaignVenueId = currentCampaignVenue?.id ?? null
   const selectedPlayerSkin = useMemo(
     () => getPlayerSkinById(playerProfile.settings.selectedPlayerSkinId),
@@ -338,7 +350,9 @@ export function useGameSession() {
   const opponentAiPersonalityId = opponentCharacters[0]?.personalityId ?? "balanced"
   const activeVariant = handState?.variant ?? variant
   const currentVenueWins = currentCampaignVenue
-    ? playerProfile.campaign.venueWinsById[currentCampaignVenue.id] ?? 0
+    ? freePlayRun?.currentVenueId === currentCampaignVenue.id
+      ? freePlayRun.venueWinsById[currentCampaignVenue.id] ?? 0
+      : playerProfile.campaign.venueWinsById[currentCampaignVenue.id] ?? 0
     : 0
   const variantSelectionDisabled = !!matchState && !matchState.finished
   const isGameplayIntroActive = gameplayIntroPhase !== "done"
@@ -667,6 +681,66 @@ export function useGameSession() {
               : `Derrota no modo debug em ${debugVenueName}.`
           )
           setTrucoMessage("Partida de teste finalizada. O progresso da campanha não foi alterado.")
+        } else if (
+          nextState.winner === "A" &&
+          freePlayRun &&
+          freePlayCurrentVenue?.id === resultVenue?.id
+        ) {
+          const resolution = applyFreePlayRunWin(freePlayRun, CAMPAIGN_STAGES)
+          const nextRun = resolution.run
+
+          if (resolution.stageCompleted) {
+            matchResultState = {
+              ...matchResultState,
+              title: `${resolution.stage?.name ?? "Circuito"} concluído`,
+              subtitle: `Vocês revisitaram ${resolution.stage?.name ?? "este circuito"} até o fim no Modo Livre.`,
+              progressionTitle: "Circuito finalizado",
+              progressionText: "O circuito livre foi concluído. Você volta para o hub para escolher outro caminho.",
+            }
+          } else if (resolution.clearedVenue && resolution.nextVenue) {
+            matchResultState = {
+              ...matchResultState,
+              title: `${resolution.clearedVenue.name} revisitado`,
+              subtitle: "Vocês fecharam este bar no Modo Livre e seguiram dentro do circuito.",
+              progressionTitle: "Próximo bar do circuito",
+              progressionText: `O próximo destino agora é ${resolution.nextVenue.name}.`,
+            }
+          } else {
+            matchResultState = {
+              ...matchResultState,
+              progressionTitle: "Modo Livre",
+              progressionText: `Vitória registrada em ${resultVenueName}. Continue até cumprir as vitórias deste bar.`,
+            }
+          }
+
+          matchResultRevealTimeoutRef.current = window.setTimeout(() => {
+            setSpeechBubble(null)
+            setHandState(null)
+            setMatchState(null)
+            setInGameContextMenuOpen(false)
+            setCampaignVictoryScreen(null)
+            setCampaignVictoryQueue([])
+            setMatchResultScreen(matchResultState)
+            setFreePlayRun(nextRun)
+            setMenuScreen("match-result")
+            setEventMessage(
+              resolution.stageCompleted
+                ? `Circuito ${resolution.stage?.name ?? "do Modo Livre"} concluído.`
+                : resolution.nextVenue
+                  ? `Próximo bar do Modo Livre: ${resolution.nextVenue.name}.`
+                  : `Vitória registrada no Modo Livre em ${resultVenueName}.`
+            )
+            setTrucoMessage(
+              resolution.stageCompleted
+                ? "Circuito livre concluído. Escolha outro circuito no hub."
+                : resolution.nextVenue
+                  ? `Modo Livre: próximo destino, ${resolution.nextVenue.name}.`
+                  : `Modo Livre: siga vencendo em ${resultVenueName}.`
+            )
+            matchResultRevealTimeoutRef.current = null
+          }, MATCH_RESULT_REVEAL_DELAY_MS)
+          syncLogs()
+          return
         } else if (nextState.winner === "A") {
           const resolution = applyCampaignWin(playerProfile, CAMPAIGN_STAGES)
           const nextEventMessage = getCampaignWinMessage(finalScore, resolution)
@@ -733,6 +807,9 @@ export function useGameSession() {
           }, MATCH_RESULT_REVEAL_DELAY_MS)
           syncLogs()
           return
+        } else if (freePlayRun && freePlayCurrentVenue?.id === resultVenue?.id) {
+          setEventMessage(getMatchEndMessage(nextState.winner, finalScore))
+          setTrucoMessage(`Derrota no Modo Livre em ${resultVenueName}. Você pode tentar este bar novamente.`)
         } else {
           const resolution = applyCampaignLoss(playerProfile, CAMPAIGN_STAGES)
           setPlayerProfile(resolution.profile)
@@ -761,6 +838,8 @@ export function useGameSession() {
     syncLogs()
   }, [
     currentCampaignVenue,
+    freePlayCurrentVenue,
+    freePlayRun,
     handState,
     matchState,
     playerProfile,
@@ -778,8 +857,9 @@ export function useGameSession() {
     const { handState: state, matchState: initialMatchState } =
       createVenueMatchState(targetVenue, firstPlayerId)
     const actualVenueId = actualCampaignVenue?.id ?? null
+    const isFreePlayVenue = freePlayCurrentVenue?.id === targetVenue.id
     const shouldUseSessionDebugVenue =
-      DEBUG_MODE && (!!debugVenueId || targetVenue.id !== actualVenueId)
+      DEBUG_MODE && (!!debugVenueId || (!isFreePlayVenue && targetVenue.id !== actualVenueId))
 
     setVariant(variantToStart)
     setMatchState(initialMatchState)
@@ -807,8 +887,9 @@ export function useGameSession() {
 
     if (!targetVenue) return
 
+    const isFreePlayVenue = freePlayCurrentVenue?.id === targetVenue.id
     const shouldUseSessionDebugVenue =
-      DEBUG_MODE && (!!debugVenueId || targetVenue.id !== actualVenueId)
+      DEBUG_MODE && (!!debugVenueId || (!isFreePlayVenue && targetVenue.id !== actualVenueId))
 
     setSessionDebugVenueId(shouldUseSessionDebugVenue ? targetVenue.id : null)
     setMatchResultScreen(null)
@@ -819,6 +900,31 @@ export function useGameSession() {
     setInGameConfirmation(null)
     setLaunchVenueAfterCharacterSelect(false)
     setCharacterSelectReturnScreen("journey-intro")
+  }
+
+  function handleOpenFreePlayStage(stageId: string) {
+    const stage = CAMPAIGN_STAGES.find((candidate) => candidate.id === stageId)
+    const run = stage ? createFreePlayRun(stage) : null
+
+    if (!run) return
+
+    setFreePlayRun(run)
+    setSessionDebugVenueId(null)
+    setMatchResultScreen(null)
+    setCampaignVictoryScreen(null)
+    setCampaignVictoryQueue([])
+    setMenuScreen("journey-intro")
+    setEventMessage(`Modo Livre aberto em ${stage?.name ?? "circuito"}.`)
+    setTrucoMessage("Vença os bares do circuito livre para avançar dentro dele.")
+  }
+
+  function handleCloseFreePlayStage() {
+    setFreePlayRun(null)
+    setSessionDebugVenueId(null)
+    setMatchResultScreen(null)
+    setCampaignVictoryScreen(null)
+    setCampaignVictoryQueue([])
+    setMenuScreen("journey-intro")
   }
 
   function handleReturnToJourneyFlow() {
@@ -910,6 +1016,7 @@ export function useGameSession() {
     setHandState(null)
     setMatchState(null)
     setSessionDebugVenueId(null)
+    setFreePlayRun(null)
     setInGameContextMenuOpen(false)
     setInGameConfirmation(null)
     setGameplayIntroPhase("done")
@@ -1283,6 +1390,7 @@ export function useGameSession() {
   function handleCloseJourneyIntro() {
     setInGameContextMenuOpen(false)
     setInGameConfirmation(null)
+    setFreePlayRun(null)
     setMenuScreen("start")
   }
 
@@ -1394,6 +1502,61 @@ export function useGameSession() {
       const debugVenueName = sessionDebugVenue?.name ?? currentCampaignVenue?.name ?? "local de debug"
       setEventMessage(`Vitória manual no modo debug em ${debugVenueName}.`)
       setTrucoMessage("Partida de teste finalizada. O progresso da campanha não foi alterado.")
+    } else if (freePlayRun && freePlayCurrentVenue?.id === resultVenue?.id) {
+      const resolution = applyFreePlayRunWin(freePlayRun, CAMPAIGN_STAGES)
+      const nextRun = resolution.run
+
+      if (resolution.stageCompleted) {
+        matchResultState = {
+          ...matchResultState,
+          title: `${resolution.stage?.name ?? "Circuito"} concluído`,
+          subtitle: `Vitória manual fechou ${resolution.stage?.name ?? "este circuito"} no Modo Livre.`,
+          progressionTitle: "Circuito finalizado",
+          progressionText: "O circuito livre foi concluído. Você volta para o hub para escolher outro caminho.",
+        }
+      } else if (resolution.clearedVenue && resolution.nextVenue) {
+        matchResultState = {
+          ...matchResultState,
+          title: `${resolution.clearedVenue.name} revisitado`,
+          subtitle: "Vitória manual avançou o circuito livre para o próximo bar.",
+          progressionTitle: "Próximo bar do circuito",
+          progressionText: `O próximo destino agora é ${resolution.nextVenue.name}.`,
+        }
+      } else {
+        matchResultState = {
+          ...matchResultState,
+          progressionTitle: "Modo Livre",
+          progressionText: `Vitória registrada em ${resultVenueName}. Continue até cumprir as vitórias deste bar.`,
+        }
+      }
+
+      matchResultRevealTimeoutRef.current = window.setTimeout(() => {
+        setSpeechBubble(null)
+        setHandState(null)
+        setMatchState(null)
+        setCampaignVictoryScreen(null)
+        setCampaignVictoryQueue([])
+        setMatchResultScreen(matchResultState)
+        setFreePlayRun(nextRun)
+        setMenuScreen("match-result")
+        setEventMessage(
+          resolution.stageCompleted
+            ? `Circuito ${resolution.stage?.name ?? "do Modo Livre"} concluído.`
+            : resolution.nextVenue
+              ? `Próximo bar do Modo Livre: ${resolution.nextVenue.name}.`
+              : `Vitória manual no Modo Livre em ${resultVenueName}.`
+        )
+        setTrucoMessage(
+          resolution.stageCompleted
+            ? "Circuito livre concluído. Escolha outro circuito no hub."
+            : resolution.nextVenue
+              ? `Modo Livre: próximo destino, ${resolution.nextVenue.name}.`
+              : `Modo Livre: siga vencendo em ${resultVenueName}.`
+        )
+        matchResultRevealTimeoutRef.current = null
+      }, MATCH_RESULT_REVEAL_DELAY_MS)
+      syncLogs()
+      return
     } else {
       const resolution = applyCampaignWin(playerProfile, CAMPAIGN_STAGES)
       const nextEventMessage = getCampaignWinMessage(finalScore, resolution)
@@ -1510,6 +1673,9 @@ export function useGameSession() {
       const debugVenueName = sessionDebugVenue?.name ?? currentCampaignVenue?.name ?? "local de debug"
       setEventMessage(`Derrota manual no modo debug em ${debugVenueName}.`)
       setTrucoMessage("Partida de teste finalizada. O progresso da campanha não foi alterado.")
+    } else if (freePlayRun && freePlayCurrentVenue?.id === resultVenue?.id) {
+      setEventMessage(getMatchEndMessage("B", finalScore))
+      setTrucoMessage(`Derrota no Modo Livre em ${resultVenueName}. Você pode tentar este bar novamente.`)
     } else {
       const resolution = applyCampaignLoss(playerProfile, CAMPAIGN_STAGES)
       setPlayerProfile(resolution.profile)
@@ -1606,6 +1772,7 @@ export function useGameSession() {
     setCampaignVictoryScreen(null)
     setCampaignVictoryQueue([])
     setSessionDebugVenueId(null)
+    setFreePlayRun(null)
     setInGameContextMenuOpen(false)
     setInGameConfirmation(null)
     setMenuScreen("start")
@@ -1625,6 +1792,7 @@ export function useGameSession() {
     currentCampaignVenue,
     currentTurnLabel,
     currentVenueWins,
+    freePlayRun,
     hasSelectedPartnerForVenue: !!currentVenuePartnerCharacterId,
     debugModeEnabled: DEBUG_MODE,
     debugVenueId,
@@ -1640,11 +1808,13 @@ export function useGameSession() {
     handleAcceptTruco,
     handleCancelInGameConfirmation,
     handleCloseInGameContextMenu,
+    handleCloseFreePlayStage,
     handleConfirmInGameConfirmation,
     handleCopyLogs,
     handleEnterVenueFromIntro,
     handleExitMatchFromContextMenu,
     handleLoseMatchFromContextMenu,
+    handleOpenFreePlayStage,
     handleOpenInGameContextMenu,
     handlePlayCard,
     handlePartnerAdvice,

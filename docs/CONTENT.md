@@ -45,7 +45,7 @@ Hoje o projeto ja possui:
 - bonus pos-campanha `Circuito Intergaláctico` / `Órbita da Lua` integrado como ultima etapa do jogo
 - `Modo Livre` pos-campanha para revisitar circuitos ou reiniciar campanha
 - testes unitarios iniciais para dialogos/raises e variantes por bar
-- proxima frente definida: balanceamento de IA com testes
+- primeira rodada de balanceamento de IA aplicada com testes
 
 ## Arquitetura que deve ser preservada
 
@@ -151,8 +151,11 @@ Arquivos principais:
   - aparece depois da campanha concluida
   - usa `src/assets/campaign/free-play-circuit-hub.png`
   - cada circuito e clicavel por hotspot invisivel
-  - abre a tela autoral de campanha do primeiro bar do circuito selecionado
-  - o `Voltar` da tela autoral retorna ao hub do `Modo Livre`
+  - inicia uma run temporaria pelo primeiro bar do circuito selecionado
+  - avanca para o proximo bar ao cumprir as vitorias do local
+  - concluir o ultimo bar do circuito livre retorna ao hub do `Modo Livre`
+  - o `Voltar` da tela autoral retorna ao hub do `Modo Livre` e encerra a run temporaria
+  - a run temporaria nao altera progresso, recompensas ou desbloqueios da campanha principal ja concluida
   - `Recomeçar campanha` usa confirmacao interna do jogo, nao `window.confirm`
 - os testes unitarios de dialogos e raises cobrem a escada `TRUCO!`, `SEIS!`, `NOVE!`, `DOZE!`, `DESCE!`, `TOMA!` e `TÔ FORA!`
 - os helpers de sessao criam partida pela variante declarada no bar e cobrem Mineiro/Paulista em testes
@@ -592,8 +595,12 @@ Estado visual atual:
 - depois da campanha concluida, `COMEÇAR` leva ao `Modo Livre`
 - o `Modo Livre` usa o asset `src/assets/campaign/free-play-circuit-hub.png`
 - no `Modo Livre`, os quadros dos circuitos sao hotspots invisiveis sobre a arte
-- clicar em um circuito abre a tela autoral de campanha do primeiro bar daquele circuito, usando os hotspots originais da tela autoral
-- o `Voltar` da tela autoral retorna ao hub do `Modo Livre`
+- clicar em um circuito inicia uma run temporaria daquele circuito
+- a run temporaria usa as telas autorais de campanha do bar atual e os hotspots originais
+- ao cumprir as vitorias do bar atual no Modo Livre, a run avanca para o proximo bar do circuito
+- concluir o ultimo bar do circuito livre retorna ao hub do `Modo Livre`
+- o `Voltar` da tela autoral retorna ao hub do `Modo Livre` e encerra a run temporaria
+- a run temporaria nao altera progresso, recompensas ou desbloqueios da campanha principal ja concluida
 - `Recomeçar campanha` exibe modal interno no stage antes de apagar progresso, escolhas de parceira, skin do jogador e historico salvo
 - o jogador deve reconhecer com clareza onde esta naquele momento
 - preservar a separacao entre:
@@ -758,8 +765,14 @@ Hoje esta assim:
     - `BORA!`
     - `CE QUE SABE!`
     - `MELHOR CORRER!`
-- a IA ainda tende a pedir truco com pouco em algumas situacoes
-- a proxima frente deve rebalancear thresholds, blefes, aceite, corrida, raises e conselho/consulta com testes antes da mudanca de comportamento
+- primeira rodada de rebalanceamento aplicada:
+  - `balanced` nao abre mais truco inicial com mao de apenas duas honras baixas
+  - `balanced` corre do truco inicial com uma unica honra baixa
+  - `balanced` aceita mas nao contra-aumenta com mao so razoavel
+  - conselhos da parceira ficaram menos otimistas com dupla fraca
+  - perfis blefadores mantem blefes com probabilidades menores e margem controlada
+  - dificuldade maxima com disciplina alta usa `trickster`, nao `reckless`
+- proximas mudancas de thresholds, blefes, aceite, corrida, raises e conselho/consulta devem continuar vindo com testes antes da mudanca de comportamento
 
 ## Estado atual do truco e dos dialogos
 

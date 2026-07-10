@@ -169,8 +169,11 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 - A tela usa arte full-screen em `src/assets/campaign/free-play-circuit-hub.png`.
 - Os circuitos sao botoes HTML invisiveis posicionados sobre os cards desenhados na arte.
 - Nao desenhar borda de selecao, dock inferior ou labels HTML por cima dos cards; os textos ja vivem na imagem.
-- Ao clicar em um circuito, abrir a tela autoral de campanha do primeiro bar daquele circuito quando houver arte cadastrada.
-- O `Voltar` dessa tela autoral deve retornar ao hub do `Modo Livre`.
+- Ao clicar em um circuito, iniciar uma run temporaria daquele circuito no `Modo Livre`.
+- A run temporaria começa no primeiro bar do circuito e avança para o proximo bar ao cumprir as vitorias do local.
+- O `Voltar` dessa tela autoral deve retornar ao hub do `Modo Livre` e encerrar a run temporaria.
+- Concluir o ultimo bar do circuito livre retorna ao hub do `Modo Livre`.
+- A run temporaria nao altera progresso, recompensas ou desbloqueios da campanha principal ja concluida.
 - O botao `Recomeçar campanha` deve abrir confirmacao dentro do stage do jogo, nunca `window.confirm` ou alerta nativo do navegador.
 
 ### Estrutura da Capa do Ze Catinga

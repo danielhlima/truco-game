@@ -111,6 +111,7 @@ function App() {
     hasSelectedPartnerForVenue,
     dealAnimationNonce,
     eventMessage,
+    freePlayRun,
     gameplayIntroPhase,
     handScoreLabel,
     handState,
@@ -119,6 +120,7 @@ function App() {
     matchResultScreen,
     handleAcceptTruco,
     handleCancelInGameConfirmation,
+    handleCloseFreePlayStage,
     handleCloseInGameContextMenu,
     handleCloseCharacterSelect,
     handleCloseJourneyIntro,
@@ -130,6 +132,7 @@ function App() {
     handleExitMatchFromContextMenu,
     handleLaunchVenue,
     handleLoseMatchFromContextMenu,
+    handleOpenFreePlayStage,
     handleOpenInGameContextMenu,
     handleOpenCharacterSelect,
     handlePlayCard,
@@ -411,6 +414,7 @@ function App() {
             currentCampaignVenue={currentCampaignVenue}
             currentVenueWins={currentVenueWins}
             dealAnimationNonce={dealAnimationNonce}
+            freePlayRun={freePlayRun}
             gameplayIntroPhase={gameplayIntroPhase}
             hasSelectedPartnerForVenue={hasSelectedPartnerForVenue}
             menuScreen={menuScreen}
@@ -454,10 +458,12 @@ function App() {
             onAcceptTruco={handleAcceptTruco}
             onAdvisePartner={handlePartnerAdvice}
             onCancelInGameConfirmation={handleCancelInGameConfirmation}
+            onCloseFreePlayStage={handleCloseFreePlayStage}
             onCloseInGameContextMenu={handleCloseInGameContextMenu}
             onConfirmInGameConfirmation={handleConfirmInGameConfirmation}
             onExitMatchFromContextMenu={handleExitMatchFromContextMenu}
             onLoseMatchFromContextMenu={handleLoseMatchFromContextMenu}
+            onOpenFreePlayStage={handleOpenFreePlayStage}
             onOpenInGameContextMenu={handleOpenInGameContextMenu}
             onRaiseTruco={handleRaiseTruco}
             onResetProgressFromContextMenu={handleResetProgressFromContextMenu}

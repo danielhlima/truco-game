@@ -21,8 +21,10 @@ Estado consolidado:
 - depois da campanha concluida, `COMEÇAR` abre o `Modo Livre`
 - o `Modo Livre` usa `src/assets/campaign/free-play-circuit-hub.png`
 - no `Modo Livre`, cada quadro de circuito e um hotspot invisivel
-- clicar em um circuito abre a tela autoral de campanha do primeiro bar daquele circuito, quando existe arte cadastrada
-- o `Voltar` dessa tela autoral retorna ao hub do `Modo Livre`
+- clicar em um circuito inicia uma run temporaria daquele circuito
+- a run temporaria avanca de bar em bar ao cumprir as vitorias locais e retorna ao hub ao concluir o circuito livre
+- o `Voltar` dessa tela autoral retorna ao hub do `Modo Livre` e encerra a run temporaria
+- a run temporaria nao altera progresso, recompensas ou desbloqueios da campanha principal ja concluida
 - o botao `Recomeçar campanha` abre confirmacao dentro do jogo, nao alerta nativo do navegador
 - testes unitarios de dialogos/raises ja cobrem `TRUCO!`, `SEIS!`, `NOVE!`, `DOZE!`, `DESCE!`, `TOMA!` e `TÔ FORA!`
 - helpers de sessao criam partidas a partir do bar e aplicam a variante declarada pelo local
@@ -51,16 +53,19 @@ Locais com pacote visual autoral integrado:
 
 ### Balanceamento de IA
 
-A proxima frente deve ser o rebalanceamento da IA de truco.
+A primeira rodada de rebalanceamento da IA de truco foi aplicada com testes.
 
-Motivo:
+Estado apos a primeira rodada:
 
-- a IA atual ainda tende a trucar com pouco
+- o perfil `balanced` subiu cortes de pedido, aceite e contra-aumento
+- conselhos da parceira ficaram menos otimistas com dupla fraca
+- perfis agressivos/blefadores ainda podem blefar, mas com probabilidades menores
+- dificuldade maxima disciplinada agora usa `trickster`, nao `reckless`
 - os dialogos e raises ja ganharam cobertura unitaria inicial
 - as variantes por bar ja passaram a ser aplicadas na criacao de partida
-- agora da para mexer no comportamento da IA com uma base mais segura
+- novas rodadas de ajuste devem continuar usando testes antes de mudar comportamento
 
-Ordem recomendada:
+Ordem recomendada para a proxima rodada de IA:
 
 1. conferir `docs/TRUCO_RULES.md`
 2. ler os testes existentes de IA e de dialogos em `tests/**/*.test.ts`
@@ -103,7 +108,7 @@ Frentes que deixaram de ser pendencia aberta nesta rodada:
 
 - dialogos e raises ganharam cobertura unitaria inicial
 - variantes Mineiro/Paulista passaram a ser criadas pela configuracao do bar
-- o fluxo pos-campanha ganhou `Modo Livre` para revisitar circuitos e resetar campanha com confirmacao interna
+- o fluxo pos-campanha ganhou `Modo Livre` para jogar runs temporarias de circuitos e resetar campanha com confirmacao interna
 
 ## Validacao Recomendada
 
@@ -125,7 +130,7 @@ Antes de concluir qualquer implementacao:
 - reabrir a responsividade da gameplay sem regressao real
 - reabrir a tela de selecao de parceira sem regressao real
 - reabrir o pacote visual principal ou bonus sem regressao ou nova decisao explicita de polimento
-- criar novos assets antes de terminar a primeira rodada de balanceamento de IA
+- criar novos assets antes de validar a primeira rodada de balanceamento de IA em jogo real
 
 ## Prompt Para Chat Novo
 

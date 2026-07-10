@@ -101,7 +101,7 @@ Organiza as skins exclusivas do jogador:
 
 ## Estado do foco atual
 
-O projeto esta com fluxo visual principal, bonus pos-campanha e `Modo Livre` pos-campanha consolidados; a proxima frente recomendada e balanceamento de IA com testes.
+O projeto esta com fluxo visual principal, bonus pos-campanha e `Modo Livre` pos-campanha consolidados; a primeira rodada de balanceamento de IA com testes foi aplicada.
 
 Estado consolidado:
 
@@ -207,13 +207,16 @@ Estado consolidado:
   - asset: `src/assets/campaign/free-play-circuit-hub.png`
   - aparece quando a campanha inteira ja foi concluida
   - cada quadro de circuito e um hotspot HTML invisivel
-  - clicar em um circuito abre a tela autoral de campanha do primeiro bar daquele circuito, quando existe arte cadastrada
-  - o `Voltar` da tela autoral retorna ao hub do `Modo Livre`
+  - clicar em um circuito inicia uma run temporaria daquele circuito
+  - a run temporaria começa no primeiro bar e avanca para o proximo bar ao cumprir as vitorias do local
+  - o `Voltar` da tela autoral retorna ao hub do `Modo Livre` e encerra a run temporaria
+  - concluir o ultimo bar do circuito livre retorna ao hub
+  - a run temporaria nao altera progresso, recompensas ou desbloqueios da campanha principal ja concluida
   - `Recomeçar campanha` usa confirmacao interna do jogo, nao alerta nativo do navegador
 
 ## Prioridade imediata para o proximo chat
 
-No proximo chat, sair da frente de assets/fluxo visual e iniciar o balanceamento de IA.
+No proximo chat, continuar a partir da primeira rodada de balanceamento de IA, sem reabrir assets/fluxo visual.
 
 Estado pos-bonus:
 
@@ -226,8 +229,8 @@ Proximo foco recomendado:
 - usar `docs/NEXT_CHAT_PROMPT.md` como briefing inicial copiavel
 - os testes unitarios de dialogos e raises ja foram criados/atualizados; preservar e ampliar essa cobertura quando necessario
 - os helpers de sessao ja criam partidas pela variante do bar e cobrem Mineiro/Paulista em testes
-- rebalancear IA com testes, porque a IA atual ainda tende a trucar com pouco
-- trabalhar uma decisao da IA por vez: pedir truco, aceitar, correr, contra-aumentar e aconselhar/consultar parceira
+- a primeira rodada de IA subiu cortes do perfil `balanced`, reduziu blefes e corrigiu dificuldade maxima disciplinada para `trickster`
+- continuar qualquer novo rebalanceamento com testes, trabalhando uma decisao por vez: pedir truco, aceitar, correr, contra-aumentar e aconselhar/consultar parceira
 - depois da primeira rodada de IA, retomar pendencias de produto/regras:
   - mao especial de 9/dez pontos
   - opcao de escolher ou nao a versao `ponto acima`
