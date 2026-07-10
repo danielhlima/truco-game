@@ -67,6 +67,7 @@ import {
   getCurrentTurnLabel,
   getEventMessageForTransition,
   getFollowUpSpeechBubbleForTransition,
+  getHandRuleContextLogLines,
   getMatchEndMessage,
   getNextRaiseValueFromPendingTruco,
   getPendingBetText,
@@ -862,6 +863,7 @@ export function useGameSession() {
       DEBUG_MODE && (!!debugVenueId || (!isFreePlayVenue && targetVenue.id !== actualVenueId))
 
     setVariant(variantToStart)
+    getHandRuleContextLogLines(state).forEach((line) => logEvent(line))
     setMatchState(initialMatchState)
     setSessionDebugVenueId(shouldUseSessionDebugVenue ? targetVenue.id : null)
     setMatchResultScreen(null)
@@ -1202,6 +1204,7 @@ export function useGameSession() {
         const nextHandNumber = matchState.handNumber
         const nextState = createNextHandStateForMatch(matchState)
 
+        getHandRuleContextLogLines(nextState).forEach((line) => logEvent(line))
         applyHandState(nextState, {
           eventMessage: `Mão ${nextHandNumber} iniciada.`,
           trucoMessage: DEFAULT_TRUCO_MESSAGE,

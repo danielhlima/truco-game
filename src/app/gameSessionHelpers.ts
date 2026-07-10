@@ -31,6 +31,20 @@ export function formatCard(card: Card): string {
   return `${card.rank} de ${card.suit}`
 }
 
+export function getHandRuleContextLogLines(handState: HandState): string[] {
+  if (handState.variant === "MINEIRO") {
+    return [
+      "Regra da mão: Truco Mineiro.",
+      "Manilhas fixas: 4 de paus (zap), 7 de copas, A de espada, 7 de ouros.",
+    ]
+  }
+
+  return [
+    "Regra da mão: Truco Paulista.",
+    `Vira: ${handState.vira ? formatCard(handState.vira) : "sem vira"}. Manilha: ${getManilhaLabel(handState)}.`,
+  ]
+}
+
 export function createVenueMatchState(
   targetVenue: CampaignVenue,
   firstPlayerId = 1

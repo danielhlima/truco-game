@@ -4,13 +4,14 @@ import {
   createNextHandStateForMatch,
   createVenueMatchState,
   getFollowUpSpeechBubbleForTransition,
+  getHandRuleContextLogLines,
   getSpeechBubbleForTransition,
   getSpeechBetLabel,
   shouldPartnerConsultHuman,
 } from "../../src/app/gameSessionHelpers.ts"
 import { CAMPAIGN_STAGES } from "../../src/career/campaign/campaignData.ts"
 import type { CampaignVenue } from "../../src/career/campaign/types.ts"
-import { createHandStateFixture } from "../helpers/gameFixtures.ts"
+import { createCard, createHandStateFixture } from "../helpers/gameFixtures.ts"
 import { requestTruco } from "../../src/game/requestTruco.ts"
 import { respondToTruco } from "../../src/game/respondToTruco.ts"
 import { stepHand } from "../../src/game/stepHand.ts"
@@ -23,6 +24,29 @@ function getCampaignVenueFixture(venueId: string): CampaignVenue {
   assert.ok(venue)
   return venue
 }
+
+test("contexto de regra da mão registra manilhas fixas no Mineiro", () => {
+  const state = createHandStateFixture()
+
+  assert.deepEqual(getHandRuleContextLogLines(state), [
+    "Regra da mão: Truco Mineiro.",
+    "Manilhas fixas: 4 de paus (zap), 7 de copas, A de espada, 7 de ouros.",
+  ])
+})
+
+test("contexto de regra da mão registra vira e manilha no Paulista", () => {
+  const state = createHandStateFixture(
+    {
+      vira: createCard("5", "ouros"),
+    },
+    "PAULISTA"
+  )
+
+  assert.deepEqual(getHandRuleContextLogLines(state), [
+    "Regra da mão: Truco Paulista.",
+    "Vira: 5 de ouros. Manilha: 6.",
+  ])
+})
 
 test("aceite de contra-aumento no mesmo cabo de guerra usa TOMA de quem abriu o truco", () => {
   const previousState = createHandStateFixture({
