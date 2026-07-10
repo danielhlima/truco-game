@@ -100,6 +100,7 @@ function App() {
     canHumanRaiseTruco,
     canHumanRespondToTruco,
     canPlayHumanCard,
+    canPlayCoveredCard,
     canRequestTruco,
     campaignCompleted,
     campaignVictoryScreen,
@@ -240,10 +241,10 @@ function App() {
       gameMainColumn: {
         ...styles.gameMainColumn,
         gridTemplateRows: isTinyLayout
-          ? "minmax(0, 1fr) 92px"
+          ? "minmax(0, 1fr) 100px"
           : isCompactLayout
-            ? "minmax(0, 1fr) 104px"
-            : "minmax(0, 1fr) 118px",
+            ? "minmax(0, 1fr) 116px"
+            : "minmax(0, 1fr) 132px",
         gap: isTinyLayout ? "3px" : "4px",
         overflow: "visible",
       },
@@ -258,8 +259,8 @@ function App() {
         width: "100%",
         boxSizing: "border-box",
         height: "100%",
-        minHeight: isTinyLayout ? "92px" : isCompactLayout ? "104px" : "118px",
-        padding: isTinyLayout ? "5px 8px 8px" : isCompactLayout ? "6px 9px 10px" : "8px 11px 12px",
+        minHeight: isTinyLayout ? "100px" : isCompactLayout ? "116px" : "132px",
+        padding: isTinyLayout ? "5px 8px 6px" : isCompactLayout ? "6px 9px 8px" : "8px 11px 9px",
         overflow: "visible",
         position: "relative",
         zIndex: 6,
@@ -372,7 +373,7 @@ function App() {
         ...styles.mobileCardButton,
         width: isTinyLayout ? "40px" : isCompactLayout ? "45px" : "50px",
         minWidth: isTinyLayout ? "40px" : isCompactLayout ? "45px" : "50px",
-        minHeight: isTinyLayout ? "58px" : isCompactLayout ? "64px" : "70px",
+        minHeight: isTinyLayout ? "56px" : isCompactLayout ? "62px" : "68px",
         padding: isTinyLayout ? "3px" : "4px",
       },
       mobileCardRank: {
@@ -438,6 +439,7 @@ function App() {
             canHumanRaiseTruco={canHumanRaiseTruco}
             canHumanRespondToTruco={canHumanRespondToTruco}
             canPlayHumanCard={canPlayHumanCard}
+            canPlayCoveredCard={canPlayCoveredCard}
             onCloseCharacterSelect={handleCloseCharacterSelect}
             onCloseJourneyIntro={handleCloseJourneyIntro}
             onClosePlayerSkinSelect={handleClosePlayerSkinSelect}
@@ -1775,10 +1777,11 @@ const styles: Record<string, React.CSSProperties> = {
   },
   mobileHandPanel: {
     display: "grid",
-    gridTemplateRows: "16px minmax(0, 1fr)",
+    gridTemplateRows: "clamp(24px, 2.2vw, 30px) minmax(0, 1fr)",
     gap: "6px",
     height: "100%",
     minHeight: 0,
+    position: "relative",
   },
   mobileHandHeader: {
     display: "flex",
@@ -1804,13 +1807,104 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 700,
     color: "#d6c7b2",
   },
+  coveredCardToggleWrap: {
+    position: "relative",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+  },
+  coveredCardHint: {
+    position: "absolute",
+    right: 0,
+    bottom: "calc(100% + 7px)",
+    width: "142px",
+    borderRadius: "10px",
+    background: "linear-gradient(180deg, rgba(255,247,237,0.98) 0%, rgba(254,215,170,0.98) 100%)",
+    border: "1px solid rgba(251,191,36,0.88)",
+    color: "#431407",
+    boxShadow: "0 8px 18px rgba(0,0,0,0.34)",
+    padding: "7px 9px",
+    boxSizing: "border-box",
+    display: "flex",
+    flexDirection: "column",
+    gap: "2px",
+    pointerEvents: "none",
+    zIndex: 12,
+  },
+  coveredCardHintTitle: {
+    fontSize: "9px",
+    fontWeight: 900,
+    lineHeight: 1,
+    textTransform: "uppercase",
+    color: "#7c2d12",
+  },
+  coveredCardHintText: {
+    fontSize: "9px",
+    fontWeight: 800,
+    lineHeight: 1.15,
+    color: "#431407",
+  },
+  coveredCardToggle: {
+    minHeight: "26px",
+    borderRadius: "999px",
+    border: "1px solid rgba(255,255,255,0.28)",
+    background: "rgba(31,20,14,0.62)",
+    color: "#f7efe0",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    padding: "3px 9px 3px 5px",
+    fontSize: "clamp(9px, 0.74vw, 10px)",
+    fontWeight: 800,
+    cursor: "pointer",
+    lineHeight: 1,
+    boxShadow: "0 5px 12px rgba(0,0,0,0.22)",
+  },
+  coveredCardToggleHighlighted: {
+    background: "rgba(120,53,15,0.9)",
+    borderColor: "rgba(251,191,36,0.88)",
+    color: "#fff7ed",
+    boxShadow: "0 0 0 2px rgba(251,191,36,0.32), 0 8px 18px rgba(0,0,0,0.34)",
+  },
+  coveredCardToggleActive: {
+    background: "rgba(245,158,11,0.22)",
+    borderColor: "rgba(251,191,36,0.72)",
+    color: "#fff7ed",
+  },
+  coveredCardToggleDisabled: {
+    opacity: 0.48,
+    cursor: "not-allowed",
+  },
+  coveredCardToggleSwitch: {
+    width: "24px",
+    height: "14px",
+    borderRadius: "999px",
+    background: "rgba(0,0,0,0.28)",
+    border: "1px solid rgba(255,255,255,0.2)",
+    display: "flex",
+    alignItems: "center",
+    padding: "1px",
+    boxSizing: "border-box",
+  },
+  coveredCardToggleKnob: {
+    width: "10px",
+    height: "10px",
+    borderRadius: "999px",
+    background: "#d6c7b2",
+    transform: "translateX(0)",
+    transition: "transform 140ms ease, background 140ms ease",
+  },
+  coveredCardToggleKnobActive: {
+    transform: "translateX(10px)",
+    background: "#fbbf24",
+  },
   mobileHandRow: {
     display: "flex",
     gap: "clamp(4px, 0.35vw, 6px)",
     flexWrap: "nowrap",
-    alignItems: "flex-end",
+    alignItems: "center",
     justifyContent: "center",
-    paddingTop: "clamp(2px, 0.2vw, 4px)",
+    paddingTop: 0,
     minWidth: 0,
   },
   mobileHandMenuDock: {
@@ -1870,6 +1964,27 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: "column",
     justifyContent: "space-between",
     cursor: "pointer",
+    position: "relative",
+    overflow: "hidden",
+  },
+  mobileCardButtonCoveredPreview: {
+    transform: "translateY(-3px)",
+    boxShadow: "0 0 0 2px rgba(251,191,36,0.85), 0 8px 14px rgba(0,0,0,0.28)",
+  },
+  coveredCardPreviewBadge: {
+    position: "absolute",
+    left: "50%",
+    top: "50%",
+    transform: "translate(-50%, -50%) rotate(-12deg)",
+    borderRadius: "999px",
+    background: "rgba(31, 20, 14, 0.86)",
+    color: "#fbbf24",
+    border: "1px solid rgba(251,191,36,0.72)",
+    padding: "3px 6px",
+    fontSize: "8px",
+    fontWeight: 900,
+    textTransform: "uppercase",
+    zIndex: 2,
   },
   mobileCardCornerTop: {
     display: "flex",

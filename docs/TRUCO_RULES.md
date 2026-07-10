@@ -132,6 +132,8 @@ Observacao:
 
 - A primeira rodada de rebalanceamento reduziu a tendencia da IA de `trucar com pouco`.
 - O perfil `balanced` agora exige mao mais firme para pedir, aceitar e contra-aumentar.
+- Quando nao consegue ganhar uma vaza, a IA descarta a menor carta disponivel em vez de queimar carta alta.
+- Quando consegue ganhar a vaza, a IA usa a menor carta vencedora.
 - Este arquivo registra a logica atual apos essa primeira rodada, nao um equilibrio final definitivo.
 - Qualquer ajuste em thresholds, blefes, aceite, corrida ou raise deve ser acompanhado por testes.
 
@@ -141,6 +143,8 @@ Observacao:
 - A criacao de partida agora usa a variante declarada pelo bar.
 - A proxima mao de uma partida preserva a variante da propria partida.
 - Existem testes unitarios cobrindo criacao de partida por local Mineiro/Paulista e proxima mao Paulista mantendo vira.
+- `Jogos Mundiais` e `Mundial` usam `Truco Mineiro`.
+- O log de inicio de mao registra a regra ativa; em Paulista, registra tambem vira e manilha.
 - Se a implementacao visual da vira/manilha do Paulista for alterada, validar novamente no fluxo real e em testes.
 
 ## Pendencias de Regras para Implementar
@@ -171,9 +175,14 @@ As regras abaixo foram confirmadas como desejadas, mas ainda nao devem ser trata
 ### Carta virada para baixo
 
 - uma rodada continua composta por ate `3 vazas`
+- na primeira vaza, todas as cartas continuam abertas
 - na segunda e na terceira vaza da rodada, qualquer jogador pode jogar uma carta virada para baixo
-- a identidade da carta virada para baixo nao deve ser revelada nem aos adversarios nem ao parceiro
-- a resolucao correta do valor dessa carta ainda deve ser definida na implementacao e coberta por testes
+- a carta virada para baixo tambem pode ser chamada de `carta coberta`
+- a carta coberta nao disputa a vaza e deve funcionar como descarte sem forca, equivalente a uma carta sem valor para vencer
+- a identidade real da carta coberta nao deve ser revelada nem aos adversarios nem ao parceiro durante a partida
+- a mesa e os logs devem registrar que uma carta coberta foi jogada, mas nao revelar a carta real
+- a IA deve considerar carta coberta como opcao quando quiser descartar sem disputar a vaza
+- a implementacao precisa ser coberta por testes antes de alterar a UI
 
 ## Nota de Continuidade
 

@@ -207,6 +207,25 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 - O fluxo de truco e as ações principais ficam dentro da tela.
 - A variante Paulista tem representação visual da vira na mesa.
 
+## Carta Virada Para Baixo / Carta Coberta
+
+Regra visual para a proxima implementacao:
+
+- A carta coberta so deve ser oferecida a partir da segunda vaza da mao/rodada.
+- A primeira vaza nao deve mostrar acao de carta coberta.
+- A acao precisa ser clara em celular, sem exigir hover e sem depender de texto longo.
+- Preferir um controle contextual perto da mao do jogador, por exemplo:
+  - ao tocar/segurar uma carta, abrir uma pequena acao `Cobrir` junto da carta selecionada
+  - ou mostrar um toggle compacto `Coberta` na faixa inferior quando a regra estiver disponivel
+- A carta selecionada para cobrir deve ter pre-visualizacao inequívoca antes de confirmar:
+  - verso da carta visivel
+  - pequeno selo `Coberta`
+  - botao de confirmar/cancelar ou gesto de arrastar para a mesa
+- Depois de jogada, a mesa deve mostrar apenas o verso da carta e um marcador discreto de carta coberta.
+- A identidade real da carta coberta nao deve aparecer em logs publicos, mesa, tooltip, baloes ou painel lateral durante a partida.
+- Evitar criar um novo painel grande; a solucao deve caber na faixa inferior da mao e preservar a mesa como foco.
+- Em telas pequenas, a area de toque para cobrir precisa ser grande o bastante para dedo, mas nao deve competir com o toque normal de jogar carta aberta.
+
 ## Pendências Visuais
 
 - A tela de selecao de parceira foi aceita como pronta no estado atual; reabrir apenas com regressao ou nova decisao de produto.

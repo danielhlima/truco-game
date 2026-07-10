@@ -1,5 +1,5 @@
-import type { Card } from "../game/card"
 import type { HandState } from "../game/handState"
+import type { TableCard } from "../game/tableCard"
 import type { CampaignVenue } from "../career/campaign/types"
 import { getBetBadgeLabel, getSuitSymbol } from "../app/gameSessionHelpers"
 import { getTableTheme, type TableTheme } from "./tableTheme"
@@ -12,9 +12,10 @@ export interface TableSceneSlot {
   highlight: boolean
   handCount: number
   card?: {
-    rank: string
-    suit: string
-    suitSymbol: string
+    rank?: string
+    suit?: string
+    suitSymbol?: string
+    covered?: boolean
   }
 }
 
@@ -37,7 +38,7 @@ export interface TableSceneModel {
 
 export function buildTableSceneModel(
   handState: HandState | null,
-  tableByPlayer: Record<number, Card | undefined>,
+  tableByPlayer: Record<number, TableCard | undefined>,
   lastPlayedPlayerId: number | null,
   venue: CampaignVenue | null
 ): TableSceneModel {
@@ -65,19 +66,24 @@ export function buildTableSceneModel(
         : undefined,
     },
     slots: slotLayout.map((slot) => {
-      const card = tableByPlayer[slot.playerId]
+      const tableCard = tableByPlayer[slot.playerId]
       const player = handState?.players.find((item) => item.id === slot.playerId)
 
       return {
         ...slot,
         highlight: lastPlayedPlayerId === slot.playerId,
         handCount: player?.hand.length ?? 0,
-        card: card
-          ? {
-              rank: card.rank,
-              suit: card.suit,
-              suitSymbol: getSuitSymbol(card.suit),
-            }
+        card: tableCard
+          ? tableCard.covered
+            ? {
+                covered: true,
+              }
+            : {
+                rank: tableCard.card.rank,
+                suit: tableCard.card.suit,
+                suitSymbol: getSuitSymbol(tableCard.card.suit),
+                covered: false,
+              }
           : undefined,
       }
     }),

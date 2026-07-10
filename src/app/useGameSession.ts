@@ -24,6 +24,7 @@ import { buildCampaignSummary } from "../career/campaign/summary"
 import type { CampaignStage, CampaignVenue } from "../career/campaign/types"
 import type { Card } from "../game/card"
 import type { HandState } from "../game/handState"
+import type { TableCard } from "../game/tableCard"
 import {
   applyCompletedHandToMatch,
   type MatchState,
@@ -380,10 +381,10 @@ export function useGameSession() {
   )
 
   const tableByPlayer = useMemo(() => {
-    const map: Record<number, Card | undefined> = {}
+    const map: Record<number, TableCard | undefined> = {}
 
     handState?.table.forEach((entry) => {
-      map[entry.playerId] = entry.card
+      map[entry.playerId] = entry
     })
 
     return map
@@ -476,6 +477,7 @@ export function useGameSession() {
     handState.currentPlayerId === 1 &&
     handState.table.length < 4 &&
     handState.truco.phase === "idle"
+  const canPlayCoveredCard = canPlayHumanCard && handState.roundNumber >= 2
 
   const statusMessage = getStatusMessage(handState)
   const currentTurnLabel = getCurrentTurnLabel(handState)
@@ -1036,7 +1038,7 @@ export function useGameSession() {
     syncLogs()
   }
 
-  function handlePlayCard(card: Card) {
+  function handlePlayCard(card: Card, options: { covered?: boolean } = {}) {
     if (!handState) return
     if (isGameplayIntroActive) return
     if (inGameContextMenuOpen || inGameConfirmation) return
@@ -1045,9 +1047,11 @@ export function useGameSession() {
     if (handState.table.length === 4) return
     if (handState.truco.phase !== "idle") return
 
-    const nextState = playHumanCard(handState, card)
+    const nextState = playHumanCard(handState, card, options)
     applyHandState(nextState, {
-      eventMessage: `Você jogou ${formatCard(card)}.`,
+      eventMessage: options.covered
+        ? "Você jogou uma carta coberta."
+        : `Você jogou ${formatCard(card)}.`,
     })
   }
 
@@ -1231,6 +1235,7 @@ export function useGameSession() {
     canHumanAdvisePartner,
     canHumanRespondToTruco,
     canPlayHumanCard,
+    canPlayCoveredCard,
     handState,
     inGameConfirmation,
     inGameContextMenuOpen,
@@ -1786,6 +1791,7 @@ export function useGameSession() {
     canHumanRespondToTruco,
     canHumanAdvisePartner,
     canPlayHumanCard,
+    canPlayCoveredCard,
     canHumanRaiseTruco,
     canRequestTruco,
     campaignCompleted,

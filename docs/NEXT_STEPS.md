@@ -51,9 +51,37 @@ Locais com pacote visual autoral integrado:
 
 ## Proximo Foco Recomendado
 
-### Balanceamento de IA
+### Carta Virada Para Baixo
 
-A primeira rodada de rebalanceamento da IA de truco foi aplicada com testes.
+A proxima frente recomendada e implementar carta virada para baixo/carta coberta a partir da segunda vaza da mao.
+
+Regra desejada:
+
+- na primeira vaza, todas as cartas jogadas continuam abertas
+- na segunda e na terceira vaza, qualquer jogador pode jogar uma carta virada para baixo
+- a carta coberta nao disputa a vaza e deve funcionar como descarte sem forca
+- a carta coberta nao deve revelar identidade para adversarios nem para parceiro durante a partida
+- a mesa e os logs devem deixar claro que uma carta coberta foi jogada, sem revelar a carta real
+- a IA deve poder usar carta coberta como descarte quando nao fizer sentido disputar a vaza
+
+Ordem recomendada:
+
+1. conferir `docs/TRUCO_RULES.md`
+2. ler `src/game/handState.ts`, `src/game/playHumanCard.ts`, `src/game/playAiTurn.ts`, `src/game/resolveTrick.ts`, `src/ai/chooseCard.ts` e os testes existentes em `tests/**/*.test.ts`
+3. criar testes antes de mudar comportamento:
+   - primeira vaza nao permite carta coberta
+   - segunda/terceira vaza permitem carta coberta
+   - carta coberta nunca vence a vaza
+   - carta coberta nao revela identidade nos logs/estado publico
+   - IA descarta coberto quando apropriado
+4. implementar estado/modelo para jogada coberta
+5. implementar acao humana e decisao da IA
+6. rodar `npm test`
+7. rodar `npm run build`
+
+### Estado da IA
+
+A primeira rodada de rebalanceamento da IA de truco foi aplicada com testes, validada em jogo real e enviada para `origin/main`.
 
 Estado apos a primeira rodada:
 
@@ -61,28 +89,16 @@ Estado apos a primeira rodada:
 - conselhos da parceira ficaram menos otimistas com dupla fraca
 - perfis agressivos/blefadores ainda podem blefar, mas com probabilidades menores
 - dificuldade maxima disciplinada agora usa `trickster`, nao `reckless`
+- quando nao consegue ganhar a vaza, a IA descarta a menor carta disponivel
+- quando consegue ganhar a vaza, a IA usa a menor carta vencedora
 - os dialogos e raises ja ganharam cobertura unitaria inicial
 - as variantes por bar ja passaram a ser aplicadas na criacao de partida
+- `Jogos Mundiais` e `Mundial` usam Truco Mineiro
 - novas rodadas de ajuste devem continuar usando testes antes de mudar comportamento
-
-Ordem recomendada para a proxima rodada de IA:
-
-1. conferir `docs/TRUCO_RULES.md`
-2. ler os testes existentes de IA e de dialogos em `tests/**/*.test.ts`
-3. mapear os cortes atuais em `src/ai/trucoDecision.ts` e `src/ai/trucoPersonalities.ts`
-4. escrever ou ajustar testes antes de mudar thresholds, blefes, aceite, corrida ou raise
-5. rebalancear uma decisao por vez:
-   - pedir truco
-   - aceitar truco
-   - correr
-   - contra-aumentar
-   - aconselhar/consultar parceira
-6. rodar `npm test`
-7. rodar `npm run build`
 
 ## Pendencias De Produto E Regras
 
-Frentes ainda pendentes, em prioridade menor que IA:
+Frentes ainda pendentes, em prioridade menor que carta coberta:
 
 - mao especial de 9/dez pontos:
   - documentacao antiga registra `mao de nove`
@@ -99,16 +115,18 @@ Frentes ainda pendentes, em prioridade menor que IA:
   - ensinar truco, aceite, corrida e aumentos
   - ensinar conselho/consulta da parceira
   - ensinar progressao de campanha e desbloqueio de parceiros
-- segunda e terceira vazas:
-  - permitir jogar carta virada para baixo
-  - definir como a resolucao dessa carta funciona
-  - cobrir com testes
+- segunda rodada fina de IA:
+  - fazer apenas se novos testes em jogo apontarem comportamento ruim
+  - preservar testes existentes de thresholds, blefes e descarte
 
 Frentes que deixaram de ser pendencia aberta nesta rodada:
 
 - dialogos e raises ganharam cobertura unitaria inicial
 - variantes Mineiro/Paulista passaram a ser criadas pela configuracao do bar
 - o fluxo pos-campanha ganhou `Modo Livre` para jogar runs temporarias de circuitos e resetar campanha com confirmacao interna
+- primeira rodada de IA foi validada em jogo real
+- `Jogos Mundiais` e `Mundial` foram corrigidos para Truco Mineiro
+- descarte da IA quando nao pode ganhar a vaza ficou coberto por testes
 
 ## Validacao Recomendada
 
@@ -130,7 +148,7 @@ Antes de concluir qualquer implementacao:
 - reabrir a responsividade da gameplay sem regressao real
 - reabrir a tela de selecao de parceira sem regressao real
 - reabrir o pacote visual principal ou bonus sem regressao ou nova decisao explicita de polimento
-- criar novos assets antes de validar a primeira rodada de balanceamento de IA em jogo real
+- criar novos assets antes de definir e validar a interacao mobile da carta coberta
 
 ## Prompt Para Chat Novo
 

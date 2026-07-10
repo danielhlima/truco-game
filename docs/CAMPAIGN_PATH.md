@@ -30,7 +30,8 @@ O caminho principal ja esta integrado com pacotes visuais autorais ate o `Cassin
 - o `Voltar` da tela autoral retorna ao hub do `Modo Livre` e encerra a run temporaria
 - a run temporaria nao altera progresso, recompensas ou desbloqueios da campanha principal ja concluida
 - `Recomeçar campanha` usa confirmacao interna do jogo
-- a proxima frente deve ser balanceamento de IA com testes, conforme `docs/NEXT_STEPS.md`
+- `Jogos Mundiais` e `Mundial` usam Truco Mineiro
+- a proxima frente deve ser carta virada para baixo/carta coberta com testes, conforme `docs/NEXT_STEPS.md`
 
 Nota visual: o caminho principal evoluiu de botecos populares para eventos oficiais, arenas, torneios internacionais e cassino de luxo. O bonus deve parecer uma virada de tom intencional, divertida e especial, sem reciclar simplesmente a estetica dos ultimos campeonatos.
 
@@ -61,8 +62,8 @@ Nota visual: o caminho principal evoluiu de botecos populares para eventos ofici
 | Campeonato Estadual | Ginásio Estadual Maneco Filé | Classico regional | Evento organizado e narrador local | Paulista | 4/5 | Geraldo Medalha + Zito Parafuso | 6 | Campanha, capa, background, mesa e resultado autorais |
 | Campeonato Nacional | Arena Nacional | Arena com transmissao | Plateia grande e pressao publica | Paulista | 4/5 | Sueli Estopim + Creusa Rabugenta | 7 | Campanha, capa, background, mesa e resultado autorais |
 | Circuito Panamericano | Centro Americano Truqueiro de Medelin. | Show continental | Producao moderna e estilos diferentes | Mineiro | 4/5 | Ramiro Bolero + Luna Candela | 5 | Campanha, capa, background, mesa e resultado autorais |
-| Jogos Mundiais | Hotel Truco de Segóvia, Espanha | Esportivo cerimonial | Bandeiras, delegacoes e tensao maxima | Paulista | 5/5 | Mina Compasso + Viktor Muralha | 4 | Campanha, capa, background, mesa e resultado autorais |
-| Mundial | Cassino Mé Maior | Cassino de luxo | Veludo, lustres e silencio tenso | Paulista | 5/5 | Madame Violeta + Augusto Crupie | 5 | Campanha, capa, background, mesa e resultado autorais |
+| Jogos Mundiais | Hotel Truco de Segóvia, Espanha | Esportivo cerimonial | Bandeiras, delegacoes e tensao maxima | Mineiro | 5/5 | Mina Compasso + Viktor Muralha | 4 | Campanha, capa, background, mesa e resultado autorais |
+| Mundial | Cassino Mé Maior | Cassino de luxo | Veludo, lustres e silencio tenso | Mineiro | 5/5 | Madame Violeta + Augusto Crupie | 5 | Campanha, capa, background, mesa e resultado autorais |
 | Circuito Intergaláctico | Órbita da Lua | Bonus lunar retrofuturista | Clube orbital improvisado, neon, bandeirolas e transmissao ao vivo | Mineiro | 5/5 | Mané Banguela + Cosme Órbita | 7 | Campanha, capa, background, mesa, resultado e vitoria de circuito autorais |
 
 ## Bonus Pos-Campanha Integrado
@@ -105,5 +106,5 @@ Observacoes:
 
 Proxima frente:
 
-- rebalancear IA com testes
-- depois da primeira rodada de IA, retomar regras pendentes e tutorial
+- implementar carta virada para baixo/carta coberta com testes
+- depois da carta coberta, retomar mao especial de 9/dez pontos, ponto acima e tutorial

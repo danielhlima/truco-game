@@ -11,15 +11,19 @@ Gerenciar toda a lógica do jogo de truco:
 
 ---
 
-## Componentes
+## Componentes Atuais
 
 ### Modelos
 
 * `card.ts`
+* `handState.ts`
+* `matchState.ts`
 
   * Suit
   * Rank
   * Card
+  * estado de mão
+  * estado de partida
 
 ---
 
@@ -32,9 +36,13 @@ Gerenciar toda a lógica do jogo de truco:
 
 ### Regras
 
-* `rulesMineiro.ts`
+* `rulesMineiroRuleSet.ts`
+* `rulesPaulistaRuleSet.ts`
+* `getRuleSet.ts`
 
   * manilhas fixas
+  * manilha dinâmica por vira
+  * seleção de regra por variante
 
 ---
 
@@ -65,24 +73,16 @@ Gerenciar toda a lógica do jogo de truco:
 
 ### Execução
 
-* `playRound.ts`
+* `playHumanCard.ts`
+* `playAiTurn.ts`
+* `stepHand.ts`
+* `resolveTrick.ts`
 
   * execução de uma vaza
   * integração com IA
   * detecção de empate
-
-* `playHand.ts`
-
-  * execução de uma mão
-  * controle de aposta
-  * resolução de empate
-  * controle de vazas
-
-* `playMatch.ts`
-
-  * controle da partida completa
-  * rotação de jogador mão
-  * pontuação até 12
+  * execução automática de passos da mão
+  * resolução de mão e rotação
 
 ---
 
@@ -101,11 +101,15 @@ Gerenciar toda a lógica do jogo de truco:
 
   * decisão de carta
   * considera parceiro
+  * descarta a menor carta quando não consegue ganhar a vaza
+  * usa a menor carta vencedora quando consegue ganhar
 
 * `trucoDecision.ts`
+* `trucoPersonalities.ts`
 
   * decisão de aposta
   * heurística de força de mão
+  * perfis de risco, blefe e disciplina
 
 ---
 
@@ -130,20 +134,22 @@ Gerenciar toda a lógica do jogo de truco:
 
 ---
 
-## Limitações
+## Limitações / Próximas Regras
 
-* IA simplificada
-* Apenas truco mineiro
-* Sem interface gráfica
+* Carta virada para baixo/carta coberta ainda não implementada.
+* Mão especial de 9/dez pontos ainda não implementada.
+* Ponto acima ainda depende de decisão de produto.
+* A camada deve continuar independente de UI, campanha, economia e monetização.
 
 ---
 
 ## Próximas evoluções
 
-* RuleSet (Mineiro vs Paulista)
-* IA avançada
-* UI (React + Three.js)
-* Backend
+* Modelar carta coberta no estado da mão.
+* Garantir que carta coberta não vença vaza e não revele identidade.
+* Permitir carta coberta a partir da segunda vaza.
+* Cobrir a regra com testes antes de ligar UI mobile.
+* Evoluir IA apenas quando testes em jogo apontarem comportamento ruim.
 
 ---
 

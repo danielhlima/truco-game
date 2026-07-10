@@ -10,15 +10,20 @@ export function resolveTrick(state: HandState): HandState {
   }
 
   const ruleSet = getRuleSet(state.variant)
+  const uncoveredCards = state.table.filter((entry) => !entry.covered)
 
   logEvent(`--- Resolvendo vaza ${state.roundNumber} ---`)
-  logEvent("Cartas na mesa:", state.table)
+  logEvent("Cartas na mesa:", maskCoveredTableCards(state.table))
 
-  let winner = state.table[0]
-  let isTie = false
+  let winner = uncoveredCards[0] ?? null
+  let isTie = uncoveredCards.length === 0
 
-  for (let i = 1; i < state.table.length; i++) {
-    const current = state.table[i]
+  for (let i = 1; i < uncoveredCards.length; i++) {
+    const current = uncoveredCards[i]
+    if (!winner) {
+      winner = current
+      continue
+    }
     const result = compareCards(ruleSet, current.card, winner.card, state.vira)
 
     if (result > 0) {
@@ -33,7 +38,7 @@ export function resolveTrick(state: HandState): HandState {
   let nextFirstNonTieWinner = state.firstNonTieWinner
   let nextCurrentPlayerId = state.currentPlayerId
 
-  if (!isTie) {
+  if (!isTie && winner) {
     const winnerTeam = getTeam(winner.playerId)
 
     if (nextFirstNonTieWinner === null) {
@@ -82,4 +87,16 @@ export function resolveTrick(state: HandState): HandState {
     winner: nextWinner,
     table: handFinished ? state.table : [],
   }
+}
+
+function maskCoveredTableCards(table: HandState["table"]): unknown[] {
+  return table.map((entry) =>
+    entry.covered
+      ? {
+          playerId: entry.playerId,
+          card: "coberta",
+          covered: true,
+        }
+      : entry
+  )
 }

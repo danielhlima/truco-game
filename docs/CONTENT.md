@@ -159,18 +159,21 @@ Arquivos principais:
   - `Recomeçar campanha` usa confirmacao interna do jogo, nao `window.confirm`
 - os testes unitarios de dialogos e raises cobrem a escada `TRUCO!`, `SEIS!`, `NOVE!`, `DOZE!`, `DESCE!`, `TOMA!` e `TÔ FORA!`
 - os helpers de sessao criam partida pela variante declarada no bar e cobrem Mineiro/Paulista em testes
-- o proximo foco recomendado e rebalancear IA com testes
+- a primeira rodada de IA foi validada em jogo real e enviada para `origin/main`
+- a IA agora preserva cartas fortes quando nao pode ganhar a vaza, descartando a menor carta disponivel
+- `Jogos Mundiais` e `Mundial` usam Truco Mineiro
+- o proximo foco recomendado e implementar carta virada para baixo/carta coberta com testes
 
 ## Direcao de produto atual
 
-O projeto esta em bom estado de tela, fluxo e conteudo visual para mudar o foco principal para balanceamento de IA.
+O projeto esta em bom estado de tela, fluxo, conteudo visual e primeira rodada de IA para mudar o foco principal para regras pendentes de partida.
 
 Decisao atual:
 
 - tratar o caminho principal e o bonus pos-campanha como visualmente integrados no estado atual
 - nao reabrir pacotes de assets sem regressao visual ou nova decisao explicita de polimento
 - manter `docs/IMAGE_PROMPT_STANDARDS.md` como referencia para futuros assets, nao como proxima frente obrigatoria
-- voltar para balanceamento, falas e refinamentos de IA
+- tratar novas rodadas de balanceamento de IA apenas quando houver regressao real observada em jogo
 - manter os testes unitarios de dialogos/raises como blindagem para qualquer mudanca futura em truco
 
 Kit minimo recomendado por bar:
@@ -190,9 +193,9 @@ Plano pratico da proxima frente:
 
 1. ler `docs/TRUCO_RULES.md` e `docs/NEXT_STEPS.md`
 2. conferir `git status` e preservar mudancas locais
-3. ler `src/ai/trucoDecision.ts`, `src/ai/trucoPersonalities.ts` e os testes existentes em `tests/**/*.test.ts`
-4. escrever ou ajustar testes antes de mudar comportamento de IA
-5. rebalancear incrementalmente uma decisao por vez: pedir truco, aceitar, correr, contra-aumentar, aconselhar/consultar parceira
+3. ler `src/game/handState.ts`, `src/game/playHumanCard.ts`, `src/game/playAiTurn.ts`, `src/game/resolveTrick.ts`, `src/ai/chooseCard.ts` e os testes existentes em `tests/**/*.test.ts`
+4. escrever testes para carta virada para baixo antes de mudar comportamento
+5. implementar a regra em incrementos pequenos: modelo de carta coberta, jogada humana, jogada da IA, resolucao de vaza e logs
 6. nao reabrir responsividade, selecao de parceira, fluxo visual ou arquitetura de estado sem regressao real
 7. rodar `npm test` e `npm run build` antes de concluir qualquer frente de codigo
 
@@ -772,6 +775,10 @@ Hoje esta assim:
   - conselhos da parceira ficaram menos otimistas com dupla fraca
   - perfis blefadores mantem blefes com probabilidades menores e margem controlada
   - dificuldade maxima com disciplina alta usa `trickster`, nao `reckless`
+- ajuste de escolha de carta aplicado:
+  - quando nao consegue ganhar a vaza, a IA joga a menor carta disponivel
+  - quando consegue ganhar a vaza, a IA usa a menor carta vencedora
+  - existe cobertura em `tests/ai/chooseCard.test.ts`
 - proximas mudancas de thresholds, blefes, aceite, corrida, raises e conselho/consulta devem continuar vindo com testes antes da mudanca de comportamento
 
 ## Estado atual do truco e dos dialogos
@@ -792,9 +799,22 @@ Hoje ja existe:
 - regra da `escalada vigente` documentada e aplicada aos dialogos
 - testes unitarios cobrem a sequencia real de raises e os rotulos principais de fala
 - partidas por local usam a variante declarada no bar; Paulista cria vira/manilha e a proxima mao preserva a variante da partida
+- `Jogos Mundiais` e `Mundial` estao declarados como Truco Mineiro e cobertos em teste de campanha
+- logs de inicio de mao registram regra ativa; no Paulista registram tambem vira e manilha
 
 Regra de continuidade importante:
 
 - esse trecho ainda esta sensivel a regressao
 - qualquer ajuste de IA deve ampliar ou preservar a cobertura de testes
 - evitar continuar corrigindo apenas por tentativa e erro sem blindagem
+
+## Proxima Regra: Carta Virada Para Baixo
+
+Regra desejada para implementar:
+
+- a partir da segunda vaza da mao/rodada, o jogador pode jogar uma carta virada para baixo
+- a carta coberta nao disputa a vaza e deve ser tratada como descarte sem forca, equivalente a uma carta sem valor para vencer
+- a identidade da carta coberta nao deve ser revelada para adversarios nem para o parceiro durante a partida
+- a primeira vaza permanece aberta, sem carta coberta
+- a IA deve considerar carta coberta como opcao de descarte quando nao puder ou nao quiser disputar a vaza
+- a implementacao precisa cobrir modelo de estado, logs, resolucao da vaza, jogada humana, jogada da IA e visual mobile

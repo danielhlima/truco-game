@@ -1,5 +1,7 @@
 import test from "node:test"
 import assert from "node:assert/strict"
+import { playHumanCard } from "../../src/game/playHumanCard.ts"
+import { playAiTurn } from "../../src/game/playAiTurn.ts"
 import { resolveTrick } from "../../src/game/resolveTrick.ts"
 import { createCard, createHandStateFixture } from "../helpers/gameFixtures.ts"
 
@@ -83,4 +85,77 @@ test("resolveTrick usa o time do jogador mão quando todas as três vazas empata
   assert.equal(nextState.finished, true)
   assert.equal(nextState.winner, "A")
   assert.deepEqual(nextState.score, { A: 0, B: 0 })
+})
+
+test("carta coberta não pode ser jogada na primeira vaza", () => {
+  const state = createHandStateFixture({
+    roundNumber: 1,
+    currentPlayerId: 1,
+  })
+
+  assert.throws(
+    () => playHumanCard(state, createCard("3", "copas"), { covered: true }),
+    /segunda vaza/
+  )
+})
+
+test("carta coberta pode ser jogada a partir da segunda vaza", () => {
+  const state = createHandStateFixture({
+    roundNumber: 2,
+    currentPlayerId: 1,
+  })
+
+  const nextState = playHumanCard(state, createCard("3", "copas"), { covered: true })
+
+  assert.equal(nextState.table[0].covered, true)
+  assert.deepEqual(nextState.table[0].card, createCard("3", "copas"))
+})
+
+test("carta coberta não vence a vaza mesmo quando seria a maior carta", () => {
+  const state = createHandStateFixture({
+    roundNumber: 2,
+    currentPlayerId: 4,
+    table: [
+      { playerId: 1, card: createCard("Q", "espada") },
+      { playerId: 2, card: createCard("K", "ouros") },
+      { playerId: 3, card: createCard("4", "paus"), covered: true },
+      { playerId: 4, card: createCard("J", "copas") },
+    ],
+  })
+
+  const nextState = resolveTrick(state)
+
+  assert.equal(nextState.score.B, 1)
+  assert.equal(nextState.currentPlayerId, 2)
+})
+
+test("IA joga carta coberta como descarte quando não consegue ganhar a vaza", () => {
+  const state = createHandStateFixture({
+    roundNumber: 2,
+    currentPlayerId: 4,
+    table: [
+      { playerId: 1, card: createCard("4", "paus") },
+      { playerId: 2, card: createCard("2", "espada") },
+      { playerId: 3, card: createCard("K", "ouros") },
+    ],
+    players: [
+      { id: 1, hand: [] },
+      { id: 2, hand: [] },
+      { id: 3, hand: [] },
+      {
+        id: 4,
+        hand: [
+          createCard("3", "copas"),
+          createCard("2", "paus"),
+          createCard("5", "espada"),
+        ],
+      },
+    ],
+  })
+
+  const nextState = playAiTurn(state)
+  const playedCard = nextState.table[3]
+
+  assert.equal(playedCard.covered, true)
+  assert.deepEqual(playedCard.card, createCard("5", "espada"))
 })

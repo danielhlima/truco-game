@@ -291,12 +291,13 @@ export function GameTableScene({
     animationTimeoutsRef.current = []
 
     for (const slot of model.slots) {
-      const nextKey = slot.card ? `${slot.card.rank}-${slot.card.suit}` : null
+      const nextKey = getSlotCardKey(slot)
       const previousKey = previousCardsRef.current[slot.playerId] ?? null
       nextPreviousCards[slot.playerId] = nextKey
 
       if (!slot.card && previousKey) {
-        const [rank, suit] = previousKey.split("-")
+        const covered = previousKey === "covered"
+        const [rank, suit] = covered ? ["", ""] : previousKey.split("-")
         const previousSymbol = getSuitSymbol(suit)
         const from = getPlayedCardOverlayPose(slot.playerId)
         const to = getClearingCardOverlayPosition(slot.playerId)
@@ -310,6 +311,7 @@ export function GameTableScene({
               rank,
               suit,
               suitSymbol: previousSymbol,
+              covered,
               from,
               to,
               stage: "from",
@@ -352,9 +354,10 @@ export function GameTableScene({
           ...current.filter((item) => item.key !== animationKey),
           {
             key: animationKey,
-            rank: card.rank,
-            suit: card.suit,
-            suitSymbol: card.suitSymbol,
+            rank: card.rank ?? "",
+            suit: card.suit ?? "",
+            suitSymbol: card.suitSymbol ?? "",
+            covered: !!card.covered,
             highlight: slot.highlight,
             from,
             to,
@@ -567,7 +570,7 @@ export function GameTableScene({
           .filter((slot) => {
             if (!slot.card) return false
 
-            const currentKey = `${slot.playerId}-${slot.card.rank}-${slot.card.suit}`
+            const currentKey = `${slot.playerId}-${getSlotCardKey(slot)}`
             return !animatingCards.some(
               (item) => item.key === currentKey && item.stage !== "settle"
             )
@@ -582,6 +585,7 @@ export function GameTableScene({
               rank={slot.card?.rank}
               suit={slot.card?.suit}
               suitSymbol={slot.card?.suitSymbol}
+              faceDown={!!slot.card?.covered}
             />
           ))}
 
@@ -595,6 +599,7 @@ export function GameTableScene({
             rank={card.rank}
             suit={card.suit}
             suitSymbol={card.suitSymbol}
+            faceDown={card.covered}
             highlight={card.highlight}
             settled={card.stage === "settle"}
           />
@@ -610,6 +615,7 @@ export function GameTableScene({
             rank={card.rank}
             suit={card.suit}
             suitSymbol={card.suitSymbol}
+            faceDown={card.covered}
             opacity={card.stage === "from" ? 1 : 0}
             scale={card.stage === "from" ? 1 : 0.86}
           />
@@ -727,11 +733,24 @@ function getPlayAnimationOrigin(playerId: number): {
   }
 }
 
+function getSlotCardKey(slot: TableSceneModel["slots"][number]): string | null {
+  if (!slot.card) {
+    return null
+  }
+
+  if (slot.card.covered) {
+    return "covered"
+  }
+
+  return `${slot.card.rank}-${slot.card.suit}`
+}
+
 interface AnimatedCard {
   key: string
   rank: string
   suit: string
   suitSymbol: string
+  covered: boolean
   highlight: boolean
   from: {
     left: string
@@ -751,6 +770,7 @@ interface ClearingCard {
   rank: string
   suit: string
   suitSymbol: string
+  covered: boolean
   from: {
     left: string
     top: string

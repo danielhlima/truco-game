@@ -1,10 +1,11 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import type React from "react"
 import type { CampaignStage, CampaignVenue } from "../career/campaign/types"
 import type { FreePlayRunState } from "../career/campaign/freePlayProgression"
 import type { Card } from "../game/card"
 import type { HandState } from "../game/handState"
 import type { Player } from "../game/gameState"
+import type { TableCard } from "../game/tableCard"
 import type { MatchState } from "../game/matchState"
 import type { GameVariant } from "../game/variant"
 import { CAMPAIGN_STAGES } from "../career/campaign/campaignData"
@@ -815,7 +816,7 @@ interface TableSectionProps {
   selectableCharacters: TrucoCharacterProfile[]
   opponentCharacters: TrucoCharacterProfile[]
   speechBubble: SpeechBubbleState | null
-  tableByPlayer: Record<number, Card | undefined>
+  tableByPlayer: Record<number, TableCard | undefined>
   lastPlayedPlayerId: number | null
   player1: Player | null
   canRequestTruco: boolean
@@ -823,6 +824,7 @@ interface TableSectionProps {
   canHumanRaiseTruco: boolean
   canHumanRespondToTruco: boolean
   canPlayHumanCard: boolean
+  canPlayCoveredCard: boolean
   onCloseCharacterSelect: () => void
   onCloseFreePlayStage: () => void
   onCloseJourneyIntro: () => void
@@ -855,7 +857,7 @@ interface TableSectionProps {
   onRunFromTruco: () => void
   onSwapPartnerFromContextMenu: () => void
   onWinMatchFromContextMenu: () => void
-  onPlayCard: (card: Card) => void
+  onPlayCard: (card: Card, options?: { covered?: boolean }) => void
   styles: StyleMap
 }
 
@@ -893,6 +895,7 @@ export function TableSection({
   canHumanRaiseTruco,
   canHumanRespondToTruco,
   canPlayHumanCard,
+  canPlayCoveredCard,
   onCloseCharacterSelect,
   onCloseFreePlayStage,
   onCloseJourneyIntro,
@@ -1176,6 +1179,7 @@ export function TableSection({
                       inGameContextMenuOpen={inGameContextMenuOpen}
                       player1={player1}
                       canPlayHumanCard={canPlayHumanCard}
+                      canPlayCoveredCard={canPlayCoveredCard}
                       onCloseInGameContextMenu={onCloseInGameContextMenu}
                       onExitMatchFromContextMenu={onExitMatchFromContextMenu}
                       onLoseMatchFromContextMenu={onLoseMatchFromContextMenu}
@@ -3466,6 +3470,7 @@ function HumanCardsPanel({
   inGameContextMenuOpen,
   player1,
   canPlayHumanCard,
+  canPlayCoveredCard,
   gameplayIntroActive,
   onCloseInGameContextMenu,
   onExitMatchFromContextMenu,
@@ -3481,17 +3486,34 @@ function HumanCardsPanel({
   inGameContextMenuOpen: boolean
   player1: Player | null
   canPlayHumanCard: boolean
+  canPlayCoveredCard: boolean
   gameplayIntroActive: boolean
   onCloseInGameContextMenu: () => void
   onExitMatchFromContextMenu: () => void
   onLoseMatchFromContextMenu: () => void
   onOpenInGameContextMenu: () => void
-  onPlayCard: (card: Card) => void
+  onPlayCard: (card: Card, options?: { covered?: boolean }) => void
   onResetProgressFromContextMenu: () => void
   onSwapPartnerFromContextMenu: () => void
   onWinMatchFromContextMenu: () => void
   styles: StyleMap
 }) {
+  const [playCovered, setPlayCovered] = useState(false)
+  const [coveredHintDismissed, setCoveredHintDismissed] = useState(false)
+  const coveredModeActive = canPlayCoveredCard && playCovered
+  const showCoveredHint = canPlayCoveredCard && !coveredModeActive && !coveredHintDismissed
+
+  useEffect(() => {
+    if (!canPlayCoveredCard) {
+      setPlayCovered(false)
+    }
+  }, [canPlayCoveredCard])
+
+  const handleToggleCovered = () => {
+    setCoveredHintDismissed(true)
+    setPlayCovered((current) => !current)
+  }
+
   return (
     <div style={styles.mobileHandPanel}>
       <div style={styles.mobileHandHeader}>
@@ -3499,6 +3521,41 @@ function HumanCardsPanel({
           {handState && handState.currentPlayerId === 1 && !handState.finished
             ? "Sua vez"
             : "Aguardando"}
+        </div>
+        <div style={styles.coveredCardToggleWrap}>
+          {showCoveredHint ? (
+            <div style={styles.coveredCardHint}>
+              <strong style={styles.coveredCardHintTitle}>Nova jogada</strong>
+              <span style={styles.coveredCardHintText}>toque para jogar coberta</span>
+            </div>
+          ) : null}
+          <button
+            type="button"
+            style={{
+              ...styles.coveredCardToggle,
+              ...(showCoveredHint ? styles.coveredCardToggleHighlighted : {}),
+              ...(coveredModeActive ? styles.coveredCardToggleActive : {}),
+              ...(!canPlayCoveredCard ? styles.coveredCardToggleDisabled : {}),
+            }}
+            onClick={handleToggleCovered}
+            disabled={!canPlayCoveredCard}
+            aria-pressed={coveredModeActive}
+            title={
+              canPlayCoveredCard
+                ? "Jogar a próxima carta coberta"
+                : "Carta coberta libera a partir da segunda vaza"
+            }
+          >
+            <span style={styles.coveredCardToggleSwitch}>
+              <span
+                style={{
+                  ...styles.coveredCardToggleKnob,
+                  ...(coveredModeActive ? styles.coveredCardToggleKnobActive : {}),
+                }}
+              />
+            </span>
+            Coberta
+          </button>
         </div>
       </div>
 
@@ -3513,11 +3570,15 @@ function HumanCardsPanel({
                 style={{
                   ...styles.mobileCardButton,
                   ...(canPlayHumanCard ? styles.cardButtonActive : styles.cardButtonDisabled),
+                  ...(coveredModeActive ? styles.mobileCardButtonCoveredPreview : {}),
                 }}
-                onClick={() => onPlayCard(card)}
+                onClick={() => onPlayCard(card, { covered: coveredModeActive })}
                 disabled={!canPlayHumanCard}
-                title={formatCard(card)}
+                title={coveredModeActive ? `Jogar ${formatCard(card)} coberta` : formatCard(card)}
               >
+                {coveredModeActive ? (
+                  <div style={styles.coveredCardPreviewBadge}>Coberta</div>
+                ) : null}
                 <div style={styles.mobileCardCornerTop}>
                   <div style={{ ...styles.mobileCardRank, color: getSuitColor(card.suit) }}>
                     {card.rank}

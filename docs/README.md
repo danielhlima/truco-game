@@ -101,7 +101,7 @@ Organiza as skins exclusivas do jogador:
 
 ## Estado do foco atual
 
-O projeto esta com fluxo visual principal, bonus pos-campanha e `Modo Livre` pos-campanha consolidados; a primeira rodada de balanceamento de IA com testes foi aplicada.
+O projeto esta com fluxo visual principal, bonus pos-campanha e `Modo Livre` pos-campanha consolidados; a primeira rodada de balanceamento de IA com testes foi aplicada, validada em jogo real e enviada para `origin/main`.
 
 Estado consolidado:
 
@@ -213,10 +213,19 @@ Estado consolidado:
   - concluir o ultimo bar do circuito livre retorna ao hub
   - a run temporaria nao altera progresso, recompensas ou desbloqueios da campanha principal ja concluida
   - `Recomeçar campanha` usa confirmacao interna do jogo, nao alerta nativo do navegador
+- IA e regras validadas nesta rodada:
+  - `balanced` ficou menos propenso a trucar com pouco
+  - perfis blefadores mantem blefes com probabilidades menores
+  - dificuldade maxima disciplinada usa `trickster`
+  - IA descarta a menor carta quando nao consegue ganhar a vaza
+  - IA usa a menor carta vencedora quando ainda consegue ganhar a vaza
+  - logs de inicio de mao registram regra ativa, vira e manilha quando houver
+  - `Jogos Mundiais` e `Mundial` usam Truco Mineiro
+  - validacao final passou em `npm test` e `npm run build`
 
 ## Prioridade imediata para o proximo chat
 
-No proximo chat, continuar a partir da primeira rodada de balanceamento de IA, sem reabrir assets/fluxo visual.
+No proximo chat, implementar a regra de carta virada para baixo/carta coberta, sem reabrir assets/fluxo visual.
 
 Estado pos-bonus:
 
@@ -227,15 +236,15 @@ Estado pos-bonus:
 Proximo foco recomendado:
 
 - usar `docs/NEXT_CHAT_PROMPT.md` como briefing inicial copiavel
-- os testes unitarios de dialogos e raises ja foram criados/atualizados; preservar e ampliar essa cobertura quando necessario
-- os helpers de sessao ja criam partidas pela variante do bar e cobrem Mineiro/Paulista em testes
-- a primeira rodada de IA subiu cortes do perfil `balanced`, reduziu blefes e corrigiu dificuldade maxima disciplinada para `trickster`
-- continuar qualquer novo rebalanceamento com testes, trabalhando uma decisao por vez: pedir truco, aceitar, correr, contra-aumentar e aconselhar/consultar parceira
-- depois da primeira rodada de IA, retomar pendencias de produto/regras:
+- implementar carta virada para baixo com testes antes de mexer na UI
+- tratar a carta coberta como descarte sem forca, equivalente a uma carta sem valor para vencer a vaza
+- permitir a acao apenas a partir da segunda vaza da mao/rodada, preservando a primeira vaza sempre aberta
+- desenhar a interacao para celular com affordance clara e sem poluir a mesa
+- depois disso, retomar pendencias de produto/regras:
   - mao especial de 9/dez pontos
   - opcao de escolher ou nao a versao `ponto acima`
   - tutorial jogavel
-  - carta virada para baixo na segunda e terceira vazas
+  - segunda rodada fina de IA apenas se novos testes em jogo apontarem regressao real
 
 ## Regra de continuidade
 

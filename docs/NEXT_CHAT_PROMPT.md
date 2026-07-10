@@ -39,33 +39,47 @@ Contexto atual:
 - Testes unitarios de dialogos/raises ja cobrem TRUCO!, SEIS!, NOVE!, DOZE!, DESCE!, TOMA! e TÔ FORA!.
 - A criacao de partida por bar ja aplica a variante declarada no local.
 - Ha testes para criacao de partida Mineiro/Paulista e proxima mao Paulista mantendo vira.
+- A primeira rodada de IA foi validada em jogo real e enviada para origin/main.
+- A IA descarta a menor carta quando nao consegue ganhar a vaza.
+- A IA usa a menor carta vencedora quando consegue ganhar a vaza.
+- Jogos Mundiais e Mundial usam Truco Mineiro.
+- Logs de inicio de mao registram regra ativa; em Paulista tambem registram vira e manilha.
 - Nao reabrir responsividade, selecao de parceira, arquitetura de estado ou pacote visual sem regressao real.
 
 Objetivo deste chat:
-Rebalancear a IA de truco com cobertura de testes.
+Implementar carta virada para baixo/carta coberta com cobertura de testes.
 
 Prioridade recomendada:
 1. Conferir git status antes de editar.
-2. Ler src/ai/trucoDecision.ts e src/ai/trucoPersonalities.ts.
-3. Ler os testes existentes em tests/**/*.test.ts, especialmente os de IA, dialogos e raises.
-4. Antes de alterar comportamento, criar ou ajustar testes para a decisao que sera balanceada.
-5. Rebalancear uma decisao por vez:
-   - pedir truco
-   - aceitar truco
-   - correr
-   - contra-aumentar
-   - aconselhar/consultar parceira
-6. Rodar npm test e npm run build antes de concluir.
+2. Ler docs/TRUCO_RULES.md, especialmente a secao Carta virada para baixo.
+3. Ler src/game/handState.ts, src/game/playHumanCard.ts, src/game/playAiTurn.ts, src/game/resolveTrick.ts e src/ai/chooseCard.ts.
+4. Ler os testes existentes em tests/**/*.test.ts, especialmente tests/ai/chooseCard.test.ts, tests/game/resolve-trick.test.ts e tests/game/truco-flow.test.ts.
+5. Antes de alterar comportamento, criar testes pequenos para:
+   - primeira vaza nao permitir carta coberta
+   - segunda/terceira vaza permitirem carta coberta
+   - carta coberta nao vencer a vaza
+   - logs/estado publico nao revelarem a carta real
+   - IA usar carta coberta como descarte quando apropriado
+6. Implementar uma parte por vez:
+   - modelo de estado para carta coberta
+   - acao humana
+   - decisao da IA
+   - resolucao de vaza
+   - logs
+   - UI mobile minima e clara
+7. Rodar npm test e npm run build antes de concluir.
 
 Problema conhecido:
-- A primeira rodada de rebalanceamento ja subiu cortes do perfil balanced, reduziu blefes e corrigiu dificuldade maxima disciplinada para trickster.
-- Evitar ajustar tudo por tentativa e erro; qualquer nova mudanca em thresholds, blefes e perfis deve vir com testes pequenos e objetivos.
+- Carta coberta ainda nao esta implementada.
+- A regra desejada e permitir carta coberta a partir da segunda vaza da mao/rodada.
+- A carta coberta nao disputa a vaza; funciona como descarte sem forca.
+- A identidade real da carta coberta nao deve ser revelada durante a partida.
 
 Pendencias que continuam abertas, mas nao sao a primeira prioridade deste chat:
 - Mao especial de 9/dez pontos.
 - Opcao de escolher ou nao a versao ponto acima.
 - Tutorial jogavel.
-- Carta virada para baixo na segunda e terceira vazas.
+- Segunda rodada fina de IA, apenas se novos testes em jogo apontarem comportamento ruim.
 
 Regras de continuidade:
 - Preservar mudancas locais do usuario.
