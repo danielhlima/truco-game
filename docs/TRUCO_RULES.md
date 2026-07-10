@@ -116,8 +116,17 @@ Hoje a força da mão é calculada assim:
 ## Observação Importante
 
 - Já foi identificado que a IA atual está `trucando com pouco`.
-- Este comportamento ainda será rebalanceado futuramente.
+- Este comportamento deve ser o proximo foco de balanceamento.
 - Por enquanto, este arquivo registra a lógica atual, não a lógica ideal.
+- Qualquer ajuste em thresholds, blefes, aceite, corrida ou raise deve ser acompanhado por testes.
+
+## Variantes Por Bar
+
+- A campanha declara bares de `Truco Mineiro` e `Truco Paulista`.
+- A criacao de partida agora usa a variante declarada pelo bar.
+- A proxima mao de uma partida preserva a variante da propria partida.
+- Existem testes unitarios cobrindo criacao de partida por local Mineiro/Paulista e proxima mao Paulista mantendo vira.
+- Se a implementacao visual da vira/manilha do Paulista for alterada, validar novamente no fluxo real e em testes.
 
 ## Pendencias de Regras para Implementar
 
@@ -150,12 +159,6 @@ As regras abaixo foram confirmadas como desejadas, mas ainda nao devem ser trata
 - na segunda e na terceira vaza da rodada, qualquer jogador pode jogar uma carta virada para baixo
 - a identidade da carta virada para baixo nao deve ser revelada nem aos adversarios nem ao parceiro
 - a resolucao correta do valor dessa carta ainda deve ser definida na implementacao e coberta por testes
-
-### Variantes por bar
-
-- a campanha declara bares de `Truco Mineiro` e `Truco Paulista`
-- atualmente, na pratica, as partidas ainda se comportam como `Truco Mineiro`
-- corrigir a aplicacao efetiva da variante configurada por bar e validar a vira/manilha do Paulista no fluxo real
 
 ## Nota de Continuidade
 

@@ -15,12 +15,10 @@ import {
 } from "../career/campaign/progression"
 import { buildCampaignSummary } from "../career/campaign/summary"
 import type { CampaignStage, CampaignVenue } from "../career/campaign/types"
-import { createHandState } from "../game/createHandState"
 import type { Card } from "../game/card"
 import type { HandState } from "../game/handState"
 import {
   applyCompletedHandToMatch,
-  createMatchState,
   type MatchState,
 } from "../game/matchState"
 import { playHumanCard } from "../game/playHumanCard"
@@ -52,6 +50,8 @@ import {
 import { clearLogs, getLogsAsText, logEvent } from "../utils/logger"
 import {
   DEFAULT_TRUCO_MESSAGE,
+  createNextHandStateForMatch,
+  createVenueMatchState,
   formatCard,
   getAcceptedBetMessage,
   getBetCallLabelFromNumber,
@@ -115,6 +115,7 @@ const DEFINITIVE_VICTORY_VENUE_IDS = new Set([
   "centro-americano-truqueiro-medelin",
   "hotel-truco-segovia-espanha",
   "casino-me-maior",
+  "orbita-da-lua",
 ])
 
 const DEFINITIVE_VICTORY_STAGE_IDS = new Set([
@@ -774,13 +775,14 @@ export function useGameSession() {
 
     const firstPlayerId = 1
     const variantToStart = targetVenue.variant
-    const state = createHandState(variantToStart, firstPlayerId)
+    const { handState: state, matchState: initialMatchState } =
+      createVenueMatchState(targetVenue, firstPlayerId)
     const actualVenueId = actualCampaignVenue?.id ?? null
     const shouldUseSessionDebugVenue =
       DEBUG_MODE && (!!debugVenueId || targetVenue.id !== actualVenueId)
 
     setVariant(variantToStart)
-    setMatchState(createMatchState(variantToStart, firstPlayerId))
+    setMatchState(initialMatchState)
     setSessionDebugVenueId(shouldUseSessionDebugVenue ? targetVenue.id : null)
     setMatchResultScreen(null)
     setCampaignVictoryScreen(null)
@@ -846,8 +848,6 @@ export function useGameSession() {
   }
 
   function handleStartHand() {
-    if (!currentCampaignVenue) return
-
     if (!hasSelectedPlayerSkin) {
       setSelectedPlayerSkinId(selectedPlayerSkin.id)
       setMenuScreen("player-skin-select")
@@ -1092,9 +1092,8 @@ export function useGameSession() {
 
     const timeoutId = window.setTimeout(() => {
       if (handState.finished) {
-        const nextStartingPlayerId = matchState.startingPlayerId
         const nextHandNumber = matchState.handNumber
-        const nextState = createHandState(activeVariant, nextStartingPlayerId)
+        const nextState = createNextHandStateForMatch(matchState)
 
         applyHandState(nextState, {
           eventMessage: `Mão ${nextHandNumber} iniciada.`,
@@ -1118,7 +1117,6 @@ export function useGameSession() {
       window.clearTimeout(timeoutId)
     }
   }, [
-    activeVariant,
     applyHandState,
     canHumanAdvisePartner,
     canHumanRespondToTruco,

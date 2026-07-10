@@ -21,6 +21,7 @@ Nao gerar prompts curtos demais. O gerador precisa receber contexto de uso no jo
 - mesa de gameplay: `780 x 780`
 - background/ambiente: `1672 x 941`
 - tela de campanha: `1672 x 941`
+- hub de `Modo Livre` pos-campanha: `1672 x 941`
 - host/dono/personagem: quadrado, idealmente `1024 x 1024` ou maior
 - resultado de partida, vitoria/derrota: `1672 x 941`
 - vitoria definitiva de bar/circuito: `1672 x 941`
@@ -131,7 +132,7 @@ Content to include in the art:
 - Circuit title: “[NOME DO CIRCUITO]”
 - Current venue: “[NOME DO LOCAL]”
 - Previous area reference: “[LOCAL ANTERIOR]”
-- Next venue hint: “[PROXIMO LOCAL]”
+- Next venue hint: “[PROXIMO LOCAL]”, only when there is another venue after this one
 - Main action plaque: “ENTRAR NO BAR”
 - Secondary action plaque: “TROCAR PARCEIRA”
 - Back control: “VOLTAR”
@@ -149,6 +150,21 @@ Restrictions:
 - No fantasy map.
 - Text must be large, readable, and not cropped.
 ```
+
+### Hub De Modo Livre Pos-Campanha
+
+O hub de `Modo Livre` e uma tela especial de campanha para depois da conclusao total.
+
+Estado atual integrado:
+
+- asset: `src/assets/campaign/free-play-circuit-hub.png`
+- dimensao: `1672 x 941`
+- finalidade: mostrar todos os circuitos conquistados como cards clicaveis
+- os nomes dos circuitos devem estar embutidos na arte, grandes e legiveis
+- os cards precisam formar uma grade regular para permitir hotspots HTML invisiveis
+- nao desenhar overlays de selecao, labels HTML ou dock inferior por cima da arte
+- reservar espaco visual para os botoes `RECOMEÇAR CAMPANHA` e `VOLTAR`
+- reset de campanha deve ser confirmado por modal interno do jogo, nao por alerta nativo do navegador
 
 ### Resultado De Partida
 
@@ -220,23 +236,23 @@ Evitar no Campeonato Municipal:
 - arena profissional moderna demais
 - marcas reais, logos, prefeitura real ou patrocinadores reais
 
-## Proximo Nivel: Bonus Pos-Campanha
+## Referencia Consolidada: Bonus Pos-Campanha
 
-O proximo pacote de prompts deve ser para o nivel bonus `Circuito Intergaláctico`, local `Órbita da Lua`.
+O pacote de prompts do nivel bonus `Circuito Intergaláctico`, local `Órbita da Lua`, ja foi usado como referencia para assets integrados.
 
-Este nivel deve parecer uma recompensa especial depois do caminho principal, com mudanca clara de tom. Ele pode ser cosmico, retrofuturista, colorido e teatral, mas ainda precisa parecer `Truco Raiz`: mesa jogavel, humor brasileiro, provocacao de truco e personagens com personalidade.
+Use esta direcao como referencia para futuras expansoes cosmicas ou polimentos do bonus. O nivel deve parecer uma recompensa especial depois do caminho principal, com mudanca clara de tom. Ele pode ser cosmico, retrofuturista, colorido e teatral, mas ainda precisa parecer `Truco Raiz`: mesa jogavel, humor brasileiro, provocacao de truco e personagens com personalidade.
 
-Assets esperados:
+Assets integrados no estado atual:
 
-- mesa de truco, `780 x 780`
-- ambiente/background, `1672 x 941`
-- tela de campanha, `1672 x 941`
-- host/organizador do evento, quadrado `1024 x 1024` ou maior
-- tela de vitoria normal da partida, `1672 x 941`, com `VOLTAR AO FLUXO DE BARES`
-- tela de derrota normal da partida, `1672 x 941`, com `VOLTAR AO FLUXO DE BARES`
-- tela de vitoria definitiva de `Órbita da Lua`, `1672 x 941`, com trofeu ou marco visual equivalente
-- tela de vitoria definitiva do `Circuito Intergaláctico`, `1672 x 941`, com trofeu ou marco visual equivalente
-- imagens pequenas dos adversarios do bonus para gameplay/roster
+- mesa de truco: `src/assets/boteco/table-top-orbita-da-lua.png`
+- ambiente/background: `src/assets/venues/orbita-da-lua/background.png`
+- tela de campanha: `src/assets/campaign/circuito-intergalactico-orbita-da-lua.png`
+- host/organizador do evento: `src/assets/venues/orbita-da-lua/host-orbita-da-lua.png`
+- vitoria normal da partida: `src/assets/venues/orbita-da-lua/match-result-win.png`
+- derrota normal da partida: `src/assets/venues/orbita-da-lua/match-result-loss.png`
+- vitoria definitiva da `Órbita da Lua`: `src/assets/campaign-victories/venue-orbita-da-lua.png`
+- vitoria definitiva do `Circuito Intergaláctico`: `src/assets/campaign-victories/stage-intergalactico.png`
+- imagens pequenas dos adversarios do bonus: `src/assets/characters/mane-banguela.png` e `src/assets/characters/cosme-orbita.png`
 
 Direcao obrigatoria:
 

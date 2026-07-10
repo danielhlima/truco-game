@@ -4,13 +4,14 @@
 
 Antes de agir, leia nesta ordem:
 
-1. `docs/CONTENT.md`
-2. `docs/LAYOUT_RULES.md`
-3. `docs/TRUCO_RULES.md`
-4. `docs/IMAGE_PROMPT_STANDARDS.md`
-5. `docs/NEXT_STEPS.md`
-6. `docs/CAMPAIGN_PATH.md`
-7. `docs/NEXT_CHAT_PROMPT.md`
+1. `docs/README.md`
+2. `docs/CONTENT.md`
+3. `docs/LAYOUT_RULES.md`
+4. `docs/TRUCO_RULES.md`
+5. `docs/IMAGE_PROMPT_STANDARDS.md`
+6. `docs/NEXT_STEPS.md`
+7. `docs/CAMPAIGN_PATH.md`
+8. `docs/NEXT_CHAT_PROMPT.md`
 
 Esses arquivos sao a fonte de verdade do estado atual do projeto.
 
@@ -32,7 +33,7 @@ Hoje o projeto ja possui:
 - roster inicial de personagens estruturado em codigo
 - tela de selecao de parceira funcional dentro do `gameViewport`
 - parceira escolhida persistida por bar
-- dois primeiros bares com adversarios fixos
+- bares/circuitos com adversarios fixos e exclusivos por local
 - fluxo de consulta/conselho da parceira no truco ja implementado
 - primeira versao da capa do `Bar do Ze Catinga` com assets proprios
 - scorepad da coluna esquerda corrigido e validado visualmente na gameplay
@@ -41,7 +42,10 @@ Hoje o projeto ja possui:
 - intro cinematografica curta antes da gameplay
 - tela inicial definitiva com arte propria
 - caminho principal com pacote visual autoral integrado ate o `Cassino Mé Maior`
-- proxima frente definida: prompts e assets do nivel bonus `Circuito Intergaláctico` / `Órbita da Lua`
+- bonus pos-campanha `Circuito Intergaláctico` / `Órbita da Lua` integrado como ultima etapa do jogo
+- `Modo Livre` pos-campanha para revisitar circuitos ou reiniciar campanha
+- testes unitarios iniciais para dialogos/raises e variantes por bar
+- proxima frente definida: balanceamento de IA com testes
 
 ## Arquitetura que deve ser preservada
 
@@ -140,21 +144,31 @@ Arquivos principais:
 - a primeira tela visivel agora mostra somente a arte de capa e um hotspot HTML sobre `COMEÇAR`
 - debug de bar, reset de campanha e seletor de variante foram removidos da tela inicial visivel
 - o caminho principal foi expandido visualmente ate o `Cassino Mé Maior`
-- o proximo foco recomendado e gerar prompts para o pacote bonus `Circuito Intergaláctico` / `Órbita da Lua`
-- antes de implementar novos assets autorais, gerar prompts seguindo `docs/IMAGE_PROMPT_STANDARDS.md`
+- o bonus pos-campanha `Circuito Intergaláctico` / `Órbita da Lua` foi integrado como ultima etapa do jogo
+- a tela de campanha do bonus nao deve apontar para um proximo local
+- as vitorias definitivas cadastradas para o bonus sao a do local `Órbita da Lua` e a do circuito `intergalactico`
+- o `Modo Livre` pos-campanha foi integrado:
+  - aparece depois da campanha concluida
+  - usa `src/assets/campaign/free-play-circuit-hub.png`
+  - cada circuito e clicavel por hotspot invisivel
+  - abre a tela autoral de campanha do primeiro bar do circuito selecionado
+  - o `Voltar` da tela autoral retorna ao hub do `Modo Livre`
+  - `Recomeçar campanha` usa confirmacao interna do jogo, nao `window.confirm`
+- os testes unitarios de dialogos e raises cobrem a escada `TRUCO!`, `SEIS!`, `NOVE!`, `DOZE!`, `DESCE!`, `TOMA!` e `TÔ FORA!`
+- os helpers de sessao criam partida pela variante declarada no bar e cobrem Mineiro/Paulista em testes
+- o proximo foco recomendado e rebalancear IA com testes
 
 ## Direcao de produto atual
 
-O projeto esta em bom estado de tela e fluxo para mudar o foco principal de polimento visual para expansao de conteudo.
+O projeto esta em bom estado de tela, fluxo e conteudo visual para mudar o foco principal para balanceamento de IA.
 
 Decisao atual:
 
-- tratar o caminho principal como visualmente integrado ate o `Cassino Mé Maior`
-- seguir para o bonus pos-campanha antes de mexer em regras complexas
-- gerar prompts do bonus antes de implementar imagens
-- alem dos 8 assets de costume, gerar imagens pequenas dos adversarios do bonus
-- manter o bonus divertido e cosmico, sem ETs assustadores, monstros, horror, gore ou criaturas grotescas
-- depois do pacote bonus, voltar para regras, tutorial, balanceamento, falas e refinamentos
+- tratar o caminho principal e o bonus pos-campanha como visualmente integrados no estado atual
+- nao reabrir pacotes de assets sem regressao visual ou nova decisao explicita de polimento
+- manter `docs/IMAGE_PROMPT_STANDARDS.md` como referencia para futuros assets, nao como proxima frente obrigatoria
+- voltar para balanceamento, falas e refinamentos de IA
+- manter os testes unitarios de dialogos/raises como blindagem para qualquer mudanca futura em truco
 
 Kit minimo recomendado por bar:
 
@@ -171,13 +185,13 @@ Kit minimo recomendado por bar:
 
 Plano pratico da proxima frente:
 
-1. ler `docs/IMAGE_PROMPT_STANDARDS.md`
-2. gerar prompts para `Órbita da Lua`
-3. incluir prompts dos 8 assets padrao e das imagens pequenas dos adversarios
-4. aguardar o usuario trazer as imagens aprovadas
-5. integrar os assets do bonus no mesmo padrao dos locais recentes
-6. rodar `npm run build`
-7. depois disso, retomar pendencias de regra/produto em `docs/NEXT_STEPS.md`
+1. ler `docs/TRUCO_RULES.md` e `docs/NEXT_STEPS.md`
+2. conferir `git status` e preservar mudancas locais
+3. ler `src/ai/trucoDecision.ts`, `src/ai/trucoPersonalities.ts` e os testes existentes em `tests/**/*.test.ts`
+4. escrever ou ajustar testes antes de mudar comportamento de IA
+5. rebalancear incrementalmente uma decisao por vez: pedir truco, aceitar, correr, contra-aumentar, aconselhar/consultar parceira
+6. nao reabrir responsividade, selecao de parceira, fluxo visual ou arquitetura de estado sem regressao real
+7. rodar `npm test` e `npm run build` antes de concluir qualquer frente de codigo
 
 ## Estado atual da gameplay screen
 
@@ -275,8 +289,16 @@ Assets principais:
 - `src/assets/boteco/table-top-trem-jaca.png`
 - `src/assets/boteco/table-top-adega-juca-bigode.png`
 - `src/assets/boteco/table-top-garagem-norte.png`
-- `src/assets/boteco/table-top-wood-street.png`
-- `src/assets/boteco/table-top-steel-patio.png`
+- `src/assets/boteco/table-top-quintal-da-leste.png`
+- `src/assets/boteco/table-top-subsolo-do-centro.png`
+- `src/assets/boteco/table-top-salao-da-sul.png`
+- `src/assets/boteco/table-top-centro-convencoes-prefeitura.png`
+- `src/assets/boteco/table-top-ginasio-estadual-maneco-file.png`
+- `src/assets/boteco/table-top-arena-nacional.png`
+- `src/assets/boteco/table-top-centro-americano-truqueiro-medelin.png`
+- `src/assets/boteco/table-top-hotel-truco-segovia-espanha.png`
+- `src/assets/boteco/table-top-casino-me-maior.png`
+- `src/assets/boteco/table-top-orbita-da-lua.png`
 - `src/assets/cards/card-back-aged-photo.png`
 - `src/assets/cards/card-face-aged-paper.png`
 
@@ -324,11 +346,33 @@ Assets em uso:
 - `Salao da Sul` tem artes proprias para:
   - vitoria: `src/assets/venues/zona-sul-salao/match-result-win.png`
   - derrota: `src/assets/venues/zona-sul-salao/match-result-loss.png`
+- `Centro de Convenções da Prefeitura` tem artes proprias para:
+  - vitoria: `src/assets/venues/centro-convencoes-prefeitura/match-result-win.png`
+  - derrota: `src/assets/venues/centro-convencoes-prefeitura/match-result-loss.png`
+- `Ginásio Estadual Maneco Filé` tem artes proprias para:
+  - vitoria: `src/assets/venues/ginasio-estadual-maneco-file/match-result-win.png`
+  - derrota: `src/assets/venues/ginasio-estadual-maneco-file/match-result-loss.png`
+- `Arena Nacional` tem artes proprias para:
+  - vitoria: `src/assets/venues/arena-nacional/match-result-win.png`
+  - derrota: `src/assets/venues/arena-nacional/match-result-loss.png`
+- `Centro Americano Truqueiro de Medelin` tem artes proprias para:
+  - vitoria: `src/assets/venues/centro-americano-truqueiro-medelin/match-result-win.png`
+  - derrota: `src/assets/venues/centro-americano-truqueiro-medelin/match-result-loss.png`
+- `Hotel Truco de Segóvia, Espanha` tem artes proprias para:
+  - vitoria: `src/assets/venues/hotel-truco-segovia-espanha/match-result-win.png`
+  - derrota: `src/assets/venues/hotel-truco-segovia-espanha/match-result-loss.png`
+- `Cassino Mé Maior` tem artes proprias para:
+  - vitoria: `src/assets/venues/casino-me-maior/match-result-win.png`
+  - derrota: `src/assets/venues/casino-me-maior/match-result-loss.png`
+- `Órbita da Lua` tem artes proprias para:
+  - vitoria: `src/assets/venues/orbita-da-lua/match-result-win.png`
+  - derrota: `src/assets/venues/orbita-da-lua/match-result-loss.png`
 - vitorias definitivas de bar e circuito ficam em `src/assets/campaign-victories/`
 - quando uma vitoria completa o bar, a tela normal de vitoria da partida nao aparece; entra a vitoria definitiva daquele bar
 - quando o bar completo tambem fecha o circuito, a sequencia e: vitoria definitiva do bar, depois vitoria definitiva do circuito, depois fluxo de bares
-- vitorias definitivas de bar cadastradas: `Bar do Ze Catinga`, `Bar Maneco Banguela`, `Trem do Jaça`, `Adega do Juca Bigode`, `Garagem Norte`, `Quintal da Leste`, `Subsolo do Centro` e `Salao da Sul`
-- vitorias definitivas de circuito cadastradas: `Botecos da Rua`, `Campeonato da Vila Naná` e `Conquista das Zonas`
+- vitorias definitivas de bar cadastradas: `Bar do Ze Catinga`, `Bar Maneco Banguela`, `Trem do Jaça`, `Adega do Juca Bigode`, `Garagem Norte`, `Quintal da Leste`, `Subsolo do Centro`, `Salao da Sul`, `Centro de Convenções da Prefeitura`, `Ginásio Estadual Maneco Filé`, `Arena Nacional`, `Centro Americano Truqueiro de Medelin`, `Hotel Truco de Segóvia, Espanha`, `Cassino Mé Maior` e `Órbita da Lua`
+- vitorias definitivas de circuito cadastradas: `Botecos da Rua`, `Campeonato da Vila Naná`, `Conquista das Zonas`, `Campeonato Estadual`, `Campeonato Nacional`, `Circuito Panamericano`, `Jogos Mundiais`, `Mundial` e `Circuito Intergaláctico`
+- ao fechar o bonus, a sequencia definitiva e: `Órbita da Lua conquistada`, depois `Circuito Intergaláctico concluido`
 - a arte de resultado deve caber inteira dentro da moldura do stage, sem cortar a placa `VOLTAR AO FLUXO DE BARES`
 - quando a arte autoral for menos larga que o stage logico `1080x500`, aceitar respiro lateral em vez de cortar topo ou rodape
 - a placa `VOLTAR AO FLUXO DE BARES` da arte recebe uma area clicavel invisivel por cima
@@ -447,7 +491,7 @@ Estado:
 
 ## Fluxo atual antes da partida
 
-Fluxo desejado e implementado parcialmente:
+Fluxo implementado:
 
 1. tela inicial com `COMEÇAR`
 2. tela de campanha com os desafios
@@ -459,18 +503,12 @@ Observacoes:
 
 - a capa do bar nao deve falar da campanha inteira
 - a capa deve falar apenas daquele bar
-- o `Bar do Ze Catinga` ja possui uma primeira capa autoral
-- o `Bar Maneco Banguela` ja possui capa propria reaproveitando os HUDs/placas existentes e trocando host/background
-- o `Trem do Jaça` ja possui capa propria reaproveitando os HUDs/placas existentes e trocando host/background
-- a `Adega do Juca Bigode` ja possui capa propria reaproveitando os HUDs/placas existentes e trocando host/background
-- a `Garagem Norte` ja possui capa propria reaproveitando os HUDs/placas existentes e trocando host/background
-- a gameplay do `Bar Maneco Banguela` usa o mesmo background da entrada do bar
-- a gameplay do `Trem do Jaça` usa o mesmo background da entrada do bar e mesa autoral propria
-- a gameplay da `Adega do Juca Bigode` usa o mesmo background da entrada do bar e mesa autoral propria
-- a gameplay da `Garagem Norte` usa o mesmo background da entrada do bar e mesa autoral propria
-- outros bares ainda podem cair em fallback generico
+- a capa do bar usa a composicao consolidada com HUDs/placas do projeto e assets proprios por local quando existem
+- os locais do caminho principal e o bonus pos-campanha possuem campanha/background/host/mesa/resultados proprios no estado atual
+- a gameplay deve usar o background e a mesa correspondentes ao local atual
+- fallbacks genericos continuam existindo para conteudos futuros que ainda nao tenham arte propria
 
-### Capas autorais dos primeiros bares
+### Capas autorais dos bares
 
 Arquivos principais:
 
@@ -482,6 +520,16 @@ Arquivos principais:
 - `src/assets/venues/trem-do-jaca/`
 - `src/assets/venues/adega-do-juca-bigode/`
 - `src/assets/venues/zona-norte-garagem/`
+- `src/assets/venues/zona-leste-quintal/`
+- `src/assets/venues/centro-subsolo/`
+- `src/assets/venues/zona-sul-salao/`
+- `src/assets/venues/centro-convencoes-prefeitura/`
+- `src/assets/venues/ginasio-estadual-maneco-file/`
+- `src/assets/venues/arena-nacional/`
+- `src/assets/venues/centro-americano-truqueiro-medelin/`
+- `src/assets/venues/hotel-truco-segovia-espanha/`
+- `src/assets/venues/casino-me-maior/`
+- `src/assets/venues/orbita-da-lua/`
 
 Assets atuais:
 
@@ -500,19 +548,14 @@ Assets atuais:
 - `src/assets/venues/adega-do-juca-bigode/host-adega-do-juca-bigode.png`
 - `src/assets/venues/zona-norte-garagem/background.png`
 - `src/assets/venues/zona-norte-garagem/host-zona-norte-garagem.png`
+- os demais locais recentes seguem o mesmo padrao: `background.png`, `host-*.png`, `match-result-win.png` e `match-result-loss.png`
 
 Estado visual atual:
 
 - coluna esquerda esta aceitavel por enquanto
 - coluna central mostra nome, endereco, descricao, adversarios e dificuldade ampliada
-- Maneco usa o mesmo sistema de layout, HUD, placa de fala, CTA, divisor, dificuldade e placa de estatisticas do Ze Catinga
-- Maneco tambem usa `src/assets/venues/maneco-banguela/background.png` como background da gameplay
-- Trem do Jaça usa o mesmo sistema de layout, HUD, placa de fala, CTA, divisor, dificuldade e placa de estatisticas do Ze Catinga
-- Trem do Jaça tambem usa `src/assets/venues/trem-do-jaca/background.png` como background da gameplay
-- Adega do Juca Bigode usa o mesmo sistema de layout, HUD, placa de fala, CTA, divisor, dificuldade e placa de estatisticas do Ze Catinga
-- Adega do Juca Bigode tambem usa `src/assets/venues/adega-do-juca-bigode/background.png` como background da gameplay
-- Garagem Norte usa o mesmo sistema de layout, HUD, placa de fala, CTA, divisor, dificuldade e placa de estatisticas do Ze Catinga
-- Garagem Norte tambem usa `src/assets/venues/zona-norte-garagem/background.png` como background da gameplay
+- os locais usam o mesmo sistema de layout, HUD, placa de fala, CTA, divisor, dificuldade e placa de estatisticas consolidado a partir do Ze Catinga
+- backgrounds, hosts e mesas devem variar por local quando houver asset proprio
 - coluna direita mostra estatisticas em placa propria e botao de entrada centralizados
 - a frase `Proximo desafio` foi removida da capa
 - a placa `ENTRAR NO BAR` e a lousa do dono seguem protegidas contra estouro de texto
@@ -522,8 +565,9 @@ Estado visual atual:
 
 ### Estado atual da tela de campanha
 
-- para os estados atuais do `Bar do Ze Catinga`, do `Bar Maneco Banguela`, do `Trem do Jaça`, da `Adega do Juca Bigode`, da `Garagem Norte`, do `Quintal da Leste`, do `Subsolo do Centro` e do `Salao da Sul`, a campanha usa arte autoral completa
-- as artes mostram o circuito atual, o bar atual, o progresso anterior e a etapa seguinte
+- para os estados atuais do caminho principal e do bonus pos-campanha, a campanha usa arte autoral completa
+- as artes mostram o circuito atual, o bar atual, o progresso anterior e a etapa seguinte quando existir
+- a arte do `Circuito Intergaláctico` / `Órbita da Lua` representa a ultima etapa do jogo e nao deve sugerir um proximo local
 - as imagens ficam em:
   - `src/assets/campaign/botecos-rua-ze-catinga.png`
   - `src/assets/campaign/botecos-rua-maneco-banguela.png`
@@ -533,11 +577,24 @@ Estado visual atual:
   - `src/assets/campaign/conquista-zonas-quintal-da-leste.png`
   - `src/assets/campaign/conquista-zonas-subsolo-do-centro.png`
   - `src/assets/campaign/conquista-zonas-salao-da-sul.png`
+  - `src/assets/campaign/campeonato-municipal-centro-convencoes-prefeitura.png`
+  - `src/assets/campaign/campeonato-estadual-ginasio-estadual-maneco-file.png`
+  - `src/assets/campaign/campeonato-nacional-arena-nacional.png`
+  - `src/assets/campaign/circuito-panamericano-centro-americano-truqueiro-medelin.png`
+  - `src/assets/campaign/jogos-mundiais-hotel-truco-segovia-espanha.png`
+  - `src/assets/campaign/mundial-casino-me-maior.png`
+  - `src/assets/campaign/circuito-intergalactico-orbita-da-lua.png`
 - o React posiciona areas clicaveis invisiveis sobre:
   - `VOLTAR`
   - `ENTRAR NO BAR`
   - `TROCAR PARCEIRA`
 - a tela de campanha dinamica permanece como fallback para outros bares/estados
+- depois da campanha concluida, `COMEÇAR` leva ao `Modo Livre`
+- o `Modo Livre` usa o asset `src/assets/campaign/free-play-circuit-hub.png`
+- no `Modo Livre`, os quadros dos circuitos sao hotspots invisiveis sobre a arte
+- clicar em um circuito abre a tela autoral de campanha do primeiro bar daquele circuito, usando os hotspots originais da tela autoral
+- o `Voltar` da tela autoral retorna ao hub do `Modo Livre`
+- `Recomeçar campanha` exibe modal interno no stage antes de apagar progresso, escolhas de parceira, skin do jogador e historico salvo
 - o jogador deve reconhecer com clareza onde esta naquele momento
 - preservar a separacao entre:
   - tela de campanha com percurso e progresso
@@ -606,6 +663,61 @@ Estado visual atual:
   - host: `src/assets/venues/zona-sul-salao/host-zona-sul-salao.png`
   - mesa: `src/assets/boteco/table-top-salao-da-sul.png`
 
+### Campeonatos finais
+
+- `Centro de Convenções da Prefeitura`
+  - id: `centro-convencoes-prefeitura`
+  - campanha: `src/assets/campaign/campeonato-municipal-centro-convencoes-prefeitura.png`
+  - background: `src/assets/venues/centro-convencoes-prefeitura/background.png`
+  - host: `src/assets/venues/centro-convencoes-prefeitura/host-centro-convencoes-prefeitura.png`
+  - mesa: `src/assets/boteco/table-top-centro-convencoes-prefeitura.png`
+- `Ginásio Estadual Maneco Filé`
+  - id: `ginasio-estadual-maneco-file`
+  - campanha: `src/assets/campaign/campeonato-estadual-ginasio-estadual-maneco-file.png`
+  - background: `src/assets/venues/ginasio-estadual-maneco-file/background.png`
+  - host: `src/assets/venues/ginasio-estadual-maneco-file/host-ginasio-estadual-maneco-file.png`
+  - mesa: `src/assets/boteco/table-top-ginasio-estadual-maneco-file.png`
+- `Arena Nacional`
+  - id: `arena-nacional`
+  - campanha: `src/assets/campaign/campeonato-nacional-arena-nacional.png`
+  - background: `src/assets/venues/arena-nacional/background.png`
+  - host: `src/assets/venues/arena-nacional/host-arena-nacional.png`
+  - mesa: `src/assets/boteco/table-top-arena-nacional.png`
+- `Centro Americano Truqueiro de Medelin`
+  - id: `centro-americano-truqueiro-medelin`
+  - campanha: `src/assets/campaign/circuito-panamericano-centro-americano-truqueiro-medelin.png`
+  - background: `src/assets/venues/centro-americano-truqueiro-medelin/background.png`
+  - host: `src/assets/venues/centro-americano-truqueiro-medelin/host-centro-americano-truqueiro-medelin.png`
+  - mesa: `src/assets/boteco/table-top-centro-americano-truqueiro-medelin.png`
+- `Hotel Truco de Segóvia, Espanha`
+  - id: `hotel-truco-segovia-espanha`
+  - campanha: `src/assets/campaign/jogos-mundiais-hotel-truco-segovia-espanha.png`
+  - background: `src/assets/venues/hotel-truco-segovia-espanha/background.png`
+  - host: `src/assets/venues/hotel-truco-segovia-espanha/host-hotel-truco-segovia-espanha.png`
+  - mesa: `src/assets/boteco/table-top-hotel-truco-segovia-espanha.png`
+- `Cassino Mé Maior`
+  - id: `casino-me-maior`
+  - campanha: `src/assets/campaign/mundial-casino-me-maior.png`
+  - background: `src/assets/venues/casino-me-maior/background.png`
+  - host: `src/assets/venues/casino-me-maior/host-casino-me-maior.png`
+  - mesa: `src/assets/boteco/table-top-casino-me-maior.png`
+
+### Bonus pos-campanha
+
+- `Órbita da Lua`
+  - id: `orbita-da-lua`
+  - circuito: `Circuito Intergaláctico`
+  - visualTheme: `sci-fi-lunar`
+  - campanha: `src/assets/campaign/circuito-intergalactico-orbita-da-lua.png`
+  - background: `src/assets/venues/orbita-da-lua/background.png`
+  - host: `src/assets/venues/orbita-da-lua/host-orbita-da-lua.png`
+  - mesa: `src/assets/boteco/table-top-orbita-da-lua.png`
+  - resultados: `src/assets/venues/orbita-da-lua/match-result-win.png` e `src/assets/venues/orbita-da-lua/match-result-loss.png`
+  - vitoria definitiva do local: `src/assets/campaign-victories/venue-orbita-da-lua.png`
+  - vitoria definitiva do circuito: `src/assets/campaign-victories/stage-intergalactico.png`
+  - adversarios fixos: `Mané Banguela` + `Cosme Órbita`
+  - observacao: a tela de campanha do bonus e a ultima etapa do jogo; nao existe `next venue`
+
 Regra importante:
 
 - sempre que um nome de bar mudar, o `id` tambem deve acompanhar a mudanca
@@ -639,13 +751,15 @@ Perfis atuais:
 Hoje esta assim:
 
 - a parceira ativa usa a personalidade da personagem escolhida
-- os adversarios dos bares iniciais ja estao fixados por bar
+- os adversarios dos bares/circuitos ja estao fixados por local
 - o sistema de consulta da parceira usa:
   - leitura da mao da parceira
   - leitura ponderada da mao do humano via:
     - `BORA!`
     - `CE QUE SABE!`
     - `MELHOR CORRER!`
+- a IA ainda tende a pedir truco com pouco em algumas situacoes
+- a proxima frente deve rebalancear thresholds, blefes, aceite, corrida, raises e conselho/consulta com testes antes da mudanca de comportamento
 
 ## Estado atual do truco e dos dialogos
 
@@ -663,9 +777,11 @@ Hoje ja existe:
 - consulta da parceira ao humano quando ela e o alvo formal da resposta
 - peso real da resposta do humano na decisao final da parceira
 - regra da `escalada vigente` documentada e aplicada aos dialogos
+- testes unitarios cobrem a sequencia real de raises e os rotulos principais de fala
+- partidas por local usam a variante declarada no bar; Paulista cria vira/manilha e a proxima mao preserva a variante da partida
 
 Regra de continuidade importante:
 
 - esse trecho ainda esta sensivel a regressao
-- o proximo trabalho deve comecar por testes unitarios de dialogo
+- qualquer ajuste de IA deve ampliar ou preservar a cobertura de testes
 - evitar continuar corrigindo apenas por tentativa e erro sem blindagem

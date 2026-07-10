@@ -2,9 +2,11 @@ import {
   applyCampaignWin,
   getCurrentCampaignVenue,
 } from "../career/campaign/progression"
-import type { CampaignStage } from "../career/campaign/types"
+import type { CampaignStage, CampaignVenue } from "../career/campaign/types"
 import type { Card } from "../game/card"
+import { createHandState } from "../game/createHandState"
 import type { HandState, TeamId } from "../game/handState"
+import { createMatchState, type MatchState } from "../game/matchState"
 import { getNextPlayerClockwise as getClockwisePlayerId } from "../game/trucoTarget"
 import { getBetCallLabel, getNextBet } from "../game/truco"
 
@@ -15,6 +17,11 @@ export interface SpeechBubbleState {
   text: string
 }
 
+export interface VenueMatchState {
+  handState: HandState
+  matchState: MatchState
+}
+
 interface TrucoAcceptSpeechSequence {
   primary: SpeechBubbleState
   followUp?: SpeechBubbleState
@@ -22,6 +29,22 @@ interface TrucoAcceptSpeechSequence {
 
 export function formatCard(card: Card): string {
   return `${card.rank} de ${card.suit}`
+}
+
+export function createVenueMatchState(
+  targetVenue: CampaignVenue,
+  firstPlayerId = 1
+): VenueMatchState {
+  const variant = targetVenue.variant
+
+  return {
+    handState: createHandState(variant, firstPlayerId),
+    matchState: createMatchState(variant, firstPlayerId),
+  }
+}
+
+export function createNextHandStateForMatch(matchState: MatchState): HandState {
+  return createHandState(matchState.variant, matchState.startingPlayerId)
 }
 
 export function getCurrentTurnLabel(handState: HandState | null): string {

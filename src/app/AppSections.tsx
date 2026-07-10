@@ -1,3 +1,4 @@
+import { useState } from "react"
 import type React from "react"
 import type { CampaignStage, CampaignVenue } from "../career/campaign/types"
 import type { Card } from "../game/card"
@@ -87,6 +88,7 @@ import victoryVenueCentroSubsoloAsset from "../assets/campaign-victories/venue-c
 import victoryVenueGinasioEstadualManecoFileAsset from "../assets/campaign-victories/venue-ginasio-estadual-maneco-file.png"
 import victoryVenueHotelTrucoSegoviaEspanhaAsset from "../assets/campaign-victories/venue-hotel-truco-segovia-espanha.png"
 import victoryVenueCasinoMeMaiorAsset from "../assets/campaign-victories/venue-casino-me-maior.png"
+import victoryVenueOrbitaDaLuaAsset from "../assets/campaign-victories/venue-orbita-da-lua.png"
 import victoryVenueTremDoJacaAsset from "../assets/campaign-victories/venue-trem-do-jaca.png"
 import victoryVenueZonaLesteQuintalAsset from "../assets/campaign-victories/venue-zona-leste-quintal.png"
 import victoryVenueZonaNorteGaragemAsset from "../assets/campaign-victories/venue-zona-norte-garagem.png"
@@ -107,6 +109,7 @@ import manecoBanguelaHostAsset from "../assets/venues/maneco-banguela/host-manec
 import manecoBanguelaMatchResultLossAsset from "../assets/venues/maneco-banguela/match-result-loss.png"
 import manecoBanguelaMatchResultWinAsset from "../assets/venues/maneco-banguela/match-result-win.png"
 import startScreenAsset from "../assets/start/truco-raiz-start.png"
+import freePlayCircuitHubAsset from "../assets/campaign/free-play-circuit-hub.png"
 import zeCatingaCampaignJourneyAsset from "../assets/campaign/botecos-rua-ze-catinga.png"
 import zeCatingaBackgroundAsset from "../assets/venues/ze-catinga/background.png"
 import zeCatingaHostAsset from "../assets/venues/ze-catinga/host-ze-catinga.png"
@@ -458,6 +461,7 @@ const CAMPAIGN_VICTORY_ASSET_BY_VENUE_ID: Record<string, string> = {
   "centro-americano-truqueiro-medelin": victoryVenueCentroAmericanoTruqueiroMedelinAsset,
   "hotel-truco-segovia-espanha": victoryVenueHotelTrucoSegoviaEspanhaAsset,
   "casino-me-maior": victoryVenueCasinoMeMaiorAsset,
+  "orbita-da-lua": victoryVenueOrbitaDaLuaAsset,
 }
 
 const CAMPAIGN_VICTORY_ASSET_BY_STAGE_ID: Record<string, string> = {
@@ -827,6 +831,7 @@ interface TableSectionProps {
   onLaunchVenue: (venueId: string) => void
   onOpenCharacterSelect: () => void
   onReturnToJourneyFlow: () => void
+  onResetCampaign: () => void
   onSelectNextCharacter: () => void
   onSelectPreviousCharacter: () => void
   onSelectNextPlayerSkin: () => void
@@ -893,6 +898,7 @@ export function TableSection({
   onLaunchVenue,
   onOpenCharacterSelect,
   onReturnToJourneyFlow,
+  onResetCampaign,
   onSelectNextCharacter,
   onSelectPreviousCharacter,
   onSelectNextPlayerSkin,
@@ -1007,6 +1013,7 @@ export function TableSection({
                     onBack={onCloseJourneyIntro}
                     onContinueToCharacterSelect={onContinueToCharacterSelect}
                     onLaunchVenue={onLaunchVenue}
+                    onResetCampaign={onResetCampaign}
                     styles={styles}
                   />
                 ) : menuScreen === "player-skin-select" ? (
@@ -1048,11 +1055,7 @@ export function TableSection({
                     styles={styles}
                   />
                 ) : (
-                  <GameStartScreen
-                    currentCampaignVenue={currentCampaignVenue}
-                    onStart={onStart}
-                    styles={styles}
-                  />
+                  <GameStartScreen onStart={onStart} styles={styles} />
                 )
               ) : (
                 <>
@@ -1391,11 +1394,9 @@ export function TableSection({
 }
 
 function GameStartScreen({
-  currentCampaignVenue,
   onStart,
   styles,
 }: {
-  currentCampaignVenue: CampaignVenue | null
   onStart: () => void
   styles: StyleMap
 }) {
@@ -1415,13 +1416,120 @@ function GameStartScreen({
       <button
         aria-label="Começar"
         title="Começar"
-        style={{
-          ...styles.gameStartHotspot,
-          ...(!currentCampaignVenue ? styles.disabledButton : {}),
-        }}
+        style={styles.gameStartHotspot}
         onClick={onStart}
-        disabled={!currentCampaignVenue}
       />
+    </div>
+  )
+}
+
+const FREE_PLAY_STAGE_HOTSPOTS: React.CSSProperties[] = [
+  { left: "3.4%", top: "21.8%", width: "18.2%", height: "32.8%" },
+  { left: "22.3%", top: "21.8%", width: "18.2%", height: "32.8%" },
+  { left: "41.2%", top: "21.8%", width: "18.2%", height: "32.8%" },
+  { left: "60.1%", top: "21.8%", width: "18.2%", height: "32.8%" },
+  { left: "79.0%", top: "21.8%", width: "18.2%", height: "32.8%" },
+  { left: "3.4%", top: "55.8%", width: "18.2%", height: "32.0%" },
+  { left: "22.3%", top: "55.8%", width: "18.2%", height: "32.0%" },
+  { left: "41.2%", top: "55.8%", width: "18.2%", height: "32.0%" },
+  { left: "60.1%", top: "55.8%", width: "18.2%", height: "32.0%" },
+  { left: "79.0%", top: "55.8%", width: "18.2%", height: "32.0%" },
+]
+
+function PostCampaignFreePlayScreen({
+  onBack,
+  onOpenStage,
+  onResetCampaign,
+  styles,
+}: {
+  onBack: () => void
+  onOpenStage: (stageId: string) => void
+  onResetCampaign: () => void
+  styles: StyleMap
+}) {
+  const [resetConfirmationOpen, setResetConfirmationOpen] = useState(false)
+
+  function handleResetCampaignFromHub() {
+    setResetConfirmationOpen(true)
+  }
+
+  function handleCancelResetCampaign() {
+    setResetConfirmationOpen(false)
+  }
+
+  function handleConfirmResetCampaign() {
+    setResetConfirmationOpen(false)
+    onResetCampaign()
+  }
+
+  return (
+    <div style={styles.freePlayScreen}>
+      <img
+        src={freePlayCircuitHubAsset}
+        alt=""
+        aria-hidden="true"
+        style={styles.freePlayImage}
+      />
+
+      <button style={styles.freePlayBackButton} onClick={onBack}>
+        Voltar
+      </button>
+      <button style={styles.freePlayResetButton} onClick={handleResetCampaignFromHub}>
+        Recomeçar campanha
+      </button>
+
+      {CAMPAIGN_STAGES.map((stage, index) => {
+        const hotspot = FREE_PLAY_STAGE_HOTSPOTS[index]
+
+        return (
+          <button
+            key={stage.id}
+            aria-label={`Abrir circuito ${stage.name}`}
+            title={stage.name}
+            style={{
+              ...styles.freePlayStageHotspot,
+              ...hotspot,
+            }}
+            onClick={() => onOpenStage(stage.id)}
+          />
+        )
+      })}
+
+      {resetConfirmationOpen ? (
+        <div style={styles.inGameConfirmationOverlay}>
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="free-play-reset-title"
+            style={styles.inGameConfirmationCard}
+          >
+            <div style={styles.inGameConfirmationEyebrow}>Confirmação</div>
+            <h3 id="free-play-reset-title" style={styles.inGameConfirmationTitle}>
+              Recomeçar a campanha?
+            </h3>
+            <p style={styles.inGameConfirmationText}>
+              Isso apaga progresso, escolhas de parceira, skin do jogador e histórico salvo.
+            </p>
+            <div style={styles.inGameConfirmationWarning}>
+              Esta ação volta a jornada para o primeiro boteco e não pode ser desfeita.
+            </div>
+            <div style={styles.inGameConfirmationActions}>
+              <button
+                style={styles.inGameConfirmationCancelButton}
+                onClick={handleCancelResetCampaign}
+              >
+                Cancelar
+              </button>
+              <button
+                style={styles.inGameConfirmationConfirmButton}
+                onClick={handleConfirmResetCampaign}
+              >
+                Recomeçar campanha
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }
@@ -1432,6 +1540,7 @@ function JourneyIntroScreen({
   onBack,
   onContinueToCharacterSelect,
   onLaunchVenue,
+  onResetCampaign,
   styles,
 }: {
   currentCampaignVenue: CampaignVenue | null
@@ -1439,34 +1548,54 @@ function JourneyIntroScreen({
   onBack: () => void
   onContinueToCharacterSelect: () => void
   onLaunchVenue: (venueId: string) => void
+  onResetCampaign: () => void
   styles: StyleMap
 }) {
-  const hasCurrentVenue = !!currentCampaignVenue
-  const activeStageIndex = currentCampaignVenue
-    ? CAMPAIGN_STAGES.findIndex((stage) => stage.venues.some((venue) => venue.id === currentCampaignVenue.id))
+  const [freePlayStageId, setFreePlayStageId] = useState<string | null>(null)
+  const campaignVenues = CAMPAIGN_STAGES.flatMap((stage) => stage.venues)
+  const campaignVenueCount = campaignVenues.length
+  const clearedCampaignVenueCount = campaignVenues.filter((venue) =>
+    isCampaignVenueCleared(playerProfile, venue)
+  ).length
+  const campaignComplete = !currentCampaignVenue && clearedCampaignVenueCount === campaignVenueCount
+  const freePlayStage =
+    campaignComplete && freePlayStageId
+      ? CAMPAIGN_STAGES.find((stage) => stage.id === freePlayStageId) ?? null
+      : null
+  const freePlayCurrentVenue = freePlayStage?.venues[0] ?? null
+  const viewedCampaignVenue = freePlayCurrentVenue ?? currentCampaignVenue
+  const viewedStages = freePlayStage ? [freePlayStage] : CAMPAIGN_STAGES
+  const viewedPlayerProfile = freePlayStage
+    ? createFreePlayStagePreviewProfile(playerProfile)
+    : playerProfile
+  const hasCurrentVenue = !!viewedCampaignVenue
+  const activeStageIndex = viewedCampaignVenue
+    ? viewedStages.findIndex((stage) => stage.venues.some((venue) => venue.id === viewedCampaignVenue.id))
     : -1
-  const activeStageId = currentCampaignVenue
-    ? CAMPAIGN_STAGES.find((stage) => stage.venues.some((venue) => venue.id === currentCampaignVenue.id))?.id
+  const activeStageId = viewedCampaignVenue
+    ? viewedStages.find((stage) => stage.venues.some((venue) => venue.id === viewedCampaignVenue.id))?.id
     : null
   const activeVenueIndex =
-    currentCampaignVenue && activeStageIndex >= 0
-      ? CAMPAIGN_STAGES[activeStageIndex]?.venues.findIndex((venue) => venue.id === currentCampaignVenue.id) ?? -1
+    viewedCampaignVenue && activeStageIndex >= 0
+      ? viewedStages[activeStageIndex]?.venues.findIndex((venue) => venue.id === viewedCampaignVenue.id) ?? -1
       : -1
-  const journeyVenues = CAMPAIGN_STAGES.flatMap((stage) => stage.venues)
+  const journeyVenues = viewedStages.flatMap((stage) => stage.venues)
   const totalVenueCount = journeyVenues.length
-  const clearedVenueCount = journeyVenues.filter((venue) => isCampaignVenueCleared(playerProfile, venue)).length
-  const currentVenueRouteIndex = currentCampaignVenue
-    ? journeyVenues.findIndex((venue) => venue.id === currentCampaignVenue.id)
+  const clearedVenueCount = journeyVenues.filter((venue) =>
+    isCampaignVenueCleared(viewedPlayerProfile, venue)
+  ).length
+  const currentVenueRouteIndex = viewedCampaignVenue
+    ? journeyVenues.findIndex((venue) => venue.id === viewedCampaignVenue.id)
     : -1
   const nextVenue = currentVenueRouteIndex >= 0 ? journeyVenues[currentVenueRouteIndex + 1] ?? null : null
-  const currentStageVenueCount = currentCampaignVenue && activeStageIndex >= 0
-    ? CAMPAIGN_STAGES[activeStageIndex]?.venues.length ?? 0
+  const currentStageVenueCount = viewedCampaignVenue && activeStageIndex >= 0
+    ? viewedStages[activeStageIndex]?.venues.length ?? 0
     : 0
-  const authoredCampaign = currentCampaignVenue
-    ? authoredCampaignScreens[currentCampaignVenue.id]
+  const authoredCampaign = viewedCampaignVenue
+    ? authoredCampaignScreens[viewedCampaignVenue.id]
     : null
 
-  if (authoredCampaign && currentCampaignVenue) {
+  if (authoredCampaign && viewedCampaignVenue) {
     return (
       <div style={styles.authoredCampaignScreen}>
         <img
@@ -1481,16 +1610,16 @@ function JourneyIntroScreen({
             ...styles.authoredCampaignHotspot,
             ...authoredCampaign.backHotspot,
           }}
-          onClick={onBack}
+          onClick={freePlayStage ? () => setFreePlayStageId(null) : onBack}
         />
         <button
-          aria-label={`Abrir capa do ${currentCampaignVenue.name}`}
-          title={`Abrir capa do ${currentCampaignVenue.name}`}
+          aria-label={`Abrir capa do ${viewedCampaignVenue.name}`}
+          title={`Abrir capa do ${viewedCampaignVenue.name}`}
           style={{
             ...styles.authoredCampaignHotspot,
             ...authoredCampaign.enterHotspot,
           }}
-          onClick={() => onLaunchVenue(currentCampaignVenue.id)}
+          onClick={() => onLaunchVenue(viewedCampaignVenue.id)}
         />
         <button
           aria-label="Trocar parceira"
@@ -1499,9 +1628,20 @@ function JourneyIntroScreen({
             ...styles.authoredCampaignHotspot,
             ...authoredCampaign.partnerHotspot,
           }}
-          onClick={onContinueToCharacterSelect}
+          onClick={freePlayStage ? () => onLaunchVenue(viewedCampaignVenue.id) : onContinueToCharacterSelect}
         />
       </div>
+    )
+  }
+
+  if (campaignComplete && !freePlayStage) {
+    return (
+      <PostCampaignFreePlayScreen
+        onBack={onBack}
+        onOpenStage={setFreePlayStageId}
+        onResetCampaign={onResetCampaign}
+        styles={styles}
+      />
     )
   }
 
@@ -1509,14 +1649,22 @@ function JourneyIntroScreen({
     <div style={styles.journeyIntroScreen}>
       <div style={styles.journeyIntroHeader}>
         <div>
-          <div style={styles.journeyIntroEyebrow}>Jornada de campanha</div>
-          <h2 style={styles.journeyIntroTitle}>Você tem um caminho pela frente</h2>
+          <div style={styles.journeyIntroEyebrow}>
+            {freePlayStage ? "Modo livre" : "Jornada de campanha"}
+          </div>
+          <h2 style={styles.journeyIntroTitle}>
+            {freePlayStage ? freePlayStage.name : "Você tem um caminho pela frente"}
+          </h2>
           <p style={styles.journeyIntroText}>
-            Leia o percurso completo, veja o que já ficou para trás e avance pelo bar
-            destacado agora. Locais vencidos continuam abertos para revisita.
+            {freePlayStage
+              ? "Revisite este circuito pelo primeiro local disponível. Os próximos bares aparecem como percurso bloqueado."
+              : "Leia o percurso completo, veja o que já ficou para trás e avance pelo bar destacado agora. Locais vencidos continuam abertos para revisita."}
           </p>
         </div>
-        <button style={styles.characterSelectBackButton} onClick={onBack}>
+        <button
+          style={styles.characterSelectBackButton}
+          onClick={freePlayStage ? () => setFreePlayStageId(null) : onBack}
+        >
           Voltar
         </button>
       </div>
@@ -1525,16 +1673,16 @@ function JourneyIntroScreen({
         <div style={styles.journeyIntroLeadGrid}>
           <div style={styles.journeyIntroLeadPrimary}>
             <div style={styles.journeyIntroLeadLabel}>
-              {currentCampaignVenue ? "Você está aqui" : "Jornada concluída"}
+              {viewedCampaignVenue ? "Você está aqui" : "Jornada concluída"}
             </div>
             <div style={styles.journeyIntroLeadVenue}>
-              {currentCampaignVenue?.name ?? "Campanha concluída"}
+              {viewedCampaignVenue?.name ?? "Campanha concluída"}
             </div>
             <div style={styles.journeyIntroLeadMeta}>
-              {currentCampaignVenue?.districtLabel ?? "Todas as etapas principais já foram vencidas."}
+              {viewedCampaignVenue?.districtLabel ?? "Todas as etapas principais já foram vencidas."}
             </div>
             <p style={styles.journeyIntroLeadText}>
-              {currentCampaignVenue?.entryNarrative ??
+              {viewedCampaignVenue?.entryNarrative ??
                 "Você já cruzou toda a jornada principal disponível até aqui."}
             </p>
           </div>
@@ -1544,14 +1692,14 @@ function JourneyIntroScreen({
             </div>
             <div style={styles.journeyIntroProgressLabel}>Bares concluídos</div>
             <div style={styles.journeyIntroProgressText}>
-              {currentCampaignVenue
-                ? `Local ${activeVenueIndex + 1} de ${currentStageVenueCount} em ${currentCampaignStageLabel(currentCampaignVenue)}.`
+              {viewedCampaignVenue
+                ? `Local ${activeVenueIndex + 1} de ${currentStageVenueCount} em ${currentCampaignStageLabel(viewedCampaignVenue)}.`
                 : "Todos os locais da campanha atual já foram vencidos."}
             </div>
-            {currentCampaignVenue ? (
+            {viewedCampaignVenue ? (
               <button
                 style={styles.journeyIntroLeadCta}
-                onClick={() => onLaunchVenue(currentCampaignVenue.id)}
+                onClick={() => onLaunchVenue(viewedCampaignVenue.id)}
               >
                 ABRIR CAPA DO BAR
               </button>
@@ -1562,7 +1710,7 @@ function JourneyIntroScreen({
           <div style={styles.journeyIntroRouteItem}>
             <span style={styles.journeyIntroRouteLabel}>Agora</span>
             <strong style={styles.journeyIntroRouteValue}>
-              {currentCampaignVenue?.name ?? "Fluxo completo"}
+              {viewedCampaignVenue?.name ?? "Fluxo completo"}
             </strong>
           </div>
           <div style={styles.journeyIntroRouteDivider} />
@@ -1581,9 +1729,12 @@ function JourneyIntroScreen({
       </div>
 
       <div style={styles.journeyIntroStages}>
-        {CAMPAIGN_STAGES.map((stage, index) => {
+        {viewedStages.map((stage) => {
+          const stageOrder = CAMPAIGN_STAGES.findIndex((campaignStage) => campaignStage.id === stage.id)
           const totalMatches = stage.venues.reduce((sum, venue) => sum + venue.matchesToClear, 0)
-          const isCompleted = stage.venues.every((venue) => isCampaignVenueCleared(playerProfile, venue))
+          const isCompleted = stage.venues.every((venue) =>
+            isCampaignVenueCleared(viewedPlayerProfile, venue)
+          )
           const isActive = hasCurrentVenue && stage.id === activeStageId
           const isLocked = !isActive && !isCompleted
           const stageStatusLabel = isActive
@@ -1602,7 +1753,9 @@ function JourneyIntroScreen({
                 ...(isLocked ? styles.journeyIntroStageCardLocked : {}),
               }}
             >
-              <div style={styles.journeyIntroStageOrder}>{String(index + 1).padStart(2, "0")}</div>
+              <div style={styles.journeyIntroStageOrder}>
+                {String(stageOrder >= 0 ? stageOrder + 1 : 1).padStart(2, "0")}
+              </div>
               <div style={styles.journeyIntroStageBody}>
                 <div style={styles.journeyIntroStageTopRow}>
                   <div>
@@ -1634,8 +1787,8 @@ function JourneyIntroScreen({
                 </div>
                 <div style={styles.journeyIntroVenueList}>
                   {stage.venues.map((venue) => {
-                    const isCurrentVenue = venue.id === currentCampaignVenue?.id
-                    const isClearedVenue = isCampaignVenueCleared(playerProfile, venue)
+                    const isCurrentVenue = venue.id === viewedCampaignVenue?.id
+                    const isClearedVenue = isCampaignVenueCleared(viewedPlayerProfile, venue)
                     const isAvailable = isCurrentVenue || isClearedVenue
                     const venueStatusLabel = isCurrentVenue
                       ? "Atual"
@@ -1683,11 +1836,13 @@ function JourneyIntroScreen({
         })}
       </div>
 
-      <div style={styles.journeyIntroActions}>
-        <button style={styles.gameStartResetButton} onClick={onContinueToCharacterSelect}>
-          TROCAR PARCEIRA
-        </button>
-      </div>
+      {!freePlayStage ? (
+        <div style={styles.journeyIntroActions}>
+          <button style={styles.gameStartResetButton} onClick={onContinueToCharacterSelect}>
+            TROCAR PARCEIRA
+          </button>
+        </div>
+      ) : null}
     </div>
   )
 }
@@ -2084,6 +2239,18 @@ function isCampaignVenueCleared(playerProfile: PlayerProfile, venue: CampaignVen
     playerProfile.campaign.clearedVenueIds.includes(venue.id) ||
     (playerProfile.campaign.venueWinsById[venue.id] ?? 0) >= venue.matchesToClear
   )
+}
+
+function createFreePlayStagePreviewProfile(playerProfile: PlayerProfile): PlayerProfile {
+  return {
+    ...playerProfile,
+    campaign: {
+      ...playerProfile.campaign,
+      completedStageIds: [],
+      clearedVenueIds: [],
+      venueWinsById: {},
+    },
+  }
 }
 
 function currentCampaignStageLabel(currentCampaignVenue: CampaignVenue) {

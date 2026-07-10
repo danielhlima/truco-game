@@ -351,7 +351,7 @@ export const CAMPAIGN_STAGES: CampaignStage[] = [
         difficulty: { aiLevel: 5, aggression: 5, trucoDiscipline: 5 },
         opponentCharacterIds: ["mane-banguela", "cosme-orbita"],
         partnerUnlockCharacterIds: ["mane-banguela", "cosme-orbita"],
-        minimumVisualState: "Campanha, capa, background, resultado e vitoria de circuito autorais.",
+        minimumVisualState: "Campanha, capa, background, resultado e vitorias definitivas de local/circuito autorais.",
         entryNarrative: "Agora vale espetáculo. O mundo ficou pequeno e a mesa subiu para a Lua.",
         reward: { coins: 1000 },
       },

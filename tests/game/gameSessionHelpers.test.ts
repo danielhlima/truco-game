@@ -1,15 +1,28 @@
 import test from "node:test"
 import assert from "node:assert/strict"
 import {
+  createNextHandStateForMatch,
+  createVenueMatchState,
   getFollowUpSpeechBubbleForTransition,
   getSpeechBubbleForTransition,
   getSpeechBetLabel,
   shouldPartnerConsultHuman,
 } from "../../src/app/gameSessionHelpers.ts"
+import { CAMPAIGN_STAGES } from "../../src/career/campaign/campaignData.ts"
+import type { CampaignVenue } from "../../src/career/campaign/types.ts"
 import { createHandStateFixture } from "../helpers/gameFixtures.ts"
 import { requestTruco } from "../../src/game/requestTruco.ts"
 import { respondToTruco } from "../../src/game/respondToTruco.ts"
 import { stepHand } from "../../src/game/stepHand.ts"
+
+function getCampaignVenueFixture(venueId: string): CampaignVenue {
+  const venue = CAMPAIGN_STAGES.flatMap((stage) => stage.venues).find(
+    (candidate) => candidate.id === venueId
+  )
+
+  assert.ok(venue)
+  return venue
+}
 
 test("aceite de contra-aumento no mesmo cabo de guerra usa TOMA de quem abriu o truco", () => {
   const previousState = createHandStateFixture({
@@ -360,6 +373,76 @@ test("rótulos de fala cobrem a escada oficial até doze", () => {
   assert.equal(getSpeechBetLabel(6), "SEIS!")
   assert.equal(getSpeechBetLabel(9), "NOVE!")
   assert.equal(getSpeechBetLabel(12), "DOZE!")
+})
+
+test("sequência real de raises preserva TRUCO, SEIS, NOVE, DOZE e TOMA", () => {
+  const initialState = createHandStateFixture({ currentPlayerId: 1 })
+  const afterTruco = requestTruco(initialState, 1)
+
+  assert.deepEqual(getSpeechBubbleForTransition(initialState, afterTruco), {
+    playerId: 1,
+    text: "TRUCO!",
+  })
+
+  const afterSix = respondToTruco(afterTruco, "raise")
+
+  assert.deepEqual(getSpeechBubbleForTransition(afterTruco, afterSix), {
+    playerId: 2,
+    text: "SEIS!",
+  })
+
+  const afterNine = respondToTruco(afterSix, "raise")
+
+  assert.deepEqual(getSpeechBubbleForTransition(afterSix, afterNine), {
+    playerId: 1,
+    text: "NOVE!",
+  })
+
+  const afterTwelve = respondToTruco(afterNine, "raise")
+
+  assert.deepEqual(getSpeechBubbleForTransition(afterNine, afterTwelve), {
+    playerId: 2,
+    text: "DOZE!",
+  })
+
+  const afterAcceptTwelve = respondToTruco(afterTwelve, "accept")
+
+  assert.equal(afterAcceptTwelve.currentBet, 12)
+  assert.deepEqual(getSpeechBubbleForTransition(afterTwelve, afterAcceptTwelve), {
+    playerId: 1,
+    text: "TOMA!",
+  })
+})
+
+test("criação de partida por local aplica variante Mineiro ou Paulista da campanha", () => {
+  const mineiroVenue = getCampaignVenueFixture("bar-do-ze-catinga")
+  const paulistaVenue = getCampaignVenueFixture("bar-maneco-banguela")
+
+  const mineiroMatch = createVenueMatchState(mineiroVenue)
+  const paulistaMatch = createVenueMatchState(paulistaVenue)
+
+  assert.equal(mineiroMatch.handState.variant, "MINEIRO")
+  assert.equal(mineiroMatch.handState.vira, undefined)
+  assert.equal(mineiroMatch.matchState.variant, "MINEIRO")
+
+  assert.equal(paulistaMatch.handState.variant, "PAULISTA")
+  assert.ok(paulistaMatch.handState.vira)
+  assert.equal(paulistaMatch.matchState.variant, "PAULISTA")
+})
+
+test("próxima mão usa a variante da partida e mantém vira no Paulista", () => {
+  const paulistaVenue = getCampaignVenueFixture("bar-maneco-banguela")
+  const { matchState } = createVenueMatchState(paulistaVenue, 1)
+
+  const nextHandState = createNextHandStateForMatch({
+    ...matchState,
+    handNumber: 2,
+    startingPlayerId: 3,
+  })
+
+  assert.equal(nextHandState.variant, "PAULISTA")
+  assert.ok(nextHandState.vira)
+  assert.equal(nextHandState.currentPlayerId, 3)
 })
 
 test("parceira só consulta o humano no pedido inicial adversário", () => {

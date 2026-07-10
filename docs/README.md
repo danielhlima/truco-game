@@ -4,15 +4,20 @@
 
 Para continuar o projeto em qualquer chat novo do Codex, leia nesta ordem:
 
-1. `docs/CONTENT.md`
-2. `docs/LAYOUT_RULES.md`
-3. `docs/TRUCO_RULES.md`
-4. `docs/IMAGE_PROMPT_STANDARDS.md`
-5. `docs/NEXT_STEPS.md`
-6. `docs/CAMPAIGN_PATH.md`
-7. `docs/NEXT_CHAT_PROMPT.md`
+1. `docs/README.md`
+2. `docs/CONTENT.md`
+3. `docs/LAYOUT_RULES.md`
+4. `docs/TRUCO_RULES.md`
+5. `docs/IMAGE_PROMPT_STANDARDS.md`
+6. `docs/NEXT_STEPS.md`
+7. `docs/CAMPAIGN_PATH.md`
+8. `docs/NEXT_CHAT_PROMPT.md`
 
 ## Papel de cada arquivo
+
+### `docs/README.md`
+
+Indice e contrato de continuidade da documentacao.
 
 ### `docs/CONTENT.md`
 
@@ -58,7 +63,7 @@ Define os padroes de prompts de imagem que funcionaram melhor:
 - estrutura obrigatoria para prompts de mesa, background, host, campanha e resultado
 - restricoes negativas para evitar artes inutilizaveis
 - lembrete de que mesa de gameplay nao pode ter fundo/cenario
-- direcao visual por tipo de asset e orientacoes para o proximo pacote bonus
+- direcao visual por tipo de asset e referencia do pacote bonus ja integrado
 
 ### `docs/CAMPAIGN_PATH.md`
 
@@ -73,31 +78,30 @@ Registra a expansao vertical da campanha:
 Entrega um prompt pronto para abrir um chat novo:
 
 - arquivos que devem ser lidos primeiro
-- estado atual da campanha principal
-- objetivo do proximo chat
-- restricoes criativas do nivel bonus
-- pendencias de regras e produto que devem ser tratadas depois dos prompts/assets
+- estado atual da campanha principal e do bonus pos-campanha
+- objetivo recomendado para o proximo chat
+- pendencias de regras e produto que devem ser tratadas agora
 
 ### `docs/CHARACTER_AVATAR_PROMPTS.md`
 
 Organiza a expansao externa do roster:
 
 - substituicoes necessarias para eliminar adversarios repetidos
-- nomes e arquivos dos proximos personagens
-- prompts prontos para gerar novos avatares fora do Codex
+- nomes e arquivos dos personagens integrados no segundo lote
+- prompts historicos usados para gerar avatares fora do Codex
 
 ### `docs/PLAYER_SKIN_PROMPTS.md`
 
 Organiza as skins exclusivas do jogador:
 
-- conjunto inicial planejado com `Zeca Viramao` e mais `10` protagonistas
+- conjunto inicial com `Zeca Viramao` e mais `10` protagonistas
 - nomes e arquivos das novas skins
-- prompts prontos para geracao externa antes da implementacao da escolha visual
+- prompts historicos usados para geracao externa
 - estado de integracao das skins recebidas e da escolha inicial do protagonista
 
 ## Estado do foco atual
 
-A responsividade estrutural da gameplay foi estabilizada depois da capa do `Bar do Ze Catinga`.
+O projeto esta com fluxo visual principal, bonus pos-campanha e `Modo Livre` pos-campanha consolidados; a proxima frente recomendada e balanceamento de IA com testes.
 
 Estado consolidado:
 
@@ -180,38 +184,55 @@ Estado consolidado:
 - ao completar as vitorias requeridas de um bar, o jogo exibe a tela definitiva do bar no lugar da vitoria normal da partida
 - se o bar completado for o ultimo do circuito, o jogo mostra a tela definitiva do bar e em seguida a tela definitiva do circuito
 - a tela de resultado so aparece depois da ultima carta visivel na mesa, com atraso de 1 segundo para leitura humana
-- caminho principal da campanha agora tem pacote visual autoral integrado ate o `Cassino Mé Maior`:
+- caminho principal da campanha tem pacote visual autoral integrado ate o `Cassino Mé Maior`:
   - `Centro de Convenções da Prefeitura`
   - `Ginásio Estadual Maneco Filé`
   - `Arena Nacional`
   - `Centro Americano Truqueiro de Medelin`
   - `Hotel Truco de Segóvia, Espanha`
   - `Cassino Mé Maior`
-- os pacotes recentes incluem campanha, background de gameplay, host, mesa, vitoria/derrota normal e conquistas definitivas de local/circuito
+- bonus pos-campanha integrado:
+  - circuito: `Circuito Intergaláctico`
+  - local: `Órbita da Lua`
+  - campanha: `src/assets/campaign/circuito-intergalactico-orbita-da-lua.png`
+  - background: `src/assets/venues/orbita-da-lua/background.png`
+  - host: `src/assets/venues/orbita-da-lua/host-orbita-da-lua.png`
+  - mesa: `src/assets/boteco/table-top-orbita-da-lua.png`
+  - resultado normal: `src/assets/venues/orbita-da-lua/match-result-win.png` e `src/assets/venues/orbita-da-lua/match-result-loss.png`
+  - vitoria definitiva do local: `src/assets/campaign-victories/venue-orbita-da-lua.png`
+  - vitoria definitiva do circuito: `src/assets/campaign-victories/stage-intergalactico.png`
+  - adversarios: `Mané Banguela` + `Cosme Órbita`
+- os pacotes recentes incluem campanha, background de gameplay, host, mesa, vitoria/derrota normal e conquistas definitivas quando cadastradas
+- modo livre pos-campanha integrado:
+  - asset: `src/assets/campaign/free-play-circuit-hub.png`
+  - aparece quando a campanha inteira ja foi concluida
+  - cada quadro de circuito e um hotspot HTML invisivel
+  - clicar em um circuito abre a tela autoral de campanha do primeiro bar daquele circuito, quando existe arte cadastrada
+  - o `Voltar` da tela autoral retorna ao hub do `Modo Livre`
+  - `Recomeçar campanha` usa confirmacao interna do jogo, nao alerta nativo do navegador
 
 ## Prioridade imediata para o proximo chat
 
-No proximo chat, retomar pelo conteudo bonus pos-campanha.
+No proximo chat, sair da frente de assets/fluxo visual e iniciar o balanceamento de IA.
+
+Estado pos-bonus:
+
+- o bonus `Circuito Intergaláctico` / `Órbita da Lua` ja esta integrado no fluxo
+- a tela de campanha do bonus e a ultima etapa do jogo; ela nao deve apontar para um proximo local
+- as conquistas definitivas cadastradas para o bonus sao a do local `Órbita da Lua` e a do circuito `intergalactico`
 
 Proximo foco recomendado:
 
 - usar `docs/NEXT_CHAT_PROMPT.md` como briefing inicial copiavel
-- gerar primeiro os prompts do nivel bonus `Circuito Intergaláctico` / `Órbita da Lua`
-- alem dos 8 assets de costume, gerar tambem prompts para imagens pequenas dos adversarios do bonus
-- manter a direcao bonus divertida, cosmica, autoral e truqueira, sem monstros, ETs assustadores, horror, gore ou criaturas grotescas
-- nao implementar assets antes de o usuario trazer as imagens aprovadas
-- depois dos prompts/assets do bonus, retomar pendencias de produto e regra:
-  - ver cartas na mao especial de 9/dez pontos, confirmando a nomenclatura desejada antes de implementar
-  - opcao para escolher ou nao a variante `ponto acima`
+- os testes unitarios de dialogos e raises ja foram criados/atualizados; preservar e ampliar essa cobertura quando necessario
+- os helpers de sessao ja criam partidas pela variante do bar e cobrem Mineiro/Paulista em testes
+- rebalancear IA com testes, porque a IA atual ainda tende a trucar com pouco
+- trabalhar uma decisao da IA por vez: pedir truco, aceitar, correr, contra-aumentar e aconselhar/consultar parceira
+- depois da primeira rodada de IA, retomar pendencias de produto/regras:
+  - mao especial de 9/dez pontos
+  - opcao de escolher ou nao a versao `ponto acima`
   - tutorial jogavel
-  - aplicacao efetiva das variantes Mineiro/Paulista
   - carta virada para baixo na segunda e terceira vazas
-
-Depois disso, seguir para:
-
-- integracao do pacote bonus aprovado
-- testes de progressao pos-campanha
-- refinamento de regras, tutorial e escolhas de variante
 
 ## Regra de continuidade
 

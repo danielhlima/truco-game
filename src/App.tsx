@@ -444,6 +444,7 @@ function App() {
             onContinueToCharacterSelect={handleContinueToCharacterSelect}
             onLaunchVenue={handleLaunchVenue}
             onReturnToJourneyFlow={handleReturnToJourneyFlow}
+            onResetCampaign={handleResetCampaign}
             onSelectNextCharacter={handleSelectNextCharacter}
             onSelectPreviousCharacter={handleSelectPreviousCharacter}
             onSelectNextPlayerSkin={handleSelectNextPlayerSkin}
@@ -2726,6 +2727,68 @@ const styles: Record<string, React.CSSProperties> = {
     background: "transparent",
     color: "transparent",
     cursor: "pointer",
+    appearance: "none",
+  },
+  freePlayScreen: {
+    gridColumn: "1 / -1",
+    position: "relative",
+    width: "100%",
+    height: "100%",
+    overflow: "hidden",
+    borderRadius: "22px",
+    background: "#090604",
+    color: "#fff3df",
+  },
+  freePlayImage: {
+    position: "absolute",
+    inset: 0,
+    width: "100%",
+    height: "100%",
+    objectFit: "fill",
+    userSelect: "none",
+    pointerEvents: "none",
+  },
+  freePlayBackButton: {
+    position: "absolute",
+    top: "4.8%",
+    right: "4.5%",
+    zIndex: 4,
+    borderRadius: "999px",
+    border: "1px solid rgba(255, 237, 202, 0.42)",
+    background: "rgba(21, 13, 8, 0.68)",
+    color: "#fff3df",
+    padding: "8px 16px",
+    fontSize: "11px",
+    fontWeight: 900,
+    textTransform: "uppercase",
+    letterSpacing: "0.08em",
+    cursor: "pointer",
+  },
+  freePlayResetButton: {
+    position: "absolute",
+    top: "4.8%",
+    left: "4.5%",
+    zIndex: 4,
+    borderRadius: "999px",
+    border: "1px solid rgba(255, 237, 202, 0.34)",
+    background: "rgba(68, 32, 20, 0.66)",
+    color: "#ffe9c5",
+    padding: "8px 14px",
+    fontSize: "10px",
+    fontWeight: 900,
+    textTransform: "uppercase",
+    letterSpacing: "0.06em",
+    cursor: "pointer",
+  },
+  freePlayStageHotspot: {
+    position: "absolute",
+    zIndex: 2,
+    border: "2px solid transparent",
+    borderRadius: "18px",
+    padding: 0,
+    background: "transparent",
+    cursor: "pointer",
+    boxSizing: "border-box",
     appearance: "none",
   },
   matchResultScreen: {

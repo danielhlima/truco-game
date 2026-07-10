@@ -19,59 +19,56 @@ Use esses arquivos como fonte de verdade.
 
 Contexto atual:
 - O caminho principal da campanha ja tem pacotes visuais autorais integrados ate o Cassino Mé Maior.
+- O bonus pos-campanha Circuito Intergaláctico / Órbita da Lua ja esta integrado como ultima etapa do jogo.
+- A tela de campanha da Órbita da Lua nao tem next venue.
+- O bonus usa Mané Banguela + Cosme Órbita como dupla adversaria.
+- O bonus tem vitoria definitiva da Órbita da Lua e vitoria definitiva do Circuito Intergaláctico cadastradas.
+- Depois da campanha concluida, COMEÇAR abre o Modo Livre.
+- O Modo Livre usa src/assets/campaign/free-play-circuit-hub.png.
+- No Modo Livre, cada circuito e um hotspot invisivel.
+- Clicar em um circuito abre a tela autoral de campanha do primeiro bar daquele circuito, quando existe arte cadastrada.
+- O Voltar da tela autoral retorna ao hub do Modo Livre.
+- Recomeçar campanha usa confirmacao interna do jogo, nao alerta nativo do navegador.
 - O fluxo atual deve ser preservado: COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo.
 - A gameplay usa stage logico 1080x500.
 - A intro curta antes da partida mostra primeiro apenas o background do local.
 - As telas de campanha autorais usam hotspots HTML invisiveis sobre a arte.
-- As telas de resultado normais e definitivas ja existem para os locais recentes.
-- Nao reabrir responsividade, selecao de parceira, arquitetura de estado ou regras de truco sem necessidade real.
+- Testes unitarios de dialogos/raises ja cobrem TRUCO!, SEIS!, NOVE!, DOZE!, DESCE!, TOMA! e TÔ FORA!.
+- A criacao de partida por bar ja aplica a variante declarada no local.
+- Ha testes para criacao de partida Mineiro/Paulista e proxima mao Paulista mantendo vira.
+- Nao reabrir responsividade, selecao de parceira, arquitetura de estado ou pacote visual sem regressao real.
 
 Objetivo deste chat:
-Gerar prompts para os assets do nivel bonus pos-campanha.
+Rebalancear a IA de truco com cobertura de testes.
 
-Nivel bonus:
-- circuito: Circuito Intergaláctico
-- local: Órbita da Lua
-- dupla adversaria reservada: Mane Banguela + Cosme Orbita
+Prioridade recomendada:
+1. Conferir git status antes de editar.
+2. Ler src/ai/trucoDecision.ts e src/ai/trucoPersonalities.ts.
+3. Ler os testes existentes em tests/**/*.test.ts, especialmente os de IA, dialogos e raises.
+4. Antes de alterar comportamento, criar ou ajustar testes para a decisao que sera balanceada.
+5. Rebalancear uma decisao por vez:
+   - pedir truco
+   - aceitar truco
+   - correr
+   - contra-aumentar
+   - aconselhar/consultar parceira
+6. Rodar npm test e npm run build antes de concluir.
 
-Importante:
-- Nao implemente assets agora.
-- Primeiro gere apenas prompts detalhados, prontos para copiar e colar no gerador de imagem.
-- Siga docs/IMAGE_PROMPT_STANDARDS.md.
-- Os prompts devem ter direcao visual, requisitos de gameplay/composicao e restricoes negativas.
+Problema conhecido:
+- A IA atual ainda tende a trucar com pouco.
+- Evitar ajustar tudo por tentativa e erro; mexer em thresholds, blefes e perfis com testes pequenos e objetivos.
 
-Assets desejados:
-1. Mesa de truco, 780 x 780, sem fundo/cenario, centro livre para cartas.
-2. Ambiente/background, 1672 x 941.
-3. Tela de campanha, 1672 x 941.
-4. Host/organizador do evento, quadrado 1024 x 1024 ou maior.
-5. Tela de vitoria normal da partida, 1672 x 941, com "VOLTAR AO FLUXO DE BARES".
-6. Tela de derrota normal da partida, 1672 x 941, com "VOLTAR AO FLUXO DE BARES".
-7. Tela de vitoria definitiva da Órbita da Lua, 1672 x 941, com trofeu ou marco visual equivalente.
-8. Tela de vitoria definitiva do Circuito Intergaláctico, 1672 x 941, com trofeu ou marco visual equivalente.
-9. Imagens pequenas dos adversarios Mane Banguela e Cosme Orbita para gameplay/roster.
+Pendencias que continuam abertas, mas nao sao a primeira prioridade deste chat:
+- Mao especial de 9/dez pontos.
+- Opcao de escolher ou nao a versao ponto acima.
+- Tutorial jogavel.
+- Carta virada para baixo na segunda e terceira vazas.
 
-Direcao criativa:
-- O bonus deve parecer uma recompensa especial depois da campanha principal.
-- Pode ser cosmico, retrofuturista, colorido, teatral e bem-humorado.
-- Ainda precisa ter alma de Truco Raiz: provocacao, mesa jogavel, humor brasileiro e personagens com personalidade.
-- Nao quero nada assustador: sem ETs ameaçadores, monstros, horror, gore, body horror ou criaturas grotescas.
-- Se houver elementos cosmicos, usar humanos excentricos, cosplayers espaciais, performers, organizadores de evento lunar, operadores de transmissao orbital ou truqueiros retrofuturistas.
-- As telas de vitoria/derrota precisam ser bem diferentes das telas de campeonato/cassino ja feitas, para manter a sensacao de descoberta.
-
-Restricoes gerais:
-- Sem logos reais, marcas registradas, NASA, agencias espaciais reais ou simbolos oficiais.
-- Sem UI moderna desenhada como app.
-- Sem texto cortado.
-- Sem objetos principais cortados.
-- Sem personagens, maos ou cartas extras no centro jogavel da mesa.
-- Sem estetica generica estrangeira fria demais.
-
-Depois dessa frente, registrar/lembrar que ainda temos pendencias de produto e regra:
-- ver cartas na mao especial de 9/dez pontos, confirmando antes a nomenclatura e o gatilho correto
-- opcao de escolher ou nao a versao ponto acima
-- tutorial jogavel
-- carta virada para baixo na segunda e terceira vazas
-- aplicacao efetiva das variantes Mineiro/Paulista
-- rebalanceamento da IA, com testes
+Regras de continuidade:
+- Preservar mudancas locais do usuario.
+- Fazer mudancas incrementais.
+- Nao reabrir responsividade, selecao de parceira, arquitetura de estado ou pacote visual sem regressao real.
+- Se alterar progressao, campanha ou resultado, validar o fluxo real desde COMEÇAR.
+- Rodar npm test quando houver mudanca de regra, IA ou helpers de sessao.
+- Rodar npm run build antes de concluir qualquer frente de codigo.
 ```

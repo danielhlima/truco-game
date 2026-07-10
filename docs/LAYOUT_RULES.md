@@ -118,7 +118,7 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 - A intro exibe apenas o background do bar por cerca de 1 segundo.
 - Em seguida, mesa, HUDs, oponentes e cartas entram com fade curto.
 - A interacao com cartas, truco e `MENU` fica bloqueada ate a intro terminar.
-- A intro reutiliza o background do bar atual, inclusive o background proprio do `Bar Maneco Banguela`.
+- A intro reutiliza o background do local atual quando houver asset proprio.
 - A intro nao altera regras de truco, estado da partida, placares ou progressao da campanha.
 - Evitar animacoes longas; a experiencia deve dar atmosfera sem atrasar o jogador.
 - Nao reabrir a responsividade estrutural da gameplay para ajustar essa intro sem regressao real.
@@ -137,7 +137,7 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 ## Regras das Telas de Resultado
 
 - Cada bar pode ter arte propria de vitoria e derrota.
-- Para o `Bar do Ze Catinga`, as artes atuais ocupam a tela inteira de resultado dentro da moldura.
+- As artes atuais de resultado ocupam a tela inteira de resultado dentro da moldura.
 - A acao `VOLTAR AO FLUXO DE BARES` continua sendo um controle real por cima da placa desenhada na arte.
 - Resultado autoral nao deve embutir placar numerico especifico no texto ou na composicao principal.
 - Rabiscos e marcadores de boteco podem existir como decoracao quando nao forem placar real do resultado.
@@ -156,11 +156,22 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 ## Regras da Tela de Campanha
 
 - A tela de campanha acontece antes da capa do bar.
-- Para os estados atuais do `Bar do Ze Catinga`, do `Bar Maneco Banguela` e do `Trem do Jaça`, usar artes autorais em `src/assets/campaign/`.
+- Para os estados atuais do caminho principal e do bonus pos-campanha, usar artes autorais em `src/assets/campaign/`.
 - A arte autoral pode conter textos, placas e ilustrações ja renderizados.
 - Controles de fluxo sobre arte autoral devem ser botoes HTML invisiveis posicionados por percentual.
 - Os hotspots atuais sao `VOLTAR`, `ENTRAR NO BAR` e `TROCAR PARCEIRA`.
+- A tela de campanha do `Circuito Intergaláctico` / `Órbita da Lua` e a ultima etapa do jogo; nao deve mostrar ou sugerir `next venue`.
 - A tela dinamica de campanha continua como fallback para bares ou estados sem arte propria.
+
+## Regras do Modo Livre Pos-Campanha
+
+- O `Modo Livre` aparece depois que a campanha inteira foi concluida.
+- A tela usa arte full-screen em `src/assets/campaign/free-play-circuit-hub.png`.
+- Os circuitos sao botoes HTML invisiveis posicionados sobre os cards desenhados na arte.
+- Nao desenhar borda de selecao, dock inferior ou labels HTML por cima dos cards; os textos ja vivem na imagem.
+- Ao clicar em um circuito, abrir a tela autoral de campanha do primeiro bar daquele circuito quando houver arte cadastrada.
+- O `Voltar` dessa tela autoral deve retornar ao hub do `Modo Livre`.
+- O botao `Recomeçar campanha` deve abrir confirmacao dentro do stage do jogo, nunca `window.confirm` ou alerta nativo do navegador.
 
 ### Estrutura da Capa do Ze Catinga
 
@@ -196,7 +207,7 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 ## Pendências Visuais
 
 - A tela de selecao de parceira foi aceita como pronta no estado atual; reabrir apenas com regressao ou nova decisao de produto.
-- A capa do `Bar Maneco Banguela` ja reaproveita os HUDs do Ze Catinga e troca host/background proprios.
-- Refinar a mesa central conforme novos assets chegarem.
-- Fazer polimento responsivo final depois do layout aprovado.
-- Expandir capa e telas autorais de resultado para outros bares.
+- Os locais do caminho principal e o bonus ja possuem pacote visual autoral no estado atual.
+- Refinar a mesa central apenas conforme novos assets aprovados chegarem ou se houver regressao visual.
+- Fazer polimento responsivo final apenas se aparecer regressao concreta em viewports reais.
+- Novas capas/telas autorais agora sao assunto de expansoes futuras, nao pendencia do caminho principal atual.
