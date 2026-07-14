@@ -20,7 +20,9 @@ import tremDoJacaSceneBgAsset from "./assets/venues/trem-do-jaca/background.png"
 
 const GAMEPLAY_STAGE_WIDTH = 1080
 const GAMEPLAY_STAGE_HEIGHT = 500
+const NATIVE_PLATFORM = Capacitor.getPlatform()
 const IS_NATIVE_SHELL = Capacitor.isNativePlatform()
+const IS_IOS_NATIVE_SHELL = NATIVE_PLATFORM === "ios"
 const GAMEPLAY_BACKGROUND_ASSET_BY_VENUE_ID: Record<string, string> = {
   "bar-maneco-banguela": manecoBanguelaSceneBgAsset,
   "trem-do-jaca": tremDoJacaSceneBgAsset,
@@ -233,14 +235,36 @@ function App() {
         ...styles.gameViewport,
         gridTemplateColumns: isCompactLayout
           ? isTinyLayout
-            ? "196px minmax(0, 1fr) 154px"
-            : "214px minmax(0, 1fr) 170px"
-          : "232px minmax(0, 1fr) 184px",
+            ? IS_NATIVE_SHELL
+              ? "250px minmax(0, 1fr) 212px"
+              : "196px minmax(0, 1fr) 212px"
+            : IS_NATIVE_SHELL
+              ? "276px minmax(0, 1fr) 235px"
+              : "214px minmax(0, 1fr) 235px"
+          : IS_NATIVE_SHELL
+            ? "302px minmax(0, 1fr) 254px"
+            : "232px minmax(0, 1fr) 254px",
         gap: isTinyLayout ? "6px" : isCompactLayout ? "7px" : "9px",
       },
       gameLeftRail: {
         ...styles.gameLeftRail,
-        gridTemplateRows: isTinyLayout ? "120px minmax(0, 1fr)" : isCompactLayout ? "138px minmax(0, 1fr)" : styles.gameLeftRail.gridTemplateRows,
+        gridTemplateRows: IS_NATIVE_SHELL
+          ? isTinyLayout
+            ? IS_IOS_NATIVE_SHELL
+              ? "252px minmax(0, 1fr)"
+              : "232px minmax(0, 1fr)"
+            : isCompactLayout
+              ? IS_IOS_NATIVE_SHELL
+                ? "292px minmax(0, 1fr)"
+                : "270px minmax(0, 1fr)"
+              : IS_IOS_NATIVE_SHELL
+                ? "306px minmax(0, 1fr)"
+                : "284px minmax(0, 1fr)"
+          : isTinyLayout
+            ? "166px minmax(0, 1fr)"
+            : isCompactLayout
+              ? "202px minmax(0, 1fr)"
+              : styles.gameLeftRail.gridTemplateRows,
         gap: isTinyLayout ? "5px" : "6px",
         justifyItems: "stretch",
       },
@@ -253,25 +277,43 @@ function App() {
         ...styles.scenePanel,
         width: "100%",
         boxSizing: "border-box",
+        ...(IS_NATIVE_SHELL ? styles.nativeScenePanel : undefined),
       },
       scorePadCard: {
         ...styles.scorePadCard,
         padding: isTinyLayout ? "7px" : "9px",
         width: "100%",
         boxSizing: "border-box",
+        ...(IS_NATIVE_SHELL ? styles.nativeScorePadCard : undefined),
       },
       scorePadCardSurface: {
         ...styles.scorePadCardSurface,
-        width: isTinyLayout ? "126px" : isCompactLayout ? "140px" : "174px",
+        width: isTinyLayout
+          ? IS_NATIVE_SHELL
+            ? "146px"
+            : "126px"
+          : isCompactLayout
+            ? IS_NATIVE_SHELL
+              ? "160px"
+              : "140px"
+            : "174px",
         maxHeight: isCompactLayout ? "94%" : "96%",
+      },
+      scorePadCellBottomLeft: {
+        ...styles.scorePadCellBottomLeft,
+        ...(IS_IOS_NATIVE_SHELL ? styles.nativeIosScorePadBottomCell : undefined),
+      },
+      scorePadCellBottomRight: {
+        ...styles.scorePadCellBottomRight,
+        ...(IS_IOS_NATIVE_SHELL ? styles.nativeIosScorePadBottomCell : undefined),
       },
       gameMainColumn: {
         ...styles.gameMainColumn,
         gridTemplateRows: isTinyLayout
-          ? "minmax(0, 1fr) 100px"
+          ? "minmax(0, 1fr) 120px"
           : isCompactLayout
-            ? "minmax(0, 1fr) 116px"
-            : "minmax(0, 1fr) 132px",
+            ? "minmax(0, 1fr) 139px"
+            : "minmax(0, 1fr) 158px",
         gap: isTinyLayout ? "3px" : "4px",
         overflow: "visible",
       },
@@ -286,8 +328,8 @@ function App() {
         width: "100%",
         boxSizing: "border-box",
         height: "100%",
-        minHeight: isTinyLayout ? "100px" : isCompactLayout ? "116px" : "132px",
-        padding: isTinyLayout ? "5px 8px 6px" : isCompactLayout ? "6px 9px 8px" : "8px 11px 9px",
+        minHeight: isTinyLayout ? "120px" : isCompactLayout ? "139px" : "158px",
+        padding: isTinyLayout ? "7px 8px 8px" : isCompactLayout ? "8px 9px 10px" : "10px 11px 12px",
         overflow: "visible",
         position: "relative",
         zIndex: 6,
@@ -358,24 +400,87 @@ function App() {
       },
       rosterGrid: {
         ...styles.rosterGrid,
-        gap: isTinyLayout ? "3px 6px" : "4px 8px",
+        gap: IS_NATIVE_SHELL
+          ? isTinyLayout
+            ? "8px 14px"
+            : "10px 16px"
+          : isTinyLayout
+            ? "3px 6px"
+            : "4px 8px",
       },
       rosterCard: {
         ...styles.rosterCard,
-        minHeight: isTinyLayout ? "50px" : isCompactLayout ? "60px" : "104px",
+        minHeight: IS_NATIVE_SHELL
+          ? isTinyLayout
+            ? "82px"
+            : isCompactLayout
+              ? "102px"
+              : "132px"
+          : isTinyLayout
+            ? "70px"
+            : isCompactLayout
+              ? "82px"
+              : "126px",
         padding: isTinyLayout ? "2px" : "4px",
         gap: "3px",
       },
       rosterAvatar: {
         ...styles.rosterAvatar,
-        width: isTinyLayout ? "34px" : isCompactLayout ? "44px" : "70px",
-        height: isTinyLayout ? "34px" : isCompactLayout ? "44px" : "70px",
-        borderRadius: isTinyLayout ? "10px" : isCompactLayout ? "12px" : styles.rosterAvatar.borderRadius,
-        fontSize: isTinyLayout ? "12px" : "14px",
+        width: IS_NATIVE_SHELL
+          ? isTinyLayout
+            ? "62px"
+            : isCompactLayout
+              ? "82px"
+              : "105px"
+          : isTinyLayout
+            ? "51px"
+            : isCompactLayout
+              ? "66px"
+              : "105px",
+        height: IS_NATIVE_SHELL
+          ? isTinyLayout
+            ? "62px"
+            : isCompactLayout
+              ? "82px"
+              : "105px"
+          : isTinyLayout
+            ? "51px"
+            : isCompactLayout
+              ? "66px"
+              : "105px",
+        borderRadius: IS_NATIVE_SHELL
+          ? isTinyLayout
+            ? "18px"
+            : isCompactLayout
+              ? "22px"
+              : "24px"
+          : isTinyLayout
+            ? "15px"
+            : isCompactLayout
+              ? "18px"
+              : "24px",
+        fontSize: isTinyLayout ? "18px" : "21px",
       },
       rosterName: {
         ...styles.rosterName,
-        fontSize: isTinyLayout ? "6px" : isCompactLayout ? "7px" : "10px",
+        fontSize: IS_NATIVE_SHELL
+          ? isTinyLayout
+            ? IS_IOS_NATIVE_SHELL
+              ? "11px"
+              : "10px"
+            : isCompactLayout
+              ? IS_IOS_NATIVE_SHELL
+                ? "13px"
+                : "12px"
+              : IS_IOS_NATIVE_SHELL
+                ? "14px"
+                : "13px"
+          : isTinyLayout
+            ? "6px"
+            : isCompactLayout
+              ? "7px"
+              : "10px",
+        lineHeight: IS_NATIVE_SHELL ? 1.1 : styles.rosterName.lineHeight,
       },
       mobileHandRowWrap: {
         ...styles.mobileHandRowWrap,
@@ -396,24 +501,46 @@ function App() {
         ...styles.mobileHandMeta,
         fontSize: isTinyLayout ? "8px" : "9px",
       },
+      coveredCardToggle: {
+        ...styles.coveredCardToggle,
+        minHeight: isTinyLayout ? "31px" : "32px",
+        gap: isTinyLayout ? "7px" : "8px",
+        padding: isTinyLayout ? "4px 11px 4px 6px" : "4px 12px 4px 6px",
+        fontSize: isTinyLayout ? "11px" : "12px",
+      },
+      coveredCardToggleSwitch: {
+        ...styles.coveredCardToggleSwitch,
+        width: isTinyLayout ? "29px" : "30px",
+        height: isTinyLayout ? "17px" : "18px",
+        padding: "1px",
+      },
+      coveredCardToggleKnob: {
+        ...styles.coveredCardToggleKnob,
+        width: isTinyLayout ? "12px" : "13px",
+        height: isTinyLayout ? "12px" : "13px",
+      },
+      coveredCardToggleKnobActive: {
+        ...styles.coveredCardToggleKnobActive,
+        transform: isTinyLayout ? "translateX(12px)" : "translateX(13px)",
+      },
       mobileCardButton: {
         ...styles.mobileCardButton,
-        width: isTinyLayout ? "40px" : isCompactLayout ? "45px" : "50px",
-        minWidth: isTinyLayout ? "40px" : isCompactLayout ? "45px" : "50px",
-        minHeight: isTinyLayout ? "56px" : isCompactLayout ? "62px" : "68px",
-        padding: isTinyLayout ? "3px" : "4px",
+        width: isTinyLayout ? "48px" : isCompactLayout ? "54px" : "60px",
+        minWidth: isTinyLayout ? "48px" : isCompactLayout ? "54px" : "60px",
+        minHeight: isTinyLayout ? "67px" : isCompactLayout ? "74px" : "82px",
+        padding: isTinyLayout ? "4px" : "5px",
       },
       mobileCardRank: {
         ...styles.mobileCardRank,
-        fontSize: isTinyLayout ? "11px" : "13px",
+        fontSize: isTinyLayout ? "13px" : "16px",
       },
       mobileCardSuit: {
         ...styles.mobileCardSuit,
-        fontSize: isTinyLayout ? "11px" : "13px",
+        fontSize: isTinyLayout ? "13px" : "16px",
       },
       mobileCardCenterSuit: {
         ...styles.mobileCardCenterSuit,
-        fontSize: isTinyLayout ? "16px" : "20px",
+        fontSize: isTinyLayout ? "19px" : "24px",
       },
     }),
     [gameplayBackgroundAsset, isCompactLayout, isTinyLayout, stageScale, useTightSidebar]
@@ -1269,6 +1396,17 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#f7ede1",
     alignSelf: "start",
   },
+  nativeScenePanel: {
+    paddingLeft: "max(34px, env(safe-area-inset-left, 0px))",
+    paddingRight: "14px",
+  },
+  nativeScorePadCard: {
+    paddingLeft: "max(34px, env(safe-area-inset-left, 0px))",
+    paddingRight: "14px",
+  },
+  nativeIosScorePadBottomCell: {
+    transform: "translateY(-22px)",
+  },
   scenePanelTitle: {
     fontSize: "clamp(9px, 0.74vw, 11px)",
     fontWeight: 800,
@@ -1876,7 +2014,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   mobileHandPanel: {
     display: "grid",
-    gridTemplateRows: "clamp(24px, 2.2vw, 30px) minmax(0, 1fr)",
+    gridTemplateRows: "clamp(31px, 2.65vw, 36px) minmax(0, 1fr)",
     gap: "6px",
     height: "100%",
     minHeight: 0,
@@ -1887,6 +2025,9 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: "space-between",
     alignItems: "center",
     gap: "12px",
+  },
+  mobileHandHeaderControlsOnly: {
+    justifyContent: "flex-end",
   },
   mobileHandRowWrap: {
     display: "grid",

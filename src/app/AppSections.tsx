@@ -1211,7 +1211,6 @@ export function TableSection({
 
                   <div style={styles.playerCardsBlock}>
                     <HumanCardsPanel
-                      handState={handState}
                       inGameContextMenuOpen={inGameContextMenuOpen}
                       player1={player1}
                       canPlayHumanCard={canPlayHumanCard}
@@ -4997,7 +4996,6 @@ export function LogsPanel({ logs, onCopyLogs, styles }: LogsPanelProps) {
 }
 
 function HumanCardsPanel({
-  handState,
   inGameContextMenuOpen,
   player1,
   canPlayHumanCard,
@@ -5014,7 +5012,6 @@ function HumanCardsPanel({
   onWinMatchFromContextMenu,
   styles,
 }: {
-  handState: HandState | null
   inGameContextMenuOpen: boolean
   player1: Player | null
   canPlayHumanCard: boolean
@@ -5049,12 +5046,7 @@ function HumanCardsPanel({
 
   return (
     <div style={styles.mobileHandPanel}>
-      <div style={styles.mobileHandHeader}>
-        <div style={styles.mobileHandMeta}>
-          {handState && handState.currentPlayerId === 1 && !handState.finished
-            ? "Sua vez"
-            : "Aguardando"}
-        </div>
+      <div style={{ ...styles.mobileHandHeader, ...styles.mobileHandHeaderControlsOnly }}>
         <div style={styles.coveredCardToggleWrap}>
           {showCoveredHint ? (
             <div style={styles.coveredCardHint}>
