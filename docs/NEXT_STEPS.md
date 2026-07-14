@@ -29,6 +29,9 @@ Estado consolidado:
 - testes unitarios de dialogos/raises ja cobrem `TRUCO!`, `SEIS!`, `NOVE!`, `DOZE!`, `DESCE!`, `TOMA!` e `TÔ FORA!`
 - helpers de sessao criam partidas a partir do bar e aplicam a variante declarada pelo local
 - ha testes para criacao de partida por local Mineiro/Paulista e para proxima mao Paulista mantendo vira/manilha
+- carta coberta esta implementada a partir da segunda vaza e coberta por testes
+- mao de 9 esta implementada com decisao `Jogar`/`Correr`
+- tutorial jogavel esta implementado, cobre aulas 1 a 10 e foi testado pelo usuario
 - `npm run build` deve continuar sendo a validacao minima antes de concluir qualquer frente
 
 Locais com pacote visual autoral integrado:
@@ -51,33 +54,86 @@ Locais com pacote visual autoral integrado:
 
 ## Proximo Foco Recomendado
 
-### Carta Virada Para Baixo
+### Capacitor + Android Studio + Xcode
 
-A proxima frente recomendada e implementar carta virada para baixo/carta coberta a partir da segunda vaza da mao.
+A frente mobile ja foi iniciada. Capacitor esta configurado como ponte entre o build web do Vite e os projetos nativos Android/iOS.
 
-Regra desejada:
+Objetivo:
 
-- na primeira vaza, todas as cartas jogadas continuam abertas
-- na segunda e na terceira vaza, qualquer jogador pode jogar uma carta virada para baixo
-- a carta coberta nao disputa a vaza e deve funcionar como descarte sem forca
-- a carta coberta nao deve revelar identidade para adversarios nem para parceiro durante a partida
-- a mesa e os logs devem deixar claro que uma carta coberta foi jogada, sem revelar a carta real
-- a IA deve poder usar carta coberta como descarte quando nao fizer sentido disputar a vaza
+- manter o jogo web funcional
+- manter Capacitor sem reestruturar a arquitetura de estado
+- validar os projetos nativos Android/iOS gerados
+- validar a experiencia em device real antes de criar novas regras opcionais
 
-Ordem recomendada:
+Estado ja feito:
 
-1. conferir `docs/TRUCO_RULES.md`
-2. ler `src/game/handState.ts`, `src/game/playHumanCard.ts`, `src/game/playAiTurn.ts`, `src/game/resolveTrick.ts`, `src/ai/chooseCard.ts` e os testes existentes em `tests/**/*.test.ts`
-3. criar testes antes de mudar comportamento:
-   - primeira vaza nao permite carta coberta
-   - segunda/terceira vaza permitem carta coberta
-   - carta coberta nunca vence a vaza
-   - carta coberta nao revela identidade nos logs/estado publico
-   - IA descarta coberto quando apropriado
-4. implementar estado/modelo para jogada coberta
-5. implementar acao humana e decisao da IA
-6. rodar `npm test`
-7. rodar `npm run build`
+- `@capacitor/core`, `@capacitor/cli`, `@capacitor/android` e `@capacitor/ios` alinhados em `8.3.0`
+- `capacitor.config.ts` criado com:
+  - `appId`: `com.trucoraiz.game`
+  - `appName`: `Truco Raiz`
+  - `webDir`: `dist`
+- plataformas `android/` e `ios/` geradas
+- build web sincronizado para as plataformas com `npx cap sync`
+- orientacao nativa travada em landscape:
+  - Android: `android:screenOrientation="landscape"`
+  - iOS: apenas `UIInterfaceOrientationLandscapeLeft` e `UIInterfaceOrientationLandscapeRight`
+- no Capacitor, o app renderiza somente a `TableSection` em tela cheia:
+  - sem header `Truco Game`
+  - sem paineis externos de status/campanha/logs usados no Chrome
+  - sem limite global de largura do `#root`
+- Android usa modo imersivo fullscreen na `MainActivity`:
+  - esconde status bar
+  - esconde navigation bar/botoes voltar-home-recentes
+  - permite ocupar area de notch/cutout em landscape
+  - reaplica fullscreen em `onResume` e ao recuperar foco
+- scripts adicionados:
+  - `npm run cap:sync`
+  - `npm run cap:open:android`
+  - `npm run cap:open:ios`
+- `npm test`, `npm run build` e `npm run cap:sync` passaram
+- Android compilou por terminal com `assembleDebug`
+- Android Studio/device fisico ja rodou o app
+- ajustes observados no Android foram aplicados:
+  - app nativo renderiza somente a tela jogavel
+  - fullscreen imersivo esconde status/navigation bars
+  - widget central `Etapa` / `Endereco` saiu da gameplay normal
+  - botoes de truco/aceitar/aumentar/correr foram ampliados e centralizados verticalmente
+- Android Studio/Gradle novo exigiu trocar `getDefaultProguardFile('proguard-android.txt')` por `getDefaultProguardFile('proguard-android-optimize.txt')` em `android/app/build.gradle`
+
+Estado do ambiente nativo:
+
+- Android:
+  - o terminal nao encontrou Java no PATH normal
+  - o JDK embutido do Android Studio funcionou em `/Applications/Android Studio.app/Contents/jbr/Contents/Home`
+  - Gradle baixou Build-Tools 35 e Android Platform 36
+  - `assembleDebug` terminou com `BUILD SUCCESSFUL`
+- iOS:
+  - projeto Xcode foi gerado e o scheme `App` foi listado com sucesso
+  - SwiftPM resolveu `capacitor-swift-pm` em `8.3.0`
+  - `Info.plist` esta valido e em landscape
+  - build por terminal ficou bloqueado pelo ambiente Xcode/CoreSimulator:
+    - `xcode-select` estava apontando para `/Library/Developer/CommandLineTools`
+    - CoreSimulator reportou versao local `1051.54.0`, abaixo da esperada `1051.55.0`
+    - Xcode pediu plataforma/destino iOS alinhado antes de compilar
+
+Ordem recomendada agora:
+
+1. conferir `git status` e preservar mudancas locais
+2. rodar `npm test` e `npm run cap:sync`
+3. se mexer em layout/mobile, validar Android de novo com `npm run cap:open:android`
+4. antes do Xcode, alinhar ambiente se necessario:
+   - apontar Command Line Tools para o Xcode completo
+   - abrir Xcode e concluir componentes/primeira inicializacao
+   - instalar/atualizar plataforma iOS/Simulator em `Xcode > Settings > Components`
+5. abrir iOS com `npm run cap:open:ios`
+6. no Xcode, escolher simulador/device, configurar signing se usar device fisico e rodar o app
+7. testar em device real:
+   - orientacao landscape
+   - safe areas/notch/home indicator
+   - toque em cartas, botoes, hotspots invisiveis, menu e tutorial
+   - escala do stage logico `1080x500`
+   - performance da mesa, animacoes e transicoes
+8. registrar qualquer ajuste mobile necessario antes de implementar novas regras
 
 ### Estado da IA
 
@@ -104,17 +160,13 @@ Estado apos a primeira rodada:
 
 ## Pendencias De Produto E Regras
 
-Frentes ainda pendentes, em prioridade menor que carta coberta:
+Frentes ainda pendentes, em prioridade menor que validacao mobile:
 
 - opcao de usar ou nao a variante `ponto acima`
-- tutorial jogavel:
-  - ensinar fluxo basico de rodada, mao e vaza
-  - ensinar truco, aceite, corrida e aumentos
-  - ensinar conselho/consulta da parceira
-  - ensinar progressao de campanha e desbloqueio de parceiros
 - segunda rodada fina de IA:
   - fazer apenas se novos testes em jogo apontarem comportamento ruim
   - preservar testes existentes de thresholds, blefes e descarte
+- extrair o roteiro/estado do tutorial de `src/app/AppSections.tsx` para modulo proprio, apenas se o tutorial aprovado comecar a atrapalhar manutencao
 
 Frentes que deixaram de ser pendencia aberta nesta rodada:
 
@@ -124,6 +176,9 @@ Frentes que deixaram de ser pendencia aberta nesta rodada:
 - primeira rodada de IA foi validada em jogo real
 - `Jogos Mundiais` e `Mundial` foram corrigidos para Truco Mineiro
 - descarte da IA quando nao pode ganhar a vaza ficou coberto por testes
+- carta coberta foi implementada e validada
+- mao de 9 foi implementada e validada
+- tutorial jogavel foi implementado, ajustado visualmente e aprovado pelo usuario
 
 ## Validacao Recomendada
 
@@ -136,16 +191,19 @@ Antes de concluir qualquer implementacao:
 - testar hotspots invisiveis quando houver tela de campanha nova
 - rodar `npm test` quando houver mudanca de regra, IA, truco, progressao ou helpers de sessao
 - rodar `npm run build`
+- para mobile, rodar `npm run cap:sync` antes de abrir Android Studio/Xcode
+- para Android, validar `assembleDebug` quando houver mudanca nativa relevante
 
 ## O Que Nao Deve Virar Prioridade Agora
 
 - refatoracao total da engine
 - troca da arquitetura de estado
-- backend, ranking online ou empacotamento mobile
+- backend ou ranking online
+- novas regras opcionais antes de validar o pacote mobile basico
 - reabrir a responsividade da gameplay sem regressao real
 - reabrir a tela de selecao de parceira sem regressao real
 - reabrir o pacote visual principal ou bonus sem regressao ou nova decisao explicita de polimento
-- criar novos assets antes de definir e validar a interacao mobile da carta coberta
+- criar novos assets antes de validar a experiencia em device real
 
 ## Prompt Para Chat Novo
 

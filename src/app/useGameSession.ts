@@ -86,6 +86,7 @@ import { getRuleSet } from "../game/getRuleSet"
 const DEBUG_MODE = true
 type MenuScreen =
   | "start"
+  | "tutorial"
   | "journey-intro"
   | "player-skin-select"
   | "character-select"
@@ -977,6 +978,22 @@ export function useGameSession() {
     }
 
     setMenuScreen("journey-intro")
+  }
+
+  function handleStartTutorial() {
+    setHandState(null)
+    setMatchState(null)
+    setMatchResultScreen(null)
+    setCampaignVictoryScreen(null)
+    setCampaignVictoryQueue([])
+    setInGameContextMenuOpen(false)
+    setInGameConfirmation(null)
+    setGameplayIntroPhase("done")
+    setMenuScreen("tutorial")
+  }
+
+  function handleCloseTutorial() {
+    setMenuScreen("start")
   }
 
   function handleClosePlayerSkinSelect() {
@@ -1885,6 +1902,7 @@ export function useGameSession() {
     handleCancelInGameConfirmation,
     handleCloseInGameContextMenu,
     handleCloseFreePlayStage,
+    handleCloseTutorial,
     handleConfirmInGameConfirmation,
     handleCopyLogs,
     handleEnterVenueFromIntro,
@@ -1904,6 +1922,7 @@ export function useGameSession() {
     handleRunFromTruco,
     handleSwapPartnerFromContextMenu,
     handleStartHand,
+    handleStartTutorial,
     handleWinMatchFromContextMenu,
     lastPlayedPlayerId,
     logs,

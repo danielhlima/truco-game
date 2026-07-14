@@ -165,6 +165,20 @@ Observacao:
   - `tests/game/nine-hand.test.ts`
   - `tests/game/gameSessionHelpers.test.ts`
 
+### Carta virada para baixo / carta coberta
+
+- uma rodada continua composta por ate `3 vazas`
+- na primeira vaza, todas as cartas continuam abertas
+- na segunda e na terceira vaza da rodada, qualquer jogador pode jogar uma carta virada para baixo
+- a carta virada para baixo tambem pode ser chamada de `carta coberta`
+- a carta coberta nao disputa a vaza e funciona como descarte sem forca, equivalente a uma carta sem valor para vencer
+- a identidade real da carta coberta nao deve ser revelada nem aos adversarios nem ao parceiro durante a partida
+- a mesa e os logs registram que uma carta coberta foi jogada, mas nao revelam a carta real
+- a IA considera carta coberta como opcao quando quer descartar sem disputar a vaza
+- cobertura atual:
+  - `tests/game/resolve-trick.test.ts`
+  - `tests/ai/chooseCard.test.ts`
+
 ## Pendencias de Regras para Implementar
 
 As regras abaixo foram confirmadas como desejadas, mas ainda nao devem ser tratadas como implementadas:
@@ -177,18 +191,6 @@ As regras abaixo foram confirmadas como desejadas, mas ainda nao devem ser trata
   - configuracao por bar/circuito
   - opcao avancada fora da primeira tela visivel
 - a escolha precisa ser persistida e refletida claramente na tela de campanha ou na entrada da partida
-
-### Carta virada para baixo
-
-- uma rodada continua composta por ate `3 vazas`
-- na primeira vaza, todas as cartas continuam abertas
-- na segunda e na terceira vaza da rodada, qualquer jogador pode jogar uma carta virada para baixo
-- a carta virada para baixo tambem pode ser chamada de `carta coberta`
-- a carta coberta nao disputa a vaza e deve funcionar como descarte sem forca, equivalente a uma carta sem valor para vencer
-- a identidade real da carta coberta nao deve ser revelada nem aos adversarios nem ao parceiro durante a partida
-- a mesa e os logs devem registrar que uma carta coberta foi jogada, mas nao revelar a carta real
-- a IA deve considerar carta coberta como opcao quando quiser descartar sem disputar a vaza
-- a implementacao precisa ser coberta por testes antes de alterar a UI
 
 ## Nota de Continuidade
 

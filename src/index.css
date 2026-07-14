@@ -66,6 +66,23 @@ body {
   margin: 0;
 }
 
+body.truco-native-app {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #120a06;
+  touch-action: manipulation;
+}
+
+body.truco-native-app #root {
+  width: 100vw;
+  max-width: none;
+  min-height: 100vh;
+  margin: 0;
+  border: 0;
+  overflow: hidden;
+}
+
 h1,
 h2 {
   font-family: var(--heading);

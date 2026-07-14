@@ -36,7 +36,6 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 ### Coluna Direita
 
 - Bloco superior `Valendo`.
-- Bloco central com contexto da partida.
 - Bloco inferior com ações de truco.
 - O fundo estrutural da coluna deve deixar o cenário aparente.
 - Os widgets da coluna podem usar madeira/couro como objetos da cena.
@@ -55,11 +54,8 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 ## Regras da Coluna Direita
 
 - `Valendo` usa placa clara.
-- O bloco central usa placa de madeira/moldura.
-- O bloco central hoje mostra apenas:
-  - `Etapa`
-  - `Endereço`
-- Os botões de ação usam asset de madeira.
+- O antigo bloco central de contexto (`Etapa` / `Endereço`) foi removido da gameplay normal para liberar espaço aos controles.
+- Os botões de ação usam asset de madeira e devem ter prioridade de area/tamanho na coluna.
 - A label `Ações` foi removida.
 
 ## Regras da Coluna Esquerda

@@ -1,4 +1,5 @@
 import { Suspense, lazy, useEffect, useMemo, useState } from "react"
+import { Capacitor } from "@capacitor/core"
 import { useGameSession } from "./app/useGameSession"
 import botecoSceneBgAsset from "./assets/boteco/boteco-scene-bg.png"
 import cardFaceAgedPaperAsset from "./assets/cards/card-face-aged-paper.png"
@@ -19,6 +20,7 @@ import tremDoJacaSceneBgAsset from "./assets/venues/trem-do-jaca/background.png"
 
 const GAMEPLAY_STAGE_WIDTH = 1080
 const GAMEPLAY_STAGE_HEIGHT = 500
+const IS_NATIVE_SHELL = Capacitor.isNativePlatform()
 const GAMEPLAY_BACKGROUND_ASSET_BY_VENUE_ID: Record<string, string> = {
   "bar-maneco-banguela": manecoBanguelaSceneBgAsset,
   "trem-do-jaca": tremDoJacaSceneBgAsset,
@@ -59,13 +61,17 @@ type GameplayViewportMetrics = {
   scale: number
 }
 
-function getGameplayViewportMetrics(): GameplayViewportMetrics {
+function getGameplayViewportMetrics(isNativeShell = false): GameplayViewportMetrics {
   if (typeof window === "undefined") {
     return { mode: "regular", scale: 1 }
   }
 
-  const availableWidth = Math.max(320, Math.min(window.innerWidth, 1126) - 116)
-  const availableHeight = Math.max(260, window.innerHeight - 260)
+  const availableWidth = isNativeShell
+    ? Math.max(320, window.innerWidth)
+    : Math.max(320, Math.min(window.innerWidth, 1126) - 116)
+  const availableHeight = isNativeShell
+    ? Math.max(260, window.innerHeight)
+    : Math.max(260, window.innerHeight - 260)
   const scale = Math.max(
     0.5,
     Math.min(1, availableWidth / GAMEPLAY_STAGE_WIDTH, availableHeight / GAMEPLAY_STAGE_HEIGHT)
@@ -82,16 +88,23 @@ function getGameplayViewportMetrics(): GameplayViewportMetrics {
 
 function App() {
   const [viewportMetrics, setViewportMetrics] = useState<GameplayViewportMetrics>(
-    getGameplayViewportMetrics
+    () => getGameplayViewportMetrics(IS_NATIVE_SHELL)
   )
 
   useEffect(() => {
     const handleResize = () => {
-      setViewportMetrics(getGameplayViewportMetrics())
+      setViewportMetrics(getGameplayViewportMetrics(IS_NATIVE_SHELL))
     }
 
     window.addEventListener("resize", handleResize)
     return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
+  useEffect(() => {
+    document.body.classList.toggle("truco-native-app", IS_NATIVE_SHELL)
+    return () => {
+      document.body.classList.remove("truco-native-app")
+    }
   }, [])
 
   const {
@@ -127,6 +140,7 @@ function App() {
     handleCloseInGameContextMenu,
     handleCloseCharacterSelect,
     handleCloseJourneyIntro,
+    handleCloseTutorial,
     handlePartnerAdvice,
     handleCopyLogs,
     handleConfirmInGameConfirmation,
@@ -150,6 +164,7 @@ function App() {
     handleSelectNextCharacter,
     handleSelectPreviousCharacter,
     handleStartHand,
+    handleStartTutorial,
     handleSwapPartnerFromContextMenu,
     handleWinMatchFromContextMenu,
     lastPlayedPlayerId,
@@ -195,17 +210,24 @@ function App() {
       tableHudSurface: {
         ...styles.tableHudSurface,
         backgroundImage: getGameplayBackgroundImage(gameplayBackgroundAsset),
+        ...(IS_NATIVE_SHELL ? styles.nativeTableHudSurface : undefined),
+      },
+      tablePanel: {
+        ...styles.tablePanel,
+        ...(IS_NATIVE_SHELL ? styles.nativeTablePanel : undefined),
       },
       gameViewportStageSlot: {
         ...styles.gameViewportStageSlot,
         width: `${GAMEPLAY_STAGE_WIDTH * stageScale}px`,
         height: `${GAMEPLAY_STAGE_HEIGHT * stageScale}px`,
+        ...(IS_NATIVE_SHELL ? styles.nativeGameViewportStageSlot : undefined),
       },
       gameViewportFrame: {
         ...styles.gameViewportFrame,
         width: `${GAMEPLAY_STAGE_WIDTH}px`,
         height: `${GAMEPLAY_STAGE_HEIGHT}px`,
         transform: `scale(${stageScale})`,
+        ...(IS_NATIVE_SHELL ? styles.nativeGameViewportFrame : undefined),
       },
       gameViewport: {
         ...styles.gameViewport,
@@ -293,9 +315,9 @@ function App() {
       },
       inGameActionsCard: {
         ...styles.inGameActionsCard,
-        width: isCompactLayout ? "90%" : "88%",
-        marginTop: useTightSidebar ? (isTinyLayout ? "4px" : "6px") : "14px",
-        gap: useTightSidebar ? (isTinyLayout ? "6px" : "8px") : "11px",
+        width: isCompactLayout ? "96%" : "94%",
+        marginTop: useTightSidebar ? 0 : "14px",
+        gap: useTightSidebar ? (isTinyLayout ? "8px" : "10px") : "13px",
       },
       tableCenterArea: {
         ...styles.tableCenterArea,
@@ -316,23 +338,23 @@ function App() {
       },
       inGameActionsRow: {
         ...styles.inGameActionsRow,
-        gap: useTightSidebar ? "6px" : "10px",
+        gap: useTightSidebar ? (isTinyLayout ? "8px" : "12px") : "14px",
       },
       inGameActionsGrid: {
         ...styles.inGameActionsGrid,
-        gap: useTightSidebar ? "6px" : "10px",
+        gap: useTightSidebar ? (isTinyLayout ? "8px" : "12px") : "14px",
       },
       trucoPrimaryButton: {
         ...styles.trucoPrimaryButton,
-        minHeight: useTightSidebar ? (isTinyLayout ? "30px" : "34px") : "38px",
-        padding: useTightSidebar ? (isTinyLayout ? "4px 9px" : "6px 12px") : "8px 14px",
-        fontSize: useTightSidebar ? (isTinyLayout ? "9px" : "10px") : "11px",
+        minHeight: useTightSidebar ? (isTinyLayout ? "43px" : "49px") : "55px",
+        padding: useTightSidebar ? (isTinyLayout ? "6px 13px" : "9px 17px") : "12px 20px",
+        fontSize: useTightSidebar ? (isTinyLayout ? "13px" : "14px") : "16px",
       },
       trucoSecondaryButton: {
         ...styles.trucoSecondaryButton,
-        minHeight: useTightSidebar ? (isTinyLayout ? "30px" : "34px") : "38px",
-        padding: useTightSidebar ? (isTinyLayout ? "4px 9px" : "6px 12px") : "8px 14px",
-        fontSize: useTightSidebar ? (isTinyLayout ? "9px" : "10px") : "11px",
+        minHeight: useTightSidebar ? (isTinyLayout ? "43px" : "49px") : "55px",
+        padding: useTightSidebar ? (isTinyLayout ? "6px 13px" : "9px 17px") : "12px 20px",
+        fontSize: useTightSidebar ? (isTinyLayout ? "13px" : "14px") : "16px",
       },
       rosterGrid: {
         ...styles.rosterGrid,
@@ -398,16 +420,16 @@ function App() {
   )
 
   return (
-    <div style={styles.page}>
-      <div style={styles.container}>
-        <header style={styles.header}>
+    <div style={IS_NATIVE_SHELL ? responsiveStyles.nativePage : styles.page}>
+      <div style={IS_NATIVE_SHELL ? responsiveStyles.nativeContainer : styles.container}>
+        {!IS_NATIVE_SHELL && <header style={styles.header}>
           <div>
             <h1 style={styles.title}>Truco Game</h1>
             <p style={styles.subtitle}>
               Mesa jogável · fluxo passo a passo · foco em clareza visual
             </p>
           </div>
-        </header>
+        </header>}
 
         <Suspense fallback={<div style={responsiveStyles.loadingCard}>Carregando mesa...</div>}>
           <TableSection
@@ -449,6 +471,7 @@ function App() {
             canPlayCoveredCard={canPlayCoveredCard}
             onCloseCharacterSelect={handleCloseCharacterSelect}
             onCloseJourneyIntro={handleCloseJourneyIntro}
+            onCloseTutorial={handleCloseTutorial}
             onClosePlayerSkinSelect={handleClosePlayerSkinSelect}
             onConfirmCharacterSelect={handleConfirmCharacterSelect}
             onConfirmPlayerSkinSelect={handleConfirmPlayerSkinSelect}
@@ -465,6 +488,7 @@ function App() {
             onSelectNextPlayerSkin={handleSelectNextPlayerSkin}
             onSelectPreviousPlayerSkin={handleSelectPreviousPlayerSkin}
             onStart={handleStartHand}
+            onStartTutorial={handleStartTutorial}
             onRequestTruco={handleRequestTruco}
             onAcceptTruco={handleAcceptTruco}
             onAddEightPointsFromContextMenu={handleAddEightPointsFromContextMenu}
@@ -487,37 +511,41 @@ function App() {
           />
         </Suspense>
 
-        <Suspense fallback={<div style={responsiveStyles.panelLoadingCard}>Carregando status...</div>}>
-          <HandStatusPanel
-            activeVariant={activeVariant}
-            currentCampaignVenue={currentCampaignVenue}
-            handState={handState}
-            matchHandNumber={matchState?.handNumber ?? 1}
-            matchScoreLabel={matchScoreLabel}
-            handScoreLabel={handScoreLabel}
-            currentTurnLabel={currentTurnLabel}
-            statusMessage={statusMessage}
-            eventMessage={eventMessage}
-            styles={responsiveStyles}
-          />
-        </Suspense>
+        {!IS_NATIVE_SHELL && (
+          <>
+            <Suspense fallback={<div style={responsiveStyles.panelLoadingCard}>Carregando status...</div>}>
+              <HandStatusPanel
+                activeVariant={activeVariant}
+                currentCampaignVenue={currentCampaignVenue}
+                handState={handState}
+                matchHandNumber={matchState?.handNumber ?? 1}
+                matchScoreLabel={matchScoreLabel}
+                handScoreLabel={handScoreLabel}
+                currentTurnLabel={currentTurnLabel}
+                statusMessage={statusMessage}
+                eventMessage={eventMessage}
+                styles={responsiveStyles}
+              />
+            </Suspense>
 
-        <Suspense fallback={<div style={responsiveStyles.panelLoadingCard}>Carregando campanha...</div>}>
-          <CampaignPanel
-            campaignCompleted={campaignCompleted}
-            currentCampaignStage={currentCampaignStage}
-            currentCampaignVenue={currentCampaignVenue}
-            currentVenueWins={currentVenueWins}
-            campaignSummary={campaignSummary}
-            playerProfile={playerProfile}
-            onResetCampaign={handleResetCampaign}
-            styles={responsiveStyles}
-          />
-        </Suspense>
+            <Suspense fallback={<div style={responsiveStyles.panelLoadingCard}>Carregando campanha...</div>}>
+              <CampaignPanel
+                campaignCompleted={campaignCompleted}
+                currentCampaignStage={currentCampaignStage}
+                currentCampaignVenue={currentCampaignVenue}
+                currentVenueWins={currentVenueWins}
+                campaignSummary={campaignSummary}
+                playerProfile={playerProfile}
+                onResetCampaign={handleResetCampaign}
+                styles={responsiveStyles}
+              />
+            </Suspense>
 
-        <Suspense fallback={<div style={responsiveStyles.panelLoadingCard}>Carregando logs...</div>}>
-          <LogsPanel logs={logs} onCopyLogs={handleCopyLogs} styles={responsiveStyles} />
-        </Suspense>
+            <Suspense fallback={<div style={responsiveStyles.panelLoadingCard}>Carregando logs...</div>}>
+              <LogsPanel logs={logs} onCopyLogs={handleCopyLogs} styles={responsiveStyles} />
+            </Suspense>
+          </>
+        )}
       </div>
     </div>
   )
@@ -552,6 +580,27 @@ const styles: Record<string, React.CSSProperties> = {
     margin: "8px 0 0 0",
     color: "#4b5563",
     fontSize: "16px",
+  },
+  nativePage: {
+    width: "100vw",
+    height: "100vh",
+    minHeight: "100vh",
+    overflow: "hidden",
+    background: "#120a06",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    fontFamily: "Arial, sans-serif",
+    color: "#111827",
+  },
+  nativeContainer: {
+    width: "100vw",
+    height: "100vh",
+    overflow: "hidden",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    background: "#120a06",
   },
   topGrid: {
     display: "grid",
@@ -923,6 +972,20 @@ const styles: Record<string, React.CSSProperties> = {
     boxShadow: "0 10px 24px rgba(15, 23, 42, 0.06)",
     marginBottom: "16px",
   },
+  nativeTablePanel: {
+    width: "100vw",
+    height: "100vh",
+    margin: 0,
+    padding: 0,
+    border: "none",
+    borderRadius: 0,
+    boxShadow: "none",
+    background: "#120a06",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+  },
   gameHudLayout: {
     display: "flex",
     flexDirection: "column",
@@ -942,11 +1005,23 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     overflow: "hidden",
   },
+  nativeTableHudSurface: {
+    width: "100vw",
+    height: "100vh",
+    padding: 0,
+    border: "none",
+    borderRadius: 0,
+    boxShadow: "none",
+    backgroundColor: "#120a06",
+  },
   gameViewportStageSlot: {
     position: "relative",
     flex: "0 0 auto",
     overflow: "hidden",
     margin: "0 auto",
+  },
+  nativeGameViewportStageSlot: {
+    margin: 0,
   },
   gameViewportFrame: {
     width: "1080px",
@@ -956,6 +1031,9 @@ const styles: Record<string, React.CSSProperties> = {
     position: "relative",
     overflow: "hidden",
     borderRadius: "22px",
+  },
+  nativeGameViewportFrame: {
+    borderRadius: 0,
   },
   gameViewport: {
     display: "grid",
@@ -1015,6 +1093,10 @@ const styles: Record<string, React.CSSProperties> = {
     minWidth: 0,
     minHeight: 0,
     overflow: "hidden",
+  },
+  gameSidebarColumnActionsOnly: {
+    gridTemplateRows: "minmax(0, 1fr)",
+    alignItems: "stretch",
   },
   inGameContextMenuWrap: {
     position: "relative",
@@ -1544,6 +1626,13 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#f8fafc",
     minHeight: 0,
     overflow: "hidden",
+  },
+  tableHudSidebarActionsOnly: {
+    gridTemplateRows: "minmax(0, 1fr)",
+    alignContent: "center",
+    alignItems: "center",
+    justifyItems: "stretch",
+    justifyContent: "center",
   },
   tableHudScoreRow: {
     display: "flex",
@@ -2384,6 +2473,355 @@ const styles: Record<string, React.CSSProperties> = {
     opacity: 0,
     zIndex: 2,
     boxSizing: "border-box",
+  },
+  gameStartTutorialButton: {
+    position: "absolute",
+    left: "65%",
+    top: "60%",
+    width: "21%",
+    height: "7.2%",
+    borderRadius: "14px",
+    border: "1px solid rgba(245, 218, 169, 0.62)",
+    background: "linear-gradient(180deg, rgba(102, 66, 36, 0.96) 0%, rgba(48, 31, 19, 0.96) 100%)",
+    color: "#fff7ed",
+    fontSize: "clamp(11px, 1.25vw, 16px)",
+    fontWeight: 900,
+    letterSpacing: "0.08em",
+    textTransform: "uppercase",
+    cursor: "pointer",
+    zIndex: 3,
+    boxShadow: "0 10px 22px rgba(0,0,0,0.32)",
+  },
+  tutorialDraftScreen: {
+    position: "relative",
+    gridColumn: "1 / -1",
+    width: "100%",
+    height: "100%",
+    display: "grid",
+    gridTemplateColumns: "232px minmax(0, 1fr) 184px",
+    gap: "9px",
+    alignItems: "stretch",
+    overflow: "hidden",
+    background:
+      "radial-gradient(circle at 50% 46%, rgba(105, 69, 37, 0.42) 0%, rgba(24, 16, 10, 0.82) 48%, #090604 100%)",
+    color: "#fff7ed",
+    isolation: "isolate",
+  },
+  tutorialGameplayOverlay: {
+    position: "absolute",
+    inset: 0,
+    background:
+      "linear-gradient(180deg, rgba(5, 3, 2, 0.16) 0%, rgba(5, 3, 2, 0.24) 100%)",
+    pointerEvents: "none",
+    zIndex: 0,
+  },
+  tutorialGameLeftRail: {
+    position: "relative",
+    zIndex: 1,
+    display: "grid",
+    gridTemplateRows: "max-content minmax(0, 1fr)",
+    gap: "7px",
+    minWidth: 0,
+    minHeight: 0,
+    alignItems: "stretch",
+    overflow: "hidden",
+  },
+  tutorialGameMainColumn: {
+    position: "relative",
+    zIndex: 1,
+    display: "grid",
+    gridTemplateRows: "minmax(0, 1fr) auto",
+    gap: "5px",
+    minWidth: 0,
+    minHeight: 0,
+    overflow: "hidden",
+  },
+  tutorialGameSidebarColumn: {
+    position: "relative",
+    zIndex: 1,
+    display: "grid",
+    gridTemplateRows: "max-content minmax(0, 1fr)",
+    gap: "8px",
+    minWidth: 0,
+    minHeight: 0,
+    overflow: "hidden",
+  },
+  tutorialHighlightedCard: {
+    boxShadow: "0 0 0 3px rgba(251, 191, 36, 0.72), 0 12px 22px rgba(0,0,0,0.28)",
+    transform: "translateY(-4px)",
+  },
+  tutorialHighlightedAction: {
+    filter: "brightness(1.16)",
+    boxShadow: "0 0 0 3px rgba(251, 191, 36, 0.78), 0 14px 24px rgba(0,0,0,0.34)",
+    transform: "translateY(-2px)",
+  },
+  tutorialDimmedCard: {
+    opacity: 0.48,
+    cursor: "default",
+    transform: "none",
+  },
+  tutorialDraftTable: {
+    position: "absolute",
+    left: "50%",
+    top: "52%",
+    width: "58%",
+    height: "64%",
+    transform: "translate(-50%, -50%)",
+    borderRadius: "22px",
+    background:
+      "linear-gradient(135deg, rgba(128, 83, 45, 0.96) 0%, rgba(82, 50, 28, 0.98) 52%, rgba(49, 31, 20, 0.98) 100%)",
+    border: "8px solid rgba(52, 31, 18, 0.95)",
+    boxShadow: "0 28px 48px rgba(0,0,0,0.42), inset 0 0 42px rgba(255,217,153,0.08)",
+  },
+  tutorialDraftHeader: {
+    position: "absolute",
+    left: "4%",
+    right: "4%",
+    top: "5%",
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    pointerEvents: "none",
+  },
+  tutorialDraftEyebrow: {
+    fontSize: "11px",
+    fontWeight: 900,
+    letterSpacing: "0.1em",
+    textTransform: "uppercase",
+    color: "#f3d5a3",
+    textShadow: "0 2px 8px rgba(0,0,0,0.5)",
+  },
+  tutorialDraftTitle: {
+    margin: "4px 0 0",
+    fontSize: "30px",
+    lineHeight: 1,
+    textShadow: "0 3px 10px rgba(0,0,0,0.48)",
+  },
+  tutorialDraftBackButton: {
+    pointerEvents: "auto",
+    border: "1px solid rgba(245, 218, 169, 0.44)",
+    borderRadius: "14px",
+    background: "rgba(34, 23, 16, 0.86)",
+    color: "#fff7ed",
+    padding: "10px 16px",
+    fontSize: "12px",
+    fontWeight: 900,
+    textTransform: "uppercase",
+    letterSpacing: "0.06em",
+    cursor: "pointer",
+    boxShadow: "0 10px 18px rgba(0,0,0,0.24)",
+  },
+  tutorialDraftViraCard: {
+    position: "absolute",
+    right: "19%",
+    top: "11%",
+    width: "48px",
+    height: "66px",
+    borderRadius: "8px",
+    background: "linear-gradient(180deg, #f5ead8 0%, #d9c4a3 100%)",
+    color: "#b91c1c",
+    border: "1px solid rgba(92, 58, 32, 0.48)",
+    boxShadow: "0 10px 18px rgba(0,0,0,0.26)",
+    transform: "rotate(-8deg)",
+    display: "grid",
+    placeItems: "center",
+    fontWeight: 900,
+  },
+  tutorialDraftCardRank: {
+    position: "absolute",
+    left: "6px",
+    top: "5px",
+    fontSize: "14px",
+  },
+  tutorialDraftCardSuit: {
+    fontSize: "25px",
+  },
+  tutorialDraftCardLabel: {
+    position: "absolute",
+    left: "50%",
+    top: "-18px",
+    transform: "translateX(-50%)",
+    padding: "2px 7px",
+    borderRadius: "999px",
+    background: "rgba(29, 18, 10, 0.86)",
+    color: "#f8ead2",
+    fontSize: "9px",
+    letterSpacing: "0.08em",
+    textTransform: "uppercase",
+  },
+  tutorialDraftPlayedCards: {
+    position: "absolute",
+    left: "50%",
+    top: "45%",
+    transform: "translate(-50%, -50%)",
+    display: "flex",
+    gap: "14px",
+    alignItems: "center",
+  },
+  tutorialDraftCard: {
+    width: "48px",
+    height: "66px",
+    borderRadius: "8px",
+    background: "linear-gradient(180deg, #f5ead8 0%, #d9c4a3 100%)",
+    color: "#1f2937",
+    display: "grid",
+    placeItems: "center",
+    fontSize: "18px",
+    fontWeight: 900,
+    boxShadow: "0 10px 18px rgba(0,0,0,0.22)",
+  },
+  tutorialDraftCardStrong: {
+    width: "52px",
+    height: "72px",
+    borderRadius: "8px",
+    background: "linear-gradient(180deg, #fff5e5 0%, #e1c79d 100%)",
+    color: "#b91c1c",
+    display: "grid",
+    placeItems: "center",
+    fontSize: "20px",
+    fontWeight: 900,
+    boxShadow: "0 0 0 3px rgba(245, 218, 169, 0.42), 0 14px 22px rgba(0,0,0,0.3)",
+  },
+  tutorialDraftCardBack: {
+    width: "48px",
+    height: "66px",
+    borderRadius: "8px",
+    background: "linear-gradient(135deg, #422515 0%, #1e130d 100%)",
+    color: "#f5d6a3",
+    border: "1px solid rgba(245, 218, 169, 0.32)",
+    display: "grid",
+    placeItems: "center",
+    fontSize: "9px",
+    fontWeight: 900,
+    textTransform: "uppercase",
+    letterSpacing: "0.06em",
+    boxShadow: "0 10px 18px rgba(0,0,0,0.22)",
+  },
+  tutorialDraftHand: {
+    position: "absolute",
+    left: "50%",
+    bottom: "7%",
+    transform: "translateX(-50%)",
+    display: "flex",
+    gap: "10px",
+  },
+  tutorialDraftPlayerCard: {
+    width: "50px",
+    height: "70px",
+    borderRadius: "8px",
+    background: "linear-gradient(180deg, #f5ead8 0%, #d8c3a3 100%)",
+    color: "#1f2937",
+    display: "grid",
+    placeItems: "center",
+    fontSize: "18px",
+    fontWeight: 900,
+    boxShadow: "0 12px 20px rgba(0,0,0,0.24)",
+  },
+  tutorialDraftActions: {
+    position: "absolute",
+    right: "-19%",
+    top: "42%",
+    display: "grid",
+    gap: "10px",
+  },
+  tutorialDraftActionButton: {
+    width: "120px",
+    border: "1px solid rgba(245, 218, 169, 0.42)",
+    borderRadius: "12px",
+    background: "linear-gradient(180deg, rgba(91, 58, 34, 0.96) 0%, rgba(44, 28, 18, 0.96) 100%)",
+    color: "#fff7ed",
+    padding: "10px 12px",
+    fontSize: "12px",
+    fontWeight: 900,
+  },
+  tutorialDraftActionButtonMuted: {
+    width: "120px",
+    border: "1px solid rgba(245, 218, 169, 0.28)",
+    borderRadius: "12px",
+    background: "rgba(20, 13, 9, 0.58)",
+    color: "#dbc7a7",
+    padding: "10px 12px",
+    fontSize: "12px",
+    fontWeight: 900,
+  },
+  tutorialDraftBubble: {
+    position: "absolute",
+    width: "330px",
+    maxWidth: "34%",
+    minHeight: "128px",
+    borderRadius: "18px",
+    background: "linear-gradient(180deg, rgba(255, 250, 238, 0.98) 0%, rgba(236, 218, 185, 0.98) 100%)",
+    border: "2px solid rgba(83, 55, 31, 0.86)",
+    color: "#2f241b",
+    padding: "16px 18px",
+    boxSizing: "border-box",
+    boxShadow: "0 18px 30px rgba(0,0,0,0.36)",
+    animation: "tutorialBubbleIn 240ms cubic-bezier(0.22, 0.9, 0.24, 1)",
+    zIndex: 4,
+  },
+  tutorialDraftBubbleKicker: {
+    fontSize: "10px",
+    fontWeight: 900,
+    letterSpacing: "0.1em",
+    textTransform: "uppercase",
+    color: "#8a5a2d",
+  },
+  tutorialDraftBubbleTitle: {
+    margin: "4px 0 6px",
+    fontSize: "20px",
+    lineHeight: 1.05,
+  },
+  tutorialDraftBubbleText: {
+    margin: 0,
+    fontSize: "14px",
+    lineHeight: 1.35,
+    fontWeight: 700,
+  },
+  tutorialDraftProgress: {
+    display: "flex",
+    gap: "6px",
+    marginTop: "12px",
+  },
+  tutorialDraftProgressDot: {
+    width: "7px",
+    height: "7px",
+    borderRadius: "999px",
+    background: "rgba(82, 53, 30, 0.28)",
+  },
+  tutorialDraftProgressDotActive: {
+    width: "18px",
+    background: "#8a5a2d",
+  },
+  tutorialDraftControls: {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: "10px",
+    marginTop: "12px",
+  },
+  tutorialDraftControlButton: {
+    border: "1px solid rgba(82, 53, 30, 0.24)",
+    borderRadius: "10px",
+    background: "rgba(82, 53, 30, 0.08)",
+    color: "#3a2a1e",
+    padding: "8px 10px",
+    fontSize: "12px",
+    fontWeight: 900,
+    cursor: "pointer",
+  },
+  tutorialDraftControlButtonDisabled: {
+    opacity: 0.42,
+    cursor: "default",
+  },
+  tutorialDraftPrimaryButton: {
+    border: "1px solid rgba(82, 53, 30, 0.2)",
+    borderRadius: "10px",
+    background: "linear-gradient(180deg, #8a5a2d 0%, #5c381f 100%)",
+    color: "#fff7ed",
+    padding: "8px 12px",
+    fontSize: "12px",
+    fontWeight: 900,
+    cursor: "pointer",
+    boxShadow: "0 8px 14px rgba(0,0,0,0.18)",
   },
   gameStartCard: {
     width: "min(100%, 460px)",

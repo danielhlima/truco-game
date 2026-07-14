@@ -14,6 +14,7 @@ Antes de agir, leia nesta ordem:
 6. docs/NEXT_STEPS.md
 7. docs/CAMPAIGN_PATH.md
 8. docs/NEXT_CHAT_PROMPT.md
+9. docs/TUTORIAL_PLAN.md
 
 Use esses arquivos como fonte de verdade.
 
@@ -44,30 +45,45 @@ Contexto atual:
 - A IA usa a menor carta vencedora quando consegue ganhar a vaza.
 - Jogos Mundiais e Mundial usam Truco Mineiro.
 - Logs de inicio de mao registram regra ativa; em Paulista tambem registram vira e manilha.
+- Carta coberta ja esta implementada a partir da segunda vaza, com UI mobile e testes.
+- Mao de 9 ja esta implementada:
+  - gatilho em `9`, `10` ou `11` pontos
+  - dupla em 9 ve cartas da parceria
+  - `Correr` entrega `1 ponto` aos adversarios
+  - `Jogar` deixa a mao valendo `3 pontos`
+  - truco/aumento ficam bloqueados nessa mao especial.
+- Tutorial jogavel ja esta implementado e testado pelo usuario:
+  - aulas 1 a 10 cobrem mesa/vaza, ordem comum, manilhas, truco, respostas, parceira, carta coberta, Truco Paulista/vira e mao de 9.
+- Capacitor ja foi integrado:
+  - `capacitor.config.ts` aponta para `dist`
+  - `android/` e `ios/` foram gerados
+  - `npm run cap:sync` faz build web e sync nativo
+  - orientacao nativa esta travada em landscape
+  - Android compilou por terminal com `assembleDebug`
+  - Android Studio/device fisico ja rodou o app
+  - fullscreen, tela jogavel nativa e controles maiores/centralizados ja foram ajustados no Android
+  - iOS foi gerado e o scheme `App` foi listado pelo Xcode, mas build/run depende de alinhar Xcode/CoreSimulator.
 - Nao reabrir responsividade, selecao de parceira, arquitetura de estado ou pacote visual sem regressao real.
 
 Objetivo deste chat:
-Implementar carta virada para baixo/carta coberta com cobertura de testes.
+Continuar a validacao mobile com Capacitor + Android Studio + Xcode, preservando o jogo web atual.
 
 Prioridade recomendada:
 1. Conferir git status antes de editar.
-2. Ler docs/TRUCO_RULES.md, especialmente a secao Carta virada para baixo.
-3. Ler src/game/handState.ts, src/game/playHumanCard.ts, src/game/playAiTurn.ts, src/game/resolveTrick.ts e src/ai/chooseCard.ts.
-4. Ler os testes existentes em tests/**/*.test.ts, especialmente tests/ai/chooseCard.test.ts, tests/game/resolve-trick.test.ts e tests/game/truco-flow.test.ts.
-5. Antes de alterar comportamento, criar testes pequenos para:
-   - primeira vaza nao permitir carta coberta
-   - segunda/terceira vaza permitirem carta coberta
-   - carta coberta nao vencer a vaza
-   - logs/estado publico nao revelarem a carta real
-   - IA usar carta coberta como descarte quando apropriado
-6. Implementar uma parte por vez:
-   - modelo de estado para carta coberta
-   - acao humana
-   - decisao da IA
-   - resolucao de vaza
-   - logs
-   - UI mobile minima e clara
-7. Rodar npm test e npm run build antes de concluir.
+2. Rodar `npm test` e `npm run cap:sync`.
+3. Revalidar Android no Android Studio apenas se houver nova mudanca mobile.
+4. Alinhar ambiente iOS:
+   - apontar Command Line Tools para `/Applications/Xcode.app/Contents/Developer`
+   - abrir Xcode e concluir primeira inicializacao/componentes
+   - instalar/atualizar plataforma iOS/Simulator em `Xcode > Settings > Components`
+5. Abrir/validar iOS no Xcode com `npm run cap:open:ios`.
+6. Testar em device real:
+   - orientacao landscape
+   - safe areas/notch/home indicator
+   - toque em cartas, botoes, hotspots invisiveis, menu e tutorial
+   - escala do stage logico `1080x500`
+   - performance da mesa, animacoes e transicoes
+7. Registrar e corrigir apenas regressões concretas de device.
 
 Estado recente:
 - Carta coberta ja esta implementada a partir da segunda vaza.
@@ -77,11 +93,12 @@ Estado recente:
   - `Correr` entrega `1 ponto` aos adversarios
   - `Jogar` deixa a mao valendo `3 pontos`
   - truco/aumento ficam bloqueados nessa mao especial.
+- Tutorial jogavel foi implementado, ajustado visualmente e aprovado pelo usuario.
 
 Pendencias que continuam abertas, mas nao sao a primeira prioridade deste chat:
 - Opcao de escolher ou nao a versao ponto acima.
-- Tutorial jogavel.
 - Segunda rodada fina de IA, apenas se novos testes em jogo apontarem comportamento ruim.
+- Extrair o tutorial para modulo proprio, apenas se a manutencao em `AppSections.tsx` ficar pesada.
 
 Regras de continuidade:
 - Preservar mudancas locais do usuario.

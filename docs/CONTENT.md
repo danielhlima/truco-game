@@ -12,6 +12,7 @@ Antes de agir, leia nesta ordem:
 6. `docs/NEXT_STEPS.md`
 7. `docs/CAMPAIGN_PATH.md`
 8. `docs/NEXT_CHAT_PROMPT.md`
+9. `docs/TUTORIAL_PLAN.md`
 
 Esses arquivos sao a fonte de verdade do estado atual do projeto.
 
@@ -162,11 +163,23 @@ Arquivos principais:
 - a primeira rodada de IA foi validada em jogo real e enviada para `origin/main`
 - a IA agora preserva cartas fortes quando nao pode ganhar a vaza, descartando a menor carta disponivel
 - `Jogos Mundiais` e `Mundial` usam Truco Mineiro
-- o proximo foco recomendado e implementar carta virada para baixo/carta coberta com testes
+- carta virada para baixo/carta coberta ja esta implementada a partir da segunda vaza, com testes
+- mao de 9 ja esta implementada com decisao `Jogar`/`Correr`
+- tutorial jogavel ja esta implementado e testado pelo usuario
+- a preparacao mobile com `Capacitor + Android Studio + Xcode` ja foi iniciada:
+  - `capacitor.config.ts` aponta para `dist`
+  - plataformas `android/` e `ios/` foram geradas
+  - orientacao nativa foi travada em landscape
+  - no Capacitor, o APK renderiza somente a area jogavel em tela cheia, sem header/painel de teste do Chrome
+  - Android Studio/device fisico ja rodou o app
+  - fullscreen imersivo e controles maiores/centralizados foram ajustados a partir do teste em device
+  - `npm run cap:sync` sincroniza build web para os projetos nativos
+  - Android ja compilou por terminal com `assembleDebug`
+  - iOS foi gerado e listado pelo Xcode, mas build/run depende de alinhar o ambiente Xcode/CoreSimulator
 
 ## Direcao de produto atual
 
-O projeto esta em bom estado de tela, fluxo, conteudo visual e primeira rodada de IA para mudar o foco principal para regras pendentes de partida.
+O projeto esta em bom estado de tela, fluxo, conteudo visual, regras principais, tutorial e base Capacitor para focar em validacao mobile em device real.
 
 Decisao atual:
 
@@ -175,6 +188,7 @@ Decisao atual:
 - manter `docs/IMAGE_PROMPT_STANDARDS.md` como referencia para futuros assets, nao como proxima frente obrigatoria
 - tratar novas rodadas de balanceamento de IA apenas quando houver regressao real observada em jogo
 - manter os testes unitarios de dialogos/raises como blindagem para qualquer mudanca futura em truco
+- tratar validacao em Android Studio, Xcode e device real como proxima frente principal antes de novas regras opcionais
 
 Kit minimo recomendado por bar:
 
@@ -191,13 +205,18 @@ Kit minimo recomendado por bar:
 
 Plano pratico da proxima frente:
 
-1. ler `docs/TRUCO_RULES.md` e `docs/NEXT_STEPS.md`
-2. conferir `git status` e preservar mudancas locais
-3. ler `src/game/handState.ts`, `src/game/playHumanCard.ts`, `src/game/playAiTurn.ts`, `src/game/resolveTrick.ts`, `src/ai/chooseCard.ts` e os testes existentes em `tests/**/*.test.ts`
-4. escrever testes para carta virada para baixo antes de mudar comportamento
-5. implementar a regra em incrementos pequenos: modelo de carta coberta, jogada humana, jogada da IA, resolucao de vaza e logs
-6. nao reabrir responsividade, selecao de parceira, fluxo visual ou arquitetura de estado sem regressao real
-7. rodar `npm test` e `npm run build` antes de concluir qualquer frente de codigo
+1. conferir `git status` e preservar mudancas locais
+2. garantir que `npm test` e `npm run cap:sync` passam antes de abrir IDEs nativas
+3. abrir o Android no Android Studio com `npm run cap:open:android` e validar build/run
+4. alinhar o ambiente Xcode/CoreSimulator se necessario
+5. abrir o iOS no Xcode com `npm run cap:open:ios` e validar build/run
+6. testar em device real:
+   - orientacao landscape
+   - safe areas
+   - toque nas cartas, botoes, hotspots e tutorial
+   - escala do stage `1080x500`
+   - performance da mesa/cenas e animacoes
+7. so ajustar responsividade ou layout quando houver regressao concreta em device
 
 ## Estado atual da gameplay screen
 
@@ -312,7 +331,7 @@ Assets principais:
 
 Estado atual:
 
-- card central mostra `Etapa` e `Endereco`
+- o card central de `Etapa` e `Endereco` foi removido da gameplay normal para abrir espaco aos controles
 - botoes de truco com textura de madeira
 - os botoes mudam temporariamente para:
   - `BORA!`
@@ -814,13 +833,18 @@ Regra de continuidade importante:
 - qualquer ajuste de IA deve ampliar ou preservar a cobertura de testes
 - evitar continuar corrigindo apenas por tentativa e erro sem blindagem
 
-## Proxima Regra: Carta Virada Para Baixo
+## Carta Virada Para Baixo / Carta Coberta
 
-Regra desejada para implementar:
+Regra implementada:
 
 - a partir da segunda vaza da mao/rodada, o jogador pode jogar uma carta virada para baixo
 - a carta coberta nao disputa a vaza e deve ser tratada como descarte sem forca, equivalente a uma carta sem valor para vencer
 - a identidade da carta coberta nao deve ser revelada para adversarios nem para o parceiro durante a partida
 - a primeira vaza permanece aberta, sem carta coberta
-- a IA deve considerar carta coberta como opcao de descarte quando nao puder ou nao quiser disputar a vaza
-- a implementacao precisa cobrir modelo de estado, logs, resolucao da vaza, jogada humana, jogada da IA e visual mobile
+- a IA considera carta coberta como opcao de descarte quando nao faz sentido disputar a vaza
+- a implementacao cobre modelo de estado, logs, resolucao da vaza, jogada humana, jogada da IA e visual mobile
+
+Cobertura atual:
+
+- `tests/game/resolve-trick.test.ts`
+- `tests/ai/chooseCard.test.ts`

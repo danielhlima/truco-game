@@ -31,7 +31,8 @@ O caminho principal ja esta integrado com pacotes visuais autorais ate o `Cassin
 - a run temporaria nao altera progresso, recompensas ou desbloqueios da campanha principal ja concluida
 - `Recomeçar campanha` usa confirmacao interna do jogo
 - `Jogos Mundiais` e `Mundial` usam Truco Mineiro
-- a proxima frente deve ser carta virada para baixo/carta coberta com testes, conforme `docs/NEXT_STEPS.md`
+- carta coberta, mao de 9 e tutorial jogavel ja estao implementados
+- a preparacao mobile com `Capacitor + Android Studio + Xcode` ja foi iniciada; a proxima frente e validar Android Studio, alinhar Xcode/CoreSimulator e testar em device real conforme `docs/NEXT_STEPS.md`
 
 Nota visual: o caminho principal evoluiu de botecos populares para eventos oficiais, arenas, torneios internacionais e cassino de luxo. O bonus deve parecer uma virada de tom intencional, divertida e especial, sem reciclar simplesmente a estetica dos ultimos campeonatos.
 
@@ -106,5 +107,6 @@ Observacoes:
 
 Proxima frente:
 
-- implementar carta virada para baixo/carta coberta com testes
-- depois da carta coberta, retomar mao especial de 9/dez pontos, ponto acima e tutorial
+- continuar a validacao mobile com `Capacitor + Android Studio + Xcode`
+- validar em device real orientacao landscape, safe areas, toque, escala do stage e performance
+- depois da validacao mobile, retomar pendencias opcionais como `ponto acima`

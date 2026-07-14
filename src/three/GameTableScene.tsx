@@ -48,6 +48,7 @@ interface GameTableSceneProps {
   model: TableSceneModel
   speechBubble?: SpeechBubbleState | null
   dealAnimationNonce?: number
+  animationsEnabled?: boolean
   style?: CSSProperties
 }
 
@@ -55,6 +56,7 @@ export function GameTableScene({
   model,
   speechBubble,
   dealAnimationNonce,
+  animationsEnabled = true,
   style,
 }: GameTableSceneProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
@@ -105,10 +107,13 @@ export function GameTableScene({
   const sceneWarmGlowStrength = model.theme.sceneWarmGlowStrength ?? 0.16
   const sceneVignetteStrength = model.theme.sceneVignetteStrength ?? 0.24
   const [animatingCards, setAnimatingCards] = useState<AnimatedCard[]>([])
+  const [animatingVira, setAnimatingVira] = useState<AnimatedViraCard | null>(null)
+  const [shownViraKey, setShownViraKey] = useState<string | null>(null)
   const [clearingCards, setClearingCards] = useState<ClearingCard[]>([])
   const [dealingCards, setDealingCards] = useState<DealingCard[]>([])
   const [isDealing, setIsDealing] = useState(false)
   const previousCardsRef = useRef<Record<number, string | null>>({})
+  const previousViraAnimationKeyRef = useRef<string | null>(null)
   const animationTimeoutsRef = useRef<number[]>([])
 
   useEffect(() => {
@@ -409,8 +414,81 @@ export function GameTableScene({
     }
   }, [model.slots])
 
+  const vira = model.centerDeck.vira
+  const viraKey =
+    model.centerDeck.show && vira ? `${vira.rank}-${vira.suit}` : null
+  const tableHasPlayedCards = model.slots.some((slot) => !!slot.card)
+
   useEffect(() => {
-    if (!dealAnimationNonce) {
+    if (!viraKey || !vira) {
+      previousViraAnimationKeyRef.current = null
+      setAnimatingVira(null)
+      setShownViraKey(null)
+      return
+    }
+
+    if (!animationsEnabled || tableHasPlayedCards) {
+      setAnimatingVira(null)
+      setShownViraKey(viraKey)
+      return
+    }
+
+    const animationKey = `${dealAnimationNonce ?? 0}:${viraKey}`
+    if (previousViraAnimationKeyRef.current === animationKey) {
+      setShownViraKey(viraKey)
+      return
+    }
+
+    previousViraAnimationKeyRef.current = animationKey
+    setShownViraKey(null)
+
+    const viraAnimationCard = {
+      key: `vira-${animationKey}`,
+      rank: vira.rank,
+      suit: vira.suit,
+      suitSymbol: vira.suitSymbol,
+      from: getViraAnimationOrigin(),
+      to: getViraOverlayPose(),
+      stage: "from" as const,
+    }
+
+    const initId = window.setTimeout(() => {
+      setAnimatingVira(viraAnimationCard)
+    }, 0)
+
+    const startId = window.setTimeout(() => {
+      setAnimatingVira((current) =>
+        current?.key === viraAnimationCard.key
+          ? {
+              ...current,
+              stage: "to",
+            }
+          : current
+      )
+    }, 24)
+
+    const finishId = window.setTimeout(() => {
+      setShownViraKey(viraKey)
+      setAnimatingVira(null)
+    }, 520)
+
+    return () => {
+      window.clearTimeout(initId)
+      window.clearTimeout(startId)
+      window.clearTimeout(finishId)
+    }
+  }, [
+    animationsEnabled,
+    dealAnimationNonce,
+    tableHasPlayedCards,
+    vira?.rank,
+    vira?.suit,
+    vira?.suitSymbol,
+    viraKey,
+  ])
+
+  useEffect(() => {
+    if (!dealAnimationNonce || !animationsEnabled) {
       return
     }
 
@@ -419,6 +497,7 @@ export function GameTableScene({
     const cardsToDeal = order.flatMap((playerId) =>
       Array.from({ length: 3 }, (_, index) => ({ playerId, index }))
     )
+    const dealIntroDelay = model.centerDeck.show && viraKey ? 520 : 0
 
     const resetId = window.setTimeout(() => {
       previousCardsRef.current = {}
@@ -433,7 +512,7 @@ export function GameTableScene({
       const key = `deal-${dealAnimationNonce}-${playerId}-${index}`
       const from = { left: "50%", top: "50%", rotation: 0 }
       const to = getDealAnimationTargetPosition(playerId, index)
-      const delay = sequenceIndex * 78
+      const delay = dealIntroDelay + sequenceIndex * 78
 
       const initId = window.setTimeout(() => {
         setDealingCards((current) => [
@@ -469,7 +548,7 @@ export function GameTableScene({
 
     const finishId = window.setTimeout(() => {
       setIsDealing(false)
-    }, cardsToDeal.length * 78 + 900)
+    }, dealIntroDelay + cardsToDeal.length * 78 + 900)
     dealTimeouts.push(finishId)
 
     return () => {
@@ -479,7 +558,12 @@ export function GameTableScene({
       setDealingCards([])
       setIsDealing(false)
     }
-  }, [dealAnimationNonce])
+  }, [
+    animationsEnabled,
+    dealAnimationNonce,
+    model.centerDeck.show,
+    viraKey,
+  ])
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%", ...style }}>
@@ -566,6 +650,24 @@ export function GameTableScene({
           pointerEvents: "none",
         }}
       >
+        {model.centerDeck.show && vira && shownViraKey === viraKey && !animatingVira ? (
+          <ViraCardOverlay vira={vira} />
+        ) : null}
+
+        {animatingVira ? (
+          <ViraCardOverlay
+            vira={animatingVira}
+            left={animatingVira.stage === "from" ? animatingVira.from.left : animatingVira.to.left}
+            top={animatingVira.stage === "from" ? animatingVira.from.top : animatingVira.to.top}
+            rotation={
+              animatingVira.stage === "from"
+                ? animatingVira.from.rotation
+                : animatingVira.to.rotation
+            }
+            transition="left 480ms cubic-bezier(0.22, 0.9, 0.24, 1), top 480ms cubic-bezier(0.22, 0.9, 0.24, 1), transform 480ms cubic-bezier(0.22, 0.9, 0.24, 1)"
+          />
+        ) : null}
+
         {!isDealing && overlaySlots
           .filter((slot) => {
             if (!slot.card) return false
@@ -733,6 +835,14 @@ function getPlayAnimationOrigin(playerId: number): {
   }
 }
 
+function getViraOverlayPose(): { left: string; top: string; rotation: number } {
+  return { left: "62%", top: "32%", rotation: -7 }
+}
+
+function getViraAnimationOrigin(): { left: string; top: string; rotation: number } {
+  return { left: "50%", top: "50%", rotation: -28 }
+}
+
 function getSlotCardKey(slot: TableSceneModel["slots"][number]): string | null {
   if (!slot.card) {
     return null
@@ -743,6 +853,27 @@ function getSlotCardKey(slot: TableSceneModel["slots"][number]): string | null {
   }
 
   return `${slot.card.rank}-${slot.card.suit}`
+}
+
+interface ViraCardData {
+  rank: string
+  suit: string
+  suitSymbol: string
+}
+
+interface AnimatedViraCard extends ViraCardData {
+  key: string
+  from: {
+    left: string
+    top: string
+    rotation: number
+  }
+  to: {
+    left: string
+    top: string
+    rotation: number
+  }
+  stage: "from" | "to"
 }
 
 interface AnimatedCard {
@@ -812,6 +943,68 @@ interface CodeCardProps {
   transition?: string
   opacity?: number
   settled?: boolean
+}
+
+function ViraCardOverlay({
+  vira,
+  left,
+  top,
+  rotation,
+  transition,
+}: {
+  vira: ViraCardData
+  left?: string
+  top?: string
+  rotation?: number
+  transition?: string
+}) {
+  const pose = getViraOverlayPose()
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: left ?? pose.left,
+        top: top ?? pose.top,
+        width: "72px",
+        height: "96px",
+        transform: `translate(-50%, -50%) rotate(${rotation ?? pose.rotation}deg)`,
+        transition,
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: 0,
+          transform: "translate(-50%, 0)",
+          padding: "2px 7px",
+          borderRadius: "999px",
+          background: "rgba(29, 18, 10, 0.8)",
+          border: "1px solid rgba(245, 218, 169, 0.58)",
+          color: "#f8ead2",
+          fontSize: "10px",
+          fontWeight: 900,
+          letterSpacing: "0.08em",
+          lineHeight: 1,
+          textTransform: "uppercase",
+          boxShadow: "0 5px 10px rgba(0,0,0,0.2)",
+        }}
+      >
+        Vira
+      </div>
+      <CodeCard
+        left="50%"
+        top="60%"
+        rotation={0}
+        scale={0.86}
+        rank={vira.rank}
+        suit={vira.suit}
+        suitSymbol={vira.suitSymbol}
+        highlight
+      />
+    </div>
+  )
 }
 
 function CodeCard({

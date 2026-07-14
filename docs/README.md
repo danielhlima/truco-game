@@ -12,6 +12,7 @@ Para continuar o projeto em qualquer chat novo do Codex, leia nesta ordem:
 6. `docs/NEXT_STEPS.md`
 7. `docs/CAMPAIGN_PATH.md`
 8. `docs/NEXT_CHAT_PROMPT.md`
+9. `docs/TUTORIAL_PLAN.md`
 
 ## Papel de cada arquivo
 
@@ -81,6 +82,14 @@ Entrega um prompt pronto para abrir um chat novo:
 - estado atual da campanha principal e do bonus pos-campanha
 - objetivo recomendado para o proximo chat
 - pendencias de regras e produto que devem ser tratadas agora
+
+### `docs/TUTORIAL_PLAN.md`
+
+Registra o tutorial jogavel aprovado:
+
+- aulas 1 a 10
+- conceitos ensinados antes da primeira experiencia mobile
+- estado atual de implementacao e futura limpeza opcional
 
 ### `docs/CHARACTER_AVATAR_PROMPTS.md`
 
@@ -225,7 +234,7 @@ Estado consolidado:
 
 ## Prioridade imediata para o proximo chat
 
-No proximo chat, implementar a regra de carta virada para baixo/carta coberta, sem reabrir assets/fluxo visual.
+No proximo chat, continuar a validacao mobile com `Capacitor + Android Studio + Xcode`, sem reabrir responsividade estrutural, selecao de parceira, arquitetura de estado ou pacote visual sem regressao real.
 
 Estado pos-bonus:
 
@@ -238,9 +247,18 @@ Proximo foco recomendado:
 - usar `docs/NEXT_CHAT_PROMPT.md` como briefing inicial copiavel
 - carta coberta ja esta implementada a partir da segunda vaza
 - mao de 9 ja esta implementada com decisao `Jogar`/`Correr`
+- tutorial jogavel ja esta implementado e testado pelo usuario:
+  - aulas 1 a 10 cobrem mesa/vaza, ordem comum, manilhas, truco, respostas, parceira, carta coberta, Truco Paulista/vira e mao de 9
+- proxima frente recomendada:
+  - Capacitor ja foi integrado com `capacitor.config.ts`, `android/` e `ios/`
+  - `npm run cap:sync` faz build web e sync nativo
+  - Android ja compilou por terminal com `assembleDebug`
+  - Android Studio/device fisico ja rodou o app
+  - fullscreen, tela jogavel nativa e controles maiores/centralizados ja foram ajustados no Android
+  - ajustar ambiente do Xcode/CoreSimulator se necessario e abrir/testar no Xcode
+  - validar em device real orientacao landscape, toque, safe areas, escala e performance
 - proximas pendencias de produto/regras:
   - opcao de escolher ou nao a versao `ponto acima`
-  - tutorial jogavel
   - segunda rodada fina de IA apenas se novos testes em jogo apontarem regressao real
 
 ## Regra de continuidade
