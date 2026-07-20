@@ -21,6 +21,7 @@ Estado consolidado:
 - depois da campanha concluida, `COMEÇAR` abre o `Modo Livre`
 - o `Modo Livre` usa `src/assets/campaign/free-play-circuit-hub.png`
 - no `Modo Livre`, cada quadro de circuito e um hotspot invisivel
+- nas telas autorais da Jornada de Campanha, a placa/nome e a foto/cartao do bar atual entram no mesmo bar por hotspots invisiveis
 - clicar em um circuito inicia uma run temporaria daquele circuito
 - a run temporaria avanca de bar em bar ao cumprir as vitorias locais e retorna ao hub ao concluir o circuito livre
 - o `Voltar` dessa tela autoral retorna ao hub do `Modo Livre` e encerra a run temporaria

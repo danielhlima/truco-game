@@ -18,6 +18,7 @@ O caminho principal ja esta integrado com pacotes visuais autorais ate o `Cassin
 - o caminho principal termina no `Cassino Mé Maior`
 - depois do mundial, o bonus `Circuito Intergaláctico` libera a `Órbita da Lua`
 - a tela de campanha da `Órbita da Lua` e a ultima etapa do jogo e nao tem `next venue`
+- nas telas autorais da Jornada de Campanha, tocar na foto/cartao do bar atual tambem entra no bar; a placa/nome continua clicavel
 - a dupla bonus e `Mané Banguela` + `Cosme Órbita`
 - o bonus usa campanha, background, host, mesa, vitoria/derrota normal e vitorias definitivas de local/circuito autorais
 - ao concluir a `Órbita da Lua`, o fluxo mostra primeiro a conquista do local e depois a conquista do circuito

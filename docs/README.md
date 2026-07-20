@@ -160,6 +160,7 @@ Estado consolidado:
   - `VOLTAR`
   - `ENTRAR NO BAR`
   - `TROCAR PARCEIRA`
+- a entrada do bar tambem cobre a foto/cartao do bar atual nas telas autorais, pois esse e um alvo natural de toque para jogadores
 - a tela de campanha dinamica continua como fallback para outros bares/estados
 - tela inicial definitiva com arte propria:
   - `src/assets/start/truco-raiz-start.png`

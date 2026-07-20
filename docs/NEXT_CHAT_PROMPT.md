@@ -37,6 +37,7 @@ Contexto atual:
 - A gameplay usa stage logico 1080x500.
 - A intro curta antes da partida mostra primeiro apenas o background do local.
 - As telas de campanha autorais usam hotspots HTML invisiveis sobre a arte.
+- Na Jornada de Campanha, `ENTRAR NO BAR` tambem cobre a foto/cartao do bar atual quando ela aparece como alvo de toque.
 - Testes unitarios de dialogos/raises ja cobrem TRUCO!, SEIS!, NOVE!, DOZE!, DESCE!, TOMA! e TÔ FORA!.
 - A criacao de partida por bar ja aplica a variante declarada no local.
 - Ha testes para criacao de partida Mineiro/Paulista e proxima mao Paulista mantendo vira.

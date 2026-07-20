@@ -44,6 +44,9 @@ const ILLUSTRATED_TABLE_ASSET_URLS: Record<string, string> = {
   "steel-patio": tableTopSteelPatioUrl,
 }
 
+const CODE_CARD_WIDTH = 56
+const CODE_CARD_HEIGHT = 80.64
+
 interface GameTableSceneProps {
   model: TableSceneModel
   speechBubble?: SpeechBubbleState | null
@@ -271,7 +274,7 @@ export function GameTableScene({
       if (slot.card) {
         const playedPosition = getPlayedCardPosition(slot.playerId)
         const glow = new THREE.Mesh(
-          new THREE.PlaneGeometry(1.05, 1.38),
+          new THREE.PlaneGeometry(1.176, 1.5456),
           new THREE.MeshBasicMaterial({
             color: slot.highlight ? model.theme.activeSlotColor : model.theme.emptySlotColor,
             transparent: true,
@@ -966,8 +969,8 @@ function ViraCardOverlay({
         position: "absolute",
         left: left ?? pose.left,
         top: top ?? pose.top,
-        width: "72px",
-        height: "96px",
+        width: "80.8px",
+        height: "107.2px",
         transform: `translate(-50%, -50%) rotate(${rotation ?? pose.rotation}deg)`,
         transition,
       }}
@@ -1021,8 +1024,8 @@ function CodeCard({
   opacity = 1,
   settled = false,
 }: CodeCardProps) {
-  const width = 50 * scale
-  const height = 72 * scale
+  const width = CODE_CARD_WIDTH * scale
+  const height = CODE_CARD_HEIGHT * scale
   const suitColor = suit === "copas" || suit === "ouros" ? "#b91c1c" : "#1f2937"
 
   return (
@@ -1034,7 +1037,7 @@ function CodeCard({
         width: `${width}px`,
         height: `${height}px`,
         transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
-        borderRadius: "9px",
+        borderRadius: "10.4px",
         overflow: "hidden",
         background: faceDown
           ? `center / cover no-repeat url(${cardBackAgedPhotoUrl})`
@@ -1051,7 +1054,7 @@ function CodeCard({
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        padding: faceDown ? "5px" : "4px 5px",
+        padding: faceDown ? "5.6px" : "4.8px 5.6px",
         boxSizing: "border-box",
         transition,
         opacity,
@@ -1059,11 +1062,11 @@ function CodeCard({
     >
       {faceDown ? null : (
         <>
-          <div style={{ fontSize: "15px", fontWeight: 800, lineHeight: 1 }}>{rank}</div>
-          <div style={{ fontSize: "26px", lineHeight: 1, alignSelf: "center" }}>{suitSymbol}</div>
+          <div style={{ fontSize: "16.8px", fontWeight: 800, lineHeight: 1 }}>{rank}</div>
+          <div style={{ fontSize: "28.8px", lineHeight: 1, alignSelf: "center" }}>{suitSymbol}</div>
           <div
             style={{
-              fontSize: "15px",
+              fontSize: "16.8px",
               fontWeight: 800,
               lineHeight: 1,
               alignSelf: "flex-end",

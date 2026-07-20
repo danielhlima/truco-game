@@ -3149,6 +3149,11 @@ function JourneyIntroScreen({
     : null
 
   if (authoredCampaign && viewedCampaignVenue) {
+    const enterHotspots = [
+      authoredCampaign.enterHotspot,
+      ...(authoredCampaign.extraEnterHotspots ?? []),
+    ]
+
     return (
       <div style={styles.authoredCampaignScreen}>
         <img
@@ -3165,15 +3170,18 @@ function JourneyIntroScreen({
           }}
           onClick={freePlayStage ? onCloseFreePlayStage : onBack}
         />
-        <button
-          aria-label={`Abrir capa do ${viewedCampaignVenue.name}`}
-          title={`Abrir capa do ${viewedCampaignVenue.name}`}
-          style={{
-            ...styles.authoredCampaignHotspot,
-            ...authoredCampaign.enterHotspot,
-          }}
-          onClick={() => onLaunchVenue(viewedCampaignVenue.id)}
-        />
+        {enterHotspots.map((enterHotspot, index) => (
+          <button
+            key={`enter-${viewedCampaignVenue.id}-${index}`}
+            aria-label={`Abrir capa do ${viewedCampaignVenue.name}`}
+            title={`Abrir capa do ${viewedCampaignVenue.name}`}
+            style={{
+              ...styles.authoredCampaignHotspot,
+              ...enterHotspot,
+            }}
+            onClick={() => onLaunchVenue(viewedCampaignVenue.id)}
+          />
+        ))}
         <button
           aria-label="Trocar parceira"
           title="Trocar parceira"
@@ -3407,6 +3415,7 @@ const authoredCampaignScreens: Record<
     alt: string
     backHotspot: React.CSSProperties
     enterHotspot: React.CSSProperties
+    extraEnterHotspots?: React.CSSProperties[]
     partnerHotspot: React.CSSProperties
   }
 > = {
@@ -3421,11 +3430,11 @@ const authoredCampaignScreens: Record<
       borderRadius: "999px",
     },
     enterHotspot: {
-      left: "14.5%",
-      top: "72.2%",
-      width: "25.3%",
-      height: "11.6%",
-      borderRadius: "8px",
+      left: "13.8%",
+      top: "34.8%",
+      width: "26.6%",
+      height: "49.2%",
+      borderRadius: "14px",
     },
     partnerHotspot: {
       left: "39.6%",
@@ -3446,11 +3455,11 @@ const authoredCampaignScreens: Record<
       borderRadius: "8px",
     },
     enterHotspot: {
-      left: "38.7%",
-      top: "70.2%",
-      width: "25.1%",
-      height: "10.8%",
-      borderRadius: "8px",
+      left: "36.5%",
+      top: "29.1%",
+      width: "27.5%",
+      height: "52.6%",
+      borderRadius: "14px",
     },
     partnerHotspot: {
       left: "35.2%",
@@ -3471,11 +3480,11 @@ const authoredCampaignScreens: Record<
       borderRadius: "8px",
     },
     enterHotspot: {
-      left: "38.1%",
-      top: "69.1%",
-      width: "25.2%",
-      height: "10.3%",
-      borderRadius: "8px",
+      left: "37.4%",
+      top: "28%",
+      width: "26.9%",
+      height: "52.2%",
+      borderRadius: "14px",
     },
     partnerHotspot: {
       left: "39.6%",
@@ -3496,11 +3505,11 @@ const authoredCampaignScreens: Record<
       borderRadius: "8px",
     },
     enterHotspot: {
-      left: "37.2%",
-      top: "69.4%",
-      width: "26.6%",
-      height: "10.9%",
-      borderRadius: "8px",
+      left: "37.1%",
+      top: "28.8%",
+      width: "27.5%",
+      height: "51.9%",
+      borderRadius: "14px",
     },
     partnerHotspot: {
       left: "39.6%",
@@ -3527,6 +3536,15 @@ const authoredCampaignScreens: Record<
       height: "11.8%",
       borderRadius: "8px",
     },
+    extraEnterHotspots: [
+      {
+        left: "37%",
+        top: "35.2%",
+        width: "27%",
+        height: "41.8%",
+        borderRadius: "14px",
+      },
+    ],
     partnerHotspot: {
       left: "38.4%",
       top: "92.5%",
@@ -3552,6 +3570,15 @@ const authoredCampaignScreens: Record<
       height: "12.1%",
       borderRadius: "8px",
     },
+    extraEnterHotspots: [
+      {
+        left: "33.8%",
+        top: "16.3%",
+        width: "34.9%",
+        height: "54%",
+        borderRadius: "14px",
+      },
+    ],
     partnerHotspot: {
       left: "62.8%",
       top: "80.7%",
@@ -3577,6 +3604,15 @@ const authoredCampaignScreens: Record<
       height: "13.2%",
       borderRadius: "8px",
     },
+    extraEnterHotspots: [
+      {
+        left: "32.6%",
+        top: "16.4%",
+        width: "36.3%",
+        height: "54.2%",
+        borderRadius: "14px",
+      },
+    ],
     partnerHotspot: {
       left: "61%",
       top: "80.6%",
@@ -3602,6 +3638,15 @@ const authoredCampaignScreens: Record<
       height: "12.2%",
       borderRadius: "8px",
     },
+    extraEnterHotspots: [
+      {
+        left: "30.3%",
+        top: "15.7%",
+        width: "42.6%",
+        height: "62.3%",
+        borderRadius: "14px",
+      },
+    ],
     partnerHotspot: {
       left: "68.1%",
       top: "84%",
@@ -3627,6 +3672,15 @@ const authoredCampaignScreens: Record<
       height: "12.8%",
       borderRadius: "8px",
     },
+    extraEnterHotspots: [
+      {
+        left: "29%",
+        top: "18.2%",
+        width: "42.2%",
+        height: "54.3%",
+        borderRadius: "14px",
+      },
+    ],
     partnerHotspot: {
       left: "31.1%",
       top: "89%",
@@ -3652,6 +3706,15 @@ const authoredCampaignScreens: Record<
       height: "12.1%",
       borderRadius: "8px",
     },
+    extraEnterHotspots: [
+      {
+        left: "29.8%",
+        top: "20.4%",
+        width: "41.4%",
+        height: "58.8%",
+        borderRadius: "14px",
+      },
+    ],
     partnerHotspot: {
       left: "68.8%",
       top: "88.6%",
@@ -3677,6 +3740,15 @@ const authoredCampaignScreens: Record<
       height: "12.1%",
       borderRadius: "8px",
     },
+    extraEnterHotspots: [
+      {
+        left: "27.4%",
+        top: "16.7%",
+        width: "45.3%",
+        height: "54.8%",
+        borderRadius: "14px",
+      },
+    ],
     partnerHotspot: {
       left: "32.4%",
       top: "87.7%",
@@ -3702,6 +3774,15 @@ const authoredCampaignScreens: Record<
       height: "14.8%",
       borderRadius: "8px",
     },
+    extraEnterHotspots: [
+      {
+        left: "28.8%",
+        top: "19.1%",
+        width: "42.3%",
+        height: "57.6%",
+        borderRadius: "14px",
+      },
+    ],
     partnerHotspot: {
       left: "72.2%",
       top: "80.9%",
@@ -3727,6 +3808,15 @@ const authoredCampaignScreens: Record<
       height: "12.6%",
       borderRadius: "8px",
     },
+    extraEnterHotspots: [
+      {
+        left: "27.4%",
+        top: "21.7%",
+        width: "44.3%",
+        height: "51.3%",
+        borderRadius: "14px",
+      },
+    ],
     partnerHotspot: {
       left: "37%",
       top: "89%",
@@ -3752,6 +3842,15 @@ const authoredCampaignScreens: Record<
       height: "11.4%",
       borderRadius: "8px",
     },
+    extraEnterHotspots: [
+      {
+        left: "35.7%",
+        top: "18.4%",
+        width: "30.1%",
+        height: "53.3%",
+        borderRadius: "14px",
+      },
+    ],
     partnerHotspot: {
       left: "34%",
       top: "88.7%",
@@ -3777,6 +3876,15 @@ const authoredCampaignScreens: Record<
       height: "17%",
       borderRadius: "8px",
     },
+    extraEnterHotspots: [
+      {
+        left: "56.5%",
+        top: "22%",
+        width: "32.8%",
+        height: "44.6%",
+        borderRadius: "14px",
+      },
+    ],
     partnerHotspot: {
       left: "25.7%",
       top: "68.7%",

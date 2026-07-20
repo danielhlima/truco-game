@@ -156,6 +156,8 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 - A arte autoral pode conter textos, placas e ilustrações ja renderizados.
 - Controles de fluxo sobre arte autoral devem ser botoes HTML invisiveis posicionados por percentual.
 - Os hotspots atuais sao `VOLTAR`, `ENTRAR NO BAR` e `TROCAR PARCEIRA`.
+- `ENTRAR NO BAR` pode ter mais de uma area HTML invisivel quando a arte pede isso: a placa/nome do bar e a foto/cartao do bar atual devem abrir o mesmo local.
+- Hotspots extras de entrada devem cobrir apenas o bar atual; nao devem invadir bares bloqueados, proxima fase, logo, `VOLTAR` ou `TROCAR PARCEIRA`.
 - A tela de campanha do `Circuito Intergaláctico` / `Órbita da Lua` e a ultima etapa do jogo; nao deve mostrar ou sugerir `next venue`.
 - A tela dinamica de campanha continua como fallback para bares ou estados sem arte propria.
 

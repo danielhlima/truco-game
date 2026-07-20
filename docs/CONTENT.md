@@ -131,6 +131,7 @@ Arquivos principais:
   - `src/assets/campaign/conquista-zonas-subsolo-do-centro.png`
   - `src/assets/campaign/conquista-zonas-salao-da-sul.png`
 - os controles `VOLTAR`, `ENTRAR NO BAR` e `TROCAR PARCEIRA` sao hotspots HTML invisiveis sobre a imagem
+- nas telas autorais de campanha, a foto/cartao do bar atual tambem deve funcionar como entrada no bar quando for um alvo visual natural para toque
 - a tela de campanha dinamica continua como fallback para bares/estados sem arte propria
 - a tela de resultado preserva a ultima mesa visivel e espera 1 segundo antes de exibir vitoria/derrota
 - a intro de gameplay foi implementada:
@@ -613,6 +614,7 @@ Estado visual atual:
   - `VOLTAR`
   - `ENTRAR NO BAR`
   - `TROCAR PARCEIRA`
+- `ENTRAR NO BAR` pode ser composto por multiplos hotspots invisiveis: a placa/nome e a foto/cartao do bar atual levam para o mesmo local
 - a tela de campanha dinamica permanece como fallback para outros bares/estados
 - depois da campanha concluida, `COMEÇAR` leva ao `Modo Livre`
 - o `Modo Livre` usa o asset `src/assets/campaign/free-play-circuit-hub.png`
