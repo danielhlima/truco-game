@@ -71,6 +71,15 @@ Quando a parceira IA é o alvo de um `pedido inicial` adversário:
   - `BORA!`
   - `CÊ QUE SABE!`
   - `MELHOR CORRER!`
+- se o humano responder `BORA!`, a parceira nao pode correr; ela deve aceitar ou aumentar
+- se o humano responder `CÊ QUE SABE!` ou `MELHOR CORRER!`, a parceira pode decidir correr conforme a leitura da dupla
+- `CÊ QUE SABE!` significa que o humano sinaliza provavelmente uma unica carta util ou mediana, como figura, `A`, `2` ou `3`
+- `MELHOR CORRER!` significa que o humano sinaliza nao ter ajuda relevante na mao
+- a parceira interpreta esses sinais com um nivel de leitura progressivo:
+  - parceiras iniciais usam leitura basica
+  - parceiros desbloqueados herdam o nivel de leitura da dificuldade do bar onde foram derrotados
+  - parceiras mais avancadas dao mais peso ao sinal `CÊ QUE SABE!`
+  - `MELHOR CORRER!` zera a contribuicao da mao do humano na consulta; a parceira so continua por forca propria
 
 ### Limite de conselho
 
@@ -106,14 +115,32 @@ Hoje a força da mão é calculada assim:
 - `A` = `1`
 - `K` = `1`
 
+## Log de Debug da IA de Truco
+
+O fluxo automatico de truco registra linhas `DEBUG IA Truco` quando a IA:
+
+- pede truco/aumento na propria vez
+- responde a um pedido adversario com `accept`, `run` ou `raise`
+
+Formato atual:
+
+- pedido: `DEBUG IA Truco: acao pedido, jogador 2, time B, perfil balanced, forcas [7], aposta atual 1, decisao pedir`
+- resposta: `DEBUG IA Truco: acao resposta, time B, perfil balanced, forcas [7, 0], aposta proposta 3, decisao raise`
+
+Observacao:
+
+- em pedido, `forcas` mostra a forca da mao do jogador que pediu
+- em resposta, `forcas` mostra as forcas dos jogadores do time que responde
+- o log foi criado para diagnosticar balanceamento de IA em testes reais; ele nao altera regra, threshold ou resultado da decisao
+
 ## Cortes Atuais do Perfil `balanced`
 
 Pedido ou aumento, por valor atual da rodada:
 
-- valendo `1`, pedir `TRUCO!` -> corte `3`
-- valendo `3`, pedir `SEIS!` -> corte `4`
-- valendo `6`, pedir `NOVE!` -> corte `4`
-- valendo `9`, pedir `DOZE!` -> corte `5`
+- valendo `1`, pedir `TRUCO!` -> corte `4`
+- valendo `3`, pedir `SEIS!` -> corte `5`
+- valendo `6`, pedir `NOVE!` -> corte `6`
+- valendo `9`, pedir `DOZE!` -> corte `7`
 
 Aceite, por valor proposto:
 
@@ -127,23 +154,28 @@ Observacao:
 - perfis agressivos, malandros e imprevisiveis possuem cortes proprios
 - blefes continuam existindo, mas com probabilidades menores e margem controlada
 - dificuldade alta com disciplina alta passa a usar perfil `trickster`, nao `reckless`
+- adversarios de campanha usam a personalidade derivada da dificuldade do bar, nao a personalidade isolada do primeiro personagem da dupla
+- re-aumentos de dupla exigem mao individual muito forte ou soma real da parceria; uma unica mao media nao deve puxar escalada automatica
 
 ## Observação Importante
 
 - A primeira rodada de rebalanceamento reduziu a tendencia da IA de `trucar com pouco`.
-- O perfil `balanced` agora exige mao mais firme para pedir, aceitar e contra-aumentar.
+- A segunda rodada vinculou adversarios a curva de dificuldade dos bares e deixou os re-aumentos mais raros.
+- O perfil `balanced` agora exige mao boa para pedir e mao muito forte ou parceria forte para contra-aumentar.
 - Quando nao consegue ganhar uma vaza, a IA descarta a menor carta disponivel em vez de queimar carta alta.
 - Quando consegue ganhar a vaza, a IA usa a menor carta vencedora.
-- Este arquivo registra a logica atual apos essa primeira rodada, nao um equilibrio final definitivo.
+- A IA considera carta coberta como sinal tatico: pode puxar coberta na segunda vaza depois de vencer a primeira quando ainda guarda carta forte, mas evita isso se a mao atual pode fechar a partida.
+- Este arquivo registra a logica atual apos a segunda rodada, nao um equilibrio final definitivo.
 - Qualquer ajuste em thresholds, blefes, aceite, corrida ou raise deve ser acompanhado por testes.
 
-## Variantes Por Bar
+## Variante Global
 
-- A campanha declara bares de `Truco Mineiro` e `Truco Paulista`.
-- A criacao de partida agora usa a variante declarada pelo bar.
+- O jogador escolhe em `CONFIGURAÇÕES` se quer jogar `Truco Paulista` ou `Truco Mineiro`.
+- `Truco Paulista` e o padrao do perfil novo e dos bares/circuitos.
+- A escolha global vale para todos os bares da campanha principal, bonus pos-campanha e Modo Livre.
+- A criacao de partida usa a variante salva no perfil do jogador; o valor declarado no bar fica apenas como fallback tecnico.
 - A proxima mao de uma partida preserva a variante da propria partida.
-- Existem testes unitarios cobrindo criacao de partida por local Mineiro/Paulista e proxima mao Paulista mantendo vira.
-- `Jogos Mundiais` e `Mundial` usam `Truco Mineiro`.
+- Existem testes unitarios cobrindo o padrao Paulista, o override global Mineiro e a proxima mao Paulista mantendo vira.
 - O log de inicio de mao registra a regra ativa; em Paulista, registra tambem vira e manilha.
 - Se a implementacao visual da vira/manilha do Paulista for alterada, validar novamente no fluxo real e em testes.
 
@@ -175,6 +207,11 @@ Observacao:
 - a identidade real da carta coberta nao deve ser revelada nem aos adversarios nem ao parceiro durante a partida
 - a mesa e os logs registram que uma carta coberta foi jogada, mas nao revelam a carta real
 - a IA considera carta coberta como opcao quando quer descartar sem disputar a vaza
+- se so adversarios jogaram coberto e nao ha carta aberta vencendo a vaza, a IA abre carta baixa para disputar barato
+- se a parceira jogou coberto e nao ha urgencia de ganhar a vaza, a IA pode acompanhar coberta para perder/empatar sem revelar carta
+- se a dupla pode ganhar a mao, evitar derrota critica ou fechar a partida, a IA abre carta mesmo apos uma coberta da parceira
+- se a IA ganhou a primeira vaza e ainda tem reserva forte para a terceira, ela pode puxar coberta na segunda vaza para nao assustar a mesa e preservar poder de resposta a truco
+- a IA nao deve puxar coberta nessa situacao quando a mao atual ja pode fechar a partida no placar
 - cobertura atual:
   - `tests/game/resolve-trick.test.ts`
   - `tests/ai/chooseCard.test.ts`

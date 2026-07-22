@@ -78,6 +78,13 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
   - espadas e paus em escuro
 - A mão precisa permanecer visível mesmo em telas mais apertadas.
 
+## Regras da Vira Paulista
+
+- No `Truco Paulista`, a carta de vira deve aparecer no canto inferior esquerdo da mesa.
+- A vira nao deve competir visualmente com as cartas jogadas no centro da mesa.
+- A posicao da vira deve preservar margem minima em telas estreitas para evitar corte lateral.
+- A distribuicao visual de cartas nao deve reiniciar apenas porque a proxima mao Paulista ganhou uma nova vira.
+
 ## Regras de Encaixe
 
 - O layout master deve ser fechado antes do polimento responsivo final.
@@ -124,11 +131,21 @@ Este arquivo documenta as regras já consolidadas do layout principal do jogo pa
 - A tela inicial atual usa arte autoral definitiva em `src/assets/start/truco-raiz-start.png`.
 - A primeira tela preserva a moldura landscape e o clima visual de boteco ja consolidado.
 - `COMEÇAR` deve continuar levando ao fluxo `campanha > capa do bar > escolha de parceira se necessario > jogo`.
+- `TUTORIAL` deve abrir o tutorial jogavel.
+- `CONFIGURAÇÕES` deve abrir a tela de ajustes.
+- A primeira configuracao e o tipo global de truco: `Truco Paulista` por padrao ou `Truco Mineiro`.
+- A variante escolhida em `CONFIGURAÇÕES` vale para todos os bares/circuitos.
 - A tela inicial nao deve substituir a tela de campanha nem a capa do bar; ela e a porta de entrada anterior ao fluxo.
-- O botao `COMEÇAR` deve ser um controle HTML real sobre a placa desenhada na arte.
+- Os botoes da arte devem ser controles HTML reais invisiveis sobre as placas desenhadas.
 - A arte deve aparecer inteira no stage; se a proporcao nao bater, usar preenchimento visual sem cortar logo ou botao.
-- Debug de bar, reset de progresso e selecao de variante nao devem dominar a primeira tela visivel.
+- Debug de bar e reset de progresso nao devem dominar a primeira tela visivel.
 - Evitar reabrir responsividade da gameplay ou selecao de parceira enquanto a tela inicial estiver sendo trabalhada.
+
+## Regras do Tutorial Jogavel
+
+- O botao `Voltar` do tutorial deve ser um controle HTML real, visivel acima das camadas de mesa, avatares e baloes.
+- A area de toque do `Voltar` deve ser confortavel em celular e nao pode depender de hover.
+- O `Voltar` do tutorial deve retornar para a tela inicial.
 
 ## Regras das Telas de Resultado
 

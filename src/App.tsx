@@ -1,6 +1,8 @@
-import { Suspense, lazy, useEffect, useMemo, useState } from "react"
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react"
 import { Capacitor } from "@capacitor/core"
 import { useGameSession } from "./app/useGameSession"
+import type { HandState } from "./game/handState"
+import cardFlipSoundAsset from "./assets/audio/cardflip.mp3"
 import botecoSceneBgAsset from "./assets/boteco/boteco-scene-bg.png"
 import cardFaceAgedPaperAsset from "./assets/cards/card-face-aged-paper.png"
 import adegaJucaBigodeSceneBgAsset from "./assets/venues/adega-do-juca-bigode/background.png"
@@ -23,6 +25,11 @@ const GAMEPLAY_STAGE_HEIGHT = 500
 const NATIVE_PLATFORM = Capacitor.getPlatform()
 const IS_NATIVE_SHELL = Capacitor.isNativePlatform()
 const IS_IOS_NATIVE_SHELL = NATIVE_PLATFORM === "ios"
+const CARD_FLIP_VOLUME = 0.82
+const DEAL_CARD_SOUND_REPEAT_COUNT = 10
+const DEAL_CARD_SOUND_INTERVAL_MS = 48
+const PAULISTA_VIRA_DEAL_INTRO_DELAY_MS = 520
+const DEAL_CARD_SOUND_VOLUME = 0.58
 const GAMEPLAY_BACKGROUND_ASSET_BY_VENUE_ID: Record<string, string> = {
   "bar-maneco-banguela": manecoBanguelaSceneBgAsset,
   "trem-do-jaca": tremDoJacaSceneBgAsset,
@@ -88,10 +95,45 @@ function getGameplayViewportMetrics(isNativeShell = false): GameplayViewportMetr
   return { mode: "regular", scale }
 }
 
+function playCardFlipSound(audio: HTMLAudioElement | null, volume = CARD_FLIP_VOLUME) {
+  if (!audio) {
+    return
+  }
+
+  const sound = audio.cloneNode(true) as HTMLAudioElement
+  sound.volume = volume
+  sound.currentTime = 0
+  void sound.play().catch(() => {
+    // Audio can be blocked before the first trusted interaction, especially on mobile WebViews.
+  })
+}
+
+function getDealCardSoundStartDelay(handState: HandState | null) {
+  return handState?.variant === "PAULISTA" && handState.vira
+    ? PAULISTA_VIRA_DEAL_INTRO_DELAY_MS
+    : 0
+}
+
+function scheduleDealCardFlipSounds(
+  audio: HTMLAudioElement | null,
+  startDelayMs: number
+): number[] {
+  return Array.from({ length: DEAL_CARD_SOUND_REPEAT_COUNT }, (_, index) =>
+    window.setTimeout(() => {
+      playCardFlipSound(audio, DEAL_CARD_SOUND_VOLUME)
+    }, startDelayMs + index * DEAL_CARD_SOUND_INTERVAL_MS)
+  )
+}
+
 function App() {
   const [viewportMetrics, setViewportMetrics] = useState<GameplayViewportMetrics>(
     () => getGameplayViewportMetrics(IS_NATIVE_SHELL)
   )
+  const cardFlipAudioRef = useRef<HTMLAudioElement | null>(null)
+  const previousTableAudioSnapshotRef = useRef<{
+    signature: string
+    count: number
+  } | null>(null)
 
   useEffect(() => {
     const handleResize = () => {
@@ -100,6 +142,46 @@ function App() {
 
     window.addEventListener("resize", handleResize)
     return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
+  useEffect(() => {
+    const audio = new Audio(cardFlipSoundAsset)
+    audio.preload = "auto"
+    audio.volume = CARD_FLIP_VOLUME
+    cardFlipAudioRef.current = audio
+
+    const unlockAudio = () => {
+      const targetAudio = cardFlipAudioRef.current
+      if (!targetAudio) {
+        return
+      }
+
+      const previousMuted = targetAudio.muted
+      targetAudio.muted = true
+      targetAudio.currentTime = 0
+      void targetAudio.play()
+        .then(() => {
+          targetAudio.pause()
+          targetAudio.currentTime = 0
+          targetAudio.muted = previousMuted
+        })
+        .catch(() => {
+          targetAudio.muted = previousMuted
+        })
+
+      window.removeEventListener("pointerdown", unlockAudio)
+      window.removeEventListener("keydown", unlockAudio)
+    }
+
+    window.addEventListener("pointerdown", unlockAudio, { once: true })
+    window.addEventListener("keydown", unlockAudio, { once: true })
+
+    return () => {
+      window.removeEventListener("pointerdown", unlockAudio)
+      window.removeEventListener("keydown", unlockAudio)
+      audio.pause()
+      cardFlipAudioRef.current = null
+    }
   }, [])
 
   useEffect(() => {
@@ -142,6 +224,7 @@ function App() {
     handleCloseInGameContextMenu,
     handleCloseCharacterSelect,
     handleCloseJourneyIntro,
+    handleCloseSettings,
     handleCloseTutorial,
     handlePartnerAdvice,
     handleCopyLogs,
@@ -154,6 +237,7 @@ function App() {
     handleOpenFreePlayStage,
     handleOpenInGameContextMenu,
     handleOpenCharacterSelect,
+    handleOpenSettings,
     handlePlayCard,
     handlePlayNineHand,
     handleFoldNineHand,
@@ -167,6 +251,7 @@ function App() {
     handleSelectPreviousCharacter,
     handleStartHand,
     handleStartTutorial,
+    handleChangeTrucoVariant,
     handleSwapPartnerFromContextMenu,
     handleWinMatchFromContextMenu,
     lastPlayedPlayerId,
@@ -205,6 +290,54 @@ function App() {
   const gameplayBackgroundAsset = currentCampaignVenue?.id
     ? GAMEPLAY_BACKGROUND_ASSET_BY_VENUE_ID[currentCampaignVenue.id] ?? botecoSceneBgAsset
     : botecoSceneBgAsset
+
+  useEffect(() => {
+    const table = handState?.table ?? []
+    const nextSnapshot = {
+      count: table.length,
+      signature: table
+        .map((entry, index) =>
+          [
+            index,
+            entry.playerId,
+            entry.card.rank,
+            entry.card.suit,
+            entry.covered ? "covered" : "open",
+          ].join(":")
+        )
+        .join("|"),
+    }
+    const previousSnapshot = previousTableAudioSnapshotRef.current
+    previousTableAudioSnapshotRef.current = nextSnapshot
+
+    if (!previousSnapshot) {
+      return
+    }
+
+    if (
+      nextSnapshot.count > previousSnapshot.count &&
+      nextSnapshot.signature !== previousSnapshot.signature
+    ) {
+      playCardFlipSound(cardFlipAudioRef.current)
+    }
+  }, [handState?.table])
+
+  useEffect(() => {
+    if (!dealAnimationNonce) {
+      return
+    }
+
+    const timeoutIds = scheduleDealCardFlipSounds(
+      cardFlipAudioRef.current,
+      getDealCardSoundStartDelay(handState)
+    )
+
+    return () => {
+      for (const timeoutId of timeoutIds) {
+        window.clearTimeout(timeoutId)
+      }
+    }
+  }, [dealAnimationNonce])
 
   const responsiveStyles = useMemo<Record<string, React.CSSProperties>>(
     () => ({
@@ -603,6 +736,7 @@ function App() {
             canPlayCoveredCard={canPlayCoveredCard}
             onCloseCharacterSelect={handleCloseCharacterSelect}
             onCloseJourneyIntro={handleCloseJourneyIntro}
+            onCloseSettings={handleCloseSettings}
             onCloseTutorial={handleCloseTutorial}
             onClosePlayerSkinSelect={handleClosePlayerSkinSelect}
             onConfirmCharacterSelect={handleConfirmCharacterSelect}
@@ -621,6 +755,7 @@ function App() {
             onSelectPreviousPlayerSkin={handleSelectPreviousPlayerSkin}
             onStart={handleStartHand}
             onStartTutorial={handleStartTutorial}
+            onChangeTrucoVariant={handleChangeTrucoVariant}
             onRequestTruco={handleRequestTruco}
             onAcceptTruco={handleAcceptTruco}
             onAddEightPointsFromContextMenu={handleAddEightPointsFromContextMenu}
@@ -632,6 +767,7 @@ function App() {
             onExitMatchFromContextMenu={handleExitMatchFromContextMenu}
             onLoseMatchFromContextMenu={handleLoseMatchFromContextMenu}
             onOpenFreePlayStage={handleOpenFreePlayStage}
+            onOpenSettings={handleOpenSettings}
             onOpenInGameContextMenu={handleOpenInGameContextMenu}
             onRaiseTruco={handleRaiseTruco}
             onResetProgressFromContextMenu={handleResetProgressFromContextMenu}
@@ -2608,10 +2744,10 @@ const styles: Record<string, React.CSSProperties> = {
   },
   gameStartHotspot: {
     position: "absolute",
-    left: "62.2%",
-    top: "68%",
-    width: "26.8%",
-    height: "28.5%",
+    left: "61.8%",
+    top: "38.6%",
+    width: "28.4%",
+    height: "26.7%",
     border: "none",
     borderRadius: "18px",
     padding: 0,
@@ -2621,23 +2757,151 @@ const styles: Record<string, React.CSSProperties> = {
     zIndex: 2,
     boxSizing: "border-box",
   },
-  gameStartTutorialButton: {
+  gameStartTutorialHotspot: {
     position: "absolute",
-    left: "65%",
-    top: "60%",
-    width: "21%",
-    height: "7.2%",
+    left: "63.2%",
+    top: "65.2%",
+    width: "26%",
+    height: "14.2%",
     borderRadius: "14px",
-    border: "1px solid rgba(245, 218, 169, 0.62)",
-    background: "linear-gradient(180deg, rgba(102, 66, 36, 0.96) 0%, rgba(48, 31, 19, 0.96) 100%)",
-    color: "#fff7ed",
-    fontSize: "clamp(11px, 1.25vw, 16px)",
+    border: "none",
+    padding: 0,
+    background: "transparent",
+    cursor: "pointer",
+    opacity: 0,
+    zIndex: 2,
+    boxSizing: "border-box",
+  },
+  gameStartSettingsHotspot: {
+    position: "absolute",
+    left: "63.2%",
+    top: "79.6%",
+    width: "26%",
+    height: "12.8%",
+    border: "none",
+    borderRadius: "14px",
+    padding: 0,
+    background: "transparent",
+    cursor: "pointer",
+    opacity: 0,
+    zIndex: 2,
+    boxSizing: "border-box",
+  },
+  settingsScreen: {
+    gridColumn: "1 / -1",
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    gap: "16px",
+    padding: "22px 28px",
+    boxSizing: "border-box",
+    background:
+      "linear-gradient(135deg, rgba(34, 21, 14, 0.96) 0%, rgba(13, 8, 5, 0.98) 56%, rgba(42, 27, 18, 0.96) 100%)",
+    color: "#f8e7cb",
+    overflow: "hidden",
+  },
+  settingsHeader: {
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: "18px",
+    flexShrink: 0,
+  },
+  settingsEyebrow: {
+    color: "#cda05f",
+    fontSize: "12px",
     fontWeight: 900,
+    letterSpacing: "0.12em",
+    textTransform: "uppercase",
+  },
+  settingsTitle: {
+    margin: "5px 0 0",
+    fontSize: "34px",
+    lineHeight: 0.98,
+    color: "#fff3df",
+    fontFamily: "Georgia, serif",
+  },
+  settingsBoard: {
+    flex: 1,
+    minHeight: 0,
+    display: "grid",
+    alignContent: "start",
+    gap: "14px",
+    padding: "18px",
+    borderRadius: "8px",
+    background: "linear-gradient(180deg, rgba(63, 42, 29, 0.9) 0%, rgba(27, 18, 12, 0.94) 100%)",
+    border: "1px solid rgba(205, 160, 95, 0.2)",
+    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04), 0 20px 36px rgba(0,0,0,0.24)",
+    boxSizing: "border-box",
+  },
+  settingsRow: {
+    display: "grid",
+    gridTemplateColumns: "minmax(180px, 0.55fr) minmax(0, 1fr)",
+    alignItems: "center",
+    gap: "20px",
+    minWidth: 0,
+  },
+  settingsRowLabel: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "7px",
+    minWidth: 0,
+  },
+  settingsLabel: {
+    color: "#f8e7cb",
+    fontSize: "20px",
+    fontWeight: 900,
+    fontFamily: "Georgia, serif",
+  },
+  settingsValue: {
+    color: "#cda05f",
+    fontSize: "12px",
+    fontWeight: 800,
     letterSpacing: "0.08em",
     textTransform: "uppercase",
+  },
+  settingsSegmentedControl: {
+    display: "grid",
+    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    gap: "10px",
+    minWidth: 0,
+  },
+  settingsSegmentButton: {
+    minHeight: "92px",
+    borderRadius: "8px",
+    border: "1px solid rgba(244, 226, 190, 0.22)",
+    background: "rgba(18, 12, 8, 0.64)",
+    color: "#ead6b6",
+    padding: "14px 16px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    gap: "6px",
+    textAlign: "left",
     cursor: "pointer",
-    zIndex: 3,
-    boxShadow: "0 10px 22px rgba(0,0,0,0.32)",
+    boxSizing: "border-box",
+    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
+  },
+  settingsSegmentButtonActive: {
+    border: "1px solid rgba(245, 190, 92, 0.78)",
+    background: "linear-gradient(180deg, rgba(104, 63, 28, 0.98) 0%, rgba(53, 33, 19, 0.98) 100%)",
+    color: "#fff6e8",
+    boxShadow: "0 16px 28px rgba(0,0,0,0.28), inset 0 0 0 1px rgba(255,255,255,0.08)",
+  },
+  settingsSegmentTitle: {
+    fontSize: "19px",
+    lineHeight: 1.05,
+    fontWeight: 900,
+    fontFamily: "Georgia, serif",
+  },
+  settingsSegmentSubtitle: {
+    color: "#d5bf9a",
+    fontSize: "12px",
+    fontWeight: 800,
+    textTransform: "uppercase",
+    letterSpacing: "0.08em",
   },
   tutorialDraftScreen: {
     position: "relative",
@@ -2722,13 +2986,14 @@ const styles: Record<string, React.CSSProperties> = {
   },
   tutorialDraftHeader: {
     position: "absolute",
-    left: "4%",
-    right: "4%",
-    top: "5%",
+    left: "18px",
+    right: "18px",
+    top: "14px",
     display: "flex",
     alignItems: "flex-start",
     justifyContent: "space-between",
     pointerEvents: "none",
+    zIndex: 12,
   },
   tutorialDraftEyebrow: {
     fontSize: "11px",
@@ -2745,18 +3010,23 @@ const styles: Record<string, React.CSSProperties> = {
     textShadow: "0 3px 10px rgba(0,0,0,0.48)",
   },
   tutorialDraftBackButton: {
+    position: "relative",
+    zIndex: 1,
     pointerEvents: "auto",
-    border: "1px solid rgba(245, 218, 169, 0.44)",
-    borderRadius: "14px",
-    background: "rgba(34, 23, 16, 0.86)",
+    minWidth: "132px",
+    minHeight: "48px",
+    border: "2px solid rgba(245, 218, 169, 0.7)",
+    borderRadius: "16px",
+    background: "linear-gradient(180deg, rgba(67, 43, 28, 0.98) 0%, rgba(30, 20, 14, 0.98) 100%)",
     color: "#fff7ed",
-    padding: "10px 16px",
-    fontSize: "12px",
+    padding: "12px 18px",
+    fontSize: "16px",
     fontWeight: 900,
     textTransform: "uppercase",
     letterSpacing: "0.06em",
     cursor: "pointer",
-    boxShadow: "0 10px 18px rgba(0,0,0,0.24)",
+    textShadow: "0 2px 4px rgba(0,0,0,0.42)",
+    boxShadow: "0 12px 22px rgba(0,0,0,0.42), inset 0 0 0 1px rgba(255,255,255,0.08)",
   },
   tutorialDraftViraCard: {
     position: "absolute",

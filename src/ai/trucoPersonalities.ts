@@ -31,16 +31,16 @@ export interface AiTrucoPersonality {
 const ULTRA_CONSERVATIVE_PERSONALITY: AiTrucoPersonality = {
   id: "ultra_conservative",
   raiseThresholdByCurrentBet: {
-    1: 4,
-    3: 5,
-    6: 6,
-    9: 7,
+    1: 5,
+    3: 6,
+    6: 7,
+    9: 8,
   },
   acceptThresholdByNextBet: {
     3: 3,
-    6: 4,
-    9: 5,
-    12: 6,
+    6: 5,
+    9: 6,
+    12: 7,
   },
   partnerGoOffset: 3,
   partnerTotalGoOffset: 4,
@@ -54,16 +54,16 @@ const ULTRA_CONSERVATIVE_PERSONALITY: AiTrucoPersonality = {
 const CONSERVATIVE_PERSONALITY: AiTrucoPersonality = {
   id: "conservative",
   raiseThresholdByCurrentBet: {
-    1: 3,
-    3: 4,
-    6: 5,
-    9: 6,
+    1: 4,
+    3: 5,
+    6: 6,
+    9: 7,
   },
   acceptThresholdByNextBet: {
     3: 2,
-    6: 3,
-    9: 4,
-    12: 5,
+    6: 4,
+    9: 5,
+    12: 6,
   },
   partnerGoOffset: 2,
   partnerTotalGoOffset: 3,
@@ -77,10 +77,10 @@ const CONSERVATIVE_PERSONALITY: AiTrucoPersonality = {
 const CAUTIOUS_PERSONALITY: AiTrucoPersonality = {
   id: "cautious",
   raiseThresholdByCurrentBet: {
-    1: 4,
-    3: 4,
-    6: 5,
-    9: 6,
+    1: 5,
+    3: 6,
+    6: 7,
+    9: 8,
   },
   acceptThresholdByNextBet: {
     3: 2,
@@ -100,16 +100,16 @@ const CAUTIOUS_PERSONALITY: AiTrucoPersonality = {
 const DISCIPLINED_PERSONALITY: AiTrucoPersonality = {
   id: "disciplined",
   raiseThresholdByCurrentBet: {
-    1: 3,
-    3: 3,
-    6: 4,
-    9: 5,
+    1: 4,
+    3: 5,
+    6: 6,
+    9: 7,
   },
   acceptThresholdByNextBet: {
     3: 2,
-    6: 2,
-    9: 3,
-    12: 4,
+    6: 3,
+    9: 4,
+    12: 5,
   },
   partnerGoOffset: 1,
   partnerTotalGoOffset: 2,
@@ -123,10 +123,10 @@ const DISCIPLINED_PERSONALITY: AiTrucoPersonality = {
 const BALANCED_PERSONALITY: AiTrucoPersonality = {
   id: "balanced",
   raiseThresholdByCurrentBet: {
-    1: 3,
-    3: 4,
-    6: 4,
-    9: 5,
+    1: 4,
+    3: 5,
+    6: 6,
+    9: 7,
   },
   acceptThresholdByNextBet: {
     3: 2,
@@ -146,16 +146,16 @@ const BALANCED_PERSONALITY: AiTrucoPersonality = {
 const OPPORTUNISTIC_PERSONALITY: AiTrucoPersonality = {
   id: "opportunistic",
   raiseThresholdByCurrentBet: {
-    1: 3,
-    3: 4,
-    6: 4,
-    9: 5,
+    1: 4,
+    3: 5,
+    6: 6,
+    9: 7,
   },
   acceptThresholdByNextBet: {
     3: 2,
     6: 3,
-    9: 3,
-    12: 4,
+    9: 4,
+    12: 5,
   },
   partnerGoOffset: 1,
   partnerTotalGoOffset: 1,
@@ -163,28 +163,28 @@ const OPPORTUNISTIC_PERSONALITY: AiTrucoPersonality = {
   raiseBluffMargin: 0,
   acceptBluffMargin: 0,
   bluffChanceRequestByCurrentBet: {
-    1: 0.08,
-    3: 0.05,
+    1: 0.04,
+    3: 0.03,
   },
   bluffChanceAcceptByNextBet: {
-    3: 0.06,
-    6: 0.04,
+    3: 0.04,
+    6: 0.03,
   },
 }
 
 const ASSERTIVE_PERSONALITY: AiTrucoPersonality = {
   id: "assertive",
   raiseThresholdByCurrentBet: {
-    1: 3,
-    3: 3,
-    6: 4,
-    9: 5,
+    1: 4,
+    3: 4,
+    6: 5,
+    9: 6,
   },
   acceptThresholdByNextBet: {
     3: 2,
-    6: 2,
-    9: 3,
-    12: 4,
+    6: 3,
+    9: 4,
+    12: 5,
   },
   partnerGoOffset: 1,
   partnerTotalGoOffset: 1,
@@ -192,23 +192,23 @@ const ASSERTIVE_PERSONALITY: AiTrucoPersonality = {
   raiseBluffMargin: 0,
   acceptBluffMargin: 1,
   bluffChanceRequestByCurrentBet: {
-    1: 0.08,
-    3: 0.06,
-    6: 0.04,
+    1: 0.04,
+    3: 0.03,
+    6: 0.02,
   },
   bluffChanceAcceptByNextBet: {
-    3: 0.08,
-    6: 0.05,
+    3: 0.04,
+    6: 0.03,
   },
 }
 
 const AGGRESSIVE_PERSONALITY: AiTrucoPersonality = {
   id: "aggressive",
   raiseThresholdByCurrentBet: {
-    1: 3,
-    3: 3,
-    6: 4,
-    9: 5,
+    1: 4,
+    3: 4,
+    6: 5,
+    9: 6,
   },
   acceptThresholdByNextBet: {
     3: 2,
@@ -222,26 +222,125 @@ const AGGRESSIVE_PERSONALITY: AiTrucoPersonality = {
   raiseBluffMargin: 1,
   acceptBluffMargin: 1,
   bluffChanceRequestByCurrentBet: {
-    1: 0.14,
-    3: 0.1,
-    6: 0.08,
-    9: 0.05,
+    1: 0.08,
+    3: 0.06,
+    6: 0.04,
+    9: 0.02,
   },
   bluffChanceAcceptByNextBet: {
-    3: 0.12,
-    6: 0.09,
-    9: 0.07,
-    12: 0.04,
+    3: 0.06,
+    6: 0.05,
+    9: 0.03,
+    12: 0.02,
   },
 }
 
 const CRAFTY_PERSONALITY: AiTrucoPersonality = {
   id: "crafty",
   raiseThresholdByCurrentBet: {
+    1: 4,
+    3: 4,
+    6: 5,
+    9: 6,
+  },
+  acceptThresholdByNextBet: {
+    3: 2,
+    6: 2,
+    9: 3,
+    12: 4,
+  },
+  partnerGoOffset: 1,
+  partnerTotalGoOffset: 1,
+  partnerMaybeOffset: 0,
+  raiseBluffMargin: 1,
+  acceptBluffMargin: 1,
+  bluffChanceRequestByCurrentBet: {
+    1: 0.1,
+    3: 0.08,
+    6: 0.05,
+    9: 0.03,
+  },
+  bluffChanceAcceptByNextBet: {
+    3: 0.08,
+    6: 0.06,
+    9: 0.04,
+    12: 0.03,
+  },
+}
+
+const TRICKSTER_PERSONALITY: AiTrucoPersonality = {
+  id: "trickster",
+  raiseThresholdByCurrentBet: {
+    1: 4,
+    3: 4,
+    6: 5,
+    9: 6,
+  },
+  acceptThresholdByNextBet: {
+    3: 2,
+    6: 2,
+    9: 3,
+    12: 4,
+  },
+  partnerGoOffset: 1,
+  partnerTotalGoOffset: 1,
+  partnerMaybeOffset: 0,
+  raiseBluffMargin: 1,
+  acceptBluffMargin: 1,
+  bluffChanceRequestByCurrentBet: {
+    1: 0.12,
+    3: 0.1,
+    6: 0.07,
+    9: 0.04,
+  },
+  bluffChanceAcceptByNextBet: {
+    3: 0.1,
+    6: 0.08,
+    9: 0.05,
+    12: 0.04,
+  },
+}
+
+const VOLATILE_PERSONALITY: AiTrucoPersonality = {
+  id: "volatile",
+  raiseThresholdByCurrentBet: {
     1: 3,
-    3: 3,
-    6: 4,
-    9: 4,
+    3: 4,
+    6: 5,
+    9: 6,
+  },
+  acceptThresholdByNextBet: {
+    3: 2,
+    6: 2,
+    9: 3,
+    12: 4,
+  },
+  partnerGoOffset: 0,
+  partnerTotalGoOffset: 0,
+  partnerMaybeOffset: 0,
+  raiseBluffMargin: 1,
+  acceptBluffMargin: 1,
+  bluffChanceRequestByCurrentBet: {
+    1: 0.16,
+    3: 0.12,
+    6: 0.08,
+    9: 0.05,
+  },
+  bluffChanceAcceptByNextBet: {
+    3: 0.12,
+    6: 0.1,
+    9: 0.06,
+    12: 0.04,
+  },
+}
+
+const RECKLESS_PERSONALITY: AiTrucoPersonality = {
+  id: "reckless",
+  raiseThresholdByCurrentBet: {
+    1: 3,
+    3: 4,
+    6: 5,
+    9: 6,
   },
   acceptThresholdByNextBet: {
     3: 2,
@@ -257,113 +356,14 @@ const CRAFTY_PERSONALITY: AiTrucoPersonality = {
   bluffChanceRequestByCurrentBet: {
     1: 0.18,
     3: 0.14,
-    6: 0.1,
-    9: 0.07,
+    6: 0.09,
+    9: 0.06,
   },
   bluffChanceAcceptByNextBet: {
-    3: 0.16,
+    3: 0.14,
     6: 0.12,
-    9: 0.09,
-    12: 0.06,
-  },
-}
-
-const TRICKSTER_PERSONALITY: AiTrucoPersonality = {
-  id: "trickster",
-  raiseThresholdByCurrentBet: {
-    1: 3,
-    3: 3,
-    6: 4,
-    9: 5,
-  },
-  acceptThresholdByNextBet: {
-    3: 2,
-    6: 2,
-    9: 3,
-    12: 4,
-  },
-  partnerGoOffset: 1,
-  partnerTotalGoOffset: 1,
-  partnerMaybeOffset: 0,
-  raiseBluffMargin: 1,
-  acceptBluffMargin: 1,
-  bluffChanceRequestByCurrentBet: {
-    1: 0.24,
-    3: 0.2,
-    6: 0.14,
-    9: 0.1,
-  },
-  bluffChanceAcceptByNextBet: {
-    3: 0.2,
-    6: 0.16,
-    9: 0.12,
-    12: 0.08,
-  },
-}
-
-const VOLATILE_PERSONALITY: AiTrucoPersonality = {
-  id: "volatile",
-  raiseThresholdByCurrentBet: {
-    1: 2,
-    3: 3,
-    6: 3,
-    9: 4,
-  },
-  acceptThresholdByNextBet: {
-    3: 2,
-    6: 2,
-    9: 3,
-    12: 3,
-  },
-  partnerGoOffset: 0,
-  partnerTotalGoOffset: 0,
-  partnerMaybeOffset: 0,
-  raiseBluffMargin: 1,
-  acceptBluffMargin: 1,
-  bluffChanceRequestByCurrentBet: {
-    1: 0.3,
-    3: 0.24,
-    6: 0.18,
-    9: 0.12,
-  },
-  bluffChanceAcceptByNextBet: {
-    3: 0.24,
-    6: 0.18,
-    9: 0.14,
-    12: 0.1,
-  },
-}
-
-const RECKLESS_PERSONALITY: AiTrucoPersonality = {
-  id: "reckless",
-  raiseThresholdByCurrentBet: {
-    1: 2,
-    3: 3,
-    6: 3,
-    9: 4,
-  },
-  acceptThresholdByNextBet: {
-    3: 1,
-    6: 2,
-    9: 3,
-    12: 3,
-  },
-  partnerGoOffset: 0,
-  partnerTotalGoOffset: 1,
-  partnerMaybeOffset: 0,
-  raiseBluffMargin: 1,
-  acceptBluffMargin: 1,
-  bluffChanceRequestByCurrentBet: {
-    1: 0.36,
-    3: 0.3,
-    6: 0.22,
-    9: 0.16,
-  },
-  bluffChanceAcceptByNextBet: {
-    3: 0.3,
-    6: 0.24,
-    9: 0.18,
-    12: 0.12,
+    9: 0.08,
+    12: 0.05,
   },
 }
 
@@ -428,7 +428,7 @@ export function getAiTrucoPersonalityIdForDifficulty(
       return "crafty"
     }
 
-    if (difficulty.aggression >= 4 || difficulty.trucoDiscipline >= 4) {
+    if (difficulty.aggression >= 4) {
       return "aggressive"
     }
 

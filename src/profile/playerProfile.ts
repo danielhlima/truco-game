@@ -1,4 +1,8 @@
 import type { CurrencyWallet } from "../economy/types"
+import {
+  DEFAULT_TRUCO_VARIANT,
+  type GameVariant,
+} from "../game/variant"
 
 export interface CampaignProgress {
   currentStageId: string
@@ -18,6 +22,7 @@ export interface PlayerProfile {
   campaign: CampaignProgress
   settings: {
     adsRemoved: boolean
+    trucoVariant: GameVariant
     selectedPlayerSkinId?: string
     selectedTableThemeId?: string
   }
@@ -43,6 +48,7 @@ export function createInitialPlayerProfile(): PlayerProfile {
     },
     settings: {
       adsRemoved: false,
+      trucoVariant: DEFAULT_TRUCO_VARIANT,
       selectedTableThemeId: "table-boteco-rua",
     },
   }

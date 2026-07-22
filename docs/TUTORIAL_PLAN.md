@@ -192,7 +192,7 @@ Fluxo:
 
 ## Estado Atual
 
-- Botao `Tutorial` existe na tela inicial.
+- Botao `TUTORIAL` existe na tela inicial como hotspot invisivel sobre a placa desenhada na arte.
 - O tutorial usa a tela do `Bar Maneco Banguela` como cenario.
 - Aulas 1 a 10 estao implementadas no tutorial jogavel:
   - mesa, mao e vaza
@@ -206,5 +206,6 @@ Fluxo:
   - vira e manilha dinamica do Truco Paulista
   - mao de 9 com cartas da parceira e decisao `Jogar`
 - O tutorial foi testado pelo usuario e esta aprovado no estado atual.
+- O botao `Voltar` do tutorial fica em camada propria, com contraste e area de toque maiores, e retorna para a tela inicial.
 - O tutorial ainda esta integrado em `src/app/AppSections.tsx`; uma futura limpeza pode extrair o roteiro para arquivo proprio apenas se isso melhorar manutencao.
 - Proxima frente do projeto: `Capacitor + Android Studio + Xcode`.

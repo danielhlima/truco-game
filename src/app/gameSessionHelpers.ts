@@ -10,6 +10,7 @@ import { createMatchState, type MatchState } from "../game/matchState"
 import { applyNineHandRules } from "../game/nineHand"
 import { getNextPlayerClockwise as getClockwisePlayerId } from "../game/trucoTarget"
 import { getBetCallLabel, getNextBet } from "../game/truco"
+import type { GameVariant } from "../game/variant"
 
 export const DEFAULT_TRUCO_MESSAGE = "Nenhum pedido de truco nesta mão."
 
@@ -57,9 +58,10 @@ export function getHandRuleContextLogLines(handState: HandState): string[] {
 
 export function createVenueMatchState(
   targetVenue: CampaignVenue,
-  firstPlayerId = 1
+  firstPlayerId = 1,
+  variantOverride?: GameVariant
 ): VenueMatchState {
-  const variant = targetVenue.variant
+  const variant = variantOverride ?? targetVenue.variant
   const matchState = createMatchState(variant, firstPlayerId)
 
   return {

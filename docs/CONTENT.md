@@ -45,7 +45,7 @@ Hoje o projeto ja possui:
 - caminho principal com pacote visual autoral integrado ate o `Cassino Mé Maior`
 - bonus pos-campanha `Circuito Intergaláctico` / `Órbita da Lua` integrado como ultima etapa do jogo
 - `Modo Livre` pos-campanha para revisitar circuitos ou reiniciar campanha
-- testes unitarios iniciais para dialogos/raises e variantes por bar
+- testes unitarios iniciais para dialogos/raises e variante global de truco
 - primeira rodada de balanceamento de IA aplicada com testes
 
 ## Arquitetura que deve ser preservada
@@ -143,8 +143,11 @@ Arquivos principais:
 - `npm run build` passou depois da estabilizacao da gameplay, das telas de resultado, da campanha autoral e da consistencia da parceira renomeada
 - `npm run build` passou depois da intro cinematografica curta
 - a tela inicial definitiva foi implementada com arte propria em `src/assets/start/truco-raiz-start.png`
-- a primeira tela visivel agora mostra somente a arte de capa e um hotspot HTML sobre `COMEÇAR`
-- debug de bar, reset de campanha e seletor de variante foram removidos da tela inicial visivel
+- a primeira tela visivel mostra a arte de capa com placas `COMEÇAR`, `TUTORIAL` e `CONFIGURAÇÕES`
+- `COMEÇAR`, `TUTORIAL` e `CONFIGURAÇÕES` sao hotspots HTML invisiveis sobre as placas desenhadas
+- `CONFIGURAÇÕES` abre a tela de ajustes com escolha global entre `Truco Paulista` e `Truco Mineiro`
+- `Truco Paulista` e o padrao do perfil novo e de todos os bares/circuitos
+- debug de bar e reset de campanha foram removidos da tela inicial visivel
 - o caminho principal foi expandido visualmente ate o `Cassino Mé Maior`
 - o bonus pos-campanha `Circuito Intergaláctico` / `Órbita da Lua` foi integrado como ultima etapa do jogo
 - a tela de campanha do bonus nao deve apontar para um proximo local
@@ -160,10 +163,10 @@ Arquivos principais:
   - a run temporaria nao altera progresso, recompensas ou desbloqueios da campanha principal ja concluida
   - `Recomeçar campanha` usa confirmacao interna do jogo, nao `window.confirm`
 - os testes unitarios de dialogos e raises cobrem a escada `TRUCO!`, `SEIS!`, `NOVE!`, `DOZE!`, `DESCE!`, `TOMA!` e `TÔ FORA!`
-- os helpers de sessao criam partida pela variante declarada no bar e cobrem Mineiro/Paulista em testes
+- os helpers de sessao criam partida pela variante salva no perfil e cobrem padrao Paulista/override Mineiro em testes
 - a primeira rodada de IA foi validada em jogo real e enviada para `origin/main`
 - a IA agora preserva cartas fortes quando nao pode ganhar a vaza, descartando a menor carta disponivel
-- `Jogos Mundiais` e `Mundial` usam Truco Mineiro
+- escolher `Truco Mineiro` em `CONFIGURAÇÕES` aplica Mineiro a todos os bares
 - carta virada para baixo/carta coberta ja esta implementada a partir da segunda vaza, com testes
 - mao de 9 ja esta implementada com decisao `Jogar`/`Correr`
 - tutorial jogavel ja esta implementado e testado pelo usuario
@@ -303,6 +306,8 @@ Estado atual:
 - cartas abertas com textura de papel envelhecido
 - cartas viradas com verso fotografico envelhecido
 - cartas jogadas entram de fora da mesa
+- cada carta que entra na mesa toca o som `src/assets/audio/cardflip.mp3`
+- a distribuicao visual dispara uma rajada curta de `10` sons de carta, sincronizada com o inicio da animacao de distribuicao e respeitando o atraso da vira no Paulista
 - limpeza entre maos recolhe as cartas para fora do enquadramento
 - distribuicao entre rodadas mantida
 - simbolos de naipe das cartas do humano ampliados
@@ -327,6 +332,7 @@ Assets principais:
 - `src/assets/boteco/table-top-orbita-da-lua.png`
 - `src/assets/cards/card-back-aged-photo.png`
 - `src/assets/cards/card-face-aged-paper.png`
+- `src/assets/audio/cardflip.mp3`
 
 ### Coluna direita
 
@@ -414,8 +420,10 @@ Estado atual:
 - a tela inicial usa a arte `src/assets/start/truco-raiz-start.png`
 - a arte entra inteira dentro do stage, com uma copia desfocada no fundo para preencher laterais sem cortar logo ou botao
 - o botao `COMEÇAR` e um hotspot HTML invisivel posicionado sobre a placa desenhada
+- o botao `TUTORIAL` tambem e um hotspot HTML invisivel posicionado sobre a placa desenhada
+- `CONFIGURAÇÕES` aparece na arte como hotspot ativo e abre o ajuste de tipo de truco
 - `COMEÇAR` continua levando para a tela de campanha
-- reset de progresso, debug de bar e selecao de variante nao aparecem mais na primeira tela visivel
+- reset de progresso e debug de bar nao aparecem mais na primeira tela visivel
 - reset total do progresso fica disponivel durante a partida no `MENU`, com confirmacao
 
 Arquivos principais:
@@ -783,12 +791,17 @@ Hoje esta assim:
 
 - a parceira ativa usa a personalidade da personagem escolhida
 - os adversarios dos bares/circuitos ja estao fixados por local
+- em campanha, a personalidade de truco da dupla adversaria vem da dificuldade do bar para criar progressao lenta e perceptivel do `Bar do Ze Catinga` ate o `Circuito Intergaláctico`
 - o sistema de consulta da parceira usa:
   - leitura da mao da parceira
   - leitura ponderada da mao do humano via:
     - `BORA!`
     - `CE QUE SABE!`
     - `MELHOR CORRER!`
+  - `BORA!` impede a parceira de correr depois da consulta; ela deve aceitar ou aumentar
+  - `CE QUE SABE!` sinaliza uma unica carta util ou mediana do humano e ganha mais peso com parceiras avancadas
+  - `MELHOR CORRER!` sinaliza que o humano nao tem ajuda relevante; nessa consulta, a parceira so continua por forca propria
+  - parceiros desbloqueados usam um nivel de leitura derivado da dificuldade do bar em que foram conquistados, criando inteligencia progressiva nas parcerias
 - primeira rodada de rebalanceamento aplicada:
   - `balanced` nao abre mais truco inicial com mao de apenas duas honras baixas
   - `balanced` corre do truco inicial com uma unica honra baixa
@@ -796,6 +809,16 @@ Hoje esta assim:
   - conselhos da parceira ficaram menos otimistas com dupla fraca
   - perfis blefadores mantem blefes com probabilidades menores e margem controlada
   - dificuldade maxima com disciplina alta usa `trickster`, nao `reckless`
+- segunda rodada de rebalanceamento aplicada:
+  - `balanced` pede truco inicial somente com mao boa
+  - re-aumentos de dupla exigem mao individual muito forte ou soma forte da parceria
+  - perfis caoticos tiveram aceite e blefes em apostas altas reduzidos
+  - adversarios nao herdam mais automaticamente a personalidade do primeiro personagem da dupla
+- log de debug de truco aplicado:
+  - linhas `DEBUG IA Truco` registram acao, time, perfil, forcas, aposta atual/proposta e decisao
+  - em pedido, a forca registrada e a mao do jogador que pediu
+  - em resposta, as forcas registradas sao as maos do time que responde
+  - o objetivo e diagnosticar pedidos e raises em logs reais sem mudar a decisao da IA
 - ajuste de escolha de carta aplicado:
   - quando nao consegue ganhar a vaza, a IA joga a menor carta disponivel
   - quando consegue ganhar a vaza, a IA usa a menor carta vencedora
@@ -823,11 +846,15 @@ Hoje ja existe:
 - conselho da parceira quando o humano e o alvo do pedido adversario
 - consulta da parceira ao humano quando ela e o alvo formal da resposta
 - peso real da resposta do humano na decisao final da parceira
+- resposta `BORA!` na consulta da parceira garante que ela nao corre; no minimo ela aceita
+- resposta `CE QUE SABE!` representa uma carta util/mediana e pesa mais para parceiras desbloqueadas em etapas avancadas
+- resposta `MELHOR CORRER!` zera a contribuicao do humano na consulta; a parceira so segue se tiver forca propria
 - regra da `escalada vigente` documentada e aplicada aos dialogos
 - testes unitarios cobrem a sequencia real de raises e os rotulos principais de fala
-- partidas por local usam a variante declarada no bar; Paulista cria vira/manilha e a proxima mao preserva a variante da partida
-- `Jogos Mundiais` e `Mundial` estao declarados como Truco Mineiro e cobertos em teste de campanha
+- partidas por local usam a variante global salva no perfil; Paulista cria vira/manilha e a proxima mao preserva a variante da partida
+- todos os bares/circuitos declaram Paulista como padrao; Mineiro vem da configuracao global do jogador
 - logs de inicio de mao registram regra ativa; no Paulista registram tambem vira e manilha
+- logs `DEBUG IA Truco` registram perfil, forcas e decisao quando a IA pede truco ou responde a pedido/raise
 
 Regra de continuidade importante:
 

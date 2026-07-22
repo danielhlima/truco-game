@@ -1,6 +1,7 @@
 import test from "node:test"
 import assert from "node:assert/strict"
 import { CAMPAIGN_STAGES } from "../../src/career/campaign/campaignData.ts"
+import { getAiTrucoPersonalityIdForDifficulty } from "../../src/ai/trucoPersonalities.ts"
 import {
   applyCampaignLoss,
   applyCampaignWin,
@@ -17,7 +18,10 @@ import {
   resetPlayerProfileStorage,
   savePlayerProfile,
 } from "../../src/platform/storage/profileStorage.ts"
-import { STARTER_PARTNER_CHARACTER_IDS } from "../../src/content/partnerProgression.ts"
+import {
+  STARTER_PARTNER_CHARACTER_IDS,
+  getPartnerAdviceSkillLevel,
+} from "../../src/content/partnerProgression.ts"
 import { installWindowLocalStorageMock } from "../helpers/storageMock.ts"
 
 test("a campanha começa no primeiro boteco da rua", () => {
@@ -77,7 +81,7 @@ test("os quatro primeiros bares seguem o caminho vertical planejado", () => {
       id: "bar-do-ze-catinga",
       name: "Bar do Zé Catinga",
       visualTheme: "boteco-raiz-ze-catinga-photo",
-      variant: "MINEIRO",
+      variant: "PAULISTA",
       difficulty: 1,
       opponents: ["tiao-casca-grossa", "cida-fumaca"],
       wins: 3,
@@ -97,7 +101,7 @@ test("os quatro primeiros bares seguem o caminho vertical planejado", () => {
       id: "trem-do-jaca",
       name: "Trem do Jaça",
       visualTheme: "bairro-madeira-suja",
-      variant: "MINEIRO",
+      variant: "PAULISTA",
       difficulty: 2,
       opponents: ["naldo-tramela", "dalva-seringa"],
       wins: 5,
@@ -115,13 +119,42 @@ test("os quatro primeiros bares seguem o caminho vertical planejado", () => {
   ])
 })
 
-test("reta mundial da campanha usa Truco Mineiro", () => {
-  const venuesById = new Map(
-    CAMPAIGN_STAGES.flatMap((stage) => stage.venues).map((venue) => [venue.id, venue])
+test("personalidade de truco dos adversários escala pela dificuldade do bar", () => {
+  const personalitiesByVenueId = Object.fromEntries(
+    CAMPAIGN_STAGES.flatMap((stage) => stage.venues).map((venue) => [
+      venue.id,
+      getAiTrucoPersonalityIdForDifficulty(venue.difficulty),
+    ])
   )
 
-  assert.equal(venuesById.get("hotel-truco-segovia-espanha")?.variant, "MINEIRO")
-  assert.equal(venuesById.get("casino-me-maior")?.variant, "MINEIRO")
+  assert.deepEqual(personalitiesByVenueId, {
+    "bar-do-ze-catinga": "ultra_conservative",
+    "bar-maneco-banguela": "cautious",
+    "trem-do-jaca": "conservative",
+    "adega-do-juca-bigode": "disciplined",
+    "zona-norte-garagem": "balanced",
+    "zona-leste-quintal": "opportunistic",
+    "centro-subsolo": "balanced",
+    "zona-sul-salao": "balanced",
+    "centro-convencoes-prefeitura": "assertive",
+    "ginasio-estadual-maneco-file": "assertive",
+    "arena-nacional": "crafty",
+    "centro-americano-truqueiro-medelin": "crafty",
+    "hotel-truco-segovia-espanha": "trickster",
+    "casino-me-maior": "trickster",
+    "orbita-da-lua": "trickster",
+  })
+})
+
+test("todos os bares da campanha usam Truco Paulista como padrão", () => {
+  const variantsByVenueId = Object.fromEntries(
+    CAMPAIGN_STAGES.flatMap((stage) => stage.venues).map((venue) => [venue.id, venue.variant])
+  )
+
+  assert.deepEqual(
+    Object.values(variantsByVenueId),
+    Array(Object.keys(variantsByVenueId).length).fill("PAULISTA")
+  )
 })
 
 test("parceiros iniciais não antecipam adversários de bares futuros", () => {
@@ -134,6 +167,16 @@ test("parceiros iniciais não antecipam adversários de bares futuros", () => {
   for (const characterId of STARTER_PARTNER_CHARACTER_IDS) {
     assert.equal(opponentCharacterIds.has(characterId), false, characterId)
   }
+})
+
+test("inteligência de leitura das parcerias cresce com desbloqueios da campanha", () => {
+  assert.equal(getPartnerAdviceSkillLevel("nega-catimbo"), 1)
+  assert.equal(getPartnerAdviceSkillLevel("tiao-casca-grossa"), 1)
+  assert.equal(getPartnerAdviceSkillLevel("naldo-tramela"), 2)
+  assert.equal(getPartnerAdviceSkillLevel("dito-marrua"), 3)
+  assert.equal(getPartnerAdviceSkillLevel("jura-pancada"), 4)
+  assert.equal(getPartnerAdviceSkillLevel("mina-compasso"), 5)
+  assert.equal(getPartnerAdviceSkillLevel("cosme-orbita"), 5)
 })
 
 test("vitórias parciais contam para o local, mas não o concluem antes da meta", () => {
@@ -199,6 +242,7 @@ test("criar perfil inicial sempre devolve campanha zerada", () => {
 
   assert.deepEqual(profile.campaign, INITIAL_PLAYER_PROFILE.campaign)
   assert.deepEqual(profile.currencies, { coins: 0, gems: 0 })
+  assert.equal(profile.settings.trucoVariant, "PAULISTA")
 })
 
 test("é possível concluir uma etapa inteira e começar a próxima acumulando vitórias por local", () => {
@@ -241,6 +285,7 @@ test("storage salva, carrega e reseta o perfil da campanha", () => {
     profile.campaign.unlockedPartnerCharacterIds = ["cida-fumaca"]
     profile.currencies.coins = 123
     profile.settings.selectedPlayerSkinId = "akemi-corte-certo"
+    profile.settings.trucoVariant = "MINEIRO"
 
     savePlayerProfile(profile)
 
@@ -250,12 +295,14 @@ test("storage salva, carrega e reseta o perfil da campanha", () => {
     assert.deepEqual(loadedProfile.campaign.unlockedPartnerCharacterIds, ["cida-fumaca"])
     assert.equal(loadedProfile.currencies.coins, 123)
     assert.equal(loadedProfile.settings.selectedPlayerSkinId, "akemi-corte-certo")
+    assert.equal(loadedProfile.settings.trucoVariant, "MINEIRO")
 
     resetPlayerProfileStorage()
 
     const resetProfile = loadPlayerProfile()
     assert.deepEqual(resetProfile.campaign, INITIAL_PLAYER_PROFILE.campaign)
     assert.deepEqual(resetProfile.currencies, INITIAL_PLAYER_PROFILE.currencies)
+    assert.equal(resetProfile.settings.trucoVariant, "PAULISTA")
     assert.equal(resetProfile.settings.selectedPlayerSkinId, undefined)
   } finally {
     cleanup()

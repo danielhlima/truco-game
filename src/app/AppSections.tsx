@@ -7,7 +7,10 @@ import type { HandState } from "../game/handState"
 import type { Player } from "../game/gameState"
 import type { TableCard } from "../game/tableCard"
 import type { MatchState } from "../game/matchState"
-import type { GameVariant } from "../game/variant"
+import {
+  getGameVariantLabel,
+  type GameVariant,
+} from "../game/variant"
 import { CAMPAIGN_STAGES } from "../career/campaign/campaignData"
 import { STORE_PRODUCTS, UNLOCKABLE_ITEMS } from "../economy/catalog"
 import { GameTableScene } from "../three/GameTableScene"
@@ -798,6 +801,7 @@ interface TableSectionProps {
   hasSelectedPartnerForVenue: boolean
   menuScreen:
     | "start"
+    | "settings"
     | "tutorial"
     | "journey-intro"
     | "player-skin-select"
@@ -831,6 +835,7 @@ interface TableSectionProps {
   onCloseCharacterSelect: () => void
   onCloseFreePlayStage: () => void
   onCloseJourneyIntro: () => void
+  onCloseSettings: () => void
   onCloseTutorial: () => void
   onClosePlayerSkinSelect: () => void
   onContinueToCharacterSelect: () => void
@@ -839,6 +844,7 @@ interface TableSectionProps {
   onEnterVenueFromIntro: () => void
   onLaunchVenue: (venueId: string) => void
   onOpenFreePlayStage: (stageId: string) => void
+  onOpenSettings: () => void
   onOpenCharacterSelect: () => void
   onPlayNineHand: () => void
   onFoldNineHand: () => void
@@ -850,6 +856,7 @@ interface TableSectionProps {
   onSelectPreviousPlayerSkin: () => void
   onStart: () => void
   onStartTutorial: () => void
+  onChangeTrucoVariant: (variant: GameVariant) => void
   onRequestTruco: () => void
   onAcceptTruco: () => void
   onAddEightPointsFromContextMenu: () => void
@@ -909,6 +916,7 @@ export function TableSection({
   onCloseCharacterSelect,
   onCloseFreePlayStage,
   onCloseJourneyIntro,
+  onCloseSettings,
   onCloseTutorial,
   onClosePlayerSkinSelect,
   onContinueToCharacterSelect,
@@ -917,6 +925,7 @@ export function TableSection({
   onEnterVenueFromIntro,
   onLaunchVenue,
   onOpenFreePlayStage,
+  onOpenSettings,
   onOpenCharacterSelect,
   onPlayNineHand,
   onFoldNineHand,
@@ -928,6 +937,7 @@ export function TableSection({
   onSelectPreviousPlayerSkin,
   onStart,
   onStartTutorial,
+  onChangeTrucoVariant,
   onRequestTruco,
   onAcceptTruco,
   onAddEightPointsFromContextMenu,
@@ -1098,10 +1108,18 @@ export function TableSection({
                     onBack={onCloseTutorial}
                     styles={styles}
                   />
+                ) : menuScreen === "settings" ? (
+                  <SettingsScreen
+                    selectedVariant={playerProfile.settings.trucoVariant}
+                    onBack={onCloseSettings}
+                    onChangeVariant={onChangeTrucoVariant}
+                    styles={styles}
+                  />
                 ) : (
                   <GameStartScreen
                     onStart={onStart}
                     onStartTutorial={onStartTutorial}
+                    onOpenSettings={onOpenSettings}
                     styles={styles}
                   />
                 )
@@ -1488,10 +1506,12 @@ export function TableSection({
 function GameStartScreen({
   onStart,
   onStartTutorial,
+  onOpenSettings,
   styles,
 }: {
   onStart: () => void
   onStartTutorial: () => void
+  onOpenSettings: () => void
   styles: StyleMap
 }) {
   return (
@@ -1508,18 +1528,97 @@ function GameStartScreen({
         style={styles.gameStartImage}
       />
       <button
-        aria-label="Tutorial"
-        style={styles.gameStartTutorialButton}
-        onClick={onStartTutorial}
-      >
-        Tutorial
-      </button>
-      <button
         aria-label="Começar"
         title="Começar"
         style={styles.gameStartHotspot}
         onClick={onStart}
       />
+      <button
+        aria-label="Tutorial"
+        title="Tutorial"
+        style={styles.gameStartTutorialHotspot}
+        onClick={onStartTutorial}
+      />
+      <button
+        aria-label="Configurações"
+        title="Configurações"
+        style={styles.gameStartSettingsHotspot}
+        onClick={onOpenSettings}
+      />
+    </div>
+  )
+}
+
+function SettingsScreen({
+  selectedVariant,
+  onBack,
+  onChangeVariant,
+  styles,
+}: {
+  selectedVariant: GameVariant
+  onBack: () => void
+  onChangeVariant: (variant: GameVariant) => void
+  styles: StyleMap
+}) {
+  const variantOptions: Array<{
+    value: GameVariant
+    title: string
+    subtitle: string
+  }> = [
+    {
+      value: "PAULISTA",
+      title: "Truco Paulista",
+      subtitle: "Com vira",
+    },
+    {
+      value: "MINEIRO",
+      title: "Truco Mineiro",
+      subtitle: "Manilhas fixas",
+    },
+  ]
+
+  return (
+    <div style={styles.settingsScreen}>
+      <div style={styles.settingsHeader}>
+        <div>
+          <div style={styles.settingsEyebrow}>Configurações</div>
+          <h2 style={styles.settingsTitle}>Mesa</h2>
+        </div>
+        <button type="button" style={styles.characterSelectBackButton} onClick={onBack}>
+          Voltar
+        </button>
+      </div>
+
+      <div style={styles.settingsBoard}>
+        <div style={styles.settingsRow}>
+          <div style={styles.settingsRowLabel}>
+            <span style={styles.settingsLabel}>Tipo de truco</span>
+            <span style={styles.settingsValue}>{getGameVariantLabel(selectedVariant)}</span>
+          </div>
+
+          <div style={styles.settingsSegmentedControl}>
+            {variantOptions.map((option) => {
+              const isActive = option.value === selectedVariant
+
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  aria-pressed={isActive}
+                  style={{
+                    ...styles.settingsSegmentButton,
+                    ...(isActive ? styles.settingsSegmentButtonActive : {}),
+                  }}
+                  onClick={() => onChangeVariant(option.value)}
+                >
+                  <span style={styles.settingsSegmentTitle}>{option.title}</span>
+                  <span style={styles.settingsSegmentSubtitle}>{option.subtitle}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
@@ -2896,7 +2995,12 @@ function TutorialDraftScreen({
       </div>
 
       <div style={styles.tutorialDraftHeader}>
-        <button style={styles.tutorialDraftBackButton} onClick={onBack}>
+        <button
+          type="button"
+          aria-label="Voltar para a tela inicial"
+          style={styles.tutorialDraftBackButton}
+          onClick={onBack}
+        >
           Voltar
         </button>
       </div>
@@ -4382,6 +4486,7 @@ function VenueIntroScreen({
     ? Math.round((playerProfile.campaign.wins / overallMatches) * 100)
     : 0
   const challengeDifficulty = currentCampaignVenue?.difficulty.aiLevel ?? 1
+  const selectedTrucoVariantLabel = getGameVariantLabel(playerProfile.settings.trucoVariant)
 
   if (!coverConfig) {
     const fallbackTheme = getTableTheme(currentCampaignVenue?.visualTheme)
@@ -4441,7 +4546,7 @@ function VenueIntroScreen({
               <div style={styles.venueIntroFactCard}>
                 <div style={styles.venueIntroFactLabel}>Variante</div>
                 <strong style={styles.venueIntroFactValue}>
-                  {currentCampaignVenue?.variant === "PAULISTA" ? "Truco Paulista" : "Truco Mineiro"}
+                  {selectedTrucoVariantLabel}
                 </strong>
               </div>
               <div style={styles.venueIntroFactCard}>

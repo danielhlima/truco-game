@@ -7,7 +7,12 @@ O caminho principal da campanha esta visualmente integrado ate o `Cassino Mé Ma
 Estado consolidado:
 
 - fluxo `COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo`
+- tela inicial com arte propria e placas `COMEÇAR`, `TUTORIAL` e `CONFIGURAÇÕES`
+- `COMEÇAR`, `TUTORIAL` e `CONFIGURAÇÕES` sao hotspots ativos
+- `CONFIGURAÇÕES` permite escolher globalmente entre `Truco Paulista` e `Truco Mineiro`; Paulista e o padrao
 - gameplay dentro de stage logico `1080x500`
+- jogadas de carta na mesa tocam `src/assets/audio/cardflip.mp3`
+- distribuicao de cartas dispara uma rajada curta de `10` sons sincronizada com a animacao visual
 - intro curta antes da partida, mostrando primeiro apenas o background do local
 - tela de selecao de parceira aceita como pronta no estado atual
 - escolha de skin do jogador implementada antes da campanha quando ainda nao existe skin salva
@@ -28,8 +33,8 @@ Estado consolidado:
 - a run temporaria nao altera progresso, recompensas ou desbloqueios da campanha principal ja concluida
 - o botao `Recomeçar campanha` abre confirmacao dentro do jogo, nao alerta nativo do navegador
 - testes unitarios de dialogos/raises ja cobrem `TRUCO!`, `SEIS!`, `NOVE!`, `DOZE!`, `DESCE!`, `TOMA!` e `TÔ FORA!`
-- helpers de sessao criam partidas a partir do bar e aplicam a variante declarada pelo local
-- ha testes para criacao de partida por local Mineiro/Paulista e para proxima mao Paulista mantendo vira/manilha
+- helpers de sessao criam partidas a partir da variante salva no perfil do jogador
+- ha testes para padrao Paulista, override global Mineiro e proxima mao Paulista mantendo vira/manilha
 - carta coberta esta implementada a partir da segunda vaza e coberta por testes
 - mao de 9 esta implementada com decisao `Jogar`/`Correr`
 - tutorial jogavel esta implementado, cobre aulas 1 a 10 e foi testado pelo usuario
@@ -138,7 +143,7 @@ Ordem recomendada agora:
 
 ### Estado da IA
 
-A primeira rodada de rebalanceamento da IA de truco foi aplicada com testes, validada em jogo real e enviada para `origin/main`.
+A segunda rodada de rebalanceamento da IA de truco foi aplicada com testes.
 
 Estado apos a primeira rodada:
 
@@ -146,11 +151,27 @@ Estado apos a primeira rodada:
 - conselhos da parceira ficaram menos otimistas com dupla fraca
 - perfis agressivos/blefadores ainda podem blefar, mas com probabilidades menores
 - dificuldade maxima disciplinada agora usa `trickster`, nao `reckless`
+
+Estado apos a segunda rodada:
+
+- adversarios de campanha usam personalidade derivada da dificuldade do bar, preservando progressao lenta do inicio ao bonus
+- `balanced` pede truco inicial apenas com mao boa e contra-aumenta apenas com mao/parceria forte
+- re-aumentos de dupla deixaram de depender de uma unica mao media
+- perfis `volatile` e `reckless` tiveram aceite e blefe em apostas altas reduzidos
+- na consulta da parceira, resposta `BORA!` do humano impede corrida e garante no minimo aceite
+- `CE QUE SABE!` representa uma carta util/mediana e ganha mais peso conforme a parceria foi desbloqueada mais tarde
+- `MELHOR CORRER!` zera a ajuda do humano na consulta; a parceira so continua se tiver forca propria
+- logs `DEBUG IA Truco` registram acao, perfil, forcas e decisao para diagnosticar pedidos e raises em testes reais
 - quando nao consegue ganhar a vaza, a IA descarta a menor carta disponivel
 - quando consegue ganhar a vaza, a IA usa a menor carta vencedora
+- a IA ja interpreta carta coberta na mesa:
+  - abre barato quando so adversarios cobriram
+  - acompanha coberta da dupla apenas quando nao precisa disputar
+  - abre carta se a dupla pode ganhar a mao, evitar risco critico ou fechar a partida
+  - pode puxar coberta na segunda vaza apos vencer a primeira se ainda guarda reserva forte para a terceira
 - os dialogos e raises ja ganharam cobertura unitaria inicial
-- as variantes por bar ja passaram a ser aplicadas na criacao de partida
-- `Jogos Mundiais` e `Mundial` usam Truco Mineiro
+- a variante global salva no perfil ja passou a ser aplicada na criacao de partida
+- todos os bares/circuitos declaram Paulista como padrao; Mineiro pode ser escolhido globalmente em `CONFIGURAÇÕES`
 - mao de 9 implementada:
   - gatilho em `9`, `10` ou `11` pontos
   - dupla em 9 ve cartas da parceria antes de decidir
@@ -164,7 +185,7 @@ Estado apos a primeira rodada:
 Frentes ainda pendentes, em prioridade menor que validacao mobile:
 
 - opcao de usar ou nao a variante `ponto acima`
-- segunda rodada fina de IA:
+- novas rodadas finas de IA:
   - fazer apenas se novos testes em jogo apontarem comportamento ruim
   - preservar testes existentes de thresholds, blefes e descarte
 - extrair o roteiro/estado do tutorial de `src/app/AppSections.tsx` para modulo proprio, apenas se o tutorial aprovado comecar a atrapalhar manutencao
@@ -172,12 +193,12 @@ Frentes ainda pendentes, em prioridade menor que validacao mobile:
 Frentes que deixaram de ser pendencia aberta nesta rodada:
 
 - dialogos e raises ganharam cobertura unitaria inicial
-- variantes Mineiro/Paulista passaram a ser criadas pela configuracao do bar
+- variantes Mineiro/Paulista passaram a ser criadas pela configuracao global do perfil
 - o fluxo pos-campanha ganhou `Modo Livre` para jogar runs temporarias de circuitos e resetar campanha com confirmacao interna
 - primeira rodada de IA foi validada em jogo real
-- `Jogos Mundiais` e `Mundial` foram corrigidos para Truco Mineiro
+- o padrao de todos os bares/circuitos foi alinhado para Truco Paulista
 - descarte da IA quando nao pode ganhar a vaza ficou coberto por testes
-- carta coberta foi implementada e validada
+- carta coberta foi implementada, validada e ganhou a primeira camada estrategica da IA
 - mao de 9 foi implementada e validada
 - tutorial jogavel foi implementado, ajustado visualmente e aprovado pelo usuario
 

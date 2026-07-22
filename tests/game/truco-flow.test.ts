@@ -4,6 +4,7 @@ import { requestTruco } from "../../src/game/requestTruco.ts"
 import { respondToTruco } from "../../src/game/respondToTruco.ts"
 import { stepHand } from "../../src/game/stepHand.ts"
 import { createHandStateFixture } from "../helpers/gameFixtures.ts"
+import { clearLogs, getLogsAsText } from "../../src/utils/logger.ts"
 
 test("requestTruco cria um pedido inicial valendo 3", () => {
   const state = createHandStateFixture()
@@ -67,6 +68,7 @@ test("respondToTruco com raise aceita o valor atual e propõe o próximo", () =>
 })
 
 test("stepHand permite que a IA aceite e peça aumento quando a mão for forte", () => {
+  clearLogs()
   const state = createHandStateFixture({
     currentBet: 1,
     players: [
@@ -74,9 +76,9 @@ test("stepHand permite que a IA aceite e peça aumento quando a mão for forte",
       {
         id: 2,
         hand: [
+          { rank: "4", suit: "paus" },
           { rank: "3", suit: "copas" },
           { rank: "2", suit: "paus" },
-          { rank: "Q", suit: "ouros" },
         ],
       },
       { id: 3, hand: [] },
@@ -101,6 +103,38 @@ test("stepHand permite que a IA aceite e peça aumento quando a mão for forte",
   assert.equal(nextState.truco.awaitingResponseFromPlayerId, 1)
   assert.equal(nextState.truco.awaitingResponseFromTeam, "A")
   assert.equal(nextState.truco.proposedBet, 6)
+  assert.match(
+    getLogsAsText(),
+    /DEBUG IA Truco: acao resposta, time B, perfil balanced, forcas \[7, 0\], aposta proposta 3, decisao raise/
+  )
+})
+
+test("stepHand registra debug quando a IA pede truco", () => {
+  clearLogs()
+  const state = createHandStateFixture({
+    currentPlayerId: 2,
+    players: [
+      { id: 1, hand: [] },
+      {
+        id: 2,
+        hand: [
+          { rank: "4", suit: "paus" },
+          { rank: "3", suit: "copas" },
+          { rank: "2", suit: "paus" },
+        ],
+      },
+      { id: 3, hand: [] },
+      { id: 4, hand: [] },
+    ],
+  })
+
+  const nextState = stepHand(state)
+
+  assert.equal(nextState.truco.phase, "awaiting-response")
+  assert.match(
+    getLogsAsText(),
+    /DEBUG IA Truco: acao pedido, jogador 2, time B, perfil balanced, forcas \[7\], aposta atual 1, decisao pedir/
+  )
 })
 
 test("stepHand não deixa a IA aumentar quando o time já tem 9 pontos", () => {

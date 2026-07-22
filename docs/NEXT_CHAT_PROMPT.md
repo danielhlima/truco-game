@@ -34,17 +34,25 @@ Contexto atual:
 - A run temporaria nao altera progresso, recompensas ou desbloqueios da campanha principal ja concluida.
 - Recomeçar campanha usa confirmacao interna do jogo, nao alerta nativo do navegador.
 - O fluxo atual deve ser preservado: COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo.
+- A tela inicial usa arte com placas COMEÇAR, TUTORIAL e CONFIGURAÇÕES; os tres sao hotspots ativos.
+- CONFIGURAÇÕES abre a tela de ajustes e permite escolher globalmente entre Truco Paulista e Truco Mineiro.
+- Truco Paulista e o padrao para perfis novos e para todos os bares/circuitos; escolher Mineiro aplica Mineiro a todos.
 - A gameplay usa stage logico 1080x500.
 - A intro curta antes da partida mostra primeiro apenas o background do local.
 - As telas de campanha autorais usam hotspots HTML invisiveis sobre a arte.
 - Na Jornada de Campanha, `ENTRAR NO BAR` tambem cobre a foto/cartao do bar atual quando ela aparece como alvo de toque.
 - Testes unitarios de dialogos/raises ja cobrem TRUCO!, SEIS!, NOVE!, DOZE!, DESCE!, TOMA! e TÔ FORA!.
-- A criacao de partida por bar ja aplica a variante declarada no local.
-- Ha testes para criacao de partida Mineiro/Paulista e proxima mao Paulista mantendo vira.
+- A criacao de partida por bar aplica a variante global salva no perfil.
+- Ha testes para padrao Paulista, override global Mineiro e proxima mao Paulista mantendo vira.
 - A primeira rodada de IA foi validada em jogo real e enviada para origin/main.
 - A IA descarta a menor carta quando nao consegue ganhar a vaza.
 - A IA usa a menor carta vencedora quando consegue ganhar a vaza.
-- Jogos Mundiais e Mundial usam Truco Mineiro.
+- A segunda rodada de balanceamento da IA faz adversarios de campanha usarem a personalidade derivada da dificuldade do bar.
+- Re-aumentos de dupla agora exigem mao/parceria forte; `balanced` nao escala com mao media.
+- Na consulta da parceira, resposta `BORA!` do humano impede corrida e garante no minimo aceite.
+- Na consulta da parceira, `CE QUE SABE!` sinaliza uma carta util/mediana e pesa mais com parceiros desbloqueados mais tarde.
+- Na consulta da parceira, `MELHOR CORRER!` sinaliza falta de ajuda do humano; a parceira so segue por forca propria.
+- Logs `DEBUG IA Truco` registram acao, time, perfil, forcas e decisao quando a IA pede truco ou responde a pedido/raise.
 - Logs de inicio de mao registram regra ativa; em Paulista tambem registram vira e manilha.
 - Carta coberta ja esta implementada a partir da segunda vaza, com UI mobile e testes.
 - Mao de 9 ja esta implementada:

@@ -160,35 +160,150 @@ test("IA joga carta coberta como descarte quando não consegue ganhar a vaza", (
   assert.deepEqual(playedCard.card, createCard("5", "espada"))
 })
 
-test("IA abre carta baixa quando todas as cartas anteriores estão cobertas", () => {
+test("IA abre carta baixa quando só adversários jogaram coberto", () => {
   const state = createHandStateFixture({
     roundNumber: 2,
-    currentPlayerId: 4,
+    currentPlayerId: 3,
     table: [
-      { playerId: 1, card: createCard("3", "copas"), covered: true },
       { playerId: 2, card: createCard("2", "espada"), covered: true },
-      { playerId: 3, card: createCard("A", "ouros"), covered: true },
     ],
     players: [
       { id: 1, hand: [] },
       { id: 2, hand: [] },
-      { id: 3, hand: [] },
       {
-        id: 4,
+        id: 3,
         hand: [
           createCard("5", "espada"),
           createCard("Q", "copas"),
           createCard("3", "paus"),
         ],
       },
+      { id: 4, hand: [] },
     ],
   })
 
   const nextState = playAiTurn(state)
-  const playedCard = nextState.table[3]
+  const playedCard = nextState.table[1]
 
   assert.equal(playedCard.covered, false)
   assert.deepEqual(playedCard.card, createCard("5", "espada"))
+})
+
+test("IA acompanha carta coberta da dupla quando não precisa disputar a vaza", () => {
+  const state = createHandStateFixture({
+    roundNumber: 2,
+    currentPlayerId: 3,
+    table: [
+      { playerId: 1, card: createCard("3", "copas"), covered: true },
+      { playerId: 2, card: createCard("2", "espada"), covered: true },
+    ],
+    players: [
+      { id: 1, hand: [] },
+      { id: 2, hand: [] },
+      {
+        id: 3,
+        hand: [
+          createCard("5", "espada"),
+          createCard("Q", "copas"),
+          createCard("3", "paus"),
+        ],
+      },
+      { id: 4, hand: [] },
+    ],
+  })
+
+  const nextState = playAiTurn(state)
+  const playedCard = nextState.table[2]
+
+  assert.equal(playedCard.covered, true)
+  assert.deepEqual(playedCard.card, createCard("5", "espada"))
+})
+
+test("IA abre carta depois da coberta da dupla quando pode ganhar a mão", () => {
+  const state = createHandStateFixture({
+    roundNumber: 2,
+    currentPlayerId: 3,
+    score: { A: 1, B: 0 },
+    firstNonTieWinner: "A",
+    table: [
+      { playerId: 1, card: createCard("3", "copas"), covered: true },
+      { playerId: 2, card: createCard("2", "espada"), covered: true },
+    ],
+    players: [
+      { id: 1, hand: [] },
+      { id: 2, hand: [] },
+      {
+        id: 3,
+        hand: [
+          createCard("5", "espada"),
+          createCard("Q", "copas"),
+        ],
+      },
+      { id: 4, hand: [] },
+    ],
+  })
+
+  const nextState = playAiTurn(state)
+  const playedCard = nextState.table[2]
+
+  assert.equal(playedCard.covered, false)
+  assert.deepEqual(playedCard.card, createCard("5", "espada"))
+})
+
+test("IA puxa coberta na segunda vaza quando tem reserva forte para a terceira", () => {
+  const state = createHandStateFixture({
+    roundNumber: 2,
+    currentPlayerId: 3,
+    score: { A: 1, B: 0 },
+    firstNonTieWinner: "A",
+    table: [],
+    players: [
+      { id: 1, hand: [] },
+      { id: 2, hand: [] },
+      {
+        id: 3,
+        hand: [
+          createCard("3", "copas"),
+          createCard("7", "copas"),
+        ],
+      },
+      { id: 4, hand: [] },
+    ],
+  })
+
+  const nextState = playAiTurn(state)
+  const playedCard = nextState.table[0]
+
+  assert.equal(playedCard.covered, true)
+  assert.deepEqual(playedCard.card, createCard("3", "copas"))
+})
+
+test("IA não puxa coberta quando a mão pode fechar a partida", () => {
+  const state = createHandStateFixture({
+    roundNumber: 2,
+    currentPlayerId: 3,
+    score: { A: 1, B: 0 },
+    firstNonTieWinner: "A",
+    table: [],
+    players: [
+      { id: 1, hand: [] },
+      { id: 2, hand: [] },
+      {
+        id: 3,
+        hand: [
+          createCard("3", "copas"),
+          createCard("3", "paus"),
+        ],
+      },
+      { id: 4, hand: [] },
+    ],
+  })
+
+  const nextState = playAiTurn(state, { A: 11, B: 4 })
+  const playedCard = nextState.table[0]
+
+  assert.equal(playedCard.covered, false)
+  assert.deepEqual(playedCard.card, createCard("3", "copas"))
 })
 
 test("IA ignora cartas cobertas anteriores ao avaliar se consegue ganhar", () => {

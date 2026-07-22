@@ -7,7 +7,7 @@ Cada bar deve entrar primeiro como pacote jogavel minimo:
 - dados completos em `src/career/campaign/campaignData.ts`
 - dupla adversaria fixa e exclusiva daquele bar
 - nenhum adversario deve se repetir em outro bar
-- variante, dificuldade e numero de vitorias definidos
+- dificuldade e numero de vitorias definidos; a variante padrao dos bares e `Truco Paulista`
 - campanha, capa e resultado genericos aceitos como fallback
 - tema de mesa reaproveitado quando ainda nao houver arte propria
 
@@ -31,8 +31,9 @@ O caminho principal ja esta integrado com pacotes visuais autorais ate o `Cassin
 - o `Voltar` da tela autoral retorna ao hub do `Modo Livre` e encerra a run temporaria
 - a run temporaria nao altera progresso, recompensas ou desbloqueios da campanha principal ja concluida
 - `Recomeçar campanha` usa confirmacao interna do jogo
-- `Jogos Mundiais` e `Mundial` usam Truco Mineiro
+- `CONFIGURAÇÕES` permite escolher globalmente entre `Truco Paulista` e `Truco Mineiro`; a escolha vale para todos os bares e circuitos
 - carta coberta, mao de 9 e tutorial jogavel ja estao implementados
+- a personalidade de truco dos adversarios segue a dificuldade declarada no bar, com curva gradual ate `trickster` na reta mundial/bonus
 - a preparacao mobile com `Capacitor + Android Studio + Xcode` ja foi iniciada; a proxima frente e validar Android Studio, alinhar Xcode/CoreSimulator e testar em device real conforme `docs/NEXT_STEPS.md`
 
 Nota visual: o caminho principal evoluiu de botecos populares para eventos oficiais, arenas, torneios internacionais e cassino de luxo. O bonus deve parecer uma virada de tom intencional, divertida e especial, sem reciclar simplesmente a estetica dos ultimos campeonatos.
@@ -47,26 +48,30 @@ Nota visual: o caminho principal evoluiu de botecos populares para eventos ofici
 - nenhum parceiro inicial aparece como adversario em bar futuro
 - ao conquistar um bar, os dois adversarios daquele local sao persistidos como novas opcoes de parceria
 - o catalogo completo permanece navegavel na tela de selecao, mas personagens ainda nao derrotados aparecem bloqueados
+- a inteligencia de leitura da consulta da parceira progride com a campanha:
+  - parceiros iniciais usam nivel basico
+  - parceiros desbloqueados herdam o nivel de leitura da dificuldade do bar onde foram derrotados
+  - isso faz respostas como `CE QUE SABE!` pesarem mais com parcerias conquistadas mais tarde
 
 ## Tabela do Caminho Principal
 
 | Fase / circuito | Bar / fase | Tema visual | Ambiente | Variante | Dificuldade | Dupla adversaria | Vitorias | Estado visual minimo |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Botecos da Rua | Bar do Ze Catinga | Boteco raiz fotografico | Paredes gastas, piso engordurado e TV velha | Mineiro | 1/5 | Tiao Casca Grossa + Cida Fumaca | 3 | Campanha, capa, background e resultado autorais |
+| Botecos da Rua | Bar do Ze Catinga | Boteco raiz fotografico | Paredes gastas, piso engordurado e TV velha | Paulista | 1/5 | Tiao Casca Grossa + Cida Fumaca | 3 | Campanha, capa, background e resultado autorais |
 | Botecos da Rua | Bar Maneco Banguela | Boteco raiz claro | Metal, copos batendo e domino | Paulista | 1/5 | Tonhao Rasga-Lata + Patricia Monique | 4 | Campanha, capa, background e resultado autorais |
-| Campeonato da Vila Naná | Trem do Jaça | Madeira suja | Trem de vila com provocacao antiga | Mineiro | 2/5 | Naldo Tramela + Dalva Seringa | 5 | Campanha, capa, background, mesa e resultado autorais |
+| Campeonato da Vila Naná | Trem do Jaça | Madeira suja | Trem de vila com provocacao antiga | Paulista | 2/5 | Naldo Tramela + Dalva Seringa | 5 | Campanha, capa, background, mesa e resultado autorais |
 | Campeonato da Vila Naná | Adega do Juca Bigode | Metal de patio | Luz improvisada, balcão de metal e plateia apertada | Paulista | 2/5 | Biu Caolho + Aninha Passarela | 6 | Campanha, capa, background, mesa e resultado autorais |
-| Conquista das Zonas | Garagem Norte | Industrial | Ferro, concreto e fumaca | Mineiro | 3/5 | Dito Marrua + Celsinho Breque | 4 | Campanha, capa, background, mesa e resultado autorais |
+| Conquista das Zonas | Garagem Norte | Industrial | Ferro, concreto e fumaca | Paulista | 3/5 | Dito Marrua + Celsinho Breque | 4 | Campanha, capa, background, mesa e resultado autorais |
 | Conquista das Zonas | Quintal da Leste | Festival de rua | Partida cheia e conversa alta | Paulista | 3/5 | Rosinha Catraca + Damiao Corote | 5 | Campanha, capa, background, mesa e resultado autorais |
-| Conquista das Zonas | Subsolo do Centro | Underground | Bar escondido e calculista | Mineiro | 3/5 | Norberto Fuba + Quiteria Mao-Torta | 6 | Campanha, capa, background, mesa e resultado autorais |
+| Conquista das Zonas | Subsolo do Centro | Underground | Bar escondido e calculista | Paulista | 3/5 | Norberto Fuba + Quiteria Mao-Torta | 6 | Campanha, capa, background, mesa e resultado autorais |
 | Conquista das Zonas | Salao da Sul | Premium de esquina | Boteco arrumado com malandragem local | Paulista | 3/5 | Ivone Verniz + Marlene Pimenta | 5 | Campanha, capa, background, mesa e resultado autorais |
 | Campeonato Municipal | Centro de Convenções da Prefeitura | Evento urbano | Publico maior e rivais conhecidos | Paulista | 4/5 | Jura Pancada + Osmar Alfinete | 6 | Campanha, capa, background, mesa e resultado autorais |
 | Campeonato Estadual | Ginásio Estadual Maneco Filé | Classico regional | Evento organizado e narrador local | Paulista | 4/5 | Geraldo Medalha + Zito Parafuso | 6 | Campanha, capa, background, mesa e resultado autorais |
 | Campeonato Nacional | Arena Nacional | Arena com transmissao | Plateia grande e pressao publica | Paulista | 4/5 | Sueli Estopim + Creusa Rabugenta | 7 | Campanha, capa, background, mesa e resultado autorais |
-| Circuito Panamericano | Centro Americano Truqueiro de Medelin. | Show continental | Producao moderna e estilos diferentes | Mineiro | 4/5 | Ramiro Bolero + Luna Candela | 5 | Campanha, capa, background, mesa e resultado autorais |
-| Jogos Mundiais | Hotel Truco de Segóvia, Espanha | Esportivo cerimonial | Bandeiras, delegacoes e tensao maxima | Mineiro | 5/5 | Mina Compasso + Viktor Muralha | 4 | Campanha, capa, background, mesa e resultado autorais |
-| Mundial | Cassino Mé Maior | Cassino de luxo | Veludo, lustres e silencio tenso | Mineiro | 5/5 | Madame Violeta + Augusto Crupie | 5 | Campanha, capa, background, mesa e resultado autorais |
-| Circuito Intergaláctico | Órbita da Lua | Bonus lunar retrofuturista | Clube orbital improvisado, neon, bandeirolas e transmissao ao vivo | Mineiro | 5/5 | Mané Banguela + Cosme Órbita | 7 | Campanha, capa, background, mesa, resultado e vitoria de circuito autorais |
+| Circuito Panamericano | Centro Americano Truqueiro de Medelin. | Show continental | Producao moderna e estilos diferentes | Paulista | 4/5 | Ramiro Bolero + Luna Candela | 5 | Campanha, capa, background, mesa e resultado autorais |
+| Jogos Mundiais | Hotel Truco de Segóvia, Espanha | Esportivo cerimonial | Bandeiras, delegacoes e tensao maxima | Paulista | 5/5 | Mina Compasso + Viktor Muralha | 4 | Campanha, capa, background, mesa e resultado autorais |
+| Mundial | Cassino Mé Maior | Cassino de luxo | Veludo, lustres e silencio tenso | Paulista | 5/5 | Madame Violeta + Augusto Crupie | 5 | Campanha, capa, background, mesa e resultado autorais |
+| Circuito Intergaláctico | Órbita da Lua | Bonus lunar retrofuturista | Clube orbital improvisado, neon, bandeirolas e transmissao ao vivo | Paulista | 5/5 | Mané Banguela + Cosme Órbita | 7 | Campanha, capa, background, mesa, resultado e vitoria de circuito autorais |
 
 ## Bonus Pos-Campanha Integrado
 

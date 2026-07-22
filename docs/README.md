@@ -71,7 +71,7 @@ Define os padroes de prompts de imagem que funcionaram melhor:
 Registra a expansao vertical da campanha:
 
 - tabela simples do caminho principal
-- dupla adversaria fixa, variante e dificuldade por bar
+- dupla adversaria fixa e dificuldade por bar; variante agora e configuracao global
 - estado visual minimo aceito antes do polimento autoral
 
 ### `docs/NEXT_CHAT_PROMPT.md`
@@ -164,8 +164,10 @@ Estado consolidado:
 - a tela de campanha dinamica continua como fallback para outros bares/estados
 - tela inicial definitiva com arte propria:
   - `src/assets/start/truco-raiz-start.png`
-  - botao `COMEÇAR` como hotspot HTML invisivel sobre a placa da arte
-  - debug, reset e seletor de variante removidos da primeira tela visivel
+  - botoes `COMEÇAR`, `TUTORIAL` e `CONFIGURAÇÕES` desenhados na arte
+  - `COMEÇAR`, `TUTORIAL` e `CONFIGURAÇÕES` como hotspots HTML invisiveis sobre as placas da arte
+  - `CONFIGURAÇÕES` abre a primeira tela de ajustes, com escolha global entre `Truco Paulista` e `Truco Mineiro`
+  - debug e reset removidos da primeira tela visivel
 - telas autorais de vitoria e derrota do `Bar do Ze Catinga`:
   - `src/assets/venues/ze-catinga/match-result-win.png`
   - `src/assets/venues/ze-catinga/match-result-loss.png`
@@ -224,13 +226,18 @@ Estado consolidado:
   - a run temporaria nao altera progresso, recompensas ou desbloqueios da campanha principal ja concluida
   - `Recomeçar campanha` usa confirmacao interna do jogo, nao alerta nativo do navegador
 - IA e regras validadas nesta rodada:
-  - `balanced` ficou menos propenso a trucar com pouco
-  - perfis blefadores mantem blefes com probabilidades menores
+  - adversarios de campanha usam personalidade de truco derivada da dificuldade do bar
+  - `balanced` ficou menos propenso a trucar com pouco e a contra-aumentar com mao media
+  - perfis blefadores mantem blefes com probabilidades menores e menos aceite em aposta alta
   - dificuldade maxima disciplinada usa `trickster`
+  - quando a parceira consulta o humano, `BORA!` impede corrida e garante no minimo aceite
+  - `CE QUE SABE!` sinaliza uma carta util/mediana e pesa mais para parceiras desbloqueadas mais tarde
+  - `MELHOR CORRER!` sinaliza que o humano nao tem ajuda; a parceira so segue por forca propria
   - IA descarta a menor carta quando nao consegue ganhar a vaza
   - IA usa a menor carta vencedora quando ainda consegue ganhar a vaza
   - logs de inicio de mao registram regra ativa, vira e manilha quando houver
-  - `Jogos Mundiais` e `Mundial` usam Truco Mineiro
+  - logs `DEBUG IA Truco` registram acao, time, perfil, forcas e decisao para diagnosticar pedidos e raises
+  - `Truco Paulista` e o padrao global; `Truco Mineiro` pode ser escolhido em `CONFIGURAÇÕES` para todos os bares
   - validacao final passou em `npm test` e `npm run build`
 
 ## Prioridade imediata para o proximo chat

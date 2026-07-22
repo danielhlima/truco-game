@@ -420,6 +420,7 @@ export function GameTableScene({
   const vira = model.centerDeck.vira
   const viraKey =
     model.centerDeck.show && vira ? `${vira.rank}-${vira.suit}` : null
+  const shouldDelayDealForVira = model.centerDeck.show && !!viraKey
   const tableHasPlayedCards = model.slots.some((slot) => !!slot.card)
 
   useEffect(() => {
@@ -500,7 +501,7 @@ export function GameTableScene({
     const cardsToDeal = order.flatMap((playerId) =>
       Array.from({ length: 3 }, (_, index) => ({ playerId, index }))
     )
-    const dealIntroDelay = model.centerDeck.show && viraKey ? 520 : 0
+    const dealIntroDelay = shouldDelayDealForVira ? 520 : 0
 
     const resetId = window.setTimeout(() => {
       previousCardsRef.current = {}
@@ -564,8 +565,7 @@ export function GameTableScene({
   }, [
     animationsEnabled,
     dealAnimationNonce,
-    model.centerDeck.show,
-    viraKey,
+    shouldDelayDealForVira,
   ])
 
   return (
@@ -839,7 +839,7 @@ function getPlayAnimationOrigin(playerId: number): {
 }
 
 function getViraOverlayPose(): { left: string; top: string; rotation: number } {
-  return { left: "62%", top: "32%", rotation: -7 }
+  return { left: "clamp(92px, 23%, 28%)", top: "76%", rotation: -7 }
 }
 
 function getViraAnimationOrigin(): { left: string; top: string; rotation: number } {

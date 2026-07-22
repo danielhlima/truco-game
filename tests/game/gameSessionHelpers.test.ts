@@ -438,20 +438,19 @@ test("sequência real de raises preserva TRUCO, SEIS, NOVE, DOZE e TOMA", () => 
   })
 })
 
-test("criação de partida por local aplica variante Mineiro ou Paulista da campanha", () => {
-  const mineiroVenue = getCampaignVenueFixture("bar-do-ze-catinga")
-  const paulistaVenue = getCampaignVenueFixture("bar-maneco-banguela")
+test("criação de partida por local usa Paulista por padrão e aceita escolha global Mineiro", () => {
+  const venue = getCampaignVenueFixture("bar-do-ze-catinga")
 
-  const mineiroMatch = createVenueMatchState(mineiroVenue)
-  const paulistaMatch = createVenueMatchState(paulistaVenue)
+  const defaultMatch = createVenueMatchState(venue)
+  const mineiroMatch = createVenueMatchState(venue, 1, "MINEIRO")
+
+  assert.equal(defaultMatch.handState.variant, "PAULISTA")
+  assert.ok(defaultMatch.handState.vira)
+  assert.equal(defaultMatch.matchState.variant, "PAULISTA")
 
   assert.equal(mineiroMatch.handState.variant, "MINEIRO")
   assert.equal(mineiroMatch.handState.vira, undefined)
   assert.equal(mineiroMatch.matchState.variant, "MINEIRO")
-
-  assert.equal(paulistaMatch.handState.variant, "PAULISTA")
-  assert.ok(paulistaMatch.handState.vira)
-  assert.equal(paulistaMatch.matchState.variant, "PAULISTA")
 })
 
 test("próxima mão usa a variante da partida e mantém vira no Paulista", () => {
@@ -470,8 +469,8 @@ test("próxima mão usa a variante da partida e mantém vira no Paulista", () =>
 })
 
 test("próxima mão entra em modo mão de 9 quando um time chega a 9 pontos", () => {
-  const mineiroVenue = getCampaignVenueFixture("bar-do-ze-catinga")
-  const { matchState } = createVenueMatchState(mineiroVenue, 1)
+  const venue = getCampaignVenueFixture("bar-do-ze-catinga")
+  const { matchState } = createVenueMatchState(venue, 1, "MINEIRO")
 
   const nextHandState = createNextHandStateForMatch({
     ...matchState,

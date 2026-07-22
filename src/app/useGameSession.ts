@@ -4,6 +4,7 @@ import {
   getTeamPartnerAdvice,
   type PartnerAdvice,
 } from "../ai/trucoDecision"
+import { getAiTrucoPersonalityIdForDifficulty } from "../ai/trucoPersonalities"
 import { CAMPAIGN_STAGES } from "../career/campaign/campaignData"
 import {
   applyCampaignLoss,
@@ -35,7 +36,11 @@ import { requestTruco } from "../game/requestTruco"
 import { respondToTruco } from "../game/respondToTruco"
 import { stepHand } from "../game/stepHand"
 import { canTeamAskForTruco, getBetCallLabel } from "../game/truco"
-import type { GameVariant } from "../game/variant"
+import {
+  DEFAULT_TRUCO_VARIANT,
+  getGameVariantLabel,
+  type GameVariant,
+} from "../game/variant"
 import {
   loadPlayerProfile,
   resetPlayerProfileStorage,
@@ -49,7 +54,10 @@ import {
   type TrucoCharacterId,
   type TrucoCharacterProfile,
 } from "../content/characters"
-import { STARTER_PARTNER_CHARACTER_IDS } from "../content/partnerProgression"
+import {
+  STARTER_PARTNER_CHARACTER_IDS,
+  getPartnerAdviceSkillLevel,
+} from "../content/partnerProgression"
 import {
   DEFAULT_PLAYER_SKIN_ID,
   PLAYER_SKINS,
@@ -86,6 +94,7 @@ import { getRuleSet } from "../game/getRuleSet"
 const DEBUG_MODE = true
 type MenuScreen =
   | "start"
+  | "settings"
   | "tutorial"
   | "journey-intro"
   | "player-skin-select"
@@ -195,7 +204,6 @@ export function useGameSession() {
   const MATCH_RESULT_REVEAL_DELAY_MS = 1000
   const GAMEPLAY_INTRO_BACKGROUND_MS = 1000
   const GAMEPLAY_INTRO_REVEAL_MS = 420
-  const [variant, setVariant] = useState<GameVariant>("MINEIRO")
   const [playerProfile, setPlayerProfile] = useState<PlayerProfile>(loadPlayerProfile)
   const [handState, setHandState] = useState<HandState | null>(null)
   const [matchState, setMatchState] = useState<MatchState | null>(null)
@@ -342,6 +350,7 @@ export function useGameSession() {
     ? selectableCharacters.findIndex((character) => character.id === selectedCharacter.id)
     : -1
   const partnerAiPersonalityId = selectedPartnerCharacter?.personalityId ?? "conservative"
+  const partnerAdviceSkillLevel = getPartnerAdviceSkillLevel(selectedPartnerCharacter?.id ?? null)
   const opponentCharacters = useMemo<TrucoCharacterProfile[]>(() => {
     if (!currentCampaignVenue) {
       return TRUCO_CHARACTER_ROSTER.filter((character) => character.role === "opponent").slice(0, 2)
@@ -351,8 +360,11 @@ export function useGameSession() {
       .map((characterId) => TRUCO_CHARACTER_BY_ID[characterId])
       .filter(Boolean)
   }, [currentCampaignVenue])
-  const opponentAiPersonalityId = opponentCharacters[0]?.personalityId ?? "balanced"
-  const activeVariant = handState?.variant ?? variant
+  const opponentAiPersonalityId = currentCampaignVenue
+    ? getAiTrucoPersonalityIdForDifficulty(currentCampaignVenue.difficulty)
+    : opponentCharacters[0]?.personalityId ?? "balanced"
+  const selectedTrucoVariant = playerProfile.settings.trucoVariant ?? DEFAULT_TRUCO_VARIANT
+  const activeVariant = handState?.variant ?? selectedTrucoVariant
   const currentVenueWins = currentCampaignVenue
     ? freePlayRun?.currentVenueId === currentCampaignVenue.id
       ? freePlayRun.venueWinsById[currentCampaignVenue.id] ?? 0
@@ -869,15 +881,14 @@ export function useGameSession() {
     clearLogs()
 
     const firstPlayerId = 1
-    const variantToStart = targetVenue.variant
+    const variantToStart = selectedTrucoVariant
     const { handState: state, matchState: initialMatchState } =
-      createVenueMatchState(targetVenue, firstPlayerId)
+      createVenueMatchState(targetVenue, firstPlayerId, variantToStart)
     const actualVenueId = actualCampaignVenue?.id ?? null
     const isFreePlayVenue = freePlayCurrentVenue?.id === targetVenue.id
     const shouldUseSessionDebugVenue =
       DEBUG_MODE && (!!debugVenueId || (!isFreePlayVenue && targetVenue.id !== actualVenueId))
 
-    setVariant(variantToStart)
     getHandRuleContextLogLines(state).forEach((line) => logEvent(line))
     setMatchState(initialMatchState)
     setSessionDebugVenueId(shouldUseSessionDebugVenue ? targetVenue.id : null)
@@ -895,6 +906,27 @@ export function useGameSession() {
       eventMessage: `Partida iniciada em ${targetVenue.name}.`,
       trucoMessage: targetVenue.entryNarrative,
     })
+  }
+
+  function handleOpenSettings() {
+    setMenuScreen("settings")
+    setInGameContextMenuOpen(false)
+    setInGameConfirmation(null)
+  }
+
+  function handleCloseSettings() {
+    setMenuScreen("start")
+  }
+
+  function handleChangeTrucoVariant(nextVariant: GameVariant) {
+    setPlayerProfile((currentProfile) => ({
+      ...currentProfile,
+      settings: {
+        ...currentProfile.settings,
+        trucoVariant: nextVariant,
+      },
+    }))
+    setEventMessage(`Tipo de truco definido: ${getGameVariantLabel(nextVariant)}.`)
   }
 
   function handleLaunchVenue(venueId?: string) {
@@ -1045,7 +1077,6 @@ export function useGameSession() {
     clearLogs()
     resetPlayerProfileStorage()
     setPlayerProfile(createInitialPlayerProfile())
-    setVariant("MINEIRO")
     setHandState(null)
     setMatchState(null)
     setSessionDebugVenueId(null)
@@ -1182,7 +1213,9 @@ export function useGameSession() {
         handState.truco.proposedBet!,
         advice,
         handState.vira,
-        partnerAiPersonalityId
+        partnerAiPersonalityId,
+        undefined,
+        partnerAdviceSkillLevel
       )
 
       const nextState = respondToTruco(handState, decision, matchState?.score)
@@ -1300,6 +1333,8 @@ export function useGameSession() {
     inGameContextMenuOpen,
     isGameplayIntroActive,
     matchState,
+    opponentAiPersonalityId,
+    partnerAiPersonalityId,
   ])
 
   useEffect(() => {
@@ -1902,6 +1937,7 @@ export function useGameSession() {
     handleCancelInGameConfirmation,
     handleCloseInGameContextMenu,
     handleCloseFreePlayStage,
+    handleCloseSettings,
     handleCloseTutorial,
     handleConfirmInGameConfirmation,
     handleCopyLogs,
@@ -1910,6 +1946,7 @@ export function useGameSession() {
     handleLoseMatchFromContextMenu,
     handleOpenFreePlayStage,
     handleOpenInGameContextMenu,
+    handleOpenSettings,
     handlePlayCard,
     handlePartnerAdvice,
     handlePlayNineHand,
@@ -1923,6 +1960,7 @@ export function useGameSession() {
     handleSwapPartnerFromContextMenu,
     handleStartHand,
     handleStartTutorial,
+    handleChangeTrucoVariant,
     handleWinMatchFromContextMenu,
     lastPlayedPlayerId,
     logs,
@@ -1943,13 +1981,12 @@ export function useGameSession() {
     isSelectedCharacterUnlocked,
     selectedPartnerCharacter,
     selectableCharacters,
-    setVariant,
     setDebugVenueId,
     statusMessage,
     speechBubble,
     tableByPlayer,
     trucoMessage,
-    variant,
+    variant: selectedTrucoVariant,
     variantSelectionDisabled,
     opponentCharacters,
     handleCloseCharacterSelect,

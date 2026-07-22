@@ -7,6 +7,7 @@ import {
 } from "./trucoPersonalities"
 
 export type PartnerAdvice = "BORA!" | "CÊ QUE SABE!" | "MELHOR CORRER!"
+export type PartnerAdviceSkillLevel = 1 | 2 | 3 | 4 | 5
 export type TrucoTeamDecision = "accept" | "run" | "raise"
 export type RandomSource = () => number
 
@@ -99,9 +100,18 @@ export function getTeamTrucoDecision(
   personalityId: AiTrucoPersonalityId = "balanced",
   randomSource: RandomSource = Math.random
 ): TrucoTeamDecision {
-  const shouldAccept = hands.some(
-    (hand) => respondToRaise(ruleSet, hand, nextBet, vira, personalityId, randomSource) === "accept"
-  )
+  const personality = getAiTrucoPersonality(personalityId)
+  const strengths = hands.map((hand) => evaluateHandStrength(ruleSet, hand, vira))
+  const acceptThreshold = getAcceptThreshold(nextBet, personalityId)
+  const shouldAcceptByCards =
+    strengths.some((strength) => strength >= acceptThreshold) ||
+    getTeamStrengthTotal(strengths) >= acceptThreshold + personality.partnerMaybeOffset + 1
+  const shouldAcceptByBluff = shouldAcceptByCards
+    ? false
+    : hands.some(
+        (hand) => respondToRaise(ruleSet, hand, nextBet, vira, personalityId, randomSource) === "accept"
+      )
+  const shouldAccept = shouldAcceptByCards || shouldAcceptByBluff
 
   if (!shouldAccept) {
     return "run"
@@ -110,7 +120,7 @@ export function getTeamTrucoDecision(
   const canRaise = nextBet !== 12
   const shouldReRaise =
     canRaise &&
-    hands.some((hand) => shouldRaiseBet(ruleSet, hand, nextBet, vira, personalityId, randomSource))
+    shouldTeamRaiseFromStrengths(strengths, nextBet, personality, randomSource)
 
   if (shouldReRaise) {
     return "raise"
@@ -126,34 +136,43 @@ export function getTeamTrucoDecisionFromPartnerAdvice(
   nextBet: BetValue,
   humanAdvice: PartnerAdvice,
   vira?: Card,
-  personalityId: AiTrucoPersonalityId = "balanced"
+  personalityId: AiTrucoPersonalityId = "balanced",
+  randomSource: RandomSource = Math.random,
+  partnerAdviceSkillLevel: PartnerAdviceSkillLevel = 3
 ): TrucoTeamDecision {
   const personality = getAiTrucoPersonality(personalityId)
   const partnerStrength = evaluateHandStrength(ruleSet, partnerHand, vira)
   const humanStrength = getWeightedHumanStrength(
     evaluateHandStrength(ruleSet, humanHand, vira),
-    humanAdvice
+    humanAdvice,
+    partnerAdviceSkillLevel
   )
   const totalStrength = partnerStrength + humanStrength
   const acceptThreshold = getAcceptThreshold(nextBet, personalityId)
-  const raiseThreshold = personality.raiseThresholdByCurrentBet[nextBet] ?? 99
+  const teamAcceptThreshold = getConsultTeamAcceptThreshold(
+    acceptThreshold,
+    personality.partnerMaybeOffset,
+    humanAdvice,
+    partnerAdviceSkillLevel
+  )
 
   const shouldAccept =
     partnerStrength >= acceptThreshold ||
     humanStrength >= acceptThreshold ||
-    totalStrength >= acceptThreshold + personality.partnerMaybeOffset
+    totalStrength >= teamAcceptThreshold
 
-  if (!shouldAccept) {
+  if (!shouldAccept && humanAdvice !== "BORA!") {
     return "run"
   }
 
   const canRaise = nextBet !== 12
   const shouldReRaise =
     canRaise &&
-    (
-      partnerStrength >= raiseThreshold ||
-      humanStrength >= raiseThreshold ||
-      totalStrength >= raiseThreshold + personality.partnerGoOffset
+    shouldTeamRaiseFromStrengths(
+      [partnerStrength, humanStrength],
+      nextBet,
+      personality,
+      randomSource
     )
 
   if (shouldReRaise) {
@@ -213,13 +232,67 @@ function getAcceptThreshold(
   return 99
 }
 
-function getWeightedHumanStrength(baseStrength: number, advice: PartnerAdvice): number {
+function shouldTeamRaiseFromStrengths(
+  strengths: number[],
+  currentBet: BetValue,
+  personality: ReturnType<typeof getAiTrucoPersonality>,
+  randomSource: RandomSource
+): boolean {
+  const threshold = personality.raiseThresholdByCurrentBet[currentBet]
+
+  if (typeof threshold !== "number") {
+    return false
+  }
+
+  const best = strengths.length > 0 ? Math.max(...strengths) : 0
+  const total = getTeamStrengthTotal(strengths)
+  const strongSingleHand = best >= threshold + 1
+  const strongCombinedHands = total >= threshold + personality.partnerGoOffset + 2
+
+  if (strongSingleHand || strongCombinedHands) {
+    return true
+  }
+
+  const bluffChance = personality.bluffChanceRequestByCurrentBet[currentBet] ?? 0
+  const withinBluffMargin =
+    best >= threshold - personality.raiseBluffMargin ||
+    total >= threshold + personality.partnerGoOffset
+
+  return withinBluffMargin && bluffChance > 0 && randomSource() < bluffChance
+}
+
+function getTeamStrengthTotal(strengths: number[]): number {
+  return strengths.reduce((sum, strength) => sum + strength, 0)
+}
+
+function getConsultTeamAcceptThreshold(
+  acceptThreshold: number,
+  partnerMaybeOffset: number,
+  advice: PartnerAdvice,
+  partnerAdviceSkillLevel: PartnerAdviceSkillLevel
+): number {
+  if (advice === "CÊ QUE SABE!") {
+    return acceptThreshold + Math.max(0, partnerMaybeOffset + 2 - partnerAdviceSkillLevel)
+  }
+
+  if (advice === "MELHOR CORRER!") {
+    return acceptThreshold + partnerMaybeOffset + 2
+  }
+
+  return acceptThreshold
+}
+
+function getWeightedHumanStrength(
+  baseStrength: number,
+  advice: PartnerAdvice,
+  partnerAdviceSkillLevel: PartnerAdviceSkillLevel
+): number {
   switch (advice) {
     case "BORA!":
-      return baseStrength + 2
+      return baseStrength + 2 + Math.floor(partnerAdviceSkillLevel / 2)
     case "CÊ QUE SABE!":
-      return baseStrength + 1
+      return Math.max(baseStrength, partnerAdviceSkillLevel >= 3 ? 2 : 1)
     case "MELHOR CORRER!":
-      return Math.max(0, baseStrength - 3)
+      return 0
   }
 }

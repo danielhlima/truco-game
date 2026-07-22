@@ -13,9 +13,9 @@ import { createCard } from "../helpers/gameFixtures.ts"
 
 const ruleSet = getRuleSet("MINEIRO")
 
-test("perfil balanced só abre truco inicial com mão firme", () => {
+test("perfil balanced só abre truco inicial com mão boa", () => {
   const mediumHand = [
-    createCard("A", "copas"),
+    createCard("2", "copas"),
     createCard("K", "espada"),
     createCard("Q", "ouros"),
   ]
@@ -24,9 +24,15 @@ test("perfil balanced só abre truco inicial com mão firme", () => {
     createCard("K", "espada"),
     createCard("Q", "ouros"),
   ]
+  const goodHand = [
+    createCard("2", "copas"),
+    createCard("A", "copas"),
+    createCard("K", "ouros"),
+  ]
 
   assert.equal(shouldRaiseBet(ruleSet, mediumHand, 1, undefined, "balanced"), false)
-  assert.equal(shouldRaiseBet(ruleSet, firmHand, 1, undefined, "balanced"), true)
+  assert.equal(shouldRaiseBet(ruleSet, firmHand, 1, undefined, "balanced"), false)
+  assert.equal(shouldRaiseBet(ruleSet, goodHand, 1, undefined, "balanced"), true)
 })
 
 test("perfil balanced corre de truco com mão fraca e aceita com duas honras", () => {
@@ -56,7 +62,7 @@ test("perfil balanced aceita, mas não contra-aumenta, com mão só razoável", 
 
 test("perfil balanced contra-aumenta quando a dupla tem uma mão forte", () => {
   const teamHands = [
-    [createCard("3", "ouros"), createCard("2", "espada"), createCard("Q", "copas")],
+    [createCard("4", "paus"), createCard("3", "ouros"), createCard("2", "espada")],
     [createCard("7", "paus"), createCard("6", "espada"), createCard("4", "copas")],
   ]
 
@@ -65,7 +71,7 @@ test("perfil balanced contra-aumenta quando a dupla tem uma mão forte", () => {
 
 test("perfil agressivo só passa do balanced em mão média por blefe controlado", () => {
   const mediumHand = [
-    createCard("A", "copas"),
+    createCard("2", "copas"),
     createCard("K", "espada"),
     createCard("Q", "ouros"),
   ]
@@ -87,8 +93,8 @@ test("conselho da parceira manda correr quando a dupla só tem uma honra", () =>
 test("perfil ultra conservador pede menos que o conservador com mão boa, mas não ótima", () => {
   const goodHand = [
     createCard("2", "copas"),
-    createCard("K", "espada"),
-    createCard("Q", "ouros"),
+    createCard("A", "copas"),
+    createCard("K", "ouros"),
   ]
 
   assert.equal(shouldRaiseBet(ruleSet, goodHand, 1, undefined, "conservative"), true)
@@ -97,8 +103,8 @@ test("perfil ultra conservador pede menos que o conservador com mão boa, mas n�
 
 test("perfil agressivo aumenta com mão firme onde o balanced só aceita", () => {
   const mediumHand = [
+    createCard("3", "copas"),
     createCard("2", "copas"),
-    createCard("K", "espada"),
     createCard("Q", "ouros"),
   ]
 
@@ -108,7 +114,7 @@ test("perfil agressivo aumenta com mão firme onde o balanced só aceita", () =>
 
 test("perfil trickster blefa no pedido quando está um ponto abaixo do limiar", () => {
   const bluffableHand = [
-    createCard("A", "copas"),
+    createCard("2", "copas"),
     createCard("K", "espada"),
     createCard("Q", "ouros"),
   ]
@@ -120,7 +126,7 @@ test("perfil trickster blefa no pedido quando está um ponto abaixo do limiar", 
 test("perfil reckless aceita no blefe onde o balanced corre", () => {
   const bluffableHand = [
     createCard("A", "copas"),
-    createCard("7", "espada"),
+    createCard("K", "espada"),
     createCard("4", "ouros"),
   ]
 
@@ -130,7 +136,7 @@ test("perfil reckless aceita no blefe onde o balanced corre", () => {
 
 test("perfil trickster pode transformar aceite em raise por blefe controlado", () => {
   const teamHands = [
-    [createCard("A", "copas"), createCard("K", "espada"), createCard("Q", "ouros")],
+    [createCard("2", "copas"), createCard("K", "espada"), createCard("Q", "ouros")],
     [createCard("7", "paus"), createCard("6", "espada"), createCard("4", "copas")],
   ]
 
@@ -140,12 +146,12 @@ test("perfil trickster pode transformar aceite em raise por blefe controlado", (
 
 test("conselho forte da parceira pode transformar aceite em raise", () => {
   const humanHand = [
+    createCard("3", "copas"),
+    createCard("2", "espada"),
     createCard("A", "copas"),
-    createCard("7", "espada"),
-    createCard("4", "ouros"),
   ]
   const partnerHand = [
-    createCard("2", "paus"),
+    createCard("A", "paus"),
     createCard("6", "espada"),
     createCard("4", "copas"),
   ]
@@ -175,7 +181,7 @@ test("conselho forte da parceira pode transformar aceite em raise", () => {
 test("MELHOR CORRER! pesa de verdade e pode derrubar o aceite da dupla", () => {
   const humanHand = [
     createCard("A", "copas"),
-    createCard("7", "espada"),
+    createCard("K", "espada"),
     createCard("4", "ouros"),
   ]
   const partnerHand = [
@@ -203,6 +209,92 @@ test("MELHOR CORRER! pesa de verdade e pode derrubar o aceite da dupla", () => {
       "MELHOR CORRER!"
     ),
     "run"
+  )
+})
+
+test("BORA! impede a parceira de correr depois da consulta", () => {
+  const weakHumanHand = [
+    createCard("6", "copas"),
+    createCard("6", "espada"),
+    createCard("5", "ouros"),
+  ]
+  const weakPartnerHand = [
+    createCard("Q", "paus"),
+    createCard("J", "copas"),
+    createCard("4", "ouros"),
+  ]
+
+  assert.equal(
+    getTeamTrucoDecisionFromPartnerAdvice(
+      ruleSet,
+      weakHumanHand,
+      weakPartnerHand,
+      12,
+      "BORA!"
+    ),
+    "accept"
+  )
+  assert.equal(
+    getTeamTrucoDecisionFromPartnerAdvice(
+      ruleSet,
+      weakHumanHand,
+      weakPartnerHand,
+      6,
+      "CÊ QUE SABE!"
+    ),
+    "run"
+  )
+  assert.equal(
+    getTeamTrucoDecisionFromPartnerAdvice(
+      ruleSet,
+      weakHumanHand,
+      weakPartnerHand,
+      6,
+      "MELHOR CORRER!"
+    ),
+    "run"
+  )
+})
+
+test("CÊ QUE SABE! pesa mais para parceiras com leitura melhor", () => {
+  const oneMediumCardSignal = [
+    createCard("Q", "copas"),
+    createCard("J", "espada"),
+    createCard("5", "ouros"),
+  ]
+  const partnerWithOneGoodCard = [
+    createCard("2", "espada"),
+    createCard("6", "paus"),
+    createCard("5", "copas"),
+  ]
+
+  assert.equal(
+    getTeamTrucoDecisionFromPartnerAdvice(
+      ruleSet,
+      oneMediumCardSignal,
+      partnerWithOneGoodCard,
+      6,
+      "CÊ QUE SABE!",
+      undefined,
+      "conservative",
+      undefined,
+      1
+    ),
+    "run"
+  )
+  assert.equal(
+    getTeamTrucoDecisionFromPartnerAdvice(
+      ruleSet,
+      oneMediumCardSignal,
+      partnerWithOneGoodCard,
+      6,
+      "CÊ QUE SABE!",
+      undefined,
+      "conservative",
+      undefined,
+      5
+    ),
+    "accept"
   )
 })
 

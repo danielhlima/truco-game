@@ -8,7 +8,8 @@ import { resolveTrick } from "./resolveTrick"
 import { respondToTruco } from "./respondToTruco"
 import { decideNineHand, isNineHandAwaitingDecision } from "./nineHand"
 import { getTeam } from "./teams"
-import { canTeamAskForTruco, type MatchScore } from "./truco"
+import { canTeamAskForTruco, type BetValue, type MatchScore } from "./truco"
+import { logEvent } from "../utils/logger"
 
 interface AiPersonalityByTeam {
   A: AiTrucoPersonalityId
@@ -51,6 +52,9 @@ export function stepHand(
     const ruleSet = getRuleSet(state.variant)
     const awaitingPlayers = state.players.filter((player) => getTeam(player.id) === awaitingTeam)
     const aiPersonalityId = aiPersonalityByTeam[awaitingTeam]
+    const strengths = awaitingPlayers.map((player) =>
+      evaluateHandStrength(ruleSet, player.hand, state.vira)
+    )
     const decision = getTeamTrucoDecision(
       ruleSet,
       awaitingPlayers.map((player) => player.hand),
@@ -58,6 +62,14 @@ export function stepHand(
       state.vira,
       aiPersonalityId
     )
+    logAiTrucoDecision({
+      action: "resposta",
+      team: awaitingTeam,
+      personalityId: aiPersonalityId,
+      strengths,
+      proposedBet,
+      decision,
+    })
 
     if (decision === "raise") {
       return respondToTruco(state, "raise", matchScore)
@@ -105,11 +117,20 @@ export function stepHand(
       const nextState = requestTruco(state, currentPlayer.id, matchScore)
 
       if (nextState !== state) {
+        logAiTrucoDecision({
+          action: "pedido",
+          playerId: currentPlayer.id,
+          team: currentTeam,
+          personalityId: aiPersonalityId,
+          strengths: [evaluateHandStrength(ruleSet, currentPlayer.hand, state.vira)],
+          currentBet: state.currentBet,
+          decision: "pedir",
+        })
         return nextState
       }
     }
 
-    return playAiTurn(state)
+    return playAiTurn(state, matchScore)
   }
 
   return state
@@ -129,4 +150,37 @@ function shouldAiPlayNineHand(state: HandState): boolean {
   const bestStrength = strengths.length > 0 ? Math.max(...strengths) : 0
 
   return totalStrength >= 5 || bestStrength >= 4
+}
+
+function logAiTrucoDecision({
+  action,
+  playerId,
+  team,
+  personalityId,
+  strengths,
+  currentBet,
+  proposedBet,
+  decision,
+}: {
+  action: "pedido" | "resposta"
+  playerId?: number
+  team: "A" | "B"
+  personalityId: AiTrucoPersonalityId
+  strengths: number[]
+  currentBet?: BetValue
+  proposedBet?: BetValue
+  decision: "pedir" | "accept" | "run" | "raise"
+}) {
+  const details = [
+    `acao ${action}`,
+    playerId ? `jogador ${playerId}` : null,
+    `time ${team}`,
+    `perfil ${personalityId}`,
+    `forcas [${strengths.join(", ")}]`,
+    typeof currentBet === "number" ? `aposta atual ${currentBet}` : null,
+    typeof proposedBet === "number" ? `aposta proposta ${proposedBet}` : null,
+    `decisao ${decision}`,
+  ].filter(Boolean)
+
+  logEvent(`DEBUG IA Truco: ${details.join(", ")}`)
 }
