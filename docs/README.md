@@ -135,6 +135,7 @@ Estado consolidado:
   - trocar de parceira
   - vencer esta partida, para validar progressao sem jogar a partida inteira
   - perder esta partida, para validar a tela de derrota
+  - configuracoes de tipo de truco, musica e efeitos sonoros
   - sair da partida
   - resetar todo o progresso do jogo com confirmacao
 - intro cinematografica curta antes da gameplay:
@@ -166,7 +167,7 @@ Estado consolidado:
   - `src/assets/start/truco-raiz-start.png`
   - botoes `COMEÇAR`, `TUTORIAL` e `CONFIGURAÇÕES` desenhados na arte
   - `COMEÇAR`, `TUTORIAL` e `CONFIGURAÇÕES` como hotspots HTML invisiveis sobre as placas da arte
-  - `CONFIGURAÇÕES` abre a primeira tela de ajustes, com escolha global entre `Truco Paulista` e `Truco Mineiro`
+  - `CONFIGURAÇÕES` abre a primeira tela de ajustes, com escolha global entre `Truco Paulista` e `Truco Mineiro`, toggle de musica e toggle de efeitos sonoros
   - debug e reset removidos da primeira tela visivel
 - telas autorais de vitoria e derrota do `Bar do Ze Catinga`:
   - `src/assets/venues/ze-catinga/match-result-win.png`

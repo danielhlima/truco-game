@@ -22,6 +22,8 @@ export interface PlayerProfile {
   campaign: CampaignProgress
   settings: {
     adsRemoved: boolean
+    musicEnabled: boolean
+    soundEffectsEnabled: boolean
     trucoVariant: GameVariant
     selectedPlayerSkinId?: string
     selectedTableThemeId?: string
@@ -48,6 +50,8 @@ export function createInitialPlayerProfile(): PlayerProfile {
     },
     settings: {
       adsRemoved: false,
+      musicEnabled: true,
+      soundEffectsEnabled: true,
       trucoVariant: DEFAULT_TRUCO_VARIANT,
       selectedTableThemeId: "table-boteco-rua",
     },

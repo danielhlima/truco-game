@@ -223,6 +223,7 @@ export function useGameSession() {
   const [freePlayRun, setFreePlayRun] = useState<FreePlayRunState | null>(null)
   const [inGameContextMenuOpen, setInGameContextMenuOpen] = useState(false)
   const [inGameConfirmation, setInGameConfirmation] = useState<InGameConfirmationState | null>(null)
+  const [inGameSettingsOpen, setInGameSettingsOpen] = useState(false)
   const [gameplayIntroPhase, setGameplayIntroPhase] = useState<GameplayIntroPhase>("done")
   const [characterSelectReturnScreen, setCharacterSelectReturnScreen] =
     useState<CharacterSelectReturnScreen>("journey-intro")
@@ -898,6 +899,7 @@ export function useGameSession() {
     setMenuScreen("start")
     setInGameContextMenuOpen(false)
     setInGameConfirmation(null)
+    setInGameSettingsOpen(false)
     setLaunchVenueAfterCharacterSelect(false)
     setCharacterSelectReturnScreen("journey-intro")
     startGameplayIntro()
@@ -909,12 +911,25 @@ export function useGameSession() {
   }
 
   function handleOpenSettings() {
+    setInGameConfirmation(null)
+    if (handState) {
+      setInGameContextMenuOpen(true)
+      setInGameSettingsOpen(true)
+      return
+    }
+
     setMenuScreen("settings")
     setInGameContextMenuOpen(false)
-    setInGameConfirmation(null)
+    setInGameSettingsOpen(false)
   }
 
   function handleCloseSettings() {
+    if (inGameSettingsOpen) {
+      setInGameSettingsOpen(false)
+      setInGameContextMenuOpen(false)
+      return
+    }
+
     setMenuScreen("start")
   }
 
@@ -927,6 +942,32 @@ export function useGameSession() {
       },
     }))
     setEventMessage(`Tipo de truco definido: ${getGameVariantLabel(nextVariant)}.`)
+  }
+
+  function handleToggleMusicEnabled() {
+    const nextEnabled = !playerProfile.settings.musicEnabled
+
+    setPlayerProfile((currentProfile) => ({
+      ...currentProfile,
+      settings: {
+        ...currentProfile.settings,
+        musicEnabled: nextEnabled,
+      },
+    }))
+    setEventMessage(nextEnabled ? "Musica ligada." : "Musica desligada.")
+  }
+
+  function handleToggleSoundEffectsEnabled() {
+    const nextEnabled = !playerProfile.settings.soundEffectsEnabled
+
+    setPlayerProfile((currentProfile) => ({
+      ...currentProfile,
+      settings: {
+        ...currentProfile.settings,
+        soundEffectsEnabled: nextEnabled,
+      },
+    }))
+    setEventMessage(nextEnabled ? "Efeitos sonoros ligados." : "Efeitos sonoros desligados.")
   }
 
   function handleLaunchVenue(venueId?: string) {
@@ -1083,6 +1124,7 @@ export function useGameSession() {
     setFreePlayRun(null)
     setInGameContextMenuOpen(false)
     setInGameConfirmation(null)
+    setInGameSettingsOpen(false)
     setGameplayIntroPhase("done")
     setSelectedPlayerSkinId(DEFAULT_PLAYER_SKIN_ID)
     setLaunchVenueAfterCharacterSelect(false)
@@ -1561,11 +1603,13 @@ export function useGameSession() {
 
   function handleOpenInGameContextMenu() {
     if (isGameplayIntroActive) return
+    setInGameSettingsOpen(false)
     setInGameContextMenuOpen(true)
   }
 
   function handleCloseInGameContextMenu() {
     setInGameContextMenuOpen(false)
+    setInGameSettingsOpen(false)
   }
 
   function handleAddEightPointsFromContextMenu() {
@@ -1931,6 +1975,7 @@ export function useGameSession() {
     handState,
     inGameConfirmation,
     inGameContextMenuOpen,
+    inGameSettingsOpen,
     matchResultScreen,
     handleAcceptTruco,
     handleAddEightPointsFromContextMenu,
@@ -1961,6 +2006,8 @@ export function useGameSession() {
     handleStartHand,
     handleStartTutorial,
     handleChangeTrucoVariant,
+    handleToggleMusicEnabled,
+    handleToggleSoundEffectsEnabled,
     handleWinMatchFromContextMenu,
     lastPlayedPlayerId,
     logs,

@@ -790,6 +790,7 @@ interface TableSectionProps {
     warning: string
   } | null
   inGameContextMenuOpen: boolean
+  inGameSettingsOpen: boolean
   matchState: MatchState | null
   matchResultScreen: MatchResultScreenState | null
   campaignVictoryScreen: CampaignVictoryScreenState | null
@@ -857,6 +858,8 @@ interface TableSectionProps {
   onStart: () => void
   onStartTutorial: () => void
   onChangeTrucoVariant: (variant: GameVariant) => void
+  onToggleMusicEnabled: () => void
+  onToggleSoundEffectsEnabled: () => void
   onRequestTruco: () => void
   onAcceptTruco: () => void
   onAddEightPointsFromContextMenu: () => void
@@ -880,6 +883,7 @@ export function TableSection({
   handState,
   inGameConfirmation,
   inGameContextMenuOpen,
+  inGameSettingsOpen,
   matchState,
   matchResultScreen,
   campaignVictoryScreen,
@@ -938,6 +942,8 @@ export function TableSection({
   onStart,
   onStartTutorial,
   onChangeTrucoVariant,
+  onToggleMusicEnabled,
+  onToggleSoundEffectsEnabled,
   onRequestTruco,
   onAcceptTruco,
   onAddEightPointsFromContextMenu,
@@ -1110,9 +1116,13 @@ export function TableSection({
                   />
                 ) : menuScreen === "settings" ? (
                   <SettingsScreen
+                    musicEnabled={playerProfile.settings.musicEnabled}
                     selectedVariant={playerProfile.settings.trucoVariant}
+                    soundEffectsEnabled={playerProfile.settings.soundEffectsEnabled}
                     onBack={onCloseSettings}
                     onChangeVariant={onChangeTrucoVariant}
+                    onToggleMusicEnabled={onToggleMusicEnabled}
+                    onToggleSoundEffectsEnabled={onToggleSoundEffectsEnabled}
                     styles={styles}
                   />
                 ) : (
@@ -1238,6 +1248,7 @@ export function TableSection({
                       onExitMatchFromContextMenu={onExitMatchFromContextMenu}
                       onLoseMatchFromContextMenu={onLoseMatchFromContextMenu}
                       onOpenInGameContextMenu={onOpenInGameContextMenu}
+                      onOpenSettings={onOpenSettings}
                       onPlayCard={onPlayCard}
                       onResetProgressFromContextMenu={onResetProgressFromContextMenu}
                       onSwapPartnerFromContextMenu={onSwapPartnerFromContextMenu}
@@ -1460,6 +1471,21 @@ export function TableSection({
               )}
             </div>
 
+            {handState && inGameSettingsOpen ? (
+              <div style={styles.inGameSettingsOverlay}>
+                <SettingsScreen
+                  musicEnabled={playerProfile.settings.musicEnabled}
+                  selectedVariant={playerProfile.settings.trucoVariant}
+                  soundEffectsEnabled={playerProfile.settings.soundEffectsEnabled}
+                  onBack={onCloseSettings}
+                  onChangeVariant={onChangeTrucoVariant}
+                  onToggleMusicEnabled={onToggleMusicEnabled}
+                  onToggleSoundEffectsEnabled={onToggleSoundEffectsEnabled}
+                  styles={styles}
+                />
+              </div>
+            ) : null}
+
             {handState && inGameConfirmation ? (
               <div style={styles.inGameConfirmationOverlay}>
                 <div style={styles.inGameConfirmationCard}>
@@ -1550,14 +1576,22 @@ function GameStartScreen({
 }
 
 function SettingsScreen({
+  musicEnabled,
   selectedVariant,
+  soundEffectsEnabled,
   onBack,
   onChangeVariant,
+  onToggleMusicEnabled,
+  onToggleSoundEffectsEnabled,
   styles,
 }: {
+  musicEnabled: boolean
   selectedVariant: GameVariant
+  soundEffectsEnabled: boolean
   onBack: () => void
   onChangeVariant: (variant: GameVariant) => void
+  onToggleMusicEnabled: () => void
+  onToggleSoundEffectsEnabled: () => void
   styles: StyleMap
 }) {
   const variantOptions: Array<{
@@ -1617,6 +1651,76 @@ function SettingsScreen({
               )
             })}
           </div>
+        </div>
+
+        <div style={styles.settingsRow}>
+          <div style={styles.settingsRowLabel}>
+            <span style={styles.settingsLabel}>Música</span>
+            <span style={styles.settingsValue}>{musicEnabled ? "Ligada" : "Desligada"}</span>
+          </div>
+
+          <button
+            type="button"
+            aria-pressed={musicEnabled}
+            style={{
+              ...styles.settingsToggleButton,
+              ...(musicEnabled ? styles.settingsToggleButtonActive : {}),
+            }}
+            onClick={onToggleMusicEnabled}
+          >
+            <span style={styles.settingsToggleText}>
+              {musicEnabled ? "Ligada" : "Desligada"}
+            </span>
+            <span
+              style={{
+                ...styles.settingsToggleTrack,
+                ...(musicEnabled ? styles.settingsToggleTrackActive : {}),
+              }}
+            >
+              <span
+                style={{
+                  ...styles.settingsToggleThumb,
+                  ...(musicEnabled ? styles.settingsToggleThumbActive : {}),
+                }}
+              />
+            </span>
+          </button>
+        </div>
+
+        <div style={styles.settingsRow}>
+          <div style={styles.settingsRowLabel}>
+            <span style={styles.settingsLabel}>Efeitos sonoros</span>
+            <span style={styles.settingsValue}>
+              {soundEffectsEnabled ? "Ligados" : "Desligados"}
+            </span>
+          </div>
+
+          <button
+            type="button"
+            aria-pressed={soundEffectsEnabled}
+            style={{
+              ...styles.settingsToggleButton,
+              ...(soundEffectsEnabled ? styles.settingsToggleButtonActive : {}),
+            }}
+            onClick={onToggleSoundEffectsEnabled}
+          >
+            <span style={styles.settingsToggleText}>
+              {soundEffectsEnabled ? "Ligados" : "Desligados"}
+            </span>
+            <span
+              style={{
+                ...styles.settingsToggleTrack,
+                ...(soundEffectsEnabled ? styles.settingsToggleTrackActive : {}),
+              }}
+            >
+              <span
+                style={{
+                  ...styles.settingsToggleThumb,
+                  ...(soundEffectsEnabled ? styles.settingsToggleThumbActive : {}),
+                }}
+              />
+            </span>
+          </button>
         </div>
       </div>
     </div>
@@ -3271,6 +3375,7 @@ function JourneyIntroScreen({
           style={{
             ...styles.authoredCampaignHotspot,
             ...authoredCampaign.backHotspot,
+            zIndex: 5,
           }}
           onClick={freePlayStage ? onCloseFreePlayStage : onBack}
         />
@@ -3282,6 +3387,7 @@ function JourneyIntroScreen({
             style={{
               ...styles.authoredCampaignHotspot,
               ...enterHotspot,
+              zIndex: 1 + index,
             }}
             onClick={() => onLaunchVenue(viewedCampaignVenue.id)}
           />
@@ -3292,8 +3398,9 @@ function JourneyIntroScreen({
           style={{
             ...styles.authoredCampaignHotspot,
             ...authoredCampaign.partnerHotspot,
+            zIndex: 6,
           }}
-          onClick={freePlayStage ? () => onLaunchVenue(viewedCampaignVenue.id) : onContinueToCharacterSelect}
+          onClick={onContinueToCharacterSelect}
         />
       </div>
     )
@@ -5219,6 +5326,7 @@ function HumanCardsPanel({
   onExitMatchFromContextMenu,
   onLoseMatchFromContextMenu,
   onOpenInGameContextMenu,
+  onOpenSettings,
   onPlayCard,
   onResetProgressFromContextMenu,
   onSwapPartnerFromContextMenu,
@@ -5235,6 +5343,7 @@ function HumanCardsPanel({
   onExitMatchFromContextMenu: () => void
   onLoseMatchFromContextMenu: () => void
   onOpenInGameContextMenu: () => void
+  onOpenSettings: () => void
   onPlayCard: (card: Card, options?: { covered?: boolean }) => void
   onResetProgressFromContextMenu: () => void
   onSwapPartnerFromContextMenu: () => void
@@ -5385,6 +5494,12 @@ function HumanCardsPanel({
                   onClick={onExitMatchFromContextMenu}
                 >
                   Sair
+                </button>
+                <button
+                  style={styles.inGameContextMenuAction}
+                  onClick={onOpenSettings}
+                >
+                  Configurações
                 </button>
                 <button
                   style={styles.inGameContextMenuAction}

@@ -242,6 +242,8 @@ test("criar perfil inicial sempre devolve campanha zerada", () => {
 
   assert.deepEqual(profile.campaign, INITIAL_PLAYER_PROFILE.campaign)
   assert.deepEqual(profile.currencies, { coins: 0, gems: 0 })
+  assert.equal(profile.settings.musicEnabled, true)
+  assert.equal(profile.settings.soundEffectsEnabled, true)
   assert.equal(profile.settings.trucoVariant, "PAULISTA")
 })
 
@@ -284,6 +286,8 @@ test("storage salva, carrega e reseta o perfil da campanha", () => {
     profile.campaign.venueWinsById["bar-do-ze-catinga"] = 2
     profile.campaign.unlockedPartnerCharacterIds = ["cida-fumaca"]
     profile.currencies.coins = 123
+    profile.settings.musicEnabled = false
+    profile.settings.soundEffectsEnabled = false
     profile.settings.selectedPlayerSkinId = "akemi-corte-certo"
     profile.settings.trucoVariant = "MINEIRO"
 
@@ -294,6 +298,8 @@ test("storage salva, carrega e reseta o perfil da campanha", () => {
     assert.equal(loadedProfile.campaign.venueWinsById["bar-do-ze-catinga"], 2)
     assert.deepEqual(loadedProfile.campaign.unlockedPartnerCharacterIds, ["cida-fumaca"])
     assert.equal(loadedProfile.currencies.coins, 123)
+    assert.equal(loadedProfile.settings.musicEnabled, false)
+    assert.equal(loadedProfile.settings.soundEffectsEnabled, false)
     assert.equal(loadedProfile.settings.selectedPlayerSkinId, "akemi-corte-certo")
     assert.equal(loadedProfile.settings.trucoVariant, "MINEIRO")
 
@@ -302,6 +308,8 @@ test("storage salva, carrega e reseta o perfil da campanha", () => {
     const resetProfile = loadPlayerProfile()
     assert.deepEqual(resetProfile.campaign, INITIAL_PLAYER_PROFILE.campaign)
     assert.deepEqual(resetProfile.currencies, INITIAL_PLAYER_PROFILE.currencies)
+    assert.equal(resetProfile.settings.musicEnabled, true)
+    assert.equal(resetProfile.settings.soundEffectsEnabled, true)
     assert.equal(resetProfile.settings.trucoVariant, "PAULISTA")
     assert.equal(resetProfile.settings.selectedPlayerSkinId, undefined)
   } finally {

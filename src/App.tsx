@@ -3,6 +3,9 @@ import { Capacitor } from "@capacitor/core"
 import { useGameSession } from "./app/useGameSession"
 import type { HandState } from "./game/handState"
 import cardFlipSoundAsset from "./assets/audio/cardflip.mp3"
+import gameOverSoundAsset from "./assets/audio/game_over.ogg"
+import menuThemeSoundAsset from "./assets/audio/menu_theme.m4a"
+import victoryThemeSoundAsset from "./assets/audio/victory_theme.ogg"
 import botecoSceneBgAsset from "./assets/boteco/boteco-scene-bg.png"
 import cardFaceAgedPaperAsset from "./assets/cards/card-face-aged-paper.png"
 import adegaJucaBigodeSceneBgAsset from "./assets/venues/adega-do-juca-bigode/background.png"
@@ -30,6 +33,9 @@ const DEAL_CARD_SOUND_REPEAT_COUNT = 10
 const DEAL_CARD_SOUND_INTERVAL_MS = 48
 const PAULISTA_VIRA_DEAL_INTRO_DELAY_MS = 520
 const DEAL_CARD_SOUND_VOLUME = 0.58
+const VICTORY_THEME_VOLUME = 0.78
+const GAME_OVER_VOLUME = 0.78
+const MENU_THEME_VOLUME = 0.44
 const GAMEPLAY_BACKGROUND_ASSET_BY_VENUE_ID: Record<string, string> = {
   "bar-maneco-banguela": manecoBanguelaSceneBgAsset,
   "trem-do-jaca": tremDoJacaSceneBgAsset,
@@ -108,6 +114,83 @@ function playCardFlipSound(audio: HTMLAudioElement | null, volume = CARD_FLIP_VO
   })
 }
 
+function playVictoryThemeSound(audio: HTMLAudioElement | null) {
+  if (!audio) {
+    return
+  }
+
+  audio.pause()
+  audio.volume = VICTORY_THEME_VOLUME
+  audio.currentTime = 0
+  void audio.play().catch(() => {
+    // Audio can be blocked before the first trusted interaction, especially on mobile WebViews.
+  })
+}
+
+function playGameOverSound(audio: HTMLAudioElement | null) {
+  if (!audio) {
+    return
+  }
+
+  audio.pause()
+  audio.volume = GAME_OVER_VOLUME
+  audio.currentTime = 0
+  void audio.play().catch(() => {
+    // Audio can be blocked before the first trusted interaction, especially on mobile WebViews.
+  })
+}
+
+function playMenuThemeSound(audio: HTMLAudioElement | null) {
+  if (!audio || !audio.paused) {
+    return
+  }
+
+  audio.volume = MENU_THEME_VOLUME
+  void audio.play().catch(() => {
+    // Audio can be blocked before the first trusted interaction, especially on mobile WebViews.
+  })
+}
+
+function stopMenuThemeSound(audio: HTMLAudioElement | null) {
+  stopAudioPlayback(audio)
+}
+
+function stopAudioPlayback(audio: HTMLAudioElement | null) {
+  if (!audio) {
+    return
+  }
+
+  audio.pause()
+  audio.currentTime = 0
+}
+
+function stopBarResultSounds(
+  victoryThemeAudio: HTMLAudioElement | null,
+  gameOverAudio: HTMLAudioElement | null
+) {
+  stopAudioPlayback(victoryThemeAudio)
+  stopAudioPlayback(gameOverAudio)
+}
+
+function unlockAudioElement(audio: HTMLAudioElement | null) {
+  if (!audio) {
+    return
+  }
+
+  const previousMuted = audio.muted
+  audio.muted = true
+  audio.currentTime = 0
+  void audio.play()
+    .then(() => {
+      audio.pause()
+      audio.currentTime = 0
+      audio.muted = previousMuted
+    })
+    .catch(() => {
+      audio.muted = previousMuted
+    })
+}
+
 function getDealCardSoundStartDelay(handState: HandState | null) {
   return handState?.variant === "PAULISTA" && handState.vira
     ? PAULISTA_VIRA_DEAL_INTRO_DELAY_MS
@@ -130,10 +213,16 @@ function App() {
     () => getGameplayViewportMetrics(IS_NATIVE_SHELL)
   )
   const cardFlipAudioRef = useRef<HTMLAudioElement | null>(null)
+  const gameOverAudioRef = useRef<HTMLAudioElement | null>(null)
+  const menuThemeAudioRef = useRef<HTMLAudioElement | null>(null)
+  const victoryThemeAudioRef = useRef<HTMLAudioElement | null>(null)
   const previousTableAudioSnapshotRef = useRef<{
     signature: string
     count: number
   } | null>(null)
+  const previousGameOverKeyRef = useRef<string | null>(null)
+  const previousVictoryThemeKeyRef = useRef<string | null>(null)
+  const shouldPlayMenuThemeRef = useRef(true)
 
   useEffect(() => {
     const handleResize = () => {
@@ -145,29 +234,36 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const audio = new Audio(cardFlipSoundAsset)
-    audio.preload = "auto"
-    audio.volume = CARD_FLIP_VOLUME
-    cardFlipAudioRef.current = audio
+    const cardFlipAudio = new Audio(cardFlipSoundAsset)
+    cardFlipAudio.preload = "auto"
+    cardFlipAudio.volume = CARD_FLIP_VOLUME
+    cardFlipAudioRef.current = cardFlipAudio
+
+    const gameOverAudio = new Audio(gameOverSoundAsset)
+    gameOverAudio.preload = "auto"
+    gameOverAudio.volume = GAME_OVER_VOLUME
+    gameOverAudioRef.current = gameOverAudio
+
+    const menuThemeAudio = new Audio(menuThemeSoundAsset)
+    menuThemeAudio.loop = true
+    menuThemeAudio.preload = "auto"
+    menuThemeAudio.volume = MENU_THEME_VOLUME
+    menuThemeAudioRef.current = menuThemeAudio
+
+    const victoryThemeAudio = new Audio(victoryThemeSoundAsset)
+    victoryThemeAudio.preload = "auto"
+    victoryThemeAudio.volume = VICTORY_THEME_VOLUME
+    victoryThemeAudioRef.current = victoryThemeAudio
 
     const unlockAudio = () => {
-      const targetAudio = cardFlipAudioRef.current
-      if (!targetAudio) {
-        return
+      unlockAudioElement(cardFlipAudioRef.current)
+      unlockAudioElement(gameOverAudioRef.current)
+      unlockAudioElement(victoryThemeAudioRef.current)
+      if (shouldPlayMenuThemeRef.current) {
+        playMenuThemeSound(menuThemeAudioRef.current)
+      } else {
+        unlockAudioElement(menuThemeAudioRef.current)
       }
-
-      const previousMuted = targetAudio.muted
-      targetAudio.muted = true
-      targetAudio.currentTime = 0
-      void targetAudio.play()
-        .then(() => {
-          targetAudio.pause()
-          targetAudio.currentTime = 0
-          targetAudio.muted = previousMuted
-        })
-        .catch(() => {
-          targetAudio.muted = previousMuted
-        })
 
       window.removeEventListener("pointerdown", unlockAudio)
       window.removeEventListener("keydown", unlockAudio)
@@ -179,8 +275,14 @@ function App() {
     return () => {
       window.removeEventListener("pointerdown", unlockAudio)
       window.removeEventListener("keydown", unlockAudio)
-      audio.pause()
+      cardFlipAudio.pause()
+      gameOverAudio.pause()
+      menuThemeAudio.pause()
+      victoryThemeAudio.pause()
       cardFlipAudioRef.current = null
+      gameOverAudioRef.current = null
+      menuThemeAudioRef.current = null
+      victoryThemeAudioRef.current = null
     }
   }, [])
 
@@ -216,6 +318,7 @@ function App() {
     handState,
     inGameConfirmation,
     inGameContextMenuOpen,
+    inGameSettingsOpen,
     matchResultScreen,
     handleAcceptTruco,
     handleAddEightPointsFromContextMenu,
@@ -252,6 +355,8 @@ function App() {
     handleStartHand,
     handleStartTutorial,
     handleChangeTrucoVariant,
+    handleToggleMusicEnabled,
+    handleToggleSoundEffectsEnabled,
     handleSwapPartnerFromContextMenu,
     handleWinMatchFromContextMenu,
     lastPlayedPlayerId,
@@ -282,6 +387,8 @@ function App() {
     handleSelectPreviousPlayerSkin,
   } = useGameSession()
 
+  const musicEnabled = playerProfile.settings.musicEnabled
+  const soundEffectsEnabled = playerProfile.settings.soundEffectsEnabled
   const layoutMode = viewportMetrics.mode
   const stageScale = viewportMetrics.scale
   const isCompactLayout = layoutMode !== "regular"
@@ -290,6 +397,7 @@ function App() {
   const gameplayBackgroundAsset = currentCampaignVenue?.id
     ? GAMEPLAY_BACKGROUND_ASSET_BY_VENUE_ID[currentCampaignVenue.id] ?? botecoSceneBgAsset
     : botecoSceneBgAsset
+  const dealCardSoundStartDelay = getDealCardSoundStartDelay(handState)
 
   useEffect(() => {
     const table = handState?.table ?? []
@@ -314,22 +422,26 @@ function App() {
       return
     }
 
+    if (!soundEffectsEnabled) {
+      return
+    }
+
     if (
       nextSnapshot.count > previousSnapshot.count &&
       nextSnapshot.signature !== previousSnapshot.signature
     ) {
       playCardFlipSound(cardFlipAudioRef.current)
     }
-  }, [handState?.table])
+  }, [handState?.table, soundEffectsEnabled])
 
   useEffect(() => {
-    if (!dealAnimationNonce) {
+    if (!dealAnimationNonce || !soundEffectsEnabled) {
       return
     }
 
     const timeoutIds = scheduleDealCardFlipSounds(
       cardFlipAudioRef.current,
-      getDealCardSoundStartDelay(handState)
+      dealCardSoundStartDelay
     )
 
     return () => {
@@ -337,7 +449,67 @@ function App() {
         window.clearTimeout(timeoutId)
       }
     }
-  }, [dealAnimationNonce])
+  }, [dealAnimationNonce, dealCardSoundStartDelay, soundEffectsEnabled])
+
+  useEffect(() => {
+    const isBarResultAudioScreen =
+      menuScreen === "match-result" ||
+      (menuScreen === "campaign-victory" && campaignVictoryScreen?.kind === "venue")
+    const shouldPlayMenuTheme = musicEnabled && !handState && !isBarResultAudioScreen
+
+    shouldPlayMenuThemeRef.current = shouldPlayMenuTheme
+
+    if (shouldPlayMenuTheme) {
+      stopBarResultSounds(victoryThemeAudioRef.current, gameOverAudioRef.current)
+      playMenuThemeSound(menuThemeAudioRef.current)
+    } else {
+      stopMenuThemeSound(menuThemeAudioRef.current)
+    }
+  }, [campaignVictoryScreen?.kind, handState, menuScreen, musicEnabled])
+
+  useEffect(() => {
+    const gameOverKey =
+      musicEnabled && menuScreen === "match-result" && matchResultScreen?.outcome === "loss"
+        ? `match:${matchResultScreen.venueId ?? matchResultScreen.venueName}:${matchResultScreen.title}`
+        : null
+
+    if (!gameOverKey) {
+      previousGameOverKeyRef.current = null
+      stopAudioPlayback(gameOverAudioRef.current)
+      return
+    }
+
+    if (previousGameOverKeyRef.current === gameOverKey) {
+      return
+    }
+
+    previousGameOverKeyRef.current = gameOverKey
+    playGameOverSound(gameOverAudioRef.current)
+  }, [matchResultScreen, menuScreen, musicEnabled])
+
+  useEffect(() => {
+    const victoryThemeKey =
+      musicEnabled
+        ? menuScreen === "match-result" && matchResultScreen?.outcome === "win"
+          ? `match:${matchResultScreen.venueId ?? matchResultScreen.venueName}:${matchResultScreen.title}`
+          : menuScreen === "campaign-victory" && campaignVictoryScreen?.kind === "venue"
+            ? `venue:${campaignVictoryScreen.id}:${campaignVictoryScreen.title}`
+            : null
+        : null
+
+    if (!victoryThemeKey) {
+      previousVictoryThemeKeyRef.current = null
+      stopAudioPlayback(victoryThemeAudioRef.current)
+      return
+    }
+
+    if (previousVictoryThemeKeyRef.current === victoryThemeKey) {
+      return
+    }
+
+    previousVictoryThemeKeyRef.current = victoryThemeKey
+    playVictoryThemeSound(victoryThemeAudioRef.current)
+  }, [campaignVictoryScreen, matchResultScreen, menuScreen, musicEnabled])
 
   const responsiveStyles = useMemo<Record<string, React.CSSProperties>>(
     () => ({
@@ -701,6 +873,7 @@ function App() {
             handState={handState}
             inGameConfirmation={inGameConfirmation}
             inGameContextMenuOpen={inGameContextMenuOpen}
+            inGameSettingsOpen={inGameSettingsOpen}
             matchState={matchState}
             matchResultScreen={matchResultScreen}
             campaignVictoryScreen={campaignVictoryScreen}
@@ -756,6 +929,8 @@ function App() {
             onStart={handleStartHand}
             onStartTutorial={handleStartTutorial}
             onChangeTrucoVariant={handleChangeTrucoVariant}
+            onToggleMusicEnabled={handleToggleMusicEnabled}
+            onToggleSoundEffectsEnabled={handleToggleSoundEffectsEnabled}
             onRequestTruco={handleRequestTruco}
             onAcceptTruco={handleAcceptTruco}
             onAddEightPointsFromContextMenu={handleAddEightPointsFromContextMenu}
@@ -1436,6 +1611,14 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "clamp(16px, 1.4vw, 24px)",
     background: "rgba(0,0,0,0.48)",
     zIndex: 80,
+  },
+  inGameSettingsOverlay: {
+    position: "absolute",
+    inset: 0,
+    padding: "clamp(14px, 1.25vw, 20px)",
+    background: "rgba(0,0,0,0.52)",
+    zIndex: 82,
+    boxSizing: "border-box",
   },
   inGameConfirmationCard: {
     width: "min(520px, 100%)",
@@ -2902,6 +3085,66 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 800,
     textTransform: "uppercase",
     letterSpacing: "0.08em",
+  },
+  settingsToggleButton: {
+    minHeight: "66px",
+    borderRadius: "8px",
+    border: "1px solid rgba(244, 226, 190, 0.22)",
+    background: "rgba(18, 12, 8, 0.64)",
+    color: "#ead6b6",
+    padding: "12px 14px 12px 18px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "16px",
+    textAlign: "left",
+    cursor: "pointer",
+    boxSizing: "border-box",
+    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
+  },
+  settingsToggleButtonActive: {
+    border: "1px solid rgba(245, 190, 92, 0.78)",
+    background: "linear-gradient(180deg, rgba(88, 56, 28, 0.98) 0%, rgba(43, 29, 18, 0.98) 100%)",
+    color: "#fff6e8",
+    boxShadow: "0 14px 24px rgba(0,0,0,0.24), inset 0 0 0 1px rgba(255,255,255,0.07)",
+  },
+  settingsToggleText: {
+    minWidth: 0,
+    color: "inherit",
+    fontSize: "18px",
+    lineHeight: 1.1,
+    fontWeight: 900,
+    fontFamily: "Georgia, serif",
+  },
+  settingsToggleTrack: {
+    position: "relative",
+    width: "60px",
+    height: "34px",
+    borderRadius: "999px",
+    border: "1px solid rgba(244, 226, 190, 0.2)",
+    background: "rgba(5, 4, 3, 0.72)",
+    boxSizing: "border-box",
+    flexShrink: 0,
+    boxShadow: "inset 0 2px 8px rgba(0,0,0,0.45)",
+  },
+  settingsToggleTrackActive: {
+    border: "1px solid rgba(245, 190, 92, 0.75)",
+    background: "linear-gradient(180deg, rgba(147, 87, 34, 0.98) 0%, rgba(104, 57, 24, 0.98) 100%)",
+  },
+  settingsToggleThumb: {
+    position: "absolute",
+    top: "4px",
+    left: "4px",
+    width: "24px",
+    height: "24px",
+    borderRadius: "999px",
+    background: "#b9aa91",
+    boxShadow: "0 3px 8px rgba(0,0,0,0.42)",
+    transition: "transform 140ms ease, background 140ms ease",
+  },
+  settingsToggleThumbActive: {
+    background: "#fff3df",
+    transform: "translateX(26px)",
   },
   tutorialDraftScreen: {
     position: "relative",

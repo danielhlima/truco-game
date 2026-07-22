@@ -116,6 +116,7 @@ Arquivos principais:
 - o menu em jogo agora inclui:
   - `Vencer esta partida`, para validar progressao sem jogar a partida inteira
   - `Perder esta partida`, para validar a tela de derrota
+  - `Configurações`, abrindo os mesmos ajustes de tipo de truco, musica e efeitos sem sair da partida
   - `Resetar progresso`, com confirmacao especifica antes de apagar campanha, escolhas de parceira, skin do jogador e historico salvo
 - as telas de resultado do `Bar do Ze Catinga` agora usam artes proprias para vitoria e derrota
 - a tela de selecao de parceira foi aceita como pronta no estado atual
@@ -132,6 +133,7 @@ Arquivos principais:
   - `src/assets/campaign/conquista-zonas-salao-da-sul.png`
 - os controles `VOLTAR`, `ENTRAR NO BAR` e `TROCAR PARCEIRA` sao hotspots HTML invisiveis sobre a imagem
 - nas telas autorais de campanha, a foto/cartao do bar atual tambem deve funcionar como entrada no bar quando for um alvo visual natural para toque
+- nas telas autorais de campanha, `TROCAR PARCEIRA` sempre abre a selecao de parceira e fica acima dos hotspots de entrada
 - a tela de campanha dinamica continua como fallback para bares/estados sem arte propria
 - a tela de resultado preserva a ultima mesa visivel e espera 1 segundo antes de exibir vitoria/derrota
 - a intro de gameplay foi implementada:
@@ -145,7 +147,7 @@ Arquivos principais:
 - a tela inicial definitiva foi implementada com arte propria em `src/assets/start/truco-raiz-start.png`
 - a primeira tela visivel mostra a arte de capa com placas `COMEÇAR`, `TUTORIAL` e `CONFIGURAÇÕES`
 - `COMEÇAR`, `TUTORIAL` e `CONFIGURAÇÕES` sao hotspots HTML invisiveis sobre as placas desenhadas
-- `CONFIGURAÇÕES` abre a tela de ajustes com escolha global entre `Truco Paulista` e `Truco Mineiro`
+- `CONFIGURAÇÕES` abre a tela de ajustes com escolha global entre `Truco Paulista` e `Truco Mineiro`, toggle de musica e toggle de efeitos sonoros
 - `Truco Paulista` e o padrao do perfil novo e de todos os bares/circuitos
 - debug de bar e reset de campanha foram removidos da tela inicial visivel
 - o caminho principal foi expandido visualmente ate o `Cassino Mé Maior`
@@ -306,8 +308,10 @@ Estado atual:
 - cartas abertas com textura de papel envelhecido
 - cartas viradas com verso fotografico envelhecido
 - cartas jogadas entram de fora da mesa
-- cada carta que entra na mesa toca o som `src/assets/audio/cardflip.mp3`
-- a distribuicao visual dispara uma rajada curta de `10` sons de carta, sincronizada com o inicio da animacao de distribuicao e respeitando o atraso da vira no Paulista
+- com musica ligada, telas fora do gameplay tocam `src/assets/audio/menu_theme.m4a` em loop; gameplay e telas de vitoria/derrota de bar param essa musica
+- com efeitos sonoros ligados, cada carta que entra na mesa toca `src/assets/audio/cardflip.mp3`
+- com efeitos sonoros ligados, a distribuicao visual dispara uma rajada curta de `10` sons de carta, sincronizada com o inicio da animacao de distribuicao e respeitando o atraso da vira no Paulista
+- com musica ligada, vitorias de bar tocam `src/assets/audio/victory_theme.ogg`; derrotas de bar tocam `src/assets/audio/game_over.ogg`; esses temas param imediatamente ao sair da tela de resultado do bar, antes da musica padrao voltar; conquistas de circuito nao disparam esses temas
 - limpeza entre maos recolhe as cartas para fora do enquadramento
 - distribuicao entre rodadas mantida
 - simbolos de naipe das cartas do humano ampliados
@@ -330,9 +334,12 @@ Assets principais:
 - `src/assets/boteco/table-top-hotel-truco-segovia-espanha.png`
 - `src/assets/boteco/table-top-casino-me-maior.png`
 - `src/assets/boteco/table-top-orbita-da-lua.png`
+- `src/assets/audio/menu_theme.m4a`
+- `src/assets/audio/cardflip.mp3`
+- `src/assets/audio/victory_theme.ogg`
+- `src/assets/audio/game_over.ogg`
 - `src/assets/cards/card-back-aged-photo.png`
 - `src/assets/cards/card-face-aged-paper.png`
-- `src/assets/audio/cardflip.mp3`
 
 ### Coluna direita
 
@@ -421,10 +428,10 @@ Estado atual:
 - a arte entra inteira dentro do stage, com uma copia desfocada no fundo para preencher laterais sem cortar logo ou botao
 - o botao `COMEÇAR` e um hotspot HTML invisivel posicionado sobre a placa desenhada
 - o botao `TUTORIAL` tambem e um hotspot HTML invisivel posicionado sobre a placa desenhada
-- `CONFIGURAÇÕES` aparece na arte como hotspot ativo e abre o ajuste de tipo de truco
+- `CONFIGURAÇÕES` aparece na arte como hotspot ativo e abre os ajustes de tipo de truco, musica e efeitos sonoros
 - `COMEÇAR` continua levando para a tela de campanha
 - reset de progresso e debug de bar nao aparecem mais na primeira tela visivel
-- reset total do progresso fica disponivel durante a partida no `MENU`, com confirmacao
+- configuracoes e reset total do progresso ficam disponiveis durante a partida no `MENU`; reset usa confirmacao
 
 Arquivos principais:
 

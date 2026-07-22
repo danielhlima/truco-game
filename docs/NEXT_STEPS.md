@@ -9,14 +9,16 @@ Estado consolidado:
 - fluxo `COMEÇAR > campanha > capa do bar > escolha de parceira se necessario > jogo`
 - tela inicial com arte propria e placas `COMEÇAR`, `TUTORIAL` e `CONFIGURAÇÕES`
 - `COMEÇAR`, `TUTORIAL` e `CONFIGURAÇÕES` sao hotspots ativos
-- `CONFIGURAÇÕES` permite escolher globalmente entre `Truco Paulista` e `Truco Mineiro`; Paulista e o padrao
+- `CONFIGURAÇÕES` permite escolher globalmente entre `Truco Paulista` e `Truco Mineiro`, ligar/desligar musica e ligar/desligar efeitos sonoros; Paulista e o padrao
 - gameplay dentro de stage logico `1080x500`
-- jogadas de carta na mesa tocam `src/assets/audio/cardflip.mp3`
-- distribuicao de cartas dispara uma rajada curta de `10` sons sincronizada com a animacao visual
+- com musica ligada, telas fora do gameplay tocam `src/assets/audio/menu_theme.m4a` em loop; gameplay e telas de vitoria/derrota de bar param essa musica
+- com efeitos sonoros ligados, jogadas de carta na mesa tocam `src/assets/audio/cardflip.mp3`
+- com efeitos sonoros ligados, distribuicao de cartas dispara uma rajada curta de `10` sons sincronizada com a animacao visual
+- com musica ligada, vitorias de bar tocam `src/assets/audio/victory_theme.ogg`; derrotas de bar tocam `src/assets/audio/game_over.ogg`; esses temas param imediatamente ao sair da tela de resultado do bar, antes da musica padrao voltar; conquistas de circuito nao disparam esses temas
 - intro curta antes da partida, mostrando primeiro apenas o background do local
 - tela de selecao de parceira aceita como pronta no estado atual
 - escolha de skin do jogador implementada antes da campanha quando ainda nao existe skin salva
-- menu em partida com opcoes de validacao, troca de parceira, saida e reset de progresso
+- menu em partida com opcoes de validacao, troca de parceira, configuracoes, saida e reset de progresso
 - telas normais de vitoria/derrota por local
 - telas definitivas de conquista de local e circuito
 - progressao principal com parceiros desbloqueados conforme a dupla adversaria e derrotada
@@ -27,6 +29,7 @@ Estado consolidado:
 - o `Modo Livre` usa `src/assets/campaign/free-play-circuit-hub.png`
 - no `Modo Livre`, cada quadro de circuito e um hotspot invisivel
 - nas telas autorais da Jornada de Campanha, a placa/nome e a foto/cartao do bar atual entram no mesmo bar por hotspots invisiveis
+- nas telas autorais da Jornada de Campanha, `TROCAR PARCEIRA` tem prioridade de toque sobre os hotspots de entrada e sempre abre a selecao de parceira
 - clicar em um circuito inicia uma run temporaria daquele circuito
 - a run temporaria avanca de bar em bar ao cumprir as vitorias locais e retorna ao hub ao concluir o circuito livre
 - o `Voltar` dessa tela autoral retorna ao hub do `Modo Livre` e encerra a run temporaria
