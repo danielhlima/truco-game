@@ -4588,12 +4588,13 @@ function VenueIntroScreen({
     ? VENUE_COVER_CONFIG_BY_ID[currentCampaignVenue.id]
     : undefined
   const ctaLabel = hasSelectedPartnerForVenue ? "ENTRAR NO BAR" : "ESCOLHER PARCEIRA"
-  const overallMatches = playerProfile.campaign.wins + playerProfile.campaign.losses
-  const overallWinRate = overallMatches > 0
-    ? Math.round((playerProfile.campaign.wins / overallMatches) * 100)
-    : 0
   const challengeDifficulty = currentCampaignVenue?.difficulty.aiLevel ?? 1
   const selectedTrucoVariantLabel = getGameVariantLabel(playerProfile.settings.trucoVariant)
+  const venueMatchesToClear = currentCampaignVenue?.matchesToClear ?? 0
+  const displayedVenueWins = Math.min(currentVenueWins, venueMatchesToClear)
+  const remainingVenueWins = Math.max(venueMatchesToClear - displayedVenueWins, 0)
+  const remainingVenueWinsVerb = remainingVenueWins === 1 ? "Falta" : "Faltam"
+  const remainingVenueWinsLabel = remainingVenueWins === 1 ? "vitória" : "vitórias"
 
   if (!coverConfig) {
     const fallbackTheme = getTableTheme(currentCampaignVenue?.visualTheme)
@@ -4659,7 +4660,7 @@ function VenueIntroScreen({
               <div style={styles.venueIntroFactCard}>
                 <div style={styles.venueIntroFactLabel}>Meta do bar</div>
                 <strong style={styles.venueIntroFactValue}>
-                  {currentCampaignVenue?.matchesToClear ?? 0} vitórias
+                  {venueMatchesToClear} vitórias
                 </strong>
               </div>
               <div style={styles.venueIntroFactCard}>
@@ -5097,12 +5098,12 @@ function VenueIntroScreen({
             <div
               style={{
                 position: "absolute",
-                top: "10%",
+                top: "9%",
                 left: "12%",
                 right: "12%",
                 textAlign: "center",
                 fontFamily: "\"Georgia\", serif",
-                fontSize: 20,
+                fontSize: 17,
                 fontWeight: 700,
                 lineHeight: 0.95,
                 color: "#2a1307",
@@ -5110,99 +5111,81 @@ function VenueIntroScreen({
                 textShadow: "0 1px 0 rgba(248,218,151,0.32)",
               }}
             >
-              Seu histórico aqui
+              Neste bar
             </div>
 
             <div
               style={{
                 position: "absolute",
-                top: "28%",
-                left: "14%",
-                right: "14%",
-                bottom: "18%",
+                top: "18%",
+                left: "12%",
+                right: "12%",
+                bottom: "14%",
                 display: "grid",
-                gridTemplateRows: "repeat(3, minmax(0, 1fr))",
-                gap: 3,
-              }}
-            >
-              {[
-                {
-                  label: "VITÓRIAS",
-                  value: String(playerProfile.campaign.wins),
-                  accent: "#75480f",
-                },
-                {
-                  label: "DERROTAS",
-                  value: String(playerProfile.campaign.losses),
-                  accent: "#762218",
-                },
-                {
-                  label: "APROVEITAMENTO",
-                  value: `${overallWinRate}%`,
-                  accent: "#704611",
-                },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "minmax(0, 1fr) minmax(48px, auto)",
-                    alignItems: "center",
-                    gap: 10,
-                    minHeight: 0,
-                    padding: "0 12px",
-                    borderBottom: item.label === "APROVEITAMENTO"
-                      ? "none"
-                      : "1px solid rgba(83, 45, 15, 0.22)",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: item.label === "APROVEITAMENTO" ? 11 : 16,
-                      fontWeight: 700,
-                      fontFamily: "\"Georgia\", serif",
-                      lineHeight: 1,
-                      letterSpacing: item.label === "APROVEITAMENTO" ? 0 : "0.02em",
-                      color: "#2a1307",
-                      textAlign: "center",
-                      whiteSpace: "nowrap",
-                      textShadow: "0 1px 0 rgba(251,225,169,0.32)",
-                    }}
-                    >
-                    {item.label}
-                  </div>
-                  <div
-                    style={{
-                      minWidth: 0,
-                      textAlign: "right",
-                      fontSize: item.value.length >= 3 ? 26 : 34,
-                      fontWeight: 700,
-                      lineHeight: 0.95,
-                      color: item.accent,
-                      fontFamily: "\"Georgia\", serif",
-                      textShadow: "0 1px 0 rgba(251,225,169,0.25)",
-                    }}
-                  >
-                    {item.value}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div
-              style={{
-                position: "absolute",
-                left: "13%",
-                right: "13%",
-                bottom: "7.6%",
-                fontSize: 12,
-                lineHeight: 1,
-                color: "rgba(47, 24, 9, 0.72)",
+                gridTemplateRows: "auto minmax(0, 1fr) auto auto auto",
+                justifyItems: "center",
+                alignItems: "center",
                 textAlign: "center",
-                fontWeight: 700,
+                fontFamily: "\"Georgia\", serif",
+                color: "#2a1307",
               }}
             >
-              Neste bar: {currentVenueWins}/{currentCampaignVenue?.matchesToClear ?? 0} vitórias
+              <div
+                style={{
+                  fontSize: 15,
+                  fontWeight: 900,
+                  lineHeight: 1,
+                  textTransform: "uppercase",
+                  color: "#2a1307",
+                  whiteSpace: "nowrap",
+                  textShadow: "0 1px 0 rgba(251,225,169,0.32)",
+                }}
+              >
+                {remainingVenueWinsVerb}
+              </div>
+              <div
+                style={{
+                  fontSize: remainingVenueWins >= 10 ? 82 : 96,
+                  fontWeight: 900,
+                  lineHeight: 0.82,
+                  color: "#75480f",
+                  textShadow: "0 1px 0 rgba(251,225,169,0.28)",
+                }}
+              >
+                {remainingVenueWins}
+              </div>
+              <div
+                style={{
+                  fontSize: 16,
+                  fontWeight: 900,
+                  lineHeight: 1,
+                  textTransform: "uppercase",
+                  color: "#2a1307",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {remainingVenueWinsLabel}
+              </div>
+              <div
+                style={{
+                  width: "76%",
+                  height: 1,
+                  margin: "8px 0 6px",
+                  background: "rgba(83, 45, 15, 0.24)",
+                }}
+              />
+              <div
+                style={{
+                  fontSize: 15,
+                  fontWeight: 900,
+                  lineHeight: 1,
+                  color: "#2a1307",
+                  whiteSpace: "nowrap",
+                  textShadow: "0 1px 0 rgba(251,225,169,0.32)",
+                }}
+              >
+                Você venceu {displayedVenueWins}/{venueMatchesToClear}
+              </div>
             </div>
           </div>
 

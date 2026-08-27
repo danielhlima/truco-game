@@ -200,6 +200,10 @@ Observacao:
 ### Carta virada para baixo / carta coberta
 
 - uma rodada continua composta por ate `3 vazas`
+- a rodada termina assim que uma dupla nao pode mais perder:
+  - se vencer as duas primeiras vazas, nao ha terceira vaza
+  - se a primeira vaza empata, quem vence a segunda ganha a rodada
+  - se alguem vence a primeira vaza e a segunda empata, vence quem ganhou a primeira
 - na primeira vaza, todas as cartas continuam abertas
 - na segunda e na terceira vaza da rodada, qualquer jogador pode jogar uma carta virada para baixo
 - a carta virada para baixo tambem pode ser chamada de `carta coberta`

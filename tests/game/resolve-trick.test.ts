@@ -45,6 +45,51 @@ test("resolveTrick mantém empate na vaza sem somar ponto", () => {
   assert.equal(nextState.roundNumber, 2)
 })
 
+test("resolveTrick encerra a mão quando a primeira vaza empata e a segunda tem vencedor", () => {
+  const state = createHandStateFixture({
+    roundNumber: 2,
+    score: { A: 0, B: 0 },
+    firstNonTieWinner: null,
+    currentPlayerId: 1,
+    table: [
+      { playerId: 1, card: createCard("3", "copas") },
+      { playerId: 2, card: createCard("K", "ouros") },
+      { playerId: 3, card: createCard("2", "paus") },
+      { playerId: 4, card: createCard("A", "paus") },
+    ],
+  })
+
+  const nextState = resolveTrick(state)
+
+  assert.deepEqual(nextState.score, { A: 1, B: 0 })
+  assert.equal(nextState.finished, true)
+  assert.equal(nextState.winner, "A")
+  assert.equal(nextState.firstNonTieWinner, "A")
+  assert.deepEqual(nextState.table, state.table)
+})
+
+test("resolveTrick encerra a mão quando a segunda vaza empata após vitória na primeira", () => {
+  const state = createHandStateFixture({
+    roundNumber: 2,
+    score: { A: 1, B: 0 },
+    firstNonTieWinner: "A",
+    currentPlayerId: 3,
+    table: [
+      { playerId: 3, card: createCard("3", "copas") },
+      { playerId: 4, card: createCard("3", "ouros") },
+      { playerId: 1, card: createCard("Q", "espada") },
+      { playerId: 2, card: createCard("K", "paus") },
+    ],
+  })
+
+  const nextState = resolveTrick(state)
+
+  assert.deepEqual(nextState.score, { A: 1, B: 0 })
+  assert.equal(nextState.finished, true)
+  assert.equal(nextState.winner, "A")
+  assert.deepEqual(nextState.table, state.table)
+})
+
 test("resolveTrick usa o primeiro vencedor não empatado como critério na terceira vaza empatada", () => {
   const state = createHandStateFixture({
     roundNumber: 3,

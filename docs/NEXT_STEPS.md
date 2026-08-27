@@ -15,6 +15,8 @@ Estado consolidado:
 - com efeitos sonoros ligados, jogadas de carta na mesa tocam `src/assets/audio/cardflip.mp3`
 - com efeitos sonoros ligados, distribuicao de cartas dispara uma rajada curta de `10` sons sincronizada com a animacao visual
 - com musica ligada, vitorias de bar tocam `src/assets/audio/victory_theme.ogg`; derrotas de bar tocam `src/assets/audio/game_over.ogg`; esses temas param imediatamente ao sair da tela de resultado do bar, antes da musica padrao voltar; conquistas de circuito nao disparam esses temas
+- no Android/iOS via Capacitor, ao minimizar ou tirar o app do foreground todos os sons param imediatamente; ao retomar, a musica/tema da tela atual reinicia se estiver habilitada
+- a placa da capa de cada bar mostra apenas o progresso daquele bar: quantas vitorias faltam, quantas ja foram feitas e a meta total
 - intro curta antes da partida, mostrando primeiro apenas o background do local
 - tela de selecao de parceira aceita como pronta no estado atual
 - escolha de skin do jogador implementada antes da campanha quando ainda nao existe skin salva

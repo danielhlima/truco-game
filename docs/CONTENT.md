@@ -312,6 +312,8 @@ Estado atual:
 - com efeitos sonoros ligados, cada carta que entra na mesa toca `src/assets/audio/cardflip.mp3`
 - com efeitos sonoros ligados, a distribuicao visual dispara uma rajada curta de `10` sons de carta, sincronizada com o inicio da animacao de distribuicao e respeitando o atraso da vira no Paulista
 - com musica ligada, vitorias de bar tocam `src/assets/audio/victory_theme.ogg`; derrotas de bar tocam `src/assets/audio/game_over.ogg`; esses temas param imediatamente ao sair da tela de resultado do bar, antes da musica padrao voltar; conquistas de circuito nao disparam esses temas
+- no Android/iOS via Capacitor, ao sair do foreground todos os sons param imediatamente; ao voltar, a musica/tema da tela atual reinicia se estiver habilitada
+- a placa da capa de cada bar mostra apenas o progresso daquele bar: quantas vitorias faltam, quantas ja foram feitas e a meta total
 - limpeza entre maos recolhe as cartas para fora do enquadramento
 - distribuicao entre rodadas mantida
 - simbolos de naipe das cartas do humano ampliados

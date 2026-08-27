@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react"
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Capacitor } from "@capacitor/core"
 import { useGameSession } from "./app/useGameSession"
 import type { HandState } from "./game/handState"
@@ -101,15 +101,27 @@ function getGameplayViewportMetrics(isNativeShell = false): GameplayViewportMetr
   return { mode: "regular", scale }
 }
 
-function playCardFlipSound(audio: HTMLAudioElement | null, volume = CARD_FLIP_VOLUME) {
+function playCardFlipSound(
+  audio: HTMLAudioElement | null,
+  volume = CARD_FLIP_VOLUME,
+  activeSounds?: Set<HTMLAudioElement>
+) {
   if (!audio) {
     return
   }
 
   const sound = audio.cloneNode(true) as HTMLAudioElement
+  const forgetSound = () => {
+    activeSounds?.delete(sound)
+  }
+
   sound.volume = volume
   sound.currentTime = 0
+  activeSounds?.add(sound)
+  sound.addEventListener("ended", forgetSound, { once: true })
+  sound.addEventListener("error", forgetSound, { once: true })
   void sound.play().catch(() => {
+    forgetSound()
     // Audio can be blocked before the first trusted interaction, especially on mobile WebViews.
   })
 }
@@ -164,6 +176,21 @@ function stopAudioPlayback(audio: HTMLAudioElement | null) {
   audio.currentTime = 0
 }
 
+function stopTrackedAudioPlayback(activeSounds: Set<HTMLAudioElement>) {
+  for (const audio of activeSounds) {
+    audio.pause()
+    audio.currentTime = 0
+  }
+  activeSounds.clear()
+}
+
+function clearScheduledAudioTimeouts(timeoutIds: number[]) {
+  for (const timeoutId of timeoutIds) {
+    window.clearTimeout(timeoutId)
+  }
+  timeoutIds.length = 0
+}
+
 function stopBarResultSounds(
   victoryThemeAudio: HTMLAudioElement | null,
   gameOverAudio: HTMLAudioElement | null
@@ -199,11 +226,12 @@ function getDealCardSoundStartDelay(handState: HandState | null) {
 
 function scheduleDealCardFlipSounds(
   audio: HTMLAudioElement | null,
-  startDelayMs: number
+  startDelayMs: number,
+  activeSounds?: Set<HTMLAudioElement>
 ): number[] {
   return Array.from({ length: DEAL_CARD_SOUND_REPEAT_COUNT }, (_, index) =>
     window.setTimeout(() => {
-      playCardFlipSound(audio, DEAL_CARD_SOUND_VOLUME)
+      playCardFlipSound(audio, DEAL_CARD_SOUND_VOLUME, activeSounds)
     }, startDelayMs + index * DEAL_CARD_SOUND_INTERVAL_MS)
   )
 }
@@ -216,6 +244,8 @@ function App() {
   const gameOverAudioRef = useRef<HTMLAudioElement | null>(null)
   const menuThemeAudioRef = useRef<HTMLAudioElement | null>(null)
   const victoryThemeAudioRef = useRef<HTMLAudioElement | null>(null)
+  const activeSoundEffectsRef = useRef<Set<HTMLAudioElement>>(new Set())
+  const dealSoundTimeoutIdsRef = useRef<number[]>([])
   const previousTableAudioSnapshotRef = useRef<{
     signature: string
     count: number
@@ -223,6 +253,20 @@ function App() {
   const previousGameOverKeyRef = useRef<string | null>(null)
   const previousVictoryThemeKeyRef = useRef<string | null>(null)
   const shouldPlayMenuThemeRef = useRef(true)
+  const [appIsForeground, setAppIsForeground] = useState(
+    () => typeof document === "undefined" || document.visibilityState !== "hidden"
+  )
+
+  const stopAllAppAudioPlayback = useCallback(() => {
+    clearScheduledAudioTimeouts(dealSoundTimeoutIdsRef.current)
+    previousGameOverKeyRef.current = null
+    previousVictoryThemeKeyRef.current = null
+    stopAudioPlayback(cardFlipAudioRef.current)
+    stopAudioPlayback(gameOverAudioRef.current)
+    stopAudioPlayback(menuThemeAudioRef.current)
+    stopAudioPlayback(victoryThemeAudioRef.current)
+    stopTrackedAudioPlayback(activeSoundEffectsRef.current)
+  }, [])
 
   useEffect(() => {
     const handleResize = () => {
@@ -232,6 +276,37 @@ function App() {
     window.addEventListener("resize", handleResize)
     return () => window.removeEventListener("resize", handleResize)
   }, [])
+
+  useEffect(() => {
+    const handleAppBackgrounded = () => {
+      setAppIsForeground(false)
+      stopAllAppAudioPlayback()
+    }
+    const handleAppForegrounded = () => {
+      setAppIsForeground(true)
+    }
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        handleAppBackgrounded()
+      } else {
+        handleAppForegrounded()
+      }
+    }
+
+    document.addEventListener("pause", handleAppBackgrounded)
+    document.addEventListener("resume", handleAppForegrounded)
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+    window.addEventListener("pagehide", handleAppBackgrounded)
+    window.addEventListener("pageshow", handleAppForegrounded)
+
+    return () => {
+      document.removeEventListener("pause", handleAppBackgrounded)
+      document.removeEventListener("resume", handleAppForegrounded)
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+      window.removeEventListener("pagehide", handleAppBackgrounded)
+      window.removeEventListener("pageshow", handleAppForegrounded)
+    }
+  }, [stopAllAppAudioPlayback])
 
   useEffect(() => {
     const cardFlipAudio = new Audio(cardFlipSoundAsset)
@@ -275,10 +350,7 @@ function App() {
     return () => {
       window.removeEventListener("pointerdown", unlockAudio)
       window.removeEventListener("keydown", unlockAudio)
-      cardFlipAudio.pause()
-      gameOverAudio.pause()
-      menuThemeAudio.pause()
-      victoryThemeAudio.pause()
+      stopAllAppAudioPlayback()
       cardFlipAudioRef.current = null
       gameOverAudioRef.current = null
       menuThemeAudioRef.current = null
@@ -422,7 +494,7 @@ function App() {
       return
     }
 
-    if (!soundEffectsEnabled) {
+    if (!appIsForeground || !soundEffectsEnabled) {
       return
     }
 
@@ -430,32 +502,36 @@ function App() {
       nextSnapshot.count > previousSnapshot.count &&
       nextSnapshot.signature !== previousSnapshot.signature
     ) {
-      playCardFlipSound(cardFlipAudioRef.current)
+      playCardFlipSound(cardFlipAudioRef.current, CARD_FLIP_VOLUME, activeSoundEffectsRef.current)
     }
-  }, [handState?.table, soundEffectsEnabled])
+  }, [appIsForeground, handState?.table, soundEffectsEnabled])
 
   useEffect(() => {
-    if (!dealAnimationNonce || !soundEffectsEnabled) {
+    if (!dealAnimationNonce || !appIsForeground || !soundEffectsEnabled) {
       return
     }
 
     const timeoutIds = scheduleDealCardFlipSounds(
       cardFlipAudioRef.current,
-      dealCardSoundStartDelay
+      dealCardSoundStartDelay,
+      activeSoundEffectsRef.current
     )
+    dealSoundTimeoutIdsRef.current = timeoutIds
 
     return () => {
-      for (const timeoutId of timeoutIds) {
-        window.clearTimeout(timeoutId)
+      clearScheduledAudioTimeouts(timeoutIds)
+      if (dealSoundTimeoutIdsRef.current === timeoutIds) {
+        dealSoundTimeoutIdsRef.current = []
       }
     }
-  }, [dealAnimationNonce, dealCardSoundStartDelay, soundEffectsEnabled])
+  }, [appIsForeground, dealAnimationNonce, dealCardSoundStartDelay, soundEffectsEnabled])
 
   useEffect(() => {
     const isBarResultAudioScreen =
       menuScreen === "match-result" ||
       (menuScreen === "campaign-victory" && campaignVictoryScreen?.kind === "venue")
-    const shouldPlayMenuTheme = musicEnabled && !handState && !isBarResultAudioScreen
+    const shouldPlayMenuTheme =
+      appIsForeground && musicEnabled && !handState && !isBarResultAudioScreen
 
     shouldPlayMenuThemeRef.current = shouldPlayMenuTheme
 
@@ -465,11 +541,14 @@ function App() {
     } else {
       stopMenuThemeSound(menuThemeAudioRef.current)
     }
-  }, [campaignVictoryScreen?.kind, handState, menuScreen, musicEnabled])
+  }, [appIsForeground, campaignVictoryScreen?.kind, handState, menuScreen, musicEnabled])
 
   useEffect(() => {
     const gameOverKey =
-      musicEnabled && menuScreen === "match-result" && matchResultScreen?.outcome === "loss"
+      appIsForeground &&
+      musicEnabled &&
+      menuScreen === "match-result" &&
+      matchResultScreen?.outcome === "loss"
         ? `match:${matchResultScreen.venueId ?? matchResultScreen.venueName}:${matchResultScreen.title}`
         : null
 
@@ -485,11 +564,11 @@ function App() {
 
     previousGameOverKeyRef.current = gameOverKey
     playGameOverSound(gameOverAudioRef.current)
-  }, [matchResultScreen, menuScreen, musicEnabled])
+  }, [appIsForeground, matchResultScreen, menuScreen, musicEnabled])
 
   useEffect(() => {
     const victoryThemeKey =
-      musicEnabled
+      appIsForeground && musicEnabled
         ? menuScreen === "match-result" && matchResultScreen?.outcome === "win"
           ? `match:${matchResultScreen.venueId ?? matchResultScreen.venueName}:${matchResultScreen.title}`
           : menuScreen === "campaign-victory" && campaignVictoryScreen?.kind === "venue"
@@ -509,7 +588,7 @@ function App() {
 
     previousVictoryThemeKeyRef.current = victoryThemeKey
     playVictoryThemeSound(victoryThemeAudioRef.current)
-  }, [campaignVictoryScreen, matchResultScreen, menuScreen, musicEnabled])
+  }, [appIsForeground, campaignVictoryScreen, matchResultScreen, menuScreen, musicEnabled])
 
   const responsiveStyles = useMemo<Record<string, React.CSSProperties>>(
     () => ({
@@ -2857,7 +2936,7 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: "pointer",
   },
   cardButtonDisabled: {
-    opacity: 0.65,
+    opacity: 1,
     cursor: "not-allowed",
   },
   cardCornerTop: {

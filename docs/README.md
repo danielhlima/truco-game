@@ -138,6 +138,8 @@ Estado consolidado:
   - configuracoes de tipo de truco, musica e efeitos sonoros
   - sair da partida
   - resetar todo o progresso do jogo com confirmacao
+- no Android/iOS via Capacitor, todo audio para ao app sair do foreground e a musica/tema da tela atual volta ao retomar se estiver habilitada
+- a placa da capa de cada bar mostra apenas o progresso daquele bar: quantas vitorias faltam, quantas ja foram feitas e a meta total
 - intro cinematografica curta antes da gameplay:
   - exibe apenas o background do bar por cerca de 1 segundo
   - revela mesa, HUDs, oponentes e cartas com fade curto

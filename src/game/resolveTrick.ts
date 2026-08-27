@@ -56,7 +56,10 @@ export function resolveTrick(state: HandState): HandState {
   }
 
   const handFinished =
-    nextScore.A === 2 || nextScore.B === 2 || state.roundNumber === 3
+    nextScore.A === 2 ||
+    nextScore.B === 2 ||
+    (state.roundNumber === 2 && nextFirstNonTieWinner !== null && nextScore.A !== nextScore.B) ||
+    state.roundNumber === 3
 
   let nextWinner = state.winner
   let nextRoundNumber = state.roundNumber
