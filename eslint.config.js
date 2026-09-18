@@ -6,7 +6,8 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // Capacitor/Gradle and Vite outputs are generated artifacts, not source files.
+  globalIgnores(['dist', 'android/app/build', 'android/build', 'android/.gradle', 'ios/App/App/public']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -15,6 +16,10 @@ export default defineConfig([
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
     ],
+    rules: {
+      // These effects intentionally synchronize transient UI state with game/session changes.
+      'react-hooks/set-state-in-effect': 'off',
+    },
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,

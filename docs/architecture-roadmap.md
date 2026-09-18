@@ -101,6 +101,14 @@ Carta virada para baixo/carta coberta:
 
 Monetização futura deve ficar fora do motor da partida.
 
+Política inicial de publicidade definida para a primeira implementação Android:
+
+- sem publicidade no `Bar do Zé Catinga`;
+- a partir do `Bar Maneco Banguela`, interstitial somente após vitória ou derrota;
+- frequência máxima de uma publicidade a cada duas partidas;
+- nunca interromper uma mão em andamento;
+- manter a política em uma camada de monetização configurável, separada da engine.
+
 Prioridades:
 
 - cosméticos

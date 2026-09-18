@@ -13,122 +13,123 @@ import {
 } from "../game/variant"
 import { CAMPAIGN_STAGES } from "../career/campaign/campaignData"
 import { STORE_PRODUCTS, UNLOCKABLE_ITEMS } from "../economy/catalog"
-import { GameTableScene } from "../three/GameTableScene"
+import { GameTableScene, getIllustratedTableAssetUrl } from "../three/GameTableScene"
 import { buildTableSceneModel } from "../three/tableSceneModel"
 import { getTableTheme } from "../three/tableTheme"
 import scorePadNotebookAsset from "../assets/ui-left/scorepad-notebook-clean-cut.png"
 import actionButtonAsset from "../assets/ui-right/action-button-solid.png"
 import statsPanelWoodAsset from "../assets/ui-right/stats-panel-wood-main.png"
-import zonaNorteGaragemCampaignJourneyAsset from "../assets/campaign/conquista-zonas-garagem-norte.png"
-import zonaNorteGaragemBackgroundAsset from "../assets/venues/zona-norte-garagem/background.png"
-import zonaNorteGaragemHostAsset from "../assets/venues/zona-norte-garagem/host-zona-norte-garagem.png"
-import zonaNorteGaragemMatchResultLossAsset from "../assets/venues/zona-norte-garagem/match-result-loss.png"
-import zonaNorteGaragemMatchResultWinAsset from "../assets/venues/zona-norte-garagem/match-result-win.png"
-import zonaLesteQuintalCampaignJourneyAsset from "../assets/campaign/conquista-zonas-quintal-da-leste.png"
-import zonaLesteQuintalBackgroundAsset from "../assets/venues/zona-leste-quintal/background.png"
-import zonaLesteQuintalHostAsset from "../assets/venues/zona-leste-quintal/host-zona-leste-quintal.png"
-import zonaLesteQuintalMatchResultLossAsset from "../assets/venues/zona-leste-quintal/match-result-loss.png"
-import zonaLesteQuintalMatchResultWinAsset from "../assets/venues/zona-leste-quintal/match-result-win.png"
-import centroSubsoloCampaignJourneyAsset from "../assets/campaign/conquista-zonas-subsolo-do-centro.png"
-import centroSubsoloBackgroundAsset from "../assets/venues/centro-subsolo/background.png"
-import centroSubsoloHostAsset from "../assets/venues/centro-subsolo/host-centro-subsolo.png"
-import centroSubsoloMatchResultLossAsset from "../assets/venues/centro-subsolo/match-result-loss.png"
-import centroSubsoloMatchResultWinAsset from "../assets/venues/centro-subsolo/match-result-win.png"
-import centroConvencoesPrefeituraCampaignJourneyAsset from "../assets/campaign/campeonato-municipal-centro-convencoes-prefeitura.png"
-import centroConvencoesPrefeituraBackgroundAsset from "../assets/venues/centro-convencoes-prefeitura/background.png"
-import centroConvencoesPrefeituraHostAsset from "../assets/venues/centro-convencoes-prefeitura/host-centro-convencoes-prefeitura.png"
-import centroConvencoesPrefeituraMatchResultLossAsset from "../assets/venues/centro-convencoes-prefeitura/match-result-loss.png"
-import centroConvencoesPrefeituraMatchResultWinAsset from "../assets/venues/centro-convencoes-prefeitura/match-result-win.png"
-import ginasioEstadualManecoFileCampaignJourneyAsset from "../assets/campaign/campeonato-estadual-ginasio-estadual-maneco-file.png"
-import ginasioEstadualManecoFileBackgroundAsset from "../assets/venues/ginasio-estadual-maneco-file/background.png"
-import ginasioEstadualManecoFileHostAsset from "../assets/venues/ginasio-estadual-maneco-file/host-ginasio-estadual-maneco-file.png"
-import ginasioEstadualManecoFileMatchResultLossAsset from "../assets/venues/ginasio-estadual-maneco-file/match-result-loss.png"
-import ginasioEstadualManecoFileMatchResultWinAsset from "../assets/venues/ginasio-estadual-maneco-file/match-result-win.png"
-import arenaNacionalCampaignJourneyAsset from "../assets/campaign/campeonato-nacional-arena-nacional.png"
-import arenaNacionalBackgroundAsset from "../assets/venues/arena-nacional/background.png"
-import arenaNacionalHostAsset from "../assets/venues/arena-nacional/host-arena-nacional.png"
-import arenaNacionalMatchResultLossAsset from "../assets/venues/arena-nacional/match-result-loss.png"
-import arenaNacionalMatchResultWinAsset from "../assets/venues/arena-nacional/match-result-win.png"
-import centroAmericanoTruqueiroMedelinCampaignJourneyAsset from "../assets/campaign/circuito-panamericano-centro-americano-truqueiro-medelin.png"
-import centroAmericanoTruqueiroMedelinBackgroundAsset from "../assets/venues/centro-americano-truqueiro-medelin/background.png"
-import centroAmericanoTruqueiroMedelinHostAsset from "../assets/venues/centro-americano-truqueiro-medelin/host-centro-americano-truqueiro-medelin.png"
-import centroAmericanoTruqueiroMedelinMatchResultLossAsset from "../assets/venues/centro-americano-truqueiro-medelin/match-result-loss.png"
-import centroAmericanoTruqueiroMedelinMatchResultWinAsset from "../assets/venues/centro-americano-truqueiro-medelin/match-result-win.png"
-import hotelTrucoSegoviaEspanhaCampaignJourneyAsset from "../assets/campaign/jogos-mundiais-hotel-truco-segovia-espanha.png"
-import hotelTrucoSegoviaEspanhaBackgroundAsset from "../assets/venues/hotel-truco-segovia-espanha/background.png"
-import hotelTrucoSegoviaEspanhaHostAsset from "../assets/venues/hotel-truco-segovia-espanha/host-hotel-truco-segovia-espanha.png"
-import hotelTrucoSegoviaEspanhaMatchResultLossAsset from "../assets/venues/hotel-truco-segovia-espanha/match-result-loss.png"
-import hotelTrucoSegoviaEspanhaMatchResultWinAsset from "../assets/venues/hotel-truco-segovia-espanha/match-result-win.png"
-import casinoMeMaiorCampaignJourneyAsset from "../assets/campaign/mundial-casino-me-maior.png"
-import casinoMeMaiorBackgroundAsset from "../assets/venues/casino-me-maior/background.png"
-import casinoMeMaiorHostAsset from "../assets/venues/casino-me-maior/host-casino-me-maior.png"
-import casinoMeMaiorMatchResultLossAsset from "../assets/venues/casino-me-maior/match-result-loss.png"
-import casinoMeMaiorMatchResultWinAsset from "../assets/venues/casino-me-maior/match-result-win.png"
-import orbitaDaLuaCampaignJourneyAsset from "../assets/campaign/circuito-intergalactico-orbita-da-lua.png"
-import orbitaDaLuaBackgroundAsset from "../assets/venues/orbita-da-lua/background.png"
-import orbitaDaLuaHostAsset from "../assets/venues/orbita-da-lua/host-orbita-da-lua.png"
-import orbitaDaLuaMatchResultLossAsset from "../assets/venues/orbita-da-lua/match-result-loss.png"
-import orbitaDaLuaMatchResultWinAsset from "../assets/venues/orbita-da-lua/match-result-win.png"
-import zonaSulSalaoCampaignJourneyAsset from "../assets/campaign/conquista-zonas-salao-da-sul.png"
-import zonaSulSalaoBackgroundAsset from "../assets/venues/zona-sul-salao/background.png"
-import zonaSulSalaoHostAsset from "../assets/venues/zona-sul-salao/host-zona-sul-salao.png"
-import zonaSulSalaoMatchResultLossAsset from "../assets/venues/zona-sul-salao/match-result-loss.png"
-import zonaSulSalaoMatchResultWinAsset from "../assets/venues/zona-sul-salao/match-result-win.png"
-import victoryStageCampeonatoVilaNanaAsset from "../assets/campaign-victories/stage-campeonato-vila-nana.png"
-import victoryStageCampeonatoEstadualAsset from "../assets/campaign-victories/stage-campeonato-estadual.png"
-import victoryStageCampeonatoNacionalAsset from "../assets/campaign-victories/stage-campeonato-nacional.png"
-import victoryStageCircuitoPanamericanoAsset from "../assets/campaign-victories/stage-circuito-panamericano.png"
-import victoryStageIntergalacticoAsset from "../assets/campaign-victories/stage-intergalactico.png"
-import victoryStageJogosMundiaisAsset from "../assets/campaign-victories/stage-jogos-mundiais.png"
-import victoryStageMundialAsset from "../assets/campaign-victories/stage-mundial.png"
-import victoryStageRuaPeriferiaAsset from "../assets/campaign-victories/stage-rua-periferia.png"
-import victoryStageZonasCidadeAsset from "../assets/campaign-victories/stage-zonas-da-cidade.png"
-import victoryVenueAdegaJucaBigodeAsset from "../assets/campaign-victories/venue-adega-do-juca-bigode.png"
-import victoryVenueArenaNacionalAsset from "../assets/campaign-victories/venue-arena-nacional.png"
-import victoryVenueBarDoZeCatingaAsset from "../assets/campaign-victories/venue-bar-do-ze-catinga.png"
-import victoryVenueBarManecoBanguelaAsset from "../assets/campaign-victories/venue-bar-maneco-banguela.png"
-import victoryVenueCentroConvencoesPrefeituraAsset from "../assets/campaign-victories/venue-centro-convencoes-prefeitura.png"
-import victoryVenueCentroAmericanoTruqueiroMedelinAsset from "../assets/campaign-victories/venue-centro-americano-truqueiro-medelin.png"
-import victoryVenueCentroSubsoloAsset from "../assets/campaign-victories/venue-centro-subsolo.png"
-import victoryVenueGinasioEstadualManecoFileAsset from "../assets/campaign-victories/venue-ginasio-estadual-maneco-file.png"
-import victoryVenueHotelTrucoSegoviaEspanhaAsset from "../assets/campaign-victories/venue-hotel-truco-segovia-espanha.png"
-import victoryVenueCasinoMeMaiorAsset from "../assets/campaign-victories/venue-casino-me-maior.png"
-import victoryVenueOrbitaDaLuaAsset from "../assets/campaign-victories/venue-orbita-da-lua.png"
-import victoryVenueTremDoJacaAsset from "../assets/campaign-victories/venue-trem-do-jaca.png"
-import victoryVenueZonaLesteQuintalAsset from "../assets/campaign-victories/venue-zona-leste-quintal.png"
-import victoryVenueZonaNorteGaragemAsset from "../assets/campaign-victories/venue-zona-norte-garagem.png"
-import victoryVenueZonaSulSalaoAsset from "../assets/campaign-victories/venue-zona-sul-salao.png"
-import adegaJucaBigodeCampaignJourneyAsset from "../assets/campaign/campeonato-vila-nana-adega-do-juca-bigode.png"
-import adegaJucaBigodeBackgroundAsset from "../assets/venues/adega-do-juca-bigode/background.png"
-import adegaJucaBigodeHostAsset from "../assets/venues/adega-do-juca-bigode/host-adega-do-juca-bigode.png"
-import adegaJucaBigodeMatchResultLossAsset from "../assets/venues/adega-do-juca-bigode/match-result-loss.png"
-import adegaJucaBigodeMatchResultWinAsset from "../assets/venues/adega-do-juca-bigode/match-result-win.png"
-import tremDoJacaCampaignJourneyAsset from "../assets/campaign/campeonato-vila-nana-trem-do-jaca.png"
-import tremDoJacaBackgroundAsset from "../assets/venues/trem-do-jaca/background.png"
-import tremDoJacaHostAsset from "../assets/venues/trem-do-jaca/host-trem-do-jaca.png"
-import tremDoJacaMatchResultLossAsset from "../assets/venues/trem-do-jaca/match-result-loss.png"
-import tremDoJacaMatchResultWinAsset from "../assets/venues/trem-do-jaca/match-result-win.png"
-import manecoBanguelaCampaignJourneyAsset from "../assets/campaign/botecos-rua-maneco-banguela.png"
-import manecoBanguelaBackgroundAsset from "../assets/venues/maneco-banguela/background.png"
-import manecoBanguelaHostAsset from "../assets/venues/maneco-banguela/host-maneco-banguela.png"
-import manecoBanguelaMatchResultLossAsset from "../assets/venues/maneco-banguela/match-result-loss.png"
-import manecoBanguelaMatchResultWinAsset from "../assets/venues/maneco-banguela/match-result-win.png"
-import startScreenAsset from "../assets/start/truco-raiz-start.png"
-import freePlayCircuitHubAsset from "../assets/campaign/free-play-circuit-hub.png"
-import zeCatingaCampaignJourneyAsset from "../assets/campaign/botecos-rua-ze-catinga.png"
-import zeCatingaBackgroundAsset from "../assets/venues/ze-catinga/background.png"
-import zeCatingaHostAsset from "../assets/venues/ze-catinga/host-ze-catinga.png"
+import zonaNorteGaragemCampaignJourneyAsset from "../assets/campaign/conquista-zonas-garagem-norte.webp"
+import zonaNorteGaragemBackgroundAsset from "../assets/venues/zona-norte-garagem/background.webp"
+import zonaNorteGaragemHostAsset from "../assets/venues/zona-norte-garagem/host-zona-norte-garagem.webp"
+import zonaNorteGaragemMatchResultLossAsset from "../assets/venues/zona-norte-garagem/match-result-loss.webp"
+import zonaNorteGaragemMatchResultWinAsset from "../assets/venues/zona-norte-garagem/match-result-win.webp"
+import zonaLesteQuintalCampaignJourneyAsset from "../assets/campaign/conquista-zonas-quintal-da-leste.webp"
+import zonaLesteQuintalBackgroundAsset from "../assets/venues/zona-leste-quintal/background.webp"
+import zonaLesteQuintalHostAsset from "../assets/venues/zona-leste-quintal/host-zona-leste-quintal.webp"
+import zonaLesteQuintalMatchResultLossAsset from "../assets/venues/zona-leste-quintal/match-result-loss.webp"
+import zonaLesteQuintalMatchResultWinAsset from "../assets/venues/zona-leste-quintal/match-result-win.webp"
+import centroSubsoloCampaignJourneyAsset from "../assets/campaign/conquista-zonas-subsolo-do-centro.webp"
+import centroSubsoloBackgroundAsset from "../assets/venues/centro-subsolo/background.webp"
+import centroSubsoloHostAsset from "../assets/venues/centro-subsolo/host-centro-subsolo.webp"
+import centroSubsoloMatchResultLossAsset from "../assets/venues/centro-subsolo/match-result-loss.webp"
+import centroSubsoloMatchResultWinAsset from "../assets/venues/centro-subsolo/match-result-win.webp"
+import centroConvencoesPrefeituraCampaignJourneyAsset from "../assets/campaign/campeonato-municipal-centro-convencoes-prefeitura.webp"
+import centroConvencoesPrefeituraBackgroundAsset from "../assets/venues/centro-convencoes-prefeitura/background.webp"
+import centroConvencoesPrefeituraHostAsset from "../assets/venues/centro-convencoes-prefeitura/host-centro-convencoes-prefeitura.webp"
+import centroConvencoesPrefeituraMatchResultLossAsset from "../assets/venues/centro-convencoes-prefeitura/match-result-loss.webp"
+import centroConvencoesPrefeituraMatchResultWinAsset from "../assets/venues/centro-convencoes-prefeitura/match-result-win.webp"
+import ginasioEstadualManecoFileCampaignJourneyAsset from "../assets/campaign/campeonato-estadual-ginasio-estadual-maneco-file.webp"
+import ginasioEstadualManecoFileBackgroundAsset from "../assets/venues/ginasio-estadual-maneco-file/background.webp"
+import ginasioEstadualManecoFileHostAsset from "../assets/venues/ginasio-estadual-maneco-file/host-ginasio-estadual-maneco-file.webp"
+import ginasioEstadualManecoFileMatchResultLossAsset from "../assets/venues/ginasio-estadual-maneco-file/match-result-loss.webp"
+import ginasioEstadualManecoFileMatchResultWinAsset from "../assets/venues/ginasio-estadual-maneco-file/match-result-win.webp"
+import arenaNacionalCampaignJourneyAsset from "../assets/campaign/campeonato-nacional-arena-nacional.webp"
+import arenaNacionalBackgroundAsset from "../assets/venues/arena-nacional/background.webp"
+import arenaNacionalHostAsset from "../assets/venues/arena-nacional/host-arena-nacional.webp"
+import arenaNacionalMatchResultLossAsset from "../assets/venues/arena-nacional/match-result-loss.webp"
+import arenaNacionalMatchResultWinAsset from "../assets/venues/arena-nacional/match-result-win.webp"
+import centroAmericanoTruqueiroMedelinCampaignJourneyAsset from "../assets/campaign/circuito-panamericano-centro-americano-truqueiro-medelin.webp"
+import centroAmericanoTruqueiroMedelinBackgroundAsset from "../assets/venues/centro-americano-truqueiro-medelin/background.webp"
+import centroAmericanoTruqueiroMedelinHostAsset from "../assets/venues/centro-americano-truqueiro-medelin/host-centro-americano-truqueiro-medelin.webp"
+import centroAmericanoTruqueiroMedelinMatchResultLossAsset from "../assets/venues/centro-americano-truqueiro-medelin/match-result-loss.webp"
+import centroAmericanoTruqueiroMedelinMatchResultWinAsset from "../assets/venues/centro-americano-truqueiro-medelin/match-result-win.webp"
+import hotelTrucoSegoviaEspanhaCampaignJourneyAsset from "../assets/campaign/jogos-mundiais-hotel-truco-segovia-espanha.webp"
+import hotelTrucoSegoviaEspanhaBackgroundAsset from "../assets/venues/hotel-truco-segovia-espanha/background.webp"
+import hotelTrucoSegoviaEspanhaHostAsset from "../assets/venues/hotel-truco-segovia-espanha/host-hotel-truco-segovia-espanha.webp"
+import hotelTrucoSegoviaEspanhaMatchResultLossAsset from "../assets/venues/hotel-truco-segovia-espanha/match-result-loss.webp"
+import hotelTrucoSegoviaEspanhaMatchResultWinAsset from "../assets/venues/hotel-truco-segovia-espanha/match-result-win.webp"
+import casinoMeMaiorCampaignJourneyAsset from "../assets/campaign/mundial-casino-me-maior.webp"
+import casinoMeMaiorBackgroundAsset from "../assets/venues/casino-me-maior/background.webp"
+import casinoMeMaiorHostAsset from "../assets/venues/casino-me-maior/host-casino-me-maior.webp"
+import casinoMeMaiorMatchResultLossAsset from "../assets/venues/casino-me-maior/match-result-loss.webp"
+import casinoMeMaiorMatchResultWinAsset from "../assets/venues/casino-me-maior/match-result-win.webp"
+import orbitaDaLuaCampaignJourneyAsset from "../assets/campaign/circuito-intergalactico-orbita-da-lua.webp"
+import orbitaDaLuaBackgroundAsset from "../assets/venues/orbita-da-lua/background.webp"
+import orbitaDaLuaHostAsset from "../assets/venues/orbita-da-lua/host-orbita-da-lua.webp"
+import orbitaDaLuaMatchResultLossAsset from "../assets/venues/orbita-da-lua/match-result-loss.webp"
+import orbitaDaLuaMatchResultWinAsset from "../assets/venues/orbita-da-lua/match-result-win.webp"
+import zonaSulSalaoCampaignJourneyAsset from "../assets/campaign/conquista-zonas-salao-da-sul.webp"
+import zonaSulSalaoBackgroundAsset from "../assets/venues/zona-sul-salao/background.webp"
+import zonaSulSalaoHostAsset from "../assets/venues/zona-sul-salao/host-zona-sul-salao.webp"
+import zonaSulSalaoMatchResultLossAsset from "../assets/venues/zona-sul-salao/match-result-loss.webp"
+import zonaSulSalaoMatchResultWinAsset from "../assets/venues/zona-sul-salao/match-result-win.webp"
+import victoryStageCampeonatoVilaNanaAsset from "../assets/campaign-victories/stage-campeonato-vila-nana.webp"
+import victoryStageCampeonatoEstadualAsset from "../assets/campaign-victories/stage-campeonato-estadual.webp"
+import victoryStageCampeonatoNacionalAsset from "../assets/campaign-victories/stage-campeonato-nacional.webp"
+import victoryStageCircuitoPanamericanoAsset from "../assets/campaign-victories/stage-circuito-panamericano.webp"
+import victoryStageIntergalacticoAsset from "../assets/campaign-victories/stage-intergalactico.webp"
+import victoryStageJogosMundiaisAsset from "../assets/campaign-victories/stage-jogos-mundiais.webp"
+import victoryStageMundialAsset from "../assets/campaign-victories/stage-mundial.webp"
+import victoryStageRuaPeriferiaAsset from "../assets/campaign-victories/stage-rua-periferia.webp"
+import victoryStageZonasCidadeAsset from "../assets/campaign-victories/stage-zonas-da-cidade.webp"
+import victoryVenueAdegaJucaBigodeAsset from "../assets/campaign-victories/venue-adega-do-juca-bigode.webp"
+import victoryVenueArenaNacionalAsset from "../assets/campaign-victories/venue-arena-nacional.webp"
+import victoryVenueBarDoZeCatingaAsset from "../assets/campaign-victories/venue-bar-do-ze-catinga.webp"
+import victoryVenueBarManecoBanguelaAsset from "../assets/campaign-victories/venue-bar-maneco-banguela.webp"
+import victoryVenueCentroConvencoesPrefeituraAsset from "../assets/campaign-victories/venue-centro-convencoes-prefeitura.webp"
+import victoryVenueCentroAmericanoTruqueiroMedelinAsset from "../assets/campaign-victories/venue-centro-americano-truqueiro-medelin.webp"
+import victoryVenueCentroSubsoloAsset from "../assets/campaign-victories/venue-centro-subsolo.webp"
+import victoryVenueGinasioEstadualManecoFileAsset from "../assets/campaign-victories/venue-ginasio-estadual-maneco-file.webp"
+import victoryVenueHotelTrucoSegoviaEspanhaAsset from "../assets/campaign-victories/venue-hotel-truco-segovia-espanha.webp"
+import victoryVenueCasinoMeMaiorAsset from "../assets/campaign-victories/venue-casino-me-maior.webp"
+import victoryVenueOrbitaDaLuaAsset from "../assets/campaign-victories/venue-orbita-da-lua.webp"
+import victoryVenueTremDoJacaAsset from "../assets/campaign-victories/venue-trem-do-jaca.webp"
+import victoryVenueZonaLesteQuintalAsset from "../assets/campaign-victories/venue-zona-leste-quintal.webp"
+import victoryVenueZonaNorteGaragemAsset from "../assets/campaign-victories/venue-zona-norte-garagem.webp"
+import victoryVenueZonaSulSalaoAsset from "../assets/campaign-victories/venue-zona-sul-salao.webp"
+import adegaJucaBigodeCampaignJourneyAsset from "../assets/campaign/campeonato-vila-nana-adega-do-juca-bigode.webp"
+import adegaJucaBigodeBackgroundAsset from "../assets/venues/adega-do-juca-bigode/background.webp"
+import adegaJucaBigodeHostAsset from "../assets/venues/adega-do-juca-bigode/host-adega-do-juca-bigode.webp"
+import adegaJucaBigodeMatchResultLossAsset from "../assets/venues/adega-do-juca-bigode/match-result-loss.webp"
+import adegaJucaBigodeMatchResultWinAsset from "../assets/venues/adega-do-juca-bigode/match-result-win.webp"
+import tremDoJacaCampaignJourneyAsset from "../assets/campaign/campeonato-vila-nana-trem-do-jaca.webp"
+import tremDoJacaBackgroundAsset from "../assets/venues/trem-do-jaca/background.webp"
+import tremDoJacaHostAsset from "../assets/venues/trem-do-jaca/host-trem-do-jaca.webp"
+import tremDoJacaMatchResultLossAsset from "../assets/venues/trem-do-jaca/match-result-loss.webp"
+import tremDoJacaMatchResultWinAsset from "../assets/venues/trem-do-jaca/match-result-win.webp"
+import manecoBanguelaCampaignJourneyAsset from "../assets/campaign/botecos-rua-maneco-banguela.webp"
+import manecoBanguelaBackgroundAsset from "../assets/venues/maneco-banguela/background.webp"
+import manecoBanguelaHostAsset from "../assets/venues/maneco-banguela/host-maneco-banguela.webp"
+import manecoBanguelaMatchResultLossAsset from "../assets/venues/maneco-banguela/match-result-loss.webp"
+import manecoBanguelaMatchResultWinAsset from "../assets/venues/maneco-banguela/match-result-win.webp"
+import startScreenAsset from "../assets/start/truco-raiz-start.webp"
+import freePlayCircuitHubAsset from "../assets/campaign/free-play-circuit-hub.webp"
+import zeCatingaCampaignJourneyAsset from "../assets/campaign/botecos-rua-ze-catinga.webp"
+import zeCatingaBackgroundAsset from "../assets/venues/ze-catinga/background.webp"
+import zeCatingaHostAsset from "../assets/venues/ze-catinga/host-ze-catinga.webp"
 import zeCatingaQuoteBoardAsset from "../assets/venues/ze-catinga/host-quote-board.png"
 import zeCatingaCtaPlaqueAsset from "../assets/venues/ze-catinga/cta-plaque.png"
 import zeCatingaDifficultyBottleAsset from "../assets/venues/ze-catinga/difficulty-bottle.png"
 import zeCatingaDividerAsset from "../assets/venues/ze-catinga/divider-ornament.png"
-import zeCatingaMatchResultLossAsset from "../assets/venues/ze-catinga/match-result-loss.png"
-import zeCatingaMatchResultWinAsset from "../assets/venues/ze-catinga/match-result-win.png"
+import zeCatingaMatchResultLossAsset from "../assets/venues/ze-catinga/match-result-loss.webp"
+import zeCatingaMatchResultWinAsset from "../assets/venues/ze-catinga/match-result-win.webp"
 import zeCatingaStatsPlaqueAsset from "../assets/venues/ze-catinga/stats-plaque-aged-blank.png"
 import type { PlayerProfile } from "../profile/playerProfile"
 import type { PartnerAdvice } from "../ai/trucoDecision"
 import { TRUCO_CHARACTER_BY_ID, type TrucoCharacterProfile } from "../content/characters"
 import type { PlayerSkinProfile } from "../content/playerSkins"
+import { preloadImages } from "./imagePreload"
 import {
   formatCard,
   getBetBadgeLabel,
@@ -790,6 +791,7 @@ interface TableSectionProps {
     warning: string
   } | null
   inGameContextMenuOpen: boolean
+  showDebugMatchActions: boolean
   inGameSettingsOpen: boolean
   matchState: MatchState | null
   matchResultScreen: MatchResultScreenState | null
@@ -860,6 +862,10 @@ interface TableSectionProps {
   onChangeTrucoVariant: (variant: GameVariant) => void
   onToggleMusicEnabled: () => void
   onToggleSoundEffectsEnabled: () => void
+  privacyOptionsRequired: boolean
+  onOpenPrivacyOptions: () => void
+  onOpenPrivacyPolicy: () => void
+  onOpenSupport: () => void
   onRequestTruco: () => void
   onAcceptTruco: () => void
   onAddEightPointsFromContextMenu: () => void
@@ -883,6 +889,7 @@ export function TableSection({
   handState,
   inGameConfirmation,
   inGameContextMenuOpen,
+  showDebugMatchActions,
   inGameSettingsOpen,
   matchState,
   matchResultScreen,
@@ -944,6 +951,10 @@ export function TableSection({
   onChangeTrucoVariant,
   onToggleMusicEnabled,
   onToggleSoundEffectsEnabled,
+  privacyOptionsRequired,
+  onOpenPrivacyOptions,
+  onOpenPrivacyPolicy,
+  onOpenSupport,
   onRequestTruco,
   onAcceptTruco,
   onAddEightPointsFromContextMenu,
@@ -969,6 +980,29 @@ export function TableSection({
     lastPlayedPlayerId,
     currentCampaignVenue
   )
+  const currentVenueId = currentCampaignVenue?.id
+  const currentVenueCover = currentVenueId
+    ? VENUE_COVER_CONFIG_BY_ID[currentVenueId]
+    : undefined
+  const currentVenueResults = currentVenueId
+    ? MATCH_RESULT_ASSET_BY_VENUE_ID[currentVenueId]
+    : undefined
+
+  useEffect(() => {
+    preloadImages([
+      currentVenueCover?.backgroundAsset,
+      currentVenueCover?.hostPortraitAsset,
+      getIllustratedTableAssetUrl(tableSceneModel.theme.illustratedTableAsset),
+      currentVenueResults?.win,
+      currentVenueResults?.loss,
+    ])
+  }, [
+    currentVenueCover?.backgroundAsset,
+    currentVenueCover?.hostPortraitAsset,
+    currentVenueResults?.loss,
+    currentVenueResults?.win,
+    tableSceneModel.theme.illustratedTableAsset,
+  ])
   const showNineHandHint = canHumanDecideNineHand && !nineHandHintDismissed
   const handlePlayNineHandClick = () => {
     setNineHandHintDismissed(true)
@@ -1123,6 +1157,10 @@ export function TableSection({
                     onChangeVariant={onChangeTrucoVariant}
                     onToggleMusicEnabled={onToggleMusicEnabled}
                     onToggleSoundEffectsEnabled={onToggleSoundEffectsEnabled}
+                    privacyOptionsRequired={privacyOptionsRequired}
+                    onOpenPrivacyOptions={onOpenPrivacyOptions}
+                    onOpenPrivacyPolicy={onOpenPrivacyPolicy}
+                    onOpenSupport={onOpenSupport}
                     styles={styles}
                   />
                 ) : (
@@ -1240,6 +1278,7 @@ export function TableSection({
                   <div style={styles.playerCardsBlock}>
                     <HumanCardsPanel
                       inGameContextMenuOpen={inGameContextMenuOpen}
+                      showDebugMatchActions={showDebugMatchActions}
                       player1={player1}
                       canPlayHumanCard={canPlayHumanCard}
                       canPlayCoveredCard={canPlayCoveredCard}
@@ -1481,6 +1520,10 @@ export function TableSection({
                   onChangeVariant={onChangeTrucoVariant}
                   onToggleMusicEnabled={onToggleMusicEnabled}
                   onToggleSoundEffectsEnabled={onToggleSoundEffectsEnabled}
+                  privacyOptionsRequired={privacyOptionsRequired}
+                  onOpenPrivacyOptions={onOpenPrivacyOptions}
+                  onOpenPrivacyPolicy={onOpenPrivacyPolicy}
+                  onOpenSupport={onOpenSupport}
                   styles={styles}
                 />
               </div>
@@ -1583,6 +1626,10 @@ function SettingsScreen({
   onChangeVariant,
   onToggleMusicEnabled,
   onToggleSoundEffectsEnabled,
+  privacyOptionsRequired,
+  onOpenPrivacyOptions,
+  onOpenPrivacyPolicy,
+  onOpenSupport,
   styles,
 }: {
   musicEnabled: boolean
@@ -1592,6 +1639,10 @@ function SettingsScreen({
   onChangeVariant: (variant: GameVariant) => void
   onToggleMusicEnabled: () => void
   onToggleSoundEffectsEnabled: () => void
+  privacyOptionsRequired: boolean
+  onOpenPrivacyOptions: () => void
+  onOpenPrivacyPolicy: () => void
+  onOpenSupport: () => void
   styles: StyleMap
 }) {
   const variantOptions: Array<{
@@ -1722,6 +1773,20 @@ function SettingsScreen({
             </span>
           </button>
         </div>
+
+        <div style={styles.settingsLinks}>
+          {privacyOptionsRequired ? (
+            <button type="button" style={styles.settingsLinkButton} onClick={onOpenPrivacyOptions}>
+              Opções de privacidade
+            </button>
+          ) : null}
+          <button type="button" style={styles.settingsLinkButton} onClick={onOpenPrivacyPolicy}>
+            Política de Privacidade
+          </button>
+          <button type="button" style={styles.settingsLinkButton} onClick={onOpenSupport}>
+            Suporte
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -1760,21 +1825,21 @@ const TUTORIAL_DRAFT_STEPS: TutorialDraftStep[] = [
   {
     id: "welcome",
     title: "Vamos na mesa",
-    text: "Aqui voce aprende jogando. A gente vai usar uma mesa real do Maneco Banguela e ir passo por passo.",
+    text: "Aqui você aprende jogando. A gente vai usar uma mesa real do Maneco Banguela e ir passo por passo.",
     target: "Tutorial",
     anchor: "top-left",
   },
   {
     id: "hand",
-    title: "Essa e sua mao",
-    text: "Essas tres cartas sao suas. No truco, voce joga uma carta por vaza.",
-    target: "Sua mao",
+    title: "Essa é sua mão",
+    text: "Essas três cartas são suas. No truco, você joga uma carta por vaza.",
+    target: "Sua mão",
     anchor: "bottom-left",
   },
   {
     id: "play-card",
     title: "Jogue uma carta",
-    text: "Toque no 2 de paus destacado. Ele vai para a mesa e a vaza sera resolvida.",
+    text: "Toque no 2 de paus destacado. Ele vai para a mesa e a vaza será resolvida.",
     target: "Toque no 2 de paus",
     anchor: "bottom-left",
     expectedAction: "play-low-card",
@@ -1782,21 +1847,21 @@ const TUTORIAL_DRAFT_STEPS: TutorialDraftStep[] = [
   {
     id: "trick-result",
     title: "A vaza resolveu",
-    text: "Sua parceira ganhou essa vaza com o 3 de copas. Quando nossa dupla vence, o caderno marca ponto na mao.",
-    target: "Placar da mao",
+    text: "Sua parceira ganhou essa vaza com o 3 de copas. Quando nossa dupla vence, o caderno marca ponto na mão.",
+    target: "Placar da mão",
     anchor: "left",
   },
   {
     id: "common-order-intro",
     title: "Agora olha a ordem",
-    text: "Nas cartas comuns do Mineiro, a forca sobe assim: 4, 5, 6, 7, Q, J, K, A, 2, 3. O 7 dos adversarios esta ganhando por enquanto.",
+    text: "Nas cartas comuns do Mineiro, a força sobe assim: 4, 5, 6, 7, Q, J, K, A, 2, 3. O 7 dos adversários está ganhando por enquanto.",
     target: "Aula 2 · Ordem comum",
     anchor: "right",
   },
   {
     id: "choose-winning-card",
     title: "Ganhe sem gastar demais",
-    text: "Toque na Q de copas. Ela e a menor carta da sua mao que vence o 7 da mesa.",
+    text: "Toque na Q de copas. Ela é a menor carta da sua mão que vence o 7 da mesa.",
     target: "Toque na Q de copas",
     anchor: "bottom-left",
     expectedAction: "play-winning-card",
@@ -1804,21 +1869,21 @@ const TUTORIAL_DRAFT_STEPS: TutorialDraftStep[] = [
   {
     id: "common-order-result",
     title: "Boa escolha",
-    text: "A Q venceu 7, 6 e 5. No Mineiro, ela ainda perde para J, K, A, 2 e 3. As manilhas ficam para a proxima aula.",
+    text: "A Q venceu 7, 6 e 5. No Mineiro, ela ainda perde para J, K, A, 2 e 3. As manilhas ficam para a próxima aula.",
     target: "Ordem comum",
     anchor: "left",
   },
   {
     id: "manilha-intro",
     title: "Agora entram as manilhas",
-    text: "No Mineiro, as manilhas sao fixas: 4 de paus, 7 de copas, A de espada e 7 de ouros. Elas vencem qualquer carta comum.",
+    text: "No Mineiro, as manilhas são fixas: 4 de paus, 7 de copas, A de espada e 7 de ouros. Elas vencem qualquer carta comum.",
     target: "Aula 3 · Manilhas fixas",
     anchor: "right",
   },
   {
     id: "play-zap",
     title: "Use o zap",
-    text: "O 3 de paus esta ganhando como carta comum. Toque no 4 de paus, o zap, para tomar a vaza.",
+    text: "O 3 de paus está ganhando como carta comum. Toque no 4 de paus, o zap, para tomar a vaza.",
     target: "Toque no 4 de paus",
     anchor: "bottom-left",
     expectedAction: "play-zap",
@@ -1826,35 +1891,35 @@ const TUTORIAL_DRAFT_STEPS: TutorialDraftStep[] = [
   {
     id: "manilha-result",
     title: "Manilha manda",
-    text: "O zap venceu o 3. Do mais forte para o mais fraco, as manilhas sao: 4 de paus, 7 de copas, A de espada e 7 de ouros.",
+    text: "O zap venceu o 3. Do mais forte para o mais fraco, as manilhas são: 4 de paus, 7 de copas, A de espada e 7 de ouros.",
     target: "Zap",
     anchor: "left",
   },
   {
     id: "hand-finished",
-    title: "Fechou a mao",
-    text: "Quando uma dupla ganha duas vazas, a mao termina. Como nos vencemos duas, o ponto sai do placar de baixo e vai para a partida.",
-    target: "Aula 4 · Mao e partida",
+    title: "Fechou a mão",
+    text: "Quando uma dupla ganha duas vazas, a mão termina. Como nós vencemos duas, o ponto sai do placar de baixo e vai para a partida.",
+    target: "Aula 4 · Mão e partida",
     anchor: "score-right",
   },
   {
     id: "match-score",
-    title: "Partida ate 12",
-    text: "O placar de cima e a partida. O placar de baixo e so da mao atual. Depois que uma mao termina, as vazas zeram e a partida continua ate 12.",
+    title: "Partida até 12",
+    text: "O placar de cima é a partida. O placar de baixo é só da mão atual. Depois que uma mão termina, as vazas zeram e a partida continua até 12.",
     target: "Placar da partida",
     anchor: "score-right",
   },
   {
     id: "truco-intro",
     title: "Hora de pedir truco",
-    text: "Quando sua mao esta forte, voce pode pedir truco. Se os adversarios aceitarem, a mao passa a valer 3 pontos.",
+    text: "Quando sua mão está forte, você pode pedir truco. Se os adversários aceitarem, a mão passa a valer 3 pontos.",
     target: "Aula 5 · Pedir truco",
     anchor: "action-left",
   },
   {
     id: "request-truco",
     title: "Peça truco",
-    text: "Sua mao esta boa. Toque em Pedir truco para aumentar o valor desta mao.",
+    text: "Sua mão está boa. Toque em Pedir truco para aumentar o valor desta mão.",
     target: "Pedir truco",
     anchor: "action-left",
     expectedAction: "request-truco",
@@ -1862,43 +1927,43 @@ const TUTORIAL_DRAFT_STEPS: TutorialDraftStep[] = [
   {
     id: "truco-accepted",
     title: "Eles aceitaram",
-    text: "Agora esta valendo 3. No jogo real, os adversarios tambem podem correr ou aumentar para seis.",
+    text: "Agora está valendo 3. No jogo real, os adversários também podem correr ou aumentar para seis.",
     target: "Valendo 3",
     anchor: "action-left",
   },
   {
     id: "response-intro",
     title: "Quando eles pedem",
-    text: "Agora e o outro lado: se os adversarios pedem truco, voce decide se aceita, corre ou aumenta.",
+    text: "Agora é o outro lado: se os adversários pedem truco, você decide se aceita, corre ou aumenta.",
     target: "Aula 6 · Responder truco",
     anchor: "action-left",
   },
   {
     id: "respond-accept",
     title: "Aceitar",
-    text: "Com uma mao jogavel, aceitar mantem a mao viva e ela passa a valer 3. Toque em Aceitar.",
+    text: "Com uma mão jogável, aceitar mantém a mão viva e ela passa a valer 3. Toque em Aceitar.",
     target: "Aceitar",
     anchor: "action-left",
     expectedAction: "accept-truco",
   },
   {
     id: "accept-result",
-    title: "Mao valendo 3",
-    text: "Voce aceitou. Agora a mao vale 3 pontos e o jogo continua normalmente.",
+    title: "Mão valendo 3",
+    text: "Você aceitou. Agora a mão vale 3 pontos e o jogo continua normalmente.",
     target: "Valendo 3",
     anchor: "action-left",
   },
   {
     id: "run-intro",
     title: "Quando correr",
-    text: "Com mao ruim, correr evita perder mais pontos. Voce entrega 1 ponto e a mao acaba.",
+    text: "Com mão ruim, correr evita perder mais pontos. Você entrega 1 ponto e a mão acaba.",
     target: "Correr",
     anchor: "action-left",
   },
   {
     id: "respond-run",
     title: "Corra desta",
-    text: "Essa mao nao promete nada. Toque em Correr.",
+    text: "Essa mão não promete nada. Toque em Correr.",
     target: "Correr",
     anchor: "action-left",
     expectedAction: "run-truco",
@@ -1906,21 +1971,21 @@ const TUTORIAL_DRAFT_STEPS: TutorialDraftStep[] = [
   {
     id: "run-result",
     title: "Eles levam 1",
-    text: "Voce correu. Os adversarios ganham 1 ponto, mas voce escapou de disputar uma mao valendo 3.",
+    text: "Você correu. Os adversários ganham 1 ponto, mas você escapou de disputar uma mão valendo 3.",
     target: "Placar da partida",
     anchor: "score-right",
   },
   {
     id: "raise-intro",
     title: "Quando aumentar",
-    text: "Com mao muito forte, voce pode aceitar e aumentar. O proximo valor depois do truco e seis.",
+    text: "Com mão muito forte, você pode aceitar e aumentar. O próximo valor depois do truco é seis.",
     target: "Aumentar",
     anchor: "action-left",
   },
   {
     id: "respond-raise",
     title: "Aumente para seis",
-    text: "Agora a mao esta forte. Toque em Aumentar.",
+    text: "Agora a mão está forte. Toque em Aumentar.",
     target: "Aumentar",
     anchor: "action-left",
     expectedAction: "raise-truco",
@@ -1928,21 +1993,21 @@ const TUTORIAL_DRAFT_STEPS: TutorialDraftStep[] = [
   {
     id: "raise-result",
     title: "Seis na mesa",
-    text: "Voce aumentou. A resposta volta para os adversarios, e se eles aceitarem a mao passa a valer 6.",
+    text: "Você aumentou. A resposta volta para os adversários, e se eles aceitarem a mão passa a valer 6.",
     target: "Valendo 6",
     anchor: "action-left",
   },
   {
     id: "partner-intro",
     title: "Jogue com a parceira",
-    text: "No truco em dupla, sua parceira tambem le a mesa. Quando alguem pede truco, o conselho dela ajuda a decidir.",
+    text: "No truco em dupla, sua parceira também lê a mesa. Quando alguém pede truco, o conselho dela ajuda a decidir.",
     target: "Aula 7 · Parceira",
     anchor: "left",
   },
   {
     id: "partner-advice",
     title: "Ela chamou",
-    text: "A Nega Catimbo disse BORA!, sinal de que ve forca na dupla. Toque em Aceitar para seguir com ela.",
+    text: "A Nega Catimbó disse BORA!, sinal de que vê força na dupla. Toque em Aceitar para seguir com ela.",
     target: "BORA!",
     anchor: "action-left",
     expectedAction: "follow-partner-advice",
@@ -1950,35 +2015,35 @@ const TUTORIAL_DRAFT_STEPS: TutorialDraftStep[] = [
   {
     id: "partner-advice-result",
     title: "A dupla comprou",
-    text: "Voce aceitou ouvindo a parceira. O conselho pesa, mas a decisao final continua sendo sua.",
+    text: "Você aceitou ouvindo a parceira. O conselho pesa, mas a decisão final continua sendo sua.",
     target: "Valendo 3",
     anchor: "action-left",
   },
   {
     id: "partner-consult",
     title: "Quando ela consulta",
-    text: "Se o pedido cai na parceira, ela pode jogar a pergunta para voce: E AI, PARCEIRO? Ai voce responde pela dupla.",
-    target: "E AI, PARCEIRO?",
+    text: "Se o pedido cai na parceira, ela pode jogar a pergunta para você: E AÍ, PARCEIRO? Aí você responde pela dupla.",
+    target: "E AÍ, PARCEIRO?",
     anchor: "left",
   },
   {
     id: "partner-summary",
     title: "Leia o tom",
-    text: "BORA! indica confianca. CE QUE SABE! e meio termo. MELHOR CORRER! avisa mao fraca. Use isso junto com suas cartas.",
+    text: "BORA! indica confiança. CÊ QUE SABE! é meio-termo. MELHOR CORRER! avisa mão fraca. Use isso junto com suas cartas.",
     target: "Conselho da parceira",
     anchor: "left",
   },
   {
     id: "covered-locked",
     title: "Primeira vaza aberta",
-    text: "Carta coberta nao existe na primeira vaza. Aqui todo mundo precisa jogar aberto para a mesa comecar limpa.",
+    text: "Carta coberta não existe na primeira vaza. Aqui todo mundo precisa jogar aberto para a mesa começar limpa.",
     target: "Aula 8 · Carta coberta",
     anchor: "right",
   },
   {
     id: "covered-intro",
     title: "Agora pode cobrir",
-    text: "A partir da segunda vaza, o toggle Coberta aparece como opcao. Use quando quiser descartar sem disputar a vaza.",
+    text: "A partir da segunda vaza, o toggle Coberta aparece como opção. Use quando quiser descartar sem disputar a vaza.",
     target: "Coberta",
     anchor: "bottom-right",
     expectedAction: "toggle-covered-card",
@@ -1986,65 +2051,65 @@ const TUTORIAL_DRAFT_STEPS: TutorialDraftStep[] = [
   {
     id: "play-covered-card",
     title: "Jogue sem mostrar",
-    text: "Com Coberta ligado, toque no 6 de ouros. Ele vai para a mesa virado para baixo e nao disputa essa vaza.",
+    text: "Com Coberta ligado, toque no 6 de ouros. Ele vai para a mesa virado para baixo e não disputa essa vaza.",
     target: "Toque no 6 de ouros",
     anchor: "bottom-left",
     expectedAction: "play-covered-card",
   },
   {
     id: "covered-result",
-    title: "Coberta nao ganha",
-    text: "A carta ficou escondida e nao contou na vaza. Mesmo que fosse forte, coberta funciona como descarte.",
+    title: "Coberta não ganha",
+    text: "A carta ficou escondida e não contou na vaza. Mesmo que fosse forte, coberta funciona como descarte.",
     target: "Carta coberta",
     anchor: "left",
   },
   {
     id: "paulista-intro",
-    title: "Agora e Paulista",
-    text: "No Truco Paulista existe a vira. Ela aparece no inicio da rodada e define qual rank vira manilha.",
+    title: "Agora é Paulista",
+    text: "No Truco Paulista existe a vira. Ela aparece no início da rodada e define qual rank vira manilha.",
     target: "Aula 9 · Truco Paulista",
     anchor: "right",
   },
   {
     id: "paulista-vira",
     title: "Leia a vira",
-    text: "A vira e 5 de ouros. A proxima carta na ordem e o 6, entao todos os 6 viram manilha nesta rodada.",
+    text: "A vira é 5 de ouros. A próxima carta na ordem é o 6, então todos os 6 viram manilha nesta rodada.",
     target: "Vira: 5 de ouros",
     anchor: "right",
   },
   {
     id: "play-paulista-manilha",
     title: "Use a manilha",
-    text: "Toque no 6 de copas. Como a vira foi 5, esse 6 vence ate cartas comuns muito fortes.",
+    text: "Toque no 6 de copas. Como a vira foi 5, esse 6 vence até cartas comuns muito fortes.",
     target: "Toque no 6 de copas",
     anchor: "bottom-left",
     expectedAction: "play-paulista-manilha",
   },
   {
     id: "paulista-result",
-    title: "Manilha dinamica",
+    title: "Manilha dinâmica",
     text: "No Paulista, a manilha muda a cada rodada. Olhe sempre a vira antes de comparar as cartas.",
     target: "Truco Paulista",
     anchor: "left",
   },
   {
     id: "nine-hand-intro",
-    title: "Mao de 9",
-    text: "Quando uma dupla chega a 9, 10 ou 11 pontos, vem a mao de 9. Antes de jogar, a dupla decide se entra ou corre.",
-    target: "Aula 10 · Mao de 9",
+    title: "Mão de 9",
+    text: "Quando uma dupla chega a 9, 10 ou 11 pontos, vem a mão de 9. Antes de jogar, a dupla decide se entra ou corre.",
+    target: "Aula 10 · Mão de 9",
     anchor: "score-right",
   },
   {
     id: "nine-hand-partner",
     title: "Olhe a parceira",
-    text: "Na nossa mao de 9, voce pode ver as cartas da parceira aqui na direita antes de decidir.",
+    text: "Na nossa mão de 9, você pode ver as cartas da parceira aqui na direita antes de decidir.",
     target: "Cartas da parceira",
     anchor: "action-left",
   },
   {
     id: "nine-hand-play",
     title: "Escolha jogar",
-    text: "Se jogar e perder, os adversarios levam 3. Se correr agora, eles levam so 1. Para treinar, toque em Jogar.",
+    text: "Se jogar e perder, os adversários levam 3. Se correr agora, eles levam só 1. Para treinar, toque em Jogar.",
     target: "Jogar",
     anchor: "action-left",
     expectedAction: "choose-nine-play",
@@ -2052,14 +2117,14 @@ const TUTORIAL_DRAFT_STEPS: TutorialDraftStep[] = [
   {
     id: "nine-hand-result",
     title: "Valendo 3",
-    text: "Voce decidiu jogar. A mao segue valendo 3 e truco fica bloqueado nessa mao especial.",
-    target: "Mao de 9",
+    text: "Você decidiu jogar. A mão segue valendo 3 e truco fica bloqueado nessa mão especial.",
+    target: "Mão de 9",
     anchor: "action-left",
   },
   {
     id: "tutorial-finished",
     title: "Pronto pra mesa",
-    text: "Voce viu vaza, ordem das cartas, manilhas, truco, parceira, carta coberta, Paulista e mao de 9. Agora e sentar e jogar.",
+    text: "Você viu vaza, ordem das cartas, manilhas, truco, parceira, carta coberta, Paulista e mão de 9. Agora é sentar e jogar.",
     target: "Tutorial completo",
     anchor: "right",
   },
@@ -2457,7 +2522,7 @@ function TutorialDraftScreen({
     step.id === "partner-advice" || step.id === "partner-advice-result"
       ? { playerId: 3, text: "BORA!" }
       : step.id === "partner-consult"
-      ? { playerId: 3, text: "E AI, PARCEIRO?" }
+      ? { playerId: 3, text: "E AÍ, PARCEIRO?" }
       : step.id === "partner-summary"
       ? { playerId: 3, text: "CE QUE SABE!" }
       : null
@@ -2694,7 +2759,7 @@ function TutorialDraftScreen({
       : "Toque no botão"
     : isLastStep
     ? "Fechar"
-    : "Proximo"
+    : "Próximo"
 
   return (
     <div
@@ -2807,7 +2872,7 @@ function TutorialDraftScreen({
                   {isLessonThreeStep
                     ? "Aula 3 · Manilhas fixas"
                     : isLessonFourStep
-                    ? "Aula 4 · Mao e partida"
+                    ? "Aula 4 · Mão e partida"
                     : isLessonFiveStep
                     ? "Aula 5 · Pedir truco"
                     : isLessonSixStep
@@ -5300,6 +5365,7 @@ export function LogsPanel({ logs, onCopyLogs, styles }: LogsPanelProps) {
 
 function HumanCardsPanel({
   inGameContextMenuOpen,
+  showDebugMatchActions,
   player1,
   canPlayHumanCard,
   canPlayCoveredCard,
@@ -5317,6 +5383,7 @@ function HumanCardsPanel({
   styles,
 }: {
   inGameContextMenuOpen: boolean
+  showDebugMatchActions: boolean
   player1: Player | null
   canPlayHumanCard: boolean
   canPlayCoveredCard: boolean
@@ -5454,24 +5521,28 @@ function HumanCardsPanel({
                 >
                   Trocar de parceira
                 </button>
-                <button
-                  style={styles.inGameContextMenuAction}
-                  onClick={onWinMatchFromContextMenu}
-                >
-                  Vencer esta partida
-                </button>
-                <button
-                  style={styles.inGameContextMenuAction}
-                  onClick={onAddEightPointsFromContextMenu}
-                >
-                  Ganhar 8 pontos
-                </button>
-                <button
-                  style={styles.inGameContextMenuAction}
-                  onClick={onLoseMatchFromContextMenu}
-                >
-                  Perder esta partida
-                </button>
+                {showDebugMatchActions && (
+                  <>
+                    <button
+                      style={styles.inGameContextMenuAction}
+                      onClick={onWinMatchFromContextMenu}
+                    >
+                      Vencer esta partida
+                    </button>
+                    <button
+                      style={styles.inGameContextMenuAction}
+                      onClick={onAddEightPointsFromContextMenu}
+                    >
+                      Ganhar 8 pontos
+                    </button>
+                    <button
+                      style={styles.inGameContextMenuAction}
+                      onClick={onLoseMatchFromContextMenu}
+                    >
+                      Perder esta partida
+                    </button>
+                  </>
+                )}
                 <button
                   style={styles.inGameContextMenuAction}
                   onClick={onExitMatchFromContextMenu}

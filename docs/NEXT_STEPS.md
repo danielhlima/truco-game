@@ -10,9 +10,12 @@ Estado consolidado:
 - tela inicial com arte propria e placas `COMEÇAR`, `TUTORIAL` e `CONFIGURAÇÕES`
 - `COMEÇAR`, `TUTORIAL` e `CONFIGURAÇÕES` sao hotspots ativos
 - `CONFIGURAÇÕES` permite escolher globalmente entre `Truco Paulista` e `Truco Mineiro`, ligar/desligar musica e ligar/desligar efeitos sonoros; Paulista e o padrao
+  - durante uma partida, a troca de variante exige confirmacao e reinicia a partida atual sem alterar o progresso do bar
 - gameplay dentro de stage logico `1080x500`
 - com musica ligada, telas fora do gameplay tocam `src/assets/audio/menu_theme.m4a` em loop; gameplay e telas de vitoria/derrota de bar param essa musica
 - com efeitos sonoros ligados, jogadas de carta na mesa tocam `src/assets/audio/cardflip.mp3`
+- as artes fotográficas de campanha, bares, mesas e resultados foram convertidas para WebP; cartas e elementos de interface continuam em PNG quando necessário
+- o carregamento antecipado é limitado ao bar atual, mesa atual e resultados possíveis, com no máximo oito imagens mantidas em cache
 - com efeitos sonoros ligados, distribuicao de cartas dispara uma rajada curta de `10` sons sincronizada com a animacao visual
 - com musica ligada, vitorias de bar tocam `src/assets/audio/victory_theme.ogg`; derrotas de bar tocam `src/assets/audio/game_over.ogg`; esses temas param imediatamente ao sair da tela de resultado do bar, antes da musica padrao voltar; conquistas de circuito nao disparam esses temas
 - no Android/iOS via Capacitor, ao minimizar ou tirar o app do foreground todos os sons param imediatamente; ao retomar, a musica/tema da tela atual reinicia se estiver habilitada
@@ -63,18 +66,35 @@ Locais com pacote visual autoral integrado:
 - `Cassino Mé Maior`
 - `Órbita da Lua`
 
+## Status Das Frentes Recentes
+
+- **Frente 1 — Capacitor + Android Studio + Xcode:** validada em Android e iOS/device real, incluindo landscape, safe areas, toque, escala do stage e performance.
+- **Frente 2 — otimização de assets e carregamento:** em andamento. A conversão das artes fotográficas para WebP e o pré-carregamento limitado ao contexto atual ainda devem ser validados no fluxo completo e consolidados.
+- **Frente 3 — pendências pós-mobile:** validada. Não há nova frente obrigatória aberta neste momento; ajustes de `ponto acima`, IA e extração do tutorial permanecem opcionais e condicionados a uma decisão/regressão concreta.
+
+## Política Inicial De Publicidade Android
+
+- `Bar do Zé Catinga` não exibe publicidade.
+- A publicidade começa a partir do `Bar Maneco Banguela`.
+- O formato inicial é interstitial após a tela de vitória ou derrota, nunca durante a mão.
+- A frequência máxima inicial é uma publicidade a cada duas partidas.
+- A primeira partida do jogador não exibe publicidade.
+- A regra deve ser aplicada fora do motor de truco, com cooldown/frequência configuráveis e fallback normal quando o anúncio não carregar.
+- A camada Android de interstitial de teste, bridge Capacitor, callbacks e política de frequência já está implementada.
+- Consentimento UMP, App ID/ad unit de produção e publicação no Google Play continuam pendentes para ativar monetização real.
+
 ## Proximo Foco Recomendado
 
-### Capacitor + Android Studio + Xcode
+### Consolidar otimização de assets e carregamento
 
-A frente mobile ja foi iniciada. Capacitor esta configurado como ponte entre o build web do Vite e os projetos nativos Android/iOS.
+A frente mobile foi concluída e validada. O foco atual é concluir a rodada de otimização de assets e carregamento sem introduzir regressões visuais ou de memória.
 
 Objetivo:
 
 - manter o jogo web funcional
-- manter Capacitor sem reestruturar a arquitetura de estado
-- validar os projetos nativos Android/iOS gerados
-- validar a experiencia em device real antes de criar novas regras opcionais
+- confirmar que todas as artes convertidas para WebP carregam corretamente
+- confirmar que o pré-carregamento limitado cobre campanha, mesa e resultados
+- medir o ganho de peso/memória e registrar qualquer regressão
 
 Estado ja feito:
 
@@ -122,29 +142,16 @@ Estado do ambiente nativo:
   - projeto Xcode foi gerado e o scheme `App` foi listado com sucesso
   - SwiftPM resolveu `capacitor-swift-pm` em `8.3.0`
   - `Info.plist` esta valido e em landscape
-  - build por terminal ficou bloqueado pelo ambiente Xcode/CoreSimulator:
-    - `xcode-select` estava apontando para `/Library/Developer/CommandLineTools`
-    - CoreSimulator reportou versao local `1051.54.0`, abaixo da esperada `1051.55.0`
-    - Xcode pediu plataforma/destino iOS alinhado antes de compilar
+  - ambiente Xcode/CoreSimulator foi alinhado e o app foi validado em device real
+  - orientacao landscape, safe areas, toque, escala e performance foram conferidos
 
 Ordem recomendada agora:
 
-1. conferir `git status` e preservar mudancas locais
-2. rodar `npm test` e `npm run cap:sync`
-3. se mexer em layout/mobile, validar Android de novo com `npm run cap:open:android`
-4. antes do Xcode, alinhar ambiente se necessario:
-   - apontar Command Line Tools para o Xcode completo
-   - abrir Xcode e concluir componentes/primeira inicializacao
-   - instalar/atualizar plataforma iOS/Simulator em `Xcode > Settings > Components`
-5. abrir iOS com `npm run cap:open:ios`
-6. no Xcode, escolher simulador/device, configurar signing se usar device fisico e rodar o app
-7. testar em device real:
-   - orientacao landscape
-   - safe areas/notch/home indicator
-   - toque em cartas, botoes, hotspots invisiveis, menu e tutorial
-   - escala do stage logico `1080x500`
-   - performance da mesa, animacoes e transicoes
-8. registrar qualquer ajuste mobile necessario antes de implementar novas regras
+1. conferir `git status` e preservar as mudanças locais da conversão para WebP
+2. rodar `npm test` e `npm run build`
+3. validar o fluxo completo `COMEÇAR > campanha > partida > resultado` para cada classe de arte convertida
+4. confirmar que o cache limitado não deixa backgrounds, hosts ou resultados incorretos entre trocas de bar
+5. registrar e corrigir apenas regressões concretas de carregamento, memória ou layout
 
 ### Estado da IA
 
@@ -187,7 +194,7 @@ Estado apos a segunda rodada:
 
 ## Pendencias De Produto E Regras
 
-Frentes ainda pendentes, em prioridade menor que validacao mobile:
+Frentes opcionais ainda pendentes, sem bloquear a validação mobile já concluída nem a otimização de assets em andamento:
 
 - opcao de usar ou nao a variante `ponto acima`
 - novas rodadas finas de IA:

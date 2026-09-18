@@ -75,24 +75,14 @@ Contexto atual:
 - Nao reabrir responsividade, selecao de parceira, arquitetura de estado ou pacote visual sem regressao real.
 
 Objetivo deste chat:
-Continuar a validacao mobile com Capacitor + Android Studio + Xcode, preservando o jogo web atual.
+Concluir a validação da otimização de assets e carregamento, preservando o jogo web e o pacote mobile já validados.
 
 Prioridade recomendada:
-1. Conferir git status antes de editar.
-2. Rodar `npm test` e `npm run cap:sync`.
-3. Revalidar Android no Android Studio apenas se houver nova mudanca mobile.
-4. Alinhar ambiente iOS:
-   - apontar Command Line Tools para `/Applications/Xcode.app/Contents/Developer`
-   - abrir Xcode e concluir primeira inicializacao/componentes
-   - instalar/atualizar plataforma iOS/Simulator em `Xcode > Settings > Components`
-5. Abrir/validar iOS no Xcode com `npm run cap:open:ios`.
-6. Testar em device real:
-   - orientacao landscape
-   - safe areas/notch/home indicator
-   - toque em cartas, botoes, hotspots invisiveis, menu e tutorial
-   - escala do stage logico `1080x500`
-   - performance da mesa, animacoes e transicoes
-7. Registrar e corrigir apenas regressões concretas de device.
+1. Conferir `git status` antes de editar.
+2. Concluir a validação da conversão das artes fotográficas para WebP e do pré-carregamento limitado.
+3. Rodar `npm test` e `npm run build`.
+4. Validar o fluxo completo de campanha, partida e resultado após a troca de assets.
+5. Registrar e corrigir apenas regressões concretas de carregamento, memória ou layout.
 
 Estado recente:
 - Carta coberta ja esta implementada a partir da segunda vaza.
@@ -104,7 +94,7 @@ Estado recente:
   - truco/aumento ficam bloqueados nessa mao especial.
 - Tutorial jogavel foi implementado, ajustado visualmente e aprovado pelo usuario.
 
-Pendencias que continuam abertas, mas nao sao a primeira prioridade deste chat:
+Pendencias opcionais que continuam abertas, mas não bloqueiam a frente atual:
 - Opcao de escolher ou nao a versao ponto acima.
 - Segunda rodada fina de IA, apenas se novos testes em jogo apontarem comportamento ruim.
 - Extrair o tutorial para modulo proprio, apenas se a manutencao em `AppSections.tsx` ficar pesada.

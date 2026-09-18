@@ -37,13 +37,13 @@ export const DEFAULT_PLAYER_SKIN_ID: PlayerSkinId = "zeca-viramao"
 export const PLAYER_SKINS: PlayerSkinProfile[] = [
   {
     id: "zeca-viramao",
-    name: "Zeca Viramao",
-    nickname: "O Mao Leve",
+    name: "Zeca Viramão",
+    nickname: "O Mão Leve",
     avatarAsset: zecaViramaoAsset,
     story:
-      "Zeca chega com cara de quem conhece todo boteco da rota, manga pronta e olhar de quem ja ouviu muita historia de mesa.",
+      "Zeca chega com cara de quem conhece todo boteco da rota, manga pronta e olhar de quem já ouviu muita história de mesa.",
     visualNote:
-      "Visual classico do jogador raiz: discreto, urbano e pronto para atravessar a campanha inteira sem parecer preso a um unico bar.",
+      "Visual clássico do jogador raiz: discreto, urbano e pronto para atravessar a campanha inteira sem parecer preso a um único bar.",
   },
   {
     id: "lia-virada",
@@ -51,7 +51,7 @@ export const PLAYER_SKINS: PlayerSkinProfile[] = [
     nickname: "A Calma da Mesa",
     avatarAsset: liaViradaAsset,
     story:
-      "Lia tem presenca tranquila, jaqueta jeans e um jeito de protagonista que parece caber tanto no boteco quanto no campeonato.",
+      "Lia tem presença tranquila, jaqueta jeans e um jeito de protagonista que parece caber tanto no boteco quanto no campeonato.",
     visualNote:
       "Retrato caloroso, com jaqueta jeans e olhar seguro. Funciona bem como protagonista de boteco, bairro e campeonato maior.",
   },
@@ -63,15 +63,15 @@ export const PLAYER_SKINS: PlayerSkinProfile[] = [
     story:
       "Bento aparece simples e firme, com roupa escura e sorriso curto de quem prefere deixar a mesa falar primeiro.",
     visualNote:
-      "Presenca simples e firme, com roupa casual escura. Passa a sensacao de jogador experiente sem virar figura de chefe.",
+      "Presença simples e firme, com roupa casual escura. Passa a sensação de jogador experiente sem virar figura de chefe.",
   },
   {
     id: "nara-certeira",
     name: "Nara Certeira",
-    nickname: "A Mao Firme",
+    nickname: "A Mão Firme",
     avatarAsset: naraCerteiraAsset,
     story:
-      "Nara tem retrato maduro, direto, com contraste forte e presenca de quem nao precisa disputar espaco para ser notada.",
+      "Nara tem retrato maduro, direto, com contraste forte e presença de quem não precisa disputar espaço para ser notada.",
     visualNote:
       "Visual maduro e direto, com contraste forte entre jaqueta escura e blusa vinho. Boa escolha para uma protagonista mais experiente.",
   },
@@ -83,17 +83,17 @@ export const PLAYER_SKINS: PlayerSkinProfile[] = [
     story:
       "Gui entra com um sorriso de canto e roupa casual, trazendo um protagonista mais jovem para a rota dos bares.",
     visualNote:
-      "Aparencia jovem, relaxada e urbana. Traz leveza para o protagonista sem transformar a skin em vantagem de jogo.",
+      "Aparência jovem, relaxada e urbana. Traz leveza para o protagonista sem transformar a skin em vantagem de jogo.",
   },
   {
     id: "solange-viracao",
-    name: "Solange Viracao",
+    name: "Solange Viração",
     nickname: "A Sem Pressa",
     avatarAsset: solangeViracaoAsset,
     story:
       "Solange tem visual sereno, tons quentes e uma postura de quem atravessa a campanha sem pressa de provar nada.",
     visualNote:
-      "Retrato sereno, jaqueta jeans e tons quentes. Tem presenca de protagonista de longa jornada, sem parecer adversaria fixa.",
+      "Retrato sereno, jaqueta jeans e tons quentes. Tem presença de protagonista de longa jornada, sem parecer adversária fixa.",
   },
   {
     id: "clara-vira-folha",
@@ -103,17 +103,17 @@ export const PLAYER_SKINS: PlayerSkinProfile[] = [
     story:
       "Clara traz um visual claro e contido, daqueles que combinam com mesa de bairro e conversa baixa no canto do bar.",
     visualNote:
-      "Visual claro e contido, com tons de verde e creme. Mantem uma identidade elegante sem fugir do clima de mesa popular.",
+      "Visual claro e contido, com tons de verde e creme. Mantém uma identidade elegante sem fugir do clima de mesa popular.",
   },
   {
     id: "dario-sete-copas",
-    name: "Dario Sete-Copas",
+    name: "Dário Sete-Copas",
     nickname: "O Olho Antigo",
     avatarAsset: darioSeteCopasAsset,
     story:
-      "Dario carrega barba grisalha, jaqueta marrom e um ar de jogador antigo que parece ter vindo de muitas mesas diferentes.",
+      "Dário carrega barba grisalha, jaqueta marrom e um ar de jogador antigo que parece ter vindo de muitas mesas diferentes.",
     visualNote:
-      "Presenca veterana, barba grisalha e jaqueta marrom. Passa tradicao e estrada sem sugerir qualquer bonus mecanico.",
+      "Presença veterana, barba grisalha e jaqueta marrom. Passa tradição e estrada sem sugerir qualquer bônus mecânico.",
   },
   {
     id: "akemi-corte-certo",
@@ -121,19 +121,19 @@ export const PLAYER_SKINS: PlayerSkinProfile[] = [
     nickname: "A Linha Certa",
     avatarAsset: akemiCorteCertoAsset,
     story:
-      "Akemi aparece com retrato limpo, roupa sobria e uma composicao moderna que destaca o rosto sem roubar a cena.",
+      "Akemi aparece com retrato limpo, roupa sóbria e uma composição moderna que destaca o rosto sem roubar a cena.",
     visualNote:
-      "Retrato limpo, reservado e moderno. Funciona como skin de jogador porque comunica identidade, nao comportamento automatico.",
+      "Retrato limpo, reservado e moderno. Funciona como skin de jogador porque comunica identidade, não comportamento automático.",
   },
   {
     id: "kenji-meia-noite",
     name: "Kenji Meia-Noite",
-    nickname: "O Silencio na Mesa",
+    nickname: "O Silêncio na Mesa",
     avatarAsset: kenjiMeiaNoiteAsset,
     story:
-      "Kenji tem visual escuro e reservado, com expressao baixa e presenca discreta para quem prefere um protagonista sobrio.",
+      "Kenji tem visual escuro e reservado, com expressão baixa e presença discreta para quem prefere um protagonista sóbrio.",
     visualNote:
-      "Visual escuro, sobrio e discreto. Boa alternativa para quem quer um protagonista mais reservado na mesa.",
+      "Visual escuro, sóbrio e discreto. Boa alternativa para quem quer um protagonista mais reservado na mesa.",
   },
   {
     id: "mei-lin-conta-fria",
@@ -141,9 +141,9 @@ export const PLAYER_SKINS: PlayerSkinProfile[] = [
     nickname: "A Conta Certa",
     avatarAsset: meiLinContaFriaAsset,
     story:
-      "Mei Lin combina oculos finos, tons escuros e uma elegancia fria que funciona bem em qualquer etapa da campanha.",
+      "Mei Lin combina óculos finos, tons escuros e uma elegância fria que funciona bem em qualquer etapa da campanha.",
     visualNote:
-      "Aparencia elegante, oculos finos e tons escuros. Mantem a skin adulta e marcante sem prometer influencia nas cartas.",
+      "Aparência elegante, óculos finos e tons escuros. Mantém a skin adulta e marcante sem prometer influência nas cartas.",
   },
 ]
 

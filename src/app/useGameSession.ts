@@ -185,7 +185,11 @@ interface DebugVenueOption {
   label: string
 }
 
-type InGameConfirmationIntent = "swap-partner" | "exit-match" | "reset-progress"
+type InGameConfirmationIntent =
+  | "change-truco-variant"
+  | "swap-partner"
+  | "exit-match"
+  | "reset-progress"
 type CharacterSelectReturnScreen = "journey-intro" | "venue-intro"
 type GameplayIntroPhase = "background" | "reveal" | "done"
 
@@ -195,6 +199,7 @@ interface InGameConfirmationState {
   message: string
   confirmLabel: string
   warning: string
+  nextVariant?: GameVariant
 }
 
 export function useGameSession() {
@@ -241,6 +246,7 @@ export function useGameSession() {
   const lastPartnerAdviceKeyRef = useRef<string | null>(null)
   const lastPartnerConsultKeyRef = useRef<string | null>(null)
   const lastDealAnimationKeyRef = useRef<string | null>(null)
+  const matchSessionIdRef = useRef(0)
 
   const actualCampaignStage =
     getCurrentCampaignStage(playerProfile, CAMPAIGN_STAGES) ?? CAMPAIGN_STAGES[0]
@@ -878,13 +884,18 @@ export function useGameSession() {
     syncLogs,
   ])
 
-  function startVenueMatch(targetVenue: CampaignVenue) {
+  function startVenueMatch(targetVenue: CampaignVenue, variant = selectedTrucoVariant) {
     clearLogs()
+    matchSessionIdRef.current += 1
+    clearPendingUiTimers()
+    showSpeechBubble(null)
+    lastPartnerAdviceKeyRef.current = null
+    lastPartnerConsultKeyRef.current = null
+    lastDealAnimationKeyRef.current = null
 
     const firstPlayerId = 1
-    const variantToStart = selectedTrucoVariant
     const { handState: state, matchState: initialMatchState } =
-      createVenueMatchState(targetVenue, firstPlayerId, variantToStart)
+      createVenueMatchState(targetVenue, firstPlayerId, variant)
     const actualVenueId = actualCampaignVenue?.id ?? null
     const isFreePlayVenue = freePlayCurrentVenue?.id === targetVenue.id
     const shouldUseSessionDebugVenue =
@@ -934,6 +945,22 @@ export function useGameSession() {
   }
 
   function handleChangeTrucoVariant(nextVariant: GameVariant) {
+    if (nextVariant === selectedTrucoVariant) return
+
+    if (handState && matchState) {
+      setInGameSettingsOpen(false)
+      setInGameContextMenuOpen(false)
+      setInGameConfirmation({
+        intent: "change-truco-variant",
+        title: `Mudar para ${getGameVariantLabel(nextVariant)}?`,
+        message: "A partida atual será reiniciada para aplicar as novas regras.",
+        confirmLabel: "Mudar e reiniciar",
+        warning: "Os pontos e as cartas desta partida serão perdidos, mas seu progresso no bar não será alterado.",
+        nextVariant,
+      })
+      return
+    }
+
     setPlayerProfile((currentProfile) => ({
       ...currentProfile,
       settings: {
@@ -954,7 +981,7 @@ export function useGameSession() {
         musicEnabled: nextEnabled,
       },
     }))
-    setEventMessage(nextEnabled ? "Musica ligada." : "Musica desligada.")
+    setEventMessage(nextEnabled ? "Música ligada." : "Música desligada.")
   }
 
   function handleToggleSoundEffectsEnabled() {
@@ -1322,6 +1349,7 @@ export function useGameSession() {
     }
 
     let dealTriggerTimeoutId: number | null = null
+    const matchSessionId = matchSessionIdRef.current
 
     if (handState.finished) {
       const dealAnimationKey = `${matchState.handNumber}:${handState.roundNumber}:${handState.winner ?? "none"}`
@@ -1329,12 +1357,15 @@ export function useGameSession() {
       if (lastDealAnimationKeyRef.current !== dealAnimationKey) {
         lastDealAnimationKeyRef.current = dealAnimationKey
         dealTriggerTimeoutId = window.setTimeout(() => {
+          if (matchSessionIdRef.current !== matchSessionId) return
           setDealAnimationNonce((current) => current + 1)
         }, 0)
       }
     }
 
     const timeoutId = window.setTimeout(() => {
+      if (matchSessionIdRef.current !== matchSessionId) return
+
       if (handState.finished) {
         const nextHandNumber = matchState.handNumber
         const nextState = createNextHandStateForMatch(matchState)
@@ -1457,6 +1488,7 @@ export function useGameSession() {
     partnerAdviceKey,
     player1,
     player3,
+    partnerAiPersonalityId,
     showSpeechBubble,
   ])
 
@@ -1901,7 +1933,7 @@ export function useGameSession() {
       title: "Resetar todo o progresso?",
       message: "Isso vai apagar sua campanha, escolhas de parceira, skin do jogador e histórico salvo para recomeçar do zero.",
       confirmLabel: "Resetar tudo",
-      warning: "A skin do protagonista tambem volta para a escolha inicial.",
+      warning: "A skin do protagonista também volta para a escolha inicial.",
     })
   }
 
@@ -1917,6 +1949,26 @@ export function useGameSession() {
 
     if (inGameConfirmation.intent === "reset-progress") {
       handleResetCampaign()
+      return
+    }
+
+    if (inGameConfirmation.intent === "change-truco-variant") {
+      const nextVariant = inGameConfirmation.nextVariant
+      const targetVenue = sessionDebugVenue ?? currentCampaignVenue
+
+      if (!nextVariant || !targetVenue) return
+
+      setPlayerProfile((currentProfile) => ({
+        ...currentProfile,
+        settings: {
+          ...currentProfile.settings,
+          trucoVariant: nextVariant,
+        },
+      }))
+      startVenueMatch(targetVenue, nextVariant)
+      setEventMessage(
+        `Partida reiniciada com ${getGameVariantLabel(nextVariant)} em ${targetVenue.name}.`
+      )
       return
     }
 

@@ -116,9 +116,12 @@ Arquivos principais:
 - o menu em jogo agora inclui:
   - `Vencer esta partida`, para validar progressao sem jogar a partida inteira
   - `Perder esta partida`, para validar a tela de derrota
-  - `Configurações`, abrindo os mesmos ajustes de tipo de truco, musica e efeitos sem sair da partida
+- `Configurações`, abrindo os mesmos ajustes de tipo de truco, musica e efeitos sem sair da partida
+    - ao mudar o tipo de truco durante uma partida, pede confirmacao e reinicia a partida atual com a variante escolhida, sem alterar o progresso do bar
   - `Resetar progresso`, com confirmacao especifica antes de apagar campanha, escolhas de parceira, skin do jogador e historico salvo
 - as telas de resultado do `Bar do Ze Catinga` agora usam artes proprias para vitoria e derrota
+- as artes fotográficas de campanha, bares, mesas e resultados usam WebP com qualidade controlada; cartas e elementos de interface que precisam de PNG permanecem em PNG
+- o app pré-carrega somente o bar atual, a mesa atual e os resultados possíveis da próxima partida, com cache limitado para preservar memoria
 - a tela de selecao de parceira foi aceita como pronta no estado atual
 - a parceira antes chamada `Ze Catinga` foi renomeada para `Joca do Busão` com id `joca-busao`
 - a persistencia antiga do perfil foi invalidada depois da mudanca de id

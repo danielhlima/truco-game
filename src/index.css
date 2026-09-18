@@ -68,7 +68,7 @@ body {
 
 body.truco-native-app {
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   background: #120a06;
   touch-action: manipulation;
@@ -77,7 +77,8 @@ body.truco-native-app {
 body.truco-native-app #root {
   width: 100vw;
   max-width: none;
-  min-height: 100vh;
+  min-height: 100dvh;
+  height: 100dvh;
   margin: 0;
   border: 0;
   overflow: hidden;

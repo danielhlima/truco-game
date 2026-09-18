@@ -95,8 +95,8 @@ export interface TrucoCharacterProfile {
 export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
   {
     id: "zeca-viramao",
-    name: "Zeca Viramao",
-    nickname: "O Mao Leve",
+    name: "Zeca Viramão",
+    nickname: "O Mão Leve",
     personalityId: "balanced",
     role: "player",
     playStyle: "Frio, observador, cresce no momento certo",
@@ -107,15 +107,15 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: zecaViramaoAsset,
     story:
-      "Ninguem sabe como, mas Zeca ja ganhou uma partida com tanta calma que o adversario pediu desculpa por ter sentado na mesa. Desde entao corre o boato de que, quando ele vem com carta ruim, e justamente quando esta mais perigoso.",
+      "Ninguém sabe como, mas Zeca já ganhou uma partida com tanta calma que o adversário pediu desculpa por ter sentado na mesa. Desde então corre o boato de que, quando ele vem com carta ruim, é justamente quando está mais perigoso.",
   },
   {
     id: "nega-catimbo",
-    name: "Nega Catimbo",
+    name: "Nega Catimbó",
     nickname: "A Que Sente a Mesa",
     personalityId: "conservative",
     role: "partner",
-    playStyle: "Calculista, fiel ao jogo, dificil de emocionar",
+    playStyle: "Calculista, fiel ao jogo, difícil de emocionar",
     attributes: {
       courage: 3,
       patience: 5,
@@ -123,12 +123,12 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: negaCatimboAsset,
     story:
-      "Ela ja expulsou um blefador da mesa usando so um 'aham' tao carregado de desprezo que o sujeito foi embora repensar a propria infancia. Dizem que ela descobre a forca da mao alheia pelo jeito que a pessoa segura o copo.",
+      "Ela já expulsou um blefador da mesa usando só um 'aham' tão carregado de desprezo que o sujeito foi embora repensar a própria infância. Dizem que ela descobre a força da mão alheia pelo jeito que a pessoa segura o copo.",
   },
   {
     id: "tiao-casca-grossa",
-    name: "Tiao Casca Grossa",
-    nickname: "O Sobrancelha de Aco",
+    name: "Tião Casca Grossa",
+    nickname: "O Sobrancelha de Aço",
     personalityId: "balanced",
     role: "opponent",
     playStyle: "Seco, intimidador, gosta de castigar erro",
@@ -139,7 +139,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: tiaoCascaGrossaAsset,
     story:
-      "Ele fala pouco porque afirma que desperdiçar palavra enfraquece o truco. Certa vez passou tres horas em silencio, pediu doze com uma sobrancelha e saiu com dinheiro, amendoim e respeito involuntario de todo o bairro.",
+      "Ele fala pouco porque afirma que desperdiçar palavra enfraquece o truco. Certa vez passou três horas em silêncio, pediu doze com uma sobrancelha e saiu com dinheiro, amendoim e respeito involuntário de todo o bairro.",
   },
   {
     id: "mane-banguela",
@@ -155,15 +155,15 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: maneBanguelaAsset,
     story:
-      "Mané jura que blefe em gravidade baixa dura mais tempo no ar. Ri antes de pedir truco, ri quando corre e ri mais ainda quando alguem acredita que ele esta distraido.",
+      "Mané jura que blefe em gravidade baixa dura mais tempo no ar. Ri antes de pedir truco, ri quando corre e ri mais ainda quando alguém acredita que ele está distraído.",
   },
   {
     id: "joca-busao",
     name: "Joca do Busão",
-    nickname: "O Nariz da Vitoria",
+    nickname: "O Nariz da Vitória",
     personalityId: "ultra_conservative",
     role: "npc",
-    playStyle: "Travado, economico, so entra com mao muito boa",
+    playStyle: "Travado, econômico, só entra com mão muito boa",
     attributes: {
       courage: 1,
       patience: 5,
@@ -171,7 +171,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: jocaBusaoAsset,
     story:
-      "Dizem que ele aprendeu a jogar truco com um papagaio aposentado de feira. O papagaio morreu invicto, e desde entao Joca jura ouvir dicas taticas vindas do cinzeiro.",
+      "Dizem que ele aprendeu a jogar truco com um papagaio aposentado de feira. O papagaio morreu invicto, e desde então Joca jura ouvir dicas táticas vindas do cinzeiro.",
   },
   {
     id: "rita-gambiarra",
@@ -187,11 +187,11 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: ritaGambiarraAsset,
     story:
-      "Ela foi banida de tres bares depois de ganhar uma partida usando apenas expressoes faciais e um guardanapo dobrado em formato de ameaca. Ate hoje ninguem sabe se ela blefa ou preve o futuro.",
+      "Ela foi banida de três bares depois de ganhar uma partida usando apenas expressões faciais e um guardanapo dobrado em formato de ameaça. Até hoje ninguém sabe se ela blefa ou prevê o futuro.",
   },
   {
     id: "tonhao-rasga-lata",
-    name: "Tonhao Rasga-Lata",
+    name: "Tonhão Rasga-Lata",
     nickname: "O Arranca Tampa",
     personalityId: "aggressive",
     role: "npc",
@@ -203,15 +203,15 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: tonhaoRasgaLataAsset,
     story:
-      "Ele afirma que ja ficou 11 dias seguidos na mesma mesa esperando 'a mao certa'. Quando finalmente jogou, pediu truco antes mesmo de receber as cartas.",
+      "Ele afirma que já ficou 11 dias seguidos na mesma mesa esperando 'a mão certa'. Quando finalmente jogou, pediu truco antes mesmo de receber as cartas.",
   },
   {
     id: "cida-fumaca",
-    name: "Cida Fumaca",
+    name: "Cida Fumaça",
     nickname: "A Neblina",
     personalityId: "balanced",
     role: "npc",
-    playStyle: "Solta, carismatica, alterna calma e ousadia",
+    playStyle: "Solta, carismática, alterna calma e ousadia",
     attributes: {
       courage: 3,
       patience: 3,
@@ -219,11 +219,11 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: cidaFumacaAsset,
     story:
-      "Reza a lenda que ela certa vez venceu um campeonato inteiro enquanto discutia preco de sabao em po no celular. No trofeu mandou gravar: 'joguei mal e ainda assim ganhei'.",
+      "Reza a lenda que ela certa vez venceu um campeonato inteiro enquanto discutia preço de sabão em pó no celular. No troféu mandou gravar: 'joguei mal e ainda assim ganhei'.",
   },
   {
     id: "dito-marrua",
-    name: "Dito Marrua",
+    name: "Dito Marruá",
     nickname: "O Touro de Mesa",
     personalityId: "reckless",
     role: "npc",
@@ -235,15 +235,15 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: ditoMarruaAsset,
     story:
-      "Ele aparece calado, senta, pede cafe frio e encara a parede por sete minutos. Quando finalmente olha para a mesa, sempre tem alguem correndo do truco sem saber por que.",
+      "Ele aparece calado, senta, pede café frio e encara a parede por sete minutos. Quando finalmente olha para a mesa, sempre tem alguém correndo do truco sem saber por quê.",
   },
   {
     id: "patricia-monique",
-    name: "Patricia Monique",
+    name: "Patrícia Monique",
     nickname: "A Auto-Bela",
     personalityId: "trickster",
     role: "npc",
-    playStyle: "Explosiva, impulsiva, blefa facil",
+    playStyle: "Explosiva, impulsiva, blefa fácil",
     attributes: {
       courage: 5,
       patience: 1,
@@ -251,7 +251,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: patriciaMoniqueAsset,
     story:
-      "Frequenta mesa de truco como se estivesse entrando num ensaio fotografico clandestino em pleno boteco. Diz que ja ganhou um seis porque o adversario ficou nervoso tentando entender se estava sendo blefado ou avaliado esteticamente.",
+      "Frequenta mesa de truco como se estivesse entrando num ensaio fotográfico clandestino em pleno boteco. Diz que já ganhou um seis porque o adversário ficou nervoso tentando entender se estava sendo blefado ou avaliado esteticamente.",
   },
   {
     id: "naldo-tramela",
@@ -259,7 +259,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     nickname: "O Fecha Porta",
     personalityId: "aggressive",
     role: "npc",
-    playStyle: "Convicto, encrenqueiro, acelera qualquer sequencia",
+    playStyle: "Convicto, encrenqueiro, acelera qualquer sequência",
     attributes: {
       courage: 4,
       patience: 2,
@@ -267,7 +267,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: naldoTramelaAsset,
     story:
-      "Ele ficou famoso no bairro por pedir truco com tanta conviccao que uma vez o garcom largou a bandeja e correu. Desde entao, joga com a autoestima de quem ja assustou inocentes por acidente.",
+      "Ele ficou famoso no bairro por pedir truco com tanta convicção que uma vez o garçom largou a bandeja e correu. Desde então, joga com a autoestima de quem já assustou inocentes por acidente.",
   },
   {
     id: "dalva-seringa",
@@ -283,7 +283,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: dalvaSeringaAsset,
     story:
-      "Ela afirma ser descendente de uma linhagem sagrada de jogadores que resolviam conflito familiar no truco e heranca no par ou impar. Ninguem acredita, mas ninguem ousa rir na frente dela.",
+      "Ela afirma ser descendente de uma linhagem sagrada de jogadores que resolviam conflito familiar no truco e herança no par ou ímpar. Ninguém acredita, mas ninguém ousa rir na frente dela.",
   },
   {
     id: "biu-caolho",
@@ -299,7 +299,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: biuCaolhoAsset,
     story:
-      "Depois de se aposentar, ele transformou a mesa do bar na sua nova reparticao publica. Chega cedo, reclama de tudo, carimba o baralho com o olhar e trata cada truco como processo disciplinar.",
+      "Depois de se aposentar, ele transformou a mesa do bar na sua nova repartição pública. Chega cedo, reclama de tudo, carimba o baralho com o olhar e trata cada truco como processo disciplinar.",
   },
   {
     id: "aninha-passarela",
@@ -307,7 +307,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     nickname: "A Desfilante",
     personalityId: "balanced",
     role: "npc",
-    playStyle: "Elegante, segura, joga no tempo da propria pose",
+    playStyle: "Elegante, segura, joga no tempo da própria pose",
     attributes: {
       courage: 3,
       patience: 4,
@@ -315,15 +315,15 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: aninhaPassarelaAsset,
     story:
-      "Jura que aprendeu a contar carta observando desfile de loja de bairro em piso encerado. Ate hoje entra na mesa como se estivesse cruzando uma passarela invisivel e, por algum motivo, isso sempre faz alguem jogar pior.",
+      "Jura que aprendeu a contar carta observando desfile de loja de bairro em piso encerado. Até hoje entra na mesa como se estivesse cruzando uma passarela invisível e, por algum motivo, isso sempre faz alguém jogar pior.",
   },
   {
     id: "celsinho-breque",
     name: "Celsinho Breque",
-    nickname: "O Freio de Mao",
+    nickname: "O Freio de Mão",
     personalityId: "conservative",
     role: "npc",
-    playStyle: "Metodico, prudente, corta excesso de euforia",
+    playStyle: "Metódico, prudente, corta excesso de euforia",
     attributes: {
       courage: 2,
       patience: 4,
@@ -331,15 +331,15 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: celsinhoBrequeAsset,
     story:
-      "Ele trabalha o dia inteiro e joga como quem faz auditoria moral da mesa. Ja chamou de 'erro estrategico grave' um sujeito que descartou um sete com tranquilidade demais.",
+      "Ele trabalha o dia inteiro e joga como quem faz auditoria moral da mesa. Já chamou de 'erro estratégico grave' um sujeito que descartou um sete com tranquilidade demais.",
   },
   {
     id: "quiteria-mao-torta",
-    name: "Quiteria Mao-Torta",
+    name: "Quitéria Mão-Torta",
     nickname: "A Dossiê",
     personalityId: "trickster",
     role: "npc",
-    playStyle: "Sinuosa, venenosa, blefa com informacao e teatrinho",
+    playStyle: "Sinuosa, venenosa, blefa com informação e teatrinho",
     attributes: {
       courage: 4,
       patience: 2,
@@ -347,11 +347,11 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: quiteriaMaoTortaAsset,
     story:
-      "Ela conhece a vida de todo mundo no bairro, inclusive de gente que ainda nem se mudou para la. Quando pede truco, o problema nao e a carta: e o tanto de informacao comprometedora que pode acompanhar o lance.",
+      "Ela conhece a vida de todo mundo no bairro, inclusive de gente que ainda nem se mudou para lá. Quando pede truco, o problema não é a carta: é o tanto de informação comprometedora que pode acompanhar o lance.",
   },
   {
     id: "norberto-fuba",
-    name: "Norberto Fuba",
+    name: "Norberto Fubá",
     nickname: "O Fantasma do Bairro",
     personalityId: "ultra_conservative",
     role: "npc",
@@ -363,7 +363,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: norbertoFubaAsset,
     story:
-      "Ele apareceu do nada, ganhou quatro mesas seguidas e foi embora sem dizer de onde veio. Ha quem diga que ele nem mora no bairro, so surge quando detecta arrogancia no ambiente.",
+      "Ele apareceu do nada, ganhou quatro mesas seguidas e foi embora sem dizer de onde veio. Há quem diga que ele nem mora no bairro, só surge quando detecta arrogância no ambiente.",
   },
   {
     id: "rosinha-catraca",
@@ -379,15 +379,15 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: rosinhaCatracaAsset,
     story:
-      "Ela parece uma senhora tranquila ate alguem embaralhar errado. Nessa hora, assume a postura de juiza suprema do boteco e comeca a aplicar pena moral em todo mundo da mesa.",
+      "Ela parece uma senhora tranquila até alguém embaralhar errado. Nessa hora, assume a postura de juíza suprema do boteco e começa a aplicar pena moral em todo mundo da mesa.",
   },
   {
     id: "damiao-corote",
-    name: "Damiao Corote",
-    nickname: "O Relicario",
+    name: "Damião Corote",
+    nickname: "O Relicário",
     personalityId: "reckless",
     role: "npc",
-    playStyle: "Caotico, nostalgico, joga no impulso e na lenda",
+    playStyle: "Caótico, nostálgico, joga no impulso e na lenda",
     attributes: {
       courage: 5,
       patience: 1,
@@ -395,7 +395,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: damiaoCoroteAsset,
     story:
-      "Ele passou tantos anos jogando truco que ja confunde lembranca real com partida antiga. Toda semana conta que ganhou um doze valendo uma geladeira e ninguem tem coragem de contestar.",
+      "Ele passou tantos anos jogando truco que já confunde lembrança real com partida antiga. Toda semana conta que ganhou um doze valendo uma geladeira e ninguém tem coragem de contestar.",
   },
   {
     id: "leninha-lambreta",
@@ -403,7 +403,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     nickname: "A Pilota Dupla",
     personalityId: "balanced",
     role: "npc",
-    playStyle: "Parceira, viva, empurra a dupla sem perder a cabeca",
+    playStyle: "Parceira, viva, empurra a dupla sem perder a cabeça",
     attributes: {
       courage: 3,
       patience: 3,
@@ -411,7 +411,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: leninhaLambretaAsset,
     story:
-      "Ela diz que joga 'na amizade', mas a amizade dela inclui pressionar a propria dupla ate ela transcender. Ja levou tres parceiros ao desespero e cinco a gloria.",
+      "Ela diz que joga 'na amizade', mas a amizade dela inclui pressionar a própria dupla até ela transcender. Já levou três parceiros ao desespero e cinco à glória.",
   },
   {
     id: "jura-pancada",
@@ -419,7 +419,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     nickname: "O Estouro",
     personalityId: "aggressive",
     role: "npc",
-    playStyle: "Rasga turno, nao pensa duas vezes, pressiona seco",
+    playStyle: "Rasga turno, não pensa duas vezes, pressiona seco",
     attributes: {
       courage: 5,
       patience: 1,
@@ -427,7 +427,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: juraPancadaAsset,
     story:
-      "Ele nao tem paciencia nem para o proprio pensamento, entao imagina para o erro dos outros. Uma vez pediu truco tao rapido que o parceiro ainda estava sentando e o adversario ja estava ofendido.",
+      "Ele não tem paciência nem para o próprio pensamento, então imagina para o erro dos outros. Uma vez pediu truco tão rápido que o parceiro ainda estava sentando e o adversário já estava ofendido.",
   },
   {
     id: "marlene-pimenta",
@@ -443,7 +443,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: marlenePimentaAsset,
     story:
-      "Ela fala baixo, mas sempre no momento exato em que alguem esta prestes a errar feio. Por isso no bairro existe a expressao 'se Marlene cochichou, ja era'.",
+      "Ela fala baixo, mas sempre no momento exato em que alguém está prestes a errar feio. Por isso no bairro existe a expressão 'se Marlene cochichou, já era'.",
   },
   {
     id: "zito-parafuso",
@@ -459,15 +459,15 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: zitoParafusoAsset,
     story:
-      "Ele ja trocou uma bicicleta, um radio e um ventilador de teto por informacao de mesa. Ninguem sabe de onde ele tira tanta historia, mas metade deve ser mentira e a outra metade e pior.",
+      "Ele já trocou uma bicicleta, um rádio e um ventilador de teto por informação de mesa. Ninguém sabe de onde ele tira tanta história, mas metade deve ser mentira e a outra metade é pior.",
   },
   {
     id: "creusa-rabugenta",
     name: "Creusa Rabugenta",
-    nickname: "A Ultima Prudencia",
+    nickname: "A Última Prudência",
     personalityId: "ultra_conservative",
     role: "npc",
-    playStyle: "Seca, economica, so vai quando a mesa ja esta perdida para os outros",
+    playStyle: "Seca, econômica, só vai quando a mesa já está perdida para os outros",
     attributes: {
       courage: 1,
       patience: 5,
@@ -475,7 +475,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: creusaRabugentaAsset,
     story:
-      "Ela jamais corre de um insulto, mas corre de aposta ruim com a serenidade de quem ja viu quinze gerações perderem por afobacao. Diz que prudencia e a unica fofoca que nunca envelhece.",
+      "Ela jamais corre de um insulto, mas corre de aposta ruim com a serenidade de quem já viu quinze gerações perderem por afobação. Diz que prudência é a única fofoca que nunca envelhece.",
   },
   {
     id: "ivone-verniz",
@@ -483,7 +483,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     nickname: "A Dama do Verniz",
     personalityId: "disciplined",
     role: "npc",
-    playStyle: "Elegante, firme, nao se deixa empurrar pela mesa",
+    playStyle: "Elegante, firme, não se deixa empurrar pela mesa",
     attributes: {
       courage: 3,
       patience: 4,
@@ -491,7 +491,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: ivoneVernizAsset,
     story:
-      "Ivone chega arrumada ate em mesa de plastico e trata provocacao como poeira no ombro. Dizem que ela nunca levanta a voz porque prefere deixar o adversario perceber sozinho que perdeu o controle.",
+      "Ivone chega arrumada até em mesa de plástico e trata provocação como poeira no ombro. Dizem que ela nunca levanta a voz porque prefere deixar o adversário perceber sozinho que perdeu o controle.",
   },
   {
     id: "osmar-alfinete",
@@ -507,7 +507,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: osmarAlfineteAsset,
     story:
-      "Osmar ganhou o apelido porque cada comentario dele parece espetar exatamente onde doi. Ele nao discute por muito tempo: espera a brecha, joga a carta e deixa o silencio terminar o servico.",
+      "Osmar ganhou o apelido porque cada comentário dele parece espetar exatamente onde dói. Ele não discute por muito tempo: espera a brecha, joga a carta e deixa o silêncio terminar o serviço.",
   },
   {
     id: "geraldo-medalha",
@@ -523,15 +523,15 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: geraldoMedalhaAsset,
     story:
-      "Geraldo garante que ja jogou final em ginasio com goteira, narrador rouco e luz caindo. Ninguem sabe quantas historias sao verdade, mas todo mundo respeita quando ele encosta na cadeira e começa a contar carta.",
+      "Geraldo garante que já jogou final em ginásio com goteira, narrador rouco e luz caindo. Ninguém sabe quantas histórias são verdade, mas todo mundo respeita quando ele encosta na cadeira e começa a contar carta.",
   },
   {
     id: "sueli-estopim",
     name: "Sueli Estopim",
-    nickname: "A Faisca",
+    nickname: "A Faísca",
     personalityId: "aggressive",
     role: "npc",
-    playStyle: "Eletrica, provocadora, transforma mao morna em pressao",
+    playStyle: "Elétrica, provocadora, transforma mão morna em pressão",
     attributes: {
       courage: 5,
       patience: 2,
@@ -539,7 +539,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: sueliEstopimAsset,
     story:
-      "Sueli aprendeu cedo que a plateia gosta de barulho e usa isso como ferramenta. Quando percebe hesitacao do outro lado, acelera tanto a mesa que ate o parceiro precisa respirar fundo para acompanhar.",
+      "Sueli aprendeu cedo que a plateia gosta de barulho e usa isso como ferramenta. Quando percebe hesitação do outro lado, acelera tanto a mesa que até o parceiro precisa respirar fundo para acompanhar.",
   },
   {
     id: "ramiro-bolero",
@@ -555,7 +555,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: ramiroBoleroAsset,
     story:
-      "Ramiro conversa como se a partida fosse apenas mais uma noite tranquila. O perigo e que ele mantém o mesmo sorriso com carta boa, carta ruim e truco pedido no momento exato.",
+      "Ramiro conversa como se a partida fosse apenas mais uma noite tranquila. O perigo é que ele mantém o mesmo sorriso com carta boa, carta ruim e truco pedido no momento exato.",
   },
   {
     id: "luna-candela",
@@ -563,7 +563,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     nickname: "La Chispa",
     personalityId: "opportunistic",
     role: "npc",
-    playStyle: "Rapida, ousada, muda o ritmo quando encontra abertura",
+    playStyle: "Rápida, ousada, muda o ritmo quando encontra abertura",
     attributes: {
       courage: 4,
       patience: 2,
@@ -571,15 +571,15 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: lunaCandelaAsset,
     story:
-      "Luna entra na mesa como quem ja ouviu a musica antes de todo mundo. Ela adora uma janela curta para pressionar e costuma sorrir justamente quando o adversario percebe que demorou demais para reagir.",
+      "Luna entra na mesa como quem já ouviu a música antes de todo mundo. Ela adora uma janela curta para pressionar e costuma sorrir justamente quando o adversário percebe que demorou demais para reagir.",
   },
   {
     id: "mina-compasso",
     name: "Mina Compasso",
-    nickname: "A Cirurgica",
+    nickname: "A Cirúrgica",
     personalityId: "disciplined",
     role: "npc",
-    playStyle: "Analitica, exata, pune cada desperdicio de carta",
+    playStyle: "Analítica, exata, pune cada desperdício de carta",
     attributes: {
       courage: 3,
       patience: 5,
@@ -587,15 +587,15 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: minaCompassoAsset,
     story:
-      "Mina observa a mesa com a calma de quem mede distancia antes de cada passo. Dizem que ela lembra de descarte antigo melhor que o proprio jogador que colocou a carta na mesa.",
+      "Mina observa a mesa com a calma de quem mede distância antes de cada passo. Dizem que ela lembra de descarte antigo melhor que o próprio jogador que colocou a carta na mesa.",
   },
   {
     id: "viktor-muralha",
     name: "Viktor Muralha",
-    nickname: "O Imovel",
+    nickname: "O Imóvel",
     personalityId: "conservative",
     role: "npc",
-    playStyle: "Solido, intimidador, dificil de arrancar do plano",
+    playStyle: "Sólido, intimidador, difícil de arrancar do plano",
     attributes: {
       courage: 4,
       patience: 5,
@@ -603,7 +603,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: viktorMuralhaAsset,
     story:
-      "Viktor fala pouco e ocupa a cadeira como se tivesse sido construida ao redor dele. A mesa inteira sabe que empurrar aposta contra sua paciencia costuma terminar em arrependimento.",
+      "Viktor fala pouco e ocupa a cadeira como se tivesse sido construída ao redor dele. A mesa inteira sabe que empurrar aposta contra sua paciência costuma terminar em arrependimento.",
   },
   {
     id: "madame-violeta",
@@ -619,15 +619,15 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: madameVioletaAsset,
     story:
-      "Madame Violeta trata cada lance como uma informacao valiosa demais para ser desperdicada. Ela espera, observa e faz a mesa parecer silenciosa mesmo quando o Cassino Mé Maior inteiro esta acordado.",
+      "Madame Violeta trata cada lance como uma informação valiosa demais para ser desperdiçada. Ela espera, observa e faz a mesa parecer silenciosa mesmo quando o Cassino Mé Maior inteiro está acordado.",
   },
   {
     id: "augusto-crupie",
-    name: "Augusto Crupie",
-    nickname: "O Ultimo Lance",
+    name: "Augusto Crupiê",
+    nickname: "O Último Lance",
     personalityId: "crafty",
     role: "npc",
-    playStyle: "Experiente, frio, esconde a pressao atras de boas maneiras",
+    playStyle: "Experiente, frio, esconde a pressão atrás de boas maneiras",
     attributes: {
       courage: 4,
       patience: 4,
@@ -635,7 +635,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: augustoCrupieAsset,
     story:
-      "Augusto parece educado demais para uma mesa decisiva, e talvez esse seja o truque. Ele oferece um aceno discreto antes de cada partida e guarda a crueldade para o instante em que a aposta ja nao tem volta.",
+      "Augusto parece educado demais para uma mesa decisiva, e talvez esse seja o truque. Ele oferece um aceno discreto antes de cada partida e guarda a crueldade para o instante em que a aposta já não tem volta.",
   },
   {
     id: "cosme-orbita",
@@ -643,7 +643,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     nickname: "O Sem Gravidade",
     personalityId: "volatile",
     role: "npc",
-    playStyle: "Imprevisivel, acelerado, comenta a propria malicia",
+    playStyle: "Imprevisível, acelerado, comenta a própria malícia",
     attributes: {
       courage: 5,
       patience: 1,
@@ -651,7 +651,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
     },
     avatarAsset: cosmeOrbitaAsset,
     story:
-      "Cosme opera a transmissao orbital e ainda arruma tempo para confundir a mesa. Muda de ideia no meio da frase, chama isso de estrategia e aumenta a aposta antes do microfone esfriar.",
+      "Cosme opera a transmissão orbital e ainda arruma tempo para confundir a mesa. Muda de ideia no meio da frase, chama isso de estratégia e aumenta a aposta antes do microfone esfriar.",
   },
 ]
 

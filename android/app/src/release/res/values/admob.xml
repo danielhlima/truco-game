@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="admob_app_id">ca-app-pub-6006838890778417~2216814771</string>
+    <string name="admob_interstitial_ad_unit_id">ca-app-pub-6006838890778417/4159776783</string>
+</resources>

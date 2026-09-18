@@ -3,24 +3,24 @@ import type { CSSProperties } from "react"
 import * as THREE from "three"
 import cardFaceAgedPaperUrl from "../assets/cards/card-face-aged-paper.png"
 import cardBackAgedPhotoUrl from "../assets/cards/card-back-aged-photo.png"
-import tableTopAdegaJucaBigodeUrl from "../assets/boteco/table-top-adega-juca-bigode.png"
-import tableTopArenaNacionalUrl from "../assets/boteco/table-top-arena-nacional.png"
-import tableTopCasinoMeMaiorUrl from "../assets/boteco/table-top-casino-me-maior.png"
-import tableTopCentroConvencoesPrefeituraUrl from "../assets/boteco/table-top-centro-convencoes-prefeitura.png"
-import tableTopCentroAmericanoTruqueiroMedelinUrl from "../assets/boteco/table-top-centro-americano-truqueiro-medelin.png"
-import tableTopGhibliishUrl from "../assets/boteco/table-top-ghibliish.png"
-import tableTopGaragemNorteUrl from "../assets/boteco/table-top-garagem-norte.png"
-import tableTopGinasioEstadualManecoFileUrl from "../assets/boteco/table-top-ginasio-estadual-maneco-file.png"
-import tableTopHotelTrucoSegoviaEspanhaUrl from "../assets/boteco/table-top-hotel-truco-segovia-espanha.png"
-import tableTopManecoWoodUrl from "../assets/boteco/table-top-maneco-wood.png"
-import tableTopOrbitaDaLuaUrl from "../assets/boteco/table-top-orbita-da-lua.png"
-import tableTopQuintalDaLesteUrl from "../assets/boteco/table-top-quintal-da-leste.png"
-import tableTopSalaoDaSulUrl from "../assets/boteco/table-top-salao-da-sul.png"
-import tableTopSteelPatioUrl from "../assets/boteco/table-top-steel-patio.png"
-import tableTopSubsoloDoCentroUrl from "../assets/boteco/table-top-subsolo-do-centro.png"
-import tableTopTremJacaUrl from "../assets/boteco/table-top-trem-jaca.png"
-import tableTopWoodStreetUrl from "../assets/boteco/table-top-wood-street.png"
-import tableTopZeCatingaPhotoUrl from "../assets/boteco/table-top-ze-catinga-photo.png"
+import tableTopAdegaJucaBigodeUrl from "../assets/boteco/table-top-adega-juca-bigode.webp"
+import tableTopArenaNacionalUrl from "../assets/boteco/table-top-arena-nacional.webp"
+import tableTopCasinoMeMaiorUrl from "../assets/boteco/table-top-casino-me-maior.webp"
+import tableTopCentroConvencoesPrefeituraUrl from "../assets/boteco/table-top-centro-convencoes-prefeitura.webp"
+import tableTopCentroAmericanoTruqueiroMedelinUrl from "../assets/boteco/table-top-centro-americano-truqueiro-medelin.webp"
+import tableTopGhibliishUrl from "../assets/boteco/table-top-ghibliish.webp"
+import tableTopGaragemNorteUrl from "../assets/boteco/table-top-garagem-norte.webp"
+import tableTopGinasioEstadualManecoFileUrl from "../assets/boteco/table-top-ginasio-estadual-maneco-file.webp"
+import tableTopHotelTrucoSegoviaEspanhaUrl from "../assets/boteco/table-top-hotel-truco-segovia-espanha.webp"
+import tableTopManecoWoodUrl from "../assets/boteco/table-top-maneco-wood.webp"
+import tableTopOrbitaDaLuaUrl from "../assets/boteco/table-top-orbita-da-lua.webp"
+import tableTopQuintalDaLesteUrl from "../assets/boteco/table-top-quintal-da-leste.webp"
+import tableTopSalaoDaSulUrl from "../assets/boteco/table-top-salao-da-sul.webp"
+import tableTopSteelPatioUrl from "../assets/boteco/table-top-steel-patio.webp"
+import tableTopSubsoloDoCentroUrl from "../assets/boteco/table-top-subsolo-do-centro.webp"
+import tableTopTremJacaUrl from "../assets/boteco/table-top-trem-jaca.webp"
+import tableTopWoodStreetUrl from "../assets/boteco/table-top-wood-street.webp"
+import tableTopZeCatingaPhotoUrl from "../assets/boteco/table-top-ze-catinga-photo.webp"
 import type { SpeechBubbleState } from "../app/gameSessionHelpers"
 import type { TableSceneModel } from "./tableSceneModel"
 
@@ -42,6 +42,14 @@ const ILLUSTRATED_TABLE_ASSET_URLS: Record<string, string> = {
   "ginasio-estadual-maneco-file": tableTopGinasioEstadualManecoFileUrl,
   "wood-street": tableTopWoodStreetUrl,
   "steel-patio": tableTopSteelPatioUrl,
+}
+
+// Shared asset lookup intentionally lives beside the scene component.
+// eslint-disable-next-line react-refresh/only-export-components
+export function getIllustratedTableAssetUrl(illustratedTableAsset?: string) {
+  return illustratedTableAsset
+    ? ILLUSTRATED_TABLE_ASSET_URLS[illustratedTableAsset] ?? tableTopGhibliishUrl
+    : tableTopGhibliishUrl
 }
 
 const CODE_CARD_WIDTH = 56
@@ -101,9 +109,7 @@ export function GameTableScene({
     illustratedTableAsset === "centro-americano-truqueiro-medelin" ||
     illustratedTableAsset === "hotel-truco-segovia-espanha" ||
     illustratedTableAsset === "orbita-da-lua"
-  const illustratedTableUrl = illustratedTableAsset
-    ? ILLUSTRATED_TABLE_ASSET_URLS[illustratedTableAsset] ?? tableTopGhibliishUrl
-    : tableTopGhibliishUrl
+  const illustratedTableUrl = getIllustratedTableAssetUrl(illustratedTableAsset)
   const tableScale = illustratedTableScale ?? 1
   const tableOffsetX = illustratedTableOffsetX ?? 0
   const tableOffsetY = illustratedTableOffsetY ?? 0
@@ -485,6 +491,7 @@ export function GameTableScene({
     animationsEnabled,
     dealAnimationNonce,
     tableHasPlayedCards,
+    vira,
     vira?.rank,
     vira?.suit,
     vira?.suitSymbol,

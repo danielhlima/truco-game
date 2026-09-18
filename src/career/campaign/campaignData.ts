@@ -25,7 +25,6 @@ export const CAMPAIGN_STAGES: CampaignStage[] = [
         minimumVisualState: "Campanha, capa, background e resultado autorais.",
         entryNarrative: "Aqui ninguém quer saber de fama. Só querem ver se você aguenta a pressão.",
         reward: { coins: 40 },
-        monetizationHooks: { rewardedAdOfferId: "double-coins-street-1" },
       },
       {
         id: "bar-maneco-banguela",

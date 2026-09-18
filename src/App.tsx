@@ -1,35 +1,46 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Capacitor } from "@capacitor/core"
 import { useGameSession } from "./app/useGameSession"
+import {
+  initializeAndroidAds,
+  isDebugBuild,
+  maybeShowInterstitialAfterMatch,
+  openPrivacyPolicy,
+  openSupport,
+  showAndroidPrivacyOptions,
+  subscribeToPrivacyOptionsRequirement,
+} from "./monetization/androidAds"
 import type { HandState } from "./game/handState"
 import cardFlipSoundAsset from "./assets/audio/cardflip.mp3"
 import gameOverSoundAsset from "./assets/audio/game_over.ogg"
 import menuThemeSoundAsset from "./assets/audio/menu_theme.m4a"
 import victoryThemeSoundAsset from "./assets/audio/victory_theme.ogg"
-import botecoSceneBgAsset from "./assets/boteco/boteco-scene-bg.png"
+import botecoSceneBgAsset from "./assets/boteco/boteco-scene-bg.webp"
 import cardFaceAgedPaperAsset from "./assets/cards/card-face-aged-paper.png"
-import adegaJucaBigodeSceneBgAsset from "./assets/venues/adega-do-juca-bigode/background.png"
-import zonaNorteGaragemSceneBgAsset from "./assets/venues/zona-norte-garagem/background.png"
-import zonaLesteQuintalSceneBgAsset from "./assets/venues/zona-leste-quintal/background.png"
-import centroSubsoloSceneBgAsset from "./assets/venues/centro-subsolo/background.png"
-import centroConvencoesPrefeituraSceneBgAsset from "./assets/venues/centro-convencoes-prefeitura/background.png"
-import ginasioEstadualManecoFileSceneBgAsset from "./assets/venues/ginasio-estadual-maneco-file/background.png"
-import arenaNacionalSceneBgAsset from "./assets/venues/arena-nacional/background.png"
-import centroAmericanoTruqueiroMedelinSceneBgAsset from "./assets/venues/centro-americano-truqueiro-medelin/background.png"
-import hotelTrucoSegoviaEspanhaSceneBgAsset from "./assets/venues/hotel-truco-segovia-espanha/background.png"
-import casinoMeMaiorSceneBgAsset from "./assets/venues/casino-me-maior/background.png"
-import orbitaDaLuaSceneBgAsset from "./assets/venues/orbita-da-lua/background.png"
-import zonaSulSalaoSceneBgAsset from "./assets/venues/zona-sul-salao/background.png"
-import manecoBanguelaSceneBgAsset from "./assets/venues/maneco-banguela/background.png"
-import tremDoJacaSceneBgAsset from "./assets/venues/trem-do-jaca/background.png"
+import adegaJucaBigodeSceneBgAsset from "./assets/venues/adega-do-juca-bigode/background.webp"
+import zonaNorteGaragemSceneBgAsset from "./assets/venues/zona-norte-garagem/background.webp"
+import zonaLesteQuintalSceneBgAsset from "./assets/venues/zona-leste-quintal/background.webp"
+import centroSubsoloSceneBgAsset from "./assets/venues/centro-subsolo/background.webp"
+import centroConvencoesPrefeituraSceneBgAsset from "./assets/venues/centro-convencoes-prefeitura/background.webp"
+import ginasioEstadualManecoFileSceneBgAsset from "./assets/venues/ginasio-estadual-maneco-file/background.webp"
+import arenaNacionalSceneBgAsset from "./assets/venues/arena-nacional/background.webp"
+import centroAmericanoTruqueiroMedelinSceneBgAsset from "./assets/venues/centro-americano-truqueiro-medelin/background.webp"
+import hotelTrucoSegoviaEspanhaSceneBgAsset from "./assets/venues/hotel-truco-segovia-espanha/background.webp"
+import casinoMeMaiorSceneBgAsset from "./assets/venues/casino-me-maior/background.webp"
+import orbitaDaLuaSceneBgAsset from "./assets/venues/orbita-da-lua/background.webp"
+import zonaSulSalaoSceneBgAsset from "./assets/venues/zona-sul-salao/background.webp"
+import manecoBanguelaSceneBgAsset from "./assets/venues/maneco-banguela/background.webp"
+import tremDoJacaSceneBgAsset from "./assets/venues/trem-do-jaca/background.webp"
 
 const GAMEPLAY_STAGE_WIDTH = 1080
-const GAMEPLAY_STAGE_HEIGHT = 500
+// The authored menu and campaign art is 16:9. Keeping the logical stage in
+// that ratio lets a 16:9 viewport map 1:1 through the uniform stage transform.
+const GAMEPLAY_STAGE_HEIGHT = (GAMEPLAY_STAGE_WIDTH * 9) / 16
 const NATIVE_PLATFORM = Capacitor.getPlatform()
 const IS_NATIVE_SHELL = Capacitor.isNativePlatform()
 const IS_IOS_NATIVE_SHELL = NATIVE_PLATFORM === "ios"
 const CARD_FLIP_VOLUME = 0.82
-const DEAL_CARD_SOUND_REPEAT_COUNT = 10
+const DEAL_CARD_SOUND_REPEAT_COUNT = 3
 const DEAL_CARD_SOUND_INTERVAL_MS = 48
 const PAULISTA_VIRA_DEAL_INTRO_DELAY_MS = 520
 const DEAL_CARD_SOUND_VOLUME = 0.58
@@ -81,15 +92,23 @@ function getGameplayViewportMetrics(isNativeShell = false): GameplayViewportMetr
     return { mode: "regular", scale: 1 }
   }
 
+  // visualViewport and innerWidth/innerHeight are CSS pixels. Do not involve
+  // devicePixelRatio here: CSS layout and touch coordinates use this same unit.
+  // visualViewport also follows transient system UI changes in native WebViews.
+  const visualViewport = window.visualViewport
+  const viewportWidth = visualViewport?.width ?? window.innerWidth
+  const viewportHeight = visualViewport?.height ?? window.innerHeight
   const availableWidth = isNativeShell
-    ? Math.max(320, window.innerWidth)
+    ? Math.max(1, viewportWidth)
     : Math.max(320, Math.min(window.innerWidth, 1126) - 116)
   const availableHeight = isNativeShell
-    ? Math.max(260, window.innerHeight)
+    ? Math.max(1, viewportHeight)
     : Math.max(260, window.innerHeight - 260)
-  const scale = Math.max(
-    0.5,
-    Math.min(1, availableWidth / GAMEPLAY_STAGE_WIDTH, availableHeight / GAMEPLAY_STAGE_HEIGHT)
+  // This is a contain scale. It intentionally has no upper cap: a 1920x1080
+  // viewport must scale the 1080x607.5 logical stage up to 1920x1080.
+  const scale = Math.min(
+    availableWidth / GAMEPLAY_STAGE_WIDTH,
+    availableHeight / GAMEPLAY_STAGE_HEIGHT
   )
 
   if (scale < 0.72) {
@@ -252,9 +271,14 @@ function App() {
   } | null>(null)
   const previousGameOverKeyRef = useRef<string | null>(null)
   const previousVictoryThemeKeyRef = useRef<string | null>(null)
+  const previousAdMatchResultKeyRef = useRef<string | null>(null)
   const shouldPlayMenuThemeRef = useRef(true)
   const [appIsForeground, setAppIsForeground] = useState(
     () => typeof document === "undefined" || document.visibilityState !== "hidden"
+  )
+  const [privacyOptionsRequired, setPrivacyOptionsRequired] = useState(false)
+  const [showDebugMatchActions, setShowDebugMatchActions] = useState(
+    () => !IS_NATIVE_SHELL && import.meta.env.DEV
   )
 
   const stopAllAppAudioPlayback = useCallback(() => {
@@ -274,7 +298,25 @@ function App() {
     }
 
     window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
+    window.visualViewport?.addEventListener("resize", handleResize)
+    window.visualViewport?.addEventListener("scroll", handleResize)
+    return () => {
+      window.removeEventListener("resize", handleResize)
+      window.visualViewport?.removeEventListener("resize", handleResize)
+      window.visualViewport?.removeEventListener("scroll", handleResize)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (NATIVE_PLATFORM !== "android") return
+
+    void isDebugBuild().then(setShowDebugMatchActions)
+
+    const unsubscribe = subscribeToPrivacyOptionsRequirement(setPrivacyOptionsRequired)
+    void initializeAndroidAds().catch((error) => {
+      console.warn("[TrucoAds] não foi possível concluir a preparação de privacidade/anúncios", error)
+    })
+    return unsubscribe
   }, [])
 
   useEffect(() => {
@@ -356,7 +398,7 @@ function App() {
       menuThemeAudioRef.current = null
       victoryThemeAudioRef.current = null
     }
-  }, [])
+  }, [stopAllAppAudioPlayback])
 
   useEffect(() => {
     document.body.classList.toggle("truco-native-app", IS_NATIVE_SHELL)
@@ -461,6 +503,39 @@ function App() {
 
   const musicEnabled = playerProfile.settings.musicEnabled
   const soundEffectsEnabled = playerProfile.settings.soundEffectsEnabled
+
+  useEffect(() => {
+    if (NATIVE_PLATFORM !== "android" || menuScreen !== "match-result" || !matchResultScreen?.venueId) {
+      // The same result title is reused for subsequent matches. Clear the guard
+      // when leaving the result screen so each completed match can be counted.
+      previousAdMatchResultKeyRef.current = null
+      return
+    }
+
+    const resultKey = `${matchResultScreen.venueId}:${matchResultScreen.outcome}:${matchResultScreen.title}`
+    if (previousAdMatchResultKeyRef.current === resultKey) {
+      console.info(`[TrucoAds] resultado já processado nesta entrada ${JSON.stringify({ resultKey })}`)
+      return
+    }
+
+    previousAdMatchResultKeyRef.current = resultKey
+    console.info(`[TrucoAds] processando resultado elegível ${JSON.stringify({
+      resultKey,
+      venueId: matchResultScreen.venueId,
+      outcome: matchResultScreen.outcome,
+    })}`)
+    const timeoutId = window.setTimeout(() => {
+      void maybeShowInterstitialAfterMatch({
+        venueId: matchResultScreen.venueId,
+        outcome: matchResultScreen.outcome,
+      }).catch((error) => {
+        console.warn("[TrucoAds] falha ao avaliar interstitial pós-partida", error)
+      })
+    }, 1_200)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [matchResultScreen, menuScreen])
+
   const layoutMode = viewportMetrics.mode
   const stageScale = viewportMetrics.scale
   const isCompactLayout = layoutMode !== "regular"
@@ -935,6 +1010,24 @@ function App() {
     [gameplayBackgroundAsset, isCompactLayout, isTinyLayout, stageScale, useTightSidebar]
   )
 
+  const handleOpenPrivacyOptions = useCallback(() => {
+    void showAndroidPrivacyOptions().catch((error) => {
+      console.warn("[TrucoAds] não foi possível abrir as opções de privacidade", error)
+    })
+  }, [])
+
+  const handleOpenPrivacyPolicy = useCallback(() => {
+    void openPrivacyPolicy().catch((error) => {
+      console.warn("[TrucoAds] não foi possível abrir a política de privacidade", error)
+    })
+  }, [])
+
+  const handleOpenSupport = useCallback(() => {
+    void openSupport().catch((error) => {
+      console.warn("[TrucoAds] não foi possível abrir o suporte", error)
+    })
+  }, [])
+
   return (
     <div style={IS_NATIVE_SHELL ? responsiveStyles.nativePage : styles.page}>
       <div style={IS_NATIVE_SHELL ? responsiveStyles.nativeContainer : styles.container}>
@@ -952,6 +1045,7 @@ function App() {
             handState={handState}
             inGameConfirmation={inGameConfirmation}
             inGameContextMenuOpen={inGameContextMenuOpen}
+            showDebugMatchActions={showDebugMatchActions}
             inGameSettingsOpen={inGameSettingsOpen}
             matchState={matchState}
             matchResultScreen={matchResultScreen}
@@ -1010,6 +1104,10 @@ function App() {
             onChangeTrucoVariant={handleChangeTrucoVariant}
             onToggleMusicEnabled={handleToggleMusicEnabled}
             onToggleSoundEffectsEnabled={handleToggleSoundEffectsEnabled}
+            privacyOptionsRequired={privacyOptionsRequired}
+            onOpenPrivacyOptions={handleOpenPrivacyOptions}
+            onOpenPrivacyPolicy={handleOpenPrivacyPolicy}
+            onOpenSupport={handleOpenSupport}
             onRequestTruco={handleRequestTruco}
             onAcceptTruco={handleAcceptTruco}
             onAddEightPointsFromContextMenu={handleAddEightPointsFromContextMenu}
@@ -1105,8 +1203,8 @@ const styles: Record<string, React.CSSProperties> = {
   },
   nativePage: {
     width: "100vw",
-    height: "100vh",
-    minHeight: "100vh",
+    height: "100dvh",
+    minHeight: "100dvh",
     overflow: "hidden",
     background: "#120a06",
     display: "flex",
@@ -1117,7 +1215,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   nativeContainer: {
     width: "100vw",
-    height: "100vh",
+    height: "100dvh",
     overflow: "hidden",
     display: "flex",
     justifyContent: "center",
@@ -1496,7 +1594,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   nativeTablePanel: {
     width: "100vw",
-    height: "100vh",
+    height: "100dvh",
     margin: 0,
     padding: 0,
     border: "none",
@@ -1529,7 +1627,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   nativeTableHudSurface: {
     width: "100vw",
-    height: "100vh",
+    height: "100dvh",
     padding: 0,
     border: "none",
     borderRadius: 0,
@@ -3225,6 +3323,22 @@ const styles: Record<string, React.CSSProperties> = {
     background: "#fff3df",
     transform: "translateX(26px)",
   },
+  settingsLinks: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "10px",
+    paddingTop: "4px",
+  },
+  settingsLinkButton: {
+    border: "1px solid rgba(205, 160, 95, 0.42)",
+    borderRadius: "7px",
+    background: "rgba(16, 10, 7, 0.58)",
+    color: "#e6c58f",
+    padding: "10px 13px",
+    fontSize: "13px",
+    fontWeight: 900,
+    cursor: "pointer",
+  },
   tutorialDraftScreen: {
     position: "relative",
     gridColumn: "1 / -1",
@@ -4202,7 +4316,10 @@ const styles: Record<string, React.CSSProperties> = {
   matchResultImageFrame: {
     position: "relative",
     height: "100%",
-    width: "82.35%",
+    // Result artwork is authored at 1672x941 (16:9). The surrounding game
+    // stage already preserves that ratio, so constraining this frame to
+    // 82.35% made contain() add a second set of black bars.
+    width: "100%",
     maxWidth: "100%",
     maxHeight: "100%",
     aspectRatio: "1672 / 941",
