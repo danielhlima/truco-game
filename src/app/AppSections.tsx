@@ -796,6 +796,8 @@ interface TableSectionProps {
   matchState: MatchState | null
   matchResultScreen: MatchResultScreenState | null
   campaignVictoryScreen: CampaignVictoryScreenState | null
+  isWideNativeLayout: boolean
+  nativeContentScale: number
   currentCampaignVenue: CampaignVenue | null
   currentVenueWins: number
   dealAnimationNonce: number
@@ -894,6 +896,8 @@ export function TableSection({
   matchState,
   matchResultScreen,
   campaignVictoryScreen,
+  isWideNativeLayout,
+  nativeContentScale,
   currentCampaignVenue,
   currentVenueWins,
   dealAnimationNonce,
@@ -1056,6 +1060,8 @@ export function TableSection({
               <VenueIntroScreen
                 currentCampaignVenue={currentCampaignVenue}
                 currentVenueWins={currentVenueWins}
+                isWideNativeLayout={isWideNativeLayout}
+                nativeContentScale={nativeContentScale}
                 hasSelectedPartnerForVenue={hasSelectedPartnerForVenue}
                 opponentCharacters={opponentCharacters}
                 playerProfile={playerProfile}
@@ -1134,6 +1140,8 @@ export function TableSection({
                   <VenueIntroScreen
                     currentCampaignVenue={currentCampaignVenue}
                     currentVenueWins={currentVenueWins}
+                    isWideNativeLayout={isWideNativeLayout}
+                    nativeContentScale={nativeContentScale}
                     hasSelectedPartnerForVenue={hasSelectedPartnerForVenue}
                     opponentCharacters={opponentCharacters}
                     playerProfile={playerProfile}
@@ -1665,13 +1673,13 @@ function SettingsScreen({
   return (
     <div style={styles.settingsScreen}>
       <div style={styles.settingsHeader}>
+        <button type="button" style={styles.characterSelectBackButton} onClick={onBack}>
+          Voltar
+        </button>
         <div>
           <div style={styles.settingsEyebrow}>Configurações</div>
           <h2 style={styles.settingsTitle}>Mesa</h2>
         </div>
-        <button type="button" style={styles.characterSelectBackButton} onClick={onBack}>
-          Voltar
-        </button>
       </div>
 
       <div style={styles.settingsBoard}>
@@ -3485,6 +3493,12 @@ function JourneyIntroScreen({
   return (
     <div style={styles.journeyIntroScreen}>
       <div style={styles.journeyIntroHeader}>
+        <button
+          style={styles.characterSelectBackButton}
+          onClick={freePlayStage ? onCloseFreePlayStage : onBack}
+        >
+          Voltar
+        </button>
         <div>
           <div style={styles.journeyIntroEyebrow}>
             {freePlayStage ? "Modo livre" : "Jornada de campanha"}
@@ -3495,15 +3509,9 @@ function JourneyIntroScreen({
           <p style={styles.journeyIntroText}>
             {freePlayStage
               ? "Vença este circuito no Modo Livre. Cada bar concluído leva ao próximo sem alterar a campanha salva."
-              : "Leia o percurso completo, veja o que já ficou para trás e avance pelo bar destacado agora. Locais vencidos continuam abertos para revisita."}
+            : "Leia o percurso completo, veja o que já ficou para trás e avance pelo bar destacado agora. Locais vencidos continuam abertos para revisita."}
           </p>
         </div>
-        <button
-          style={styles.characterSelectBackButton}
-          onClick={freePlayStage ? onCloseFreePlayStage : onBack}
-        >
-          Voltar
-        </button>
       </div>
 
       <div style={styles.journeyIntroLeadCard}>
@@ -4243,7 +4251,10 @@ function CampaignVictoryScreen({
         <p style={styles.matchResultSubtitle}>
           A campanha avançou. Volte ao fluxo de bares para ver o próximo passo.
         </p>
-        <button style={styles.gameStartLaunchButton} onClick={onContinue}>
+        <button
+          style={{ ...styles.gameStartLaunchButton, alignSelf: "flex-start" }}
+          onClick={onContinue}
+        >
           VOLTAR AO FLUXO DE BARES
         </button>
       </div>
@@ -4326,7 +4337,10 @@ function MatchResultScreen({
           </div>
         ) : null}
 
-        <button style={styles.gameStartLaunchButton} onClick={onContinue}>
+        <button
+          style={{ ...styles.gameStartLaunchButton, alignSelf: "flex-start" }}
+          onClick={onContinue}
+        >
           VOLTAR AO FLUXO DE BARES
         </button>
       </div>
@@ -4359,10 +4373,10 @@ function PlayerSkinSelectionScreen({
   return (
     <div style={styles.characterSelectScreen}>
       <div style={styles.characterSelectHeader}>
-        <div style={styles.characterSelectEyebrow}>Escolha seu protagonista</div>
         <button style={styles.characterSelectBackButton} onClick={onBack}>
           Voltar
         </button>
+        <div style={styles.characterSelectEyebrow}>Escolha seu protagonista</div>
       </div>
 
       <div style={styles.characterSelectBoard}>
@@ -4491,10 +4505,10 @@ function CharacterSelectionScreen({
   return (
     <div style={styles.characterSelectScreen}>
       <div style={styles.characterSelectHeader}>
-        <div style={styles.characterSelectEyebrow}>Escolha seu parceiro</div>
         <button style={styles.characterSelectBackButton} onClick={onBack}>
           Voltar
         </button>
+        <div style={styles.characterSelectEyebrow}>Escolha seu parceiro</div>
       </div>
 
       <div style={styles.characterSelectBoard}>
@@ -4631,6 +4645,8 @@ function CharacterSelectionScreen({
 function VenueIntroScreen({
   currentCampaignVenue,
   currentVenueWins,
+  isWideNativeLayout,
+  nativeContentScale,
   hasSelectedPartnerForVenue,
   opponentCharacters,
   playerProfile,
@@ -4641,6 +4657,8 @@ function VenueIntroScreen({
 }: {
   currentCampaignVenue: CampaignVenue | null
   currentVenueWins: number
+  isWideNativeLayout: boolean
+  nativeContentScale: number
   hasSelectedPartnerForVenue: boolean
   opponentCharacters: TrucoCharacterProfile[]
   playerProfile: PlayerProfile
@@ -4658,6 +4676,10 @@ function VenueIntroScreen({
   const venueMatchesToClear = currentCampaignVenue?.matchesToClear ?? 0
   const displayedVenueWins = Math.min(currentVenueWins, venueMatchesToClear)
   const remainingVenueWins = Math.max(venueMatchesToClear - displayedVenueWins, 0)
+  const minNativeCssSize = (baseSize: number, minimumCssSize: number) =>
+    nativeContentScale < 0.9
+      ? `${Math.max(baseSize, minimumCssSize / nativeContentScale)}px`
+      : `${baseSize}px`
   const remainingVenueWinsVerb = remainingVenueWins === 1 ? "Falta" : "Faltam"
   const remainingVenueWinsLabel = remainingVenueWins === 1 ? "vitória" : "vitórias"
 
@@ -4794,7 +4816,9 @@ function VenueIntroScreen({
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "220px minmax(340px, 386px) minmax(302px, 1fr)",
+          gridTemplateColumns: isWideNativeLayout
+            ? "minmax(270px, 0.82fr) minmax(420px, 1.15fr) minmax(390px, 1.25fr)"
+            : "220px minmax(340px, 386px) minmax(302px, 1fr)",
           gap: 12,
           height: "100%",
           minHeight: 0,
@@ -4804,7 +4828,9 @@ function VenueIntroScreen({
         <div
           style={{
             display: "grid",
-            gridTemplateRows: "minmax(190px, 1fr) 128px auto",
+            gridTemplateRows: isWideNativeLayout
+              ? "minmax(190px, 1fr) 150px auto"
+              : "minmax(190px, 1fr) 128px auto",
             gap: 8,
             alignItems: "end",
             minHeight: 0,
@@ -4868,7 +4894,7 @@ function VenueIntroScreen({
                 maxWidth: "66%",
                 color: "#efe0be",
                 fontFamily: "\"Georgia\", serif",
-                fontSize: 13,
+                fontSize: isWideNativeLayout ? 18 : minNativeCssSize(13, 16),
                 lineHeight: 1.12,
                 fontStyle: "italic",
                 overflowWrap: "break-word",
@@ -4884,7 +4910,7 @@ function VenueIntroScreen({
             <div
               style={{
                 fontFamily: "\"Georgia\", serif",
-                fontSize: 26,
+                fontSize: isWideNativeLayout ? 34 : minNativeCssSize(26, 28),
                 fontWeight: 700,
                 letterSpacing: "0.03em",
               }}
@@ -4895,7 +4921,7 @@ function VenueIntroScreen({
             style={{
               marginTop: 4,
               color: "rgba(245, 219, 165, 0.9)",
-              fontSize: 12,
+              fontSize: isWideNativeLayout ? 15 : minNativeCssSize(12, 14),
               letterSpacing: "0.14em",
               textTransform: "uppercase",
             }}
@@ -4938,7 +4964,7 @@ function VenueIntroScreen({
               style={{
                 margin: "3px 0 5px",
                 fontFamily: "\"Georgia\", serif",
-                fontSize: 32,
+                fontSize: isWideNativeLayout ? 38 : minNativeCssSize(32, 34),
                 lineHeight: 0.98,
                 color: "#e0b25d",
                 textShadow: "0 2px 16px rgba(0,0,0,0.28)",
@@ -4949,7 +4975,7 @@ function VenueIntroScreen({
             <div
               style={{
                 color: "#f2d9a7",
-                fontSize: 13,
+                fontSize: isWideNativeLayout ? 15 : minNativeCssSize(13, 14),
                 lineHeight: 1.15,
               }}
             >
@@ -4984,7 +5010,7 @@ function VenueIntroScreen({
               style={{
                 margin: 0,
                 fontFamily: "\"Georgia\", serif",
-                fontSize: 15,
+                fontSize: isWideNativeLayout ? 18 : minNativeCssSize(15, 16),
                 lineHeight: 1.08,
                 color: "#f0d7a0",
               }}
@@ -4995,7 +5021,7 @@ function VenueIntroScreen({
               style={{
                 margin: "5px 0 0",
                 fontFamily: "\"Georgia\", serif",
-                fontSize: 13,
+                fontSize: isWideNativeLayout ? 16 : minNativeCssSize(13, 14),
                 lineHeight: 1.08,
                 color: "rgba(238, 220, 180, 0.9)",
               }}
@@ -5045,7 +5071,7 @@ function VenueIntroScreen({
                   <div
                     style={{
                       width: "100%",
-                      maxWidth: 86,
+                      maxWidth: isWideNativeLayout ? 112 : 86,
                       aspectRatio: "0.84",
                       borderRadius: 12,
                       overflow: "hidden",
@@ -5069,7 +5095,7 @@ function VenueIntroScreen({
                       color: "#f0dcc0",
                       fontFamily: "\"Georgia\", serif",
                       fontWeight: 700,
-                      fontSize: 12,
+                      fontSize: isWideNativeLayout ? 16 : minNativeCssSize(12, 14),
                       lineHeight: 1.1,
                     }}
                   >
@@ -5096,7 +5122,7 @@ function VenueIntroScreen({
               style={{
                 color: "#c69643",
                 letterSpacing: "0.18em",
-                fontSize: 12,
+                fontSize: isWideNativeLayout ? 15 : minNativeCssSize(12, 14),
                 textTransform: "uppercase",
                 textAlign: "center",
               }}
@@ -5111,8 +5137,8 @@ function VenueIntroScreen({
                   alt=""
                   aria-hidden="true"
                   style={{
-                    width: 32,
-                    height: 52,
+                    width: isWideNativeLayout ? 38 : 32,
+                    height: isWideNativeLayout ? 60 : 52,
                     objectFit: "contain",
                     mixBlendMode: "screen",
                     opacity: index < challengeDifficulty ? 0.98 : 0.3,
@@ -5129,10 +5155,10 @@ function VenueIntroScreen({
         <div
           style={{
             display: "grid",
-            gridTemplateRows: "auto 100px",
+            gridTemplateRows: isWideNativeLayout ? "auto 110px 48px" : "auto 100px 44px",
             alignContent: "center",
             justifyItems: "center",
-            gap: 14,
+            gap: isWideNativeLayout ? 10 : 12,
             height: "100%",
             minHeight: 0,
           }}
@@ -5140,7 +5166,7 @@ function VenueIntroScreen({
           <div
             style={{
               position: "relative",
-              width: "min(96%, 302px)",
+              width: isWideNativeLayout ? "min(96%, 360px)" : "min(96%, 302px)",
               aspectRatio: "1 / 1.08",
               color: "#2b1608",
               filter: "drop-shadow(0 20px 28px rgba(0,0,0,0.32))",
@@ -5168,7 +5194,7 @@ function VenueIntroScreen({
                 right: "12%",
                 textAlign: "center",
                 fontFamily: "\"Georgia\", serif",
-                fontSize: 17,
+                fontSize: isWideNativeLayout ? 21 : minNativeCssSize(17, 18),
                 fontWeight: 700,
                 lineHeight: 0.95,
                 color: "#2a1307",
@@ -5197,7 +5223,7 @@ function VenueIntroScreen({
             >
               <div
                 style={{
-                  fontSize: 15,
+                  fontSize: isWideNativeLayout ? 18 : minNativeCssSize(15, 16),
                   fontWeight: 900,
                   lineHeight: 1,
                   textTransform: "uppercase",
@@ -5210,7 +5236,9 @@ function VenueIntroScreen({
               </div>
               <div
                 style={{
-                  fontSize: remainingVenueWins >= 10 ? 82 : 96,
+                  fontSize: isWideNativeLayout
+                    ? remainingVenueWins >= 10 ? 96 : 112
+                    : remainingVenueWins >= 10 ? 82 : 96,
                   fontWeight: 900,
                   lineHeight: 0.82,
                   color: "#75480f",
@@ -5221,7 +5249,7 @@ function VenueIntroScreen({
               </div>
               <div
                 style={{
-                  fontSize: 16,
+                  fontSize: isWideNativeLayout ? 20 : minNativeCssSize(16, 17),
                   fontWeight: 900,
                   lineHeight: 1,
                   textTransform: "uppercase",
@@ -5241,7 +5269,7 @@ function VenueIntroScreen({
               />
               <div
                 style={{
-                  fontSize: 15,
+                  fontSize: isWideNativeLayout ? 18 : minNativeCssSize(15, 16),
                   fontWeight: 900,
                   lineHeight: 1,
                   color: "#2a1307",
@@ -5258,8 +5286,8 @@ function VenueIntroScreen({
             onClick={onStart}
             style={{
               position: "relative",
-              width: "min(96%, 302px)",
-              minHeight: 100,
+              width: isWideNativeLayout ? "min(96%, 390px)" : "min(96%, 302px)",
+              minHeight: isWideNativeLayout ? 110 : 100,
               padding: "10px 12px",
               border: "none",
               background: "transparent",
@@ -5267,7 +5295,7 @@ function VenueIntroScreen({
               color: "#f3d08a",
               fontFamily: "\"Georgia\", serif",
               fontWeight: 700,
-              fontSize: 15,
+              fontSize: isWideNativeLayout ? 18 : minNativeCssSize(15, 16),
               lineHeight: 0.98,
               letterSpacing: "0.03em",
               textShadow: "0 3px 10px rgba(0,0,0,0.4)",
@@ -5294,7 +5322,7 @@ function VenueIntroScreen({
               style={{
                 position: "relative",
                 display: "inline-block",
-                width: 132,
+                width: isWideNativeLayout ? 164 : 132,
                 maxWidth: "58%",
                 textAlign: "center",
                 whiteSpace: "normal",
@@ -5303,6 +5331,22 @@ function VenueIntroScreen({
             >
               {ctaLabel}
             </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={onOpenCharacterSelect}
+            aria-label="Voltar à seleção de parceira"
+            style={{
+              ...styles.characterSelectBackButton,
+              minHeight: isWideNativeLayout ? 48 : 44,
+              width: isWideNativeLayout ? "min(96%, 360px)" : "min(96%, 302px)",
+              padding: "8px 18px",
+              fontSize: isWideNativeLayout ? 16 : minNativeCssSize(14, 14),
+              justifySelf: "center",
+            }}
+          >
+            VOLTAR
           </button>
         </div>
       </div>

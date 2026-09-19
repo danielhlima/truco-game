@@ -196,6 +196,10 @@ Estado apos a segunda rodada:
 
 Frentes opcionais ainda pendentes, sem bloquear a validação mobile já concluída nem a otimização de assets em andamento:
 
+- implementar sinais durante o truco
+- implementar uma forma de fechar o jogo
+- posicionar à esquerda da tela todos os botões `Voltar`
+
 - opcao de usar ou nao a variante `ponto acima`
 - novas rodadas finas de IA:
   - fazer apenas se novos testes em jogo apontarem comportamento ruim

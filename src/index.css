@@ -74,6 +74,10 @@ body.truco-native-app {
   touch-action: manipulation;
 }
 
+body.truco-native-app button {
+  -webkit-tap-highlight-color: transparent;
+}
+
 body.truco-native-app #root {
   width: 100vw;
   max-width: none;

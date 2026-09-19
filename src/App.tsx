@@ -85,11 +85,18 @@ type GameplayLayoutMode = "regular" | "compact" | "tiny"
 type GameplayViewportMetrics = {
   mode: GameplayLayoutMode
   scale: number
+  stageWidth: number
+  stageHeight: number
 }
 
 function getGameplayViewportMetrics(isNativeShell = false): GameplayViewportMetrics {
   if (typeof window === "undefined") {
-    return { mode: "regular", scale: 1 }
+    return {
+      mode: "regular",
+      scale: 1,
+      stageWidth: GAMEPLAY_STAGE_WIDTH,
+      stageHeight: GAMEPLAY_STAGE_HEIGHT,
+    }
   }
 
   // visualViewport and innerWidth/innerHeight are CSS pixels. Do not involve
@@ -104,20 +111,26 @@ function getGameplayViewportMetrics(isNativeShell = false): GameplayViewportMetr
   const availableHeight = isNativeShell
     ? Math.max(1, viewportHeight)
     : Math.max(260, window.innerHeight - 260)
+  const viewportAspectRatio = availableWidth / availableHeight
+  // Widen the logical stage on ultrawide native phones so the existing rails
+  // and table can reflow into the side space instead of letterboxing it.
+  const stageWidth = isNativeShell && viewportAspectRatio > 1.9
+    ? Math.min(GAMEPLAY_STAGE_HEIGHT * viewportAspectRatio, GAMEPLAY_STAGE_HEIGHT * 2.35)
+    : GAMEPLAY_STAGE_WIDTH
   // This is a contain scale. It intentionally has no upper cap: a 1920x1080
   // viewport must scale the 1080x607.5 logical stage up to 1920x1080.
   const scale = Math.min(
-    availableWidth / GAMEPLAY_STAGE_WIDTH,
+    availableWidth / stageWidth,
     availableHeight / GAMEPLAY_STAGE_HEIGHT
   )
 
   if (scale < 0.72) {
-    return { mode: "tiny", scale }
+    return { mode: "tiny", scale, stageWidth, stageHeight: GAMEPLAY_STAGE_HEIGHT }
   }
   if (scale < 0.9) {
-    return { mode: "compact", scale }
+    return { mode: "compact", scale, stageWidth, stageHeight: GAMEPLAY_STAGE_HEIGHT }
   }
-  return { mode: "regular", scale }
+  return { mode: "regular", scale, stageWidth, stageHeight: GAMEPLAY_STAGE_HEIGHT }
 }
 
 function playCardFlipSound(
@@ -538,9 +551,16 @@ function App() {
 
   const layoutMode = viewportMetrics.mode
   const stageScale = viewportMetrics.scale
+  const stageWidth = viewportMetrics.stageWidth
+  const stageHeight = viewportMetrics.stageHeight
   const isCompactLayout = layoutMode !== "regular"
   const isTinyLayout = layoutMode === "tiny"
+  const isWideNativeLayout = IS_NATIVE_SHELL && stageWidth > GAMEPLAY_STAGE_WIDTH
   const useTightSidebar = layoutMode !== "regular"
+  const minNativeCssSize = (baseSize: number, minimumCssSize: number) =>
+    IS_NATIVE_SHELL && stageScale < 0.9
+      ? `${Math.max(baseSize, minimumCssSize / stageScale)}px`
+      : `${baseSize}px`
   const gameplayBackgroundAsset = currentCampaignVenue?.id
     ? GAMEPLAY_BACKGROUND_ASSET_BY_VENUE_ID[currentCampaignVenue.id] ?? botecoSceneBgAsset
     : botecoSceneBgAsset
@@ -679,20 +699,24 @@ function App() {
       },
       gameViewportStageSlot: {
         ...styles.gameViewportStageSlot,
-        width: `${GAMEPLAY_STAGE_WIDTH * stageScale}px`,
-        height: `${GAMEPLAY_STAGE_HEIGHT * stageScale}px`,
+        width: `${stageWidth * stageScale}px`,
+        height: `${stageHeight * stageScale}px`,
         ...(IS_NATIVE_SHELL ? styles.nativeGameViewportStageSlot : undefined),
       },
       gameViewportFrame: {
         ...styles.gameViewportFrame,
-        width: `${GAMEPLAY_STAGE_WIDTH}px`,
-        height: `${GAMEPLAY_STAGE_HEIGHT}px`,
+        width: `${stageWidth}px`,
+        height: `${stageHeight}px`,
         transform: `scale(${stageScale})`,
         ...(IS_NATIVE_SHELL ? styles.nativeGameViewportFrame : undefined),
       },
       gameViewport: {
         ...styles.gameViewport,
-        gridTemplateColumns: isCompactLayout
+        gridTemplateColumns: isWideNativeLayout
+          ? isTinyLayout
+            ? "330px minmax(0, 1fr) 270px"
+            : "350px minmax(0, 1fr) 286px"
+          : isCompactLayout
           ? isTinyLayout
             ? IS_NATIVE_SHELL
               ? "250px minmax(0, 1fr) 212px"
@@ -708,7 +732,9 @@ function App() {
       gameLeftRail: {
         ...styles.gameLeftRail,
         gridTemplateRows: IS_NATIVE_SHELL
-          ? isTinyLayout
+          ? isWideNativeLayout
+            ? "320px minmax(0, 1fr)"
+            : isTinyLayout
             ? IS_IOS_NATIVE_SHELL
               ? "252px minmax(0, 1fr)"
               : "232px minmax(0, 1fr)"
@@ -830,11 +856,15 @@ function App() {
       },
       tableHudStatLabelCentered: {
         ...styles.tableHudStatLabelCentered,
-        fontSize: useTightSidebar ? (isTinyLayout ? "7px" : "8px") : "9px",
+        fontSize: useTightSidebar
+          ? minNativeCssSize(isTinyLayout ? 7 : 8, 12)
+          : "9px",
       },
       tableHudStatValueCentered: {
         ...styles.tableHudStatValueCentered,
-        fontSize: useTightSidebar ? (isTinyLayout ? "11px" : "13px") : "15px",
+        fontSize: useTightSidebar
+          ? minNativeCssSize(isTinyLayout ? 11 : 13, 16)
+          : "15px",
         lineHeight: useTightSidebar ? 1.05 : styles.tableHudStatValueCentered.lineHeight,
       },
       inGameActionsRow: {
@@ -847,15 +877,23 @@ function App() {
       },
       trucoPrimaryButton: {
         ...styles.trucoPrimaryButton,
-        minHeight: useTightSidebar ? (isTinyLayout ? "43px" : "49px") : "55px",
+        minHeight: useTightSidebar
+          ? minNativeCssSize(isTinyLayout ? 43 : 49, 48)
+          : "55px",
         padding: useTightSidebar ? (isTinyLayout ? "6px 13px" : "9px 17px") : "12px 20px",
-        fontSize: useTightSidebar ? (isTinyLayout ? "13px" : "14px") : "16px",
+        fontSize: useTightSidebar
+          ? minNativeCssSize(isTinyLayout ? 13 : 14, 15)
+          : "16px",
       },
       trucoSecondaryButton: {
         ...styles.trucoSecondaryButton,
-        minHeight: useTightSidebar ? (isTinyLayout ? "43px" : "49px") : "55px",
+        minHeight: useTightSidebar
+          ? minNativeCssSize(isTinyLayout ? 43 : 49, 48)
+          : "55px",
         padding: useTightSidebar ? (isTinyLayout ? "6px 13px" : "9px 17px") : "12px 20px",
-        fontSize: useTightSidebar ? (isTinyLayout ? "13px" : "14px") : "16px",
+        fontSize: useTightSidebar
+          ? minNativeCssSize(isTinyLayout ? 13 : 14, 15)
+          : "16px",
       },
       rosterGrid: {
         ...styles.rosterGrid,
@@ -870,11 +908,9 @@ function App() {
       rosterCard: {
         ...styles.rosterCard,
         minHeight: IS_NATIVE_SHELL
-          ? isTinyLayout
-            ? "82px"
-            : isCompactLayout
-              ? "102px"
-              : "132px"
+          ? isWideNativeLayout || isCompactLayout
+            ? minNativeCssSize(isTinyLayout ? 82 : 102, 74)
+            : "132px"
           : isTinyLayout
             ? "70px"
             : isCompactLayout
@@ -886,22 +922,18 @@ function App() {
       rosterAvatar: {
         ...styles.rosterAvatar,
         width: IS_NATIVE_SHELL
-          ? isTinyLayout
-            ? "62px"
-            : isCompactLayout
-              ? "82px"
-              : "105px"
+          ? isWideNativeLayout || isCompactLayout
+            ? minNativeCssSize(isTinyLayout ? 62 : 82, 50)
+            : "105px"
           : isTinyLayout
             ? "51px"
             : isCompactLayout
               ? "66px"
               : "105px",
         height: IS_NATIVE_SHELL
-          ? isTinyLayout
-            ? "62px"
-            : isCompactLayout
-              ? "82px"
-              : "105px"
+          ? isWideNativeLayout || isCompactLayout
+            ? minNativeCssSize(isTinyLayout ? 62 : 82, 50)
+            : "105px"
           : isTinyLayout
             ? "51px"
             : isCompactLayout
@@ -923,17 +955,11 @@ function App() {
       rosterName: {
         ...styles.rosterName,
         fontSize: IS_NATIVE_SHELL
-          ? isTinyLayout
-            ? IS_IOS_NATIVE_SHELL
-              ? "11px"
-              : "10px"
-            : isCompactLayout
-              ? IS_IOS_NATIVE_SHELL
-                ? "13px"
-                : "12px"
-              : IS_IOS_NATIVE_SHELL
-                ? "14px"
-                : "13px"
+          ? isWideNativeLayout || isCompactLayout
+            ? minNativeCssSize(isTinyLayout ? 10 : 12, 14)
+            : IS_IOS_NATIVE_SHELL
+              ? "14px"
+              : "13px"
           : isTinyLayout
             ? "6px"
             : isCompactLayout
@@ -959,18 +985,18 @@ function App() {
       },
       mobileHandTitle: {
         ...styles.mobileHandTitle,
-        fontSize: isTinyLayout ? "10px" : "12px",
+        fontSize: minNativeCssSize(isTinyLayout ? 10 : 12, 13),
       },
       mobileHandMeta: {
         ...styles.mobileHandMeta,
-        fontSize: isTinyLayout ? "8px" : "9px",
+        fontSize: minNativeCssSize(isTinyLayout ? 8 : 9, 11),
       },
       coveredCardToggle: {
         ...styles.coveredCardToggle,
-        minHeight: isTinyLayout ? "44px" : "48px",
+        minHeight: minNativeCssSize(isTinyLayout ? 44 : 48, 48),
         gap: isTinyLayout ? "10px" : "12px",
         padding: isTinyLayout ? "7px 16px 7px 9px" : "8px 18px 8px 10px",
-        fontSize: isTinyLayout ? "15px" : "17px",
+        fontSize: minNativeCssSize(isTinyLayout ? 15 : 17, 15),
       },
       coveredCardToggleSwitch: {
         ...styles.coveredCardToggleSwitch,
@@ -989,25 +1015,127 @@ function App() {
       },
       mobileCardButton: {
         ...styles.mobileCardButton,
-        width: isTinyLayout ? "67px" : isCompactLayout ? "76px" : "84px",
-        minWidth: isTinyLayout ? "67px" : isCompactLayout ? "76px" : "84px",
-        minHeight: isTinyLayout ? "94px" : isCompactLayout ? "104px" : "115px",
+        width: minNativeCssSize(isTinyLayout ? 67 : isCompactLayout ? 76 : 84, 52),
+        minWidth: minNativeCssSize(isTinyLayout ? 67 : isCompactLayout ? 76 : 84, 52),
+        minHeight: minNativeCssSize(isTinyLayout ? 94 : isCompactLayout ? 104 : 115, 72),
         padding: isTinyLayout ? "6px" : "7px",
       },
       mobileCardRank: {
         ...styles.mobileCardRank,
-        fontSize: isTinyLayout ? "18px" : "22px",
+        fontSize: minNativeCssSize(isTinyLayout ? 18 : 22, 15),
       },
       mobileCardSuit: {
         ...styles.mobileCardSuit,
-        fontSize: isTinyLayout ? "18px" : "22px",
+        fontSize: minNativeCssSize(isTinyLayout ? 18 : 22, 15),
       },
       mobileCardCenterSuit: {
         ...styles.mobileCardCenterSuit,
-        fontSize: isTinyLayout ? "27px" : "34px",
+        fontSize: minNativeCssSize(isTinyLayout ? 27 : 34, 22),
+      },
+      characterPortraitFrame: {
+        ...styles.characterPortraitFrame,
+        width: isWideNativeLayout ? "min(100%, 270px)" : "min(100%, 248px)",
+      },
+      characterSelectBoard: {
+        ...styles.characterSelectBoard,
+        gridTemplateColumns: isWideNativeLayout
+          ? "minmax(300px, 0.82fr) minmax(0, 1.18fr)"
+          : styles.characterSelectBoard.gridTemplateColumns,
+      },
+      characterPortraitName: {
+        ...styles.characterPortraitName,
+        fontSize: minNativeCssSize(27, 22),
+      },
+      characterPortraitNickname: {
+        ...styles.characterPortraitNickname,
+        fontSize: minNativeCssSize(16, 15),
+      },
+      characterIdentityPanel: {
+        ...styles.characterIdentityPanel,
+        width: isWideNativeLayout ? "min(100%, 270px)" : "min(100%, 248px)",
+      },
+      characterName: {
+        ...styles.characterName,
+        fontSize: minNativeCssSize(48, 25),
+      },
+      characterNickname: {
+        ...styles.characterNickname,
+        fontSize: minNativeCssSize(26, 17),
+      },
+      characterStoryQuote: {
+        ...styles.characterStoryQuote,
+        fontSize: minNativeCssSize(17, 16),
+      },
+      playerSkinStoryQuote: {
+        ...styles.playerSkinStoryQuote,
+        fontSize: minNativeCssSize(26, 16),
+      },
+      characterInfoTitle: {
+        ...styles.characterInfoTitle,
+        fontSize: minNativeCssSize(18, 16),
+      },
+      characterSelectEyebrow: {
+        ...styles.characterSelectEyebrow,
+        fontSize: minNativeCssSize(18, 14),
+      },
+      characterNavButton: {
+        ...styles.characterNavButton,
+        width: minNativeCssSize(32, 48),
+        height: minNativeCssSize(32, 48),
+        fontSize: minNativeCssSize(18, 22),
+        flex: "0 0 auto",
+      },
+      characterNavCounter: {
+        ...styles.characterNavCounter,
+        fontSize: minNativeCssSize(10, 13),
+      },
+      characterSelectBackButton: {
+        ...styles.characterSelectBackButton,
+        minHeight: minNativeCssSize(36, 44),
+        fontSize: minNativeCssSize(11, 14),
+      },
+      characterSelectActionButton: {
+        ...styles.characterSelectActionButton,
+        minHeight: minNativeCssSize(42, 48),
+        fontSize: minNativeCssSize(15, 15),
+      },
+      playerSkinActionButton: {
+        ...styles.playerSkinActionButton,
+        minHeight: minNativeCssSize(44, 48),
+        fontSize: minNativeCssSize(17, 15),
+      },
+      inGameContextMenuButton: {
+        ...styles.inGameContextMenuButton,
+        fontSize: minNativeCssSize(11, 14),
+      },
+      inGameContextMenuButtonHand: {
+        ...styles.inGameContextMenuButtonHand,
+        minHeight: minNativeCssSize(38, 48),
+        minWidth: minNativeCssSize(92, 104),
+        fontSize: minNativeCssSize(11, 14),
+      },
+      inGameContextMenuPanelHand: {
+        ...styles.inGameContextMenuPanelHand,
+        width: stageScale < 0.9
+          ? isWideNativeLayout ? "300px" : "270px"
+          : "220px",
+        maxHeight: `${stageHeight * 0.78}px`,
+        overflowY: "auto",
+      },
+      inGameContextMenuAction: {
+        ...styles.inGameContextMenuAction,
+        minHeight: minNativeCssSize(40, 44),
+        padding: `${minNativeCssSize(10, 11)} ${minNativeCssSize(14, 14)}`,
+        fontSize: minNativeCssSize(13, 14),
+      },
+      inGameContextMenuActionSecondary: {
+        ...styles.inGameContextMenuActionSecondary,
+        minHeight: minNativeCssSize(40, 44),
+        padding: `${minNativeCssSize(10, 11)} ${minNativeCssSize(14, 14)}`,
+        fontSize: minNativeCssSize(13, 14),
       },
     }),
-    [gameplayBackgroundAsset, isCompactLayout, isTinyLayout, stageScale, useTightSidebar]
+    [gameplayBackgroundAsset, isCompactLayout, isTinyLayout, isWideNativeLayout, stageHeight, stageScale, stageWidth, useTightSidebar]
   )
 
   const handleOpenPrivacyOptions = useCallback(() => {
@@ -1050,6 +1178,8 @@ function App() {
             matchState={matchState}
             matchResultScreen={matchResultScreen}
             campaignVictoryScreen={campaignVictoryScreen}
+            isWideNativeLayout={isWideNativeLayout}
+            nativeContentScale={IS_NATIVE_SHELL ? stageScale : 1}
             currentCampaignVenue={currentCampaignVenue}
             currentVenueWins={currentVenueWins}
             dealAnimationNonce={dealAnimationNonce}
@@ -3164,7 +3294,7 @@ const styles: Record<string, React.CSSProperties> = {
   settingsHeader: {
     display: "flex",
     alignItems: "flex-start",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
     gap: "18px",
     flexShrink: 0,
   },
@@ -3827,7 +3957,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   journeyIntroHeader: {
     display: "flex",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
     alignItems: "flex-start",
     gap: "12px",
     flexShrink: 0,
@@ -4253,7 +4383,7 @@ const styles: Record<string, React.CSSProperties> = {
   freePlayBackButton: {
     position: "absolute",
     top: "4.8%",
-    right: "4.5%",
+    left: "4.5%",
     zIndex: 4,
     borderRadius: "999px",
     border: "1px solid rgba(255, 237, 202, 0.42)",
@@ -4269,7 +4399,7 @@ const styles: Record<string, React.CSSProperties> = {
   freePlayResetButton: {
     position: "absolute",
     top: "4.8%",
-    left: "4.5%",
+    right: "4.5%",
     zIndex: 4,
     borderRadius: "999px",
     border: "1px solid rgba(255, 237, 202, 0.34)",
@@ -4614,7 +4744,7 @@ const styles: Record<string, React.CSSProperties> = {
   characterSelectHeader: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
     gap: "16px",
   },
   characterSelectEyebrow: {
