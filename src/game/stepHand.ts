@@ -1,5 +1,6 @@
 import { evaluateHandStrength, getTeamTrucoDecision, shouldRaiseBet } from "../ai/trucoDecision"
 import type { AiTrucoPersonalityId } from "../ai/trucoPersonalities"
+import { compareCards } from "./compare"
 import { getRuleSet } from "./getRuleSet"
 import type { HandState } from "./handState"
 import { playAiTurn } from "./playAiTurn"
@@ -55,13 +56,15 @@ export function stepHand(
     const strengths = awaitingPlayers.map((player) =>
       evaluateHandStrength(ruleSet, player.hand, state.vira)
     )
-    const decision = getTeamTrucoDecision(
-      ruleSet,
-      awaitingPlayers.map((player) => player.hand),
-      proposedBet,
-      state.vira,
-      aiPersonalityId
-    )
+    const decision = isCurrentTrickGuaranteedForTeam(state, awaitingTeam)
+      ? "accept"
+      : getTeamTrucoDecision(
+          ruleSet,
+          awaitingPlayers.map((player) => player.hand),
+          proposedBet,
+          state.vira,
+          aiPersonalityId
+        )
     logAiTrucoDecision({
       action: "resposta",
       team: awaitingTeam,
@@ -134,6 +137,48 @@ export function stepHand(
   }
 
   return state
+}
+
+/**
+ * A team that already won one trick cannot lose the hand when it is
+ * guaranteed to win the trick currently on the table. This is especially
+ * important after the zap has been played: hand-strength thresholds alone
+ * do not know that the decisive trick is already secured.
+ */
+export function isCurrentTrickGuaranteedForTeam(
+  state: HandState,
+  team: "A" | "B"
+): boolean {
+  if (state.score[team] < 1 || state.table.length === 0) {
+    return false
+  }
+
+  const ruleSet = getRuleSet(state.variant)
+  const uncoveredTable = state.table.filter((entry) => !entry.covered)
+  if (uncoveredTable.length === 0) {
+    return false
+  }
+
+  let currentWinner = uncoveredTable[0]
+  for (const entry of uncoveredTable.slice(1)) {
+    if (compareCards(ruleSet, entry.card, currentWinner.card, state.vira) > 0) {
+      currentWinner = entry
+    }
+  }
+
+  if (getTeam(currentWinner.playerId) !== team) {
+    return false
+  }
+
+  const opposingPlayers = state.players.filter(
+    (player) => getTeam(player.id) !== team
+  )
+
+  return opposingPlayers.every((player) =>
+    player.hand.every(
+      (card) => compareCards(ruleSet, currentWinner.card, card, state.vira) > 0
+    )
+  )
 }
 
 function shouldAiPlayNineHand(state: HandState): boolean {

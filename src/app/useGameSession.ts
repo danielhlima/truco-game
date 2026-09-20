@@ -24,7 +24,7 @@ import {
 import { buildCampaignSummary } from "../career/campaign/summary"
 import type { CampaignStage, CampaignVenue } from "../career/campaign/types"
 import type { Card } from "../game/card"
-import type { HandState } from "../game/handState"
+import type { HandState, TeamId } from "../game/handState"
 import type { TableCard } from "../game/tableCard"
 import {
   applyCompletedHandToMatch,
@@ -34,7 +34,7 @@ import { decideNineHand, isNineHandAwaitingDecision } from "../game/nineHand"
 import { playHumanCard } from "../game/playHumanCard"
 import { requestTruco } from "../game/requestTruco"
 import { respondToTruco } from "../game/respondToTruco"
-import { stepHand } from "../game/stepHand"
+import { isCurrentTrickGuaranteedForTeam, stepHand } from "../game/stepHand"
 import { canTeamAskForTruco, getBetCallLabel } from "../game/truco"
 import {
   DEFAULT_TRUCO_VARIANT,
@@ -46,6 +46,10 @@ import {
   resetPlayerProfileStorage,
   savePlayerProfile,
 } from "../platform/storage/profileStorage"
+import {
+  loadRoundEndDialogueProgress,
+  saveRoundEndDialogueProgress,
+} from "../platform/storage/roundEndDialogueStorage"
 import { createInitialPlayerProfile } from "../profile/playerProfile"
 import type { PlayerProfile } from "../profile/playerProfile"
 import {
@@ -64,6 +68,12 @@ import {
   getPlayerSkinById,
   type PlayerSkinId,
 } from "../content/playerSkins"
+import {
+  getRoundEndDialogue,
+  getNextRoundEndDialogueIndex,
+  ROUND_END_DIALOGUES,
+  type RoundEndDialogue,
+} from "../content/roundEndDialogues"
 import { clearLogs, getLogsAsText, logEvent } from "../utils/logger"
 import {
   DEFAULT_TRUCO_MESSAGE,
@@ -206,6 +216,8 @@ export function useGameSession() {
   const AUTO_STEP_DELAY_MS = 820
   const NEXT_HAND_DELAY_MS = 1180
   const BUBBLE_DURATION_MS = 1500
+  const ROUND_END_DIALOGUE_LINE_DURATION_MS = 2500
+  const ROUND_END_DIALOGUE_GAP_MS = 120
   const MATCH_RESULT_REVEAL_DELAY_MS = 1000
   const GAMEPLAY_INTRO_BACKGROUND_MS = 1000
   const GAMEPLAY_INTRO_REVEAL_MS = 420
@@ -216,6 +228,7 @@ export function useGameSession() {
   const [eventMessage, setEventMessage] = useState("")
   const [trucoMessage, setTrucoMessage] = useState(DEFAULT_TRUCO_MESSAGE)
   const [speechBubble, setSpeechBubble] = useState<SpeechBubbleState | null>(null)
+  const [isRoundEndDialogueActive, setIsRoundEndDialogueActive] = useState(false)
   const [dealAnimationNonce, setDealAnimationNonce] = useState(0)
   const [shownPartnerAdviceKey, setShownPartnerAdviceKey] = useState<string | null>(null)
   const [debugVenueId, setDebugVenueId] = useState("")
@@ -237,6 +250,16 @@ export function useGameSession() {
     useState<PlayerSkinId>(DEFAULT_PLAYER_SKIN_ID)
   const speechBubbleTimeoutRef = useRef<number | null>(null)
   const followUpSpeechTimeoutRef = useRef<number | null>(null)
+  const roundEndDialogueTimeoutRef = useRef<number | null>(null)
+  const roundEndDialogueGenerationRef = useRef(0)
+  const lastRoundEndDialogueKeyRef = useRef<string | null>(null)
+  const roundEndDialogueProgressRef = useRef(loadRoundEndDialogueProgress())
+  const lastRoundEndDialogueIndexRef = useRef<Record<TeamId, number>>(
+    roundEndDialogueProgressRef.current.cursors
+  )
+  const roundsUntilNextDialogueRef = useRef(
+    roundEndDialogueProgressRef.current.roundsUntilNextDialogue
+  )
   const partnerAdviceTimeoutRef = useRef<number | null>(null)
   const partnerConsultTimeoutRef = useRef<number | null>(null)
   const partnerConsultResolutionTimeoutRef = useRef<number | null>(null)
@@ -539,7 +562,10 @@ export function useGameSession() {
     setLogs(getLogsAsText())
   }, [])
 
-  const showSpeechBubble = useCallback((nextSpeechBubble: SpeechBubbleState | null) => {
+  const showSpeechBubble = useCallback((
+    nextSpeechBubble: SpeechBubbleState | null,
+    durationMs = BUBBLE_DURATION_MS
+  ) => {
     if (speechBubbleTimeoutRef.current) {
       window.clearTimeout(speechBubbleTimeoutRef.current)
       speechBubbleTimeoutRef.current = null
@@ -562,8 +588,51 @@ export function useGameSession() {
         current === nextSpeechBubble ? null : current
       )
       speechBubbleTimeoutRef.current = null
-    }, BUBBLE_DURATION_MS)
+    }, durationMs)
   }, [BUBBLE_DURATION_MS])
+
+  const playRoundEndDialogue = useCallback((
+    dialogue: RoundEndDialogue,
+    startDelayMs = 0
+  ): number => {
+    if (dialogue.lines.length === 0) {
+      return 0
+    }
+
+    if (roundEndDialogueTimeoutRef.current) {
+      window.clearTimeout(roundEndDialogueTimeoutRef.current)
+    }
+
+    const generation = ++roundEndDialogueGenerationRef.current
+    setIsRoundEndDialogueActive(true)
+
+    const playLine = (lineIndex: number) => {
+      if (roundEndDialogueGenerationRef.current !== generation) {
+        return
+      }
+
+      const line = dialogue.lines[lineIndex]
+      if (!line) {
+        setIsRoundEndDialogueActive(false)
+        roundEndDialogueTimeoutRef.current = null
+        return
+      }
+
+      showSpeechBubble(
+        { ...line, kind: "round-end" },
+        ROUND_END_DIALOGUE_LINE_DURATION_MS
+      )
+      roundEndDialogueTimeoutRef.current = window.setTimeout(() => {
+        playLine(lineIndex + 1)
+      }, ROUND_END_DIALOGUE_LINE_DURATION_MS + ROUND_END_DIALOGUE_GAP_MS)
+    }
+
+    roundEndDialogueTimeoutRef.current = window.setTimeout(() => {
+      playLine(0)
+    }, startDelayMs)
+
+    return startDelayMs + dialogue.lines.length * (ROUND_END_DIALOGUE_LINE_DURATION_MS + ROUND_END_DIALOGUE_GAP_MS)
+  }, [ROUND_END_DIALOGUE_GAP_MS, ROUND_END_DIALOGUE_LINE_DURATION_MS, showSpeechBubble])
 
   const clearPendingUiTimers = useCallback(() => {
     if (speechBubbleTimeoutRef.current) {
@@ -574,6 +643,12 @@ export function useGameSession() {
       window.clearTimeout(followUpSpeechTimeoutRef.current)
       followUpSpeechTimeoutRef.current = null
     }
+    if (roundEndDialogueTimeoutRef.current) {
+      window.clearTimeout(roundEndDialogueTimeoutRef.current)
+      roundEndDialogueTimeoutRef.current = null
+    }
+    roundEndDialogueGenerationRef.current += 1
+    setIsRoundEndDialogueActive(false)
     if (partnerAdviceTimeoutRef.current) {
       window.clearTimeout(partnerAdviceTimeoutRef.current)
       partnerAdviceTimeoutRef.current = null
@@ -648,6 +723,52 @@ export function useGameSession() {
       hasExplicitFollowUpSpeechBubble
         ? explicitMessages?.followUpSpeechBubble ?? null
         : getFollowUpSpeechBubbleForTransition(handState, nextState)
+    const completedRoundWinner =
+      !handState?.finished && nextState.finished ? nextState.winner : undefined
+    const completedRound = completedRoundWinner !== undefined
+    const roundEndDialogueKey = completedRoundWinner
+      ? [
+          matchSessionIdRef.current,
+          matchState?.handNumber ?? "none",
+          nextState.roundNumber,
+          completedRoundWinner,
+          nextState.score.A,
+          nextState.score.B,
+        ].join(":")
+      : null
+    const isNewCompletedRound =
+      !!roundEndDialogueKey && lastRoundEndDialogueKeyRef.current !== roundEndDialogueKey
+    const shouldStartRoundEndDialogue =
+      isNewCompletedRound && roundsUntilNextDialogueRef.current === 0
+    if (isNewCompletedRound) {
+      lastRoundEndDialogueKeyRef.current = roundEndDialogueKey
+      // After displaying one, skip exactly the next two completed rounds.
+      roundsUntilNextDialogueRef.current = shouldStartRoundEndDialogue
+        ? 2
+        : Math.max(0, roundsUntilNextDialogueRef.current - 1)
+      saveRoundEndDialogueProgress({
+        cursors: lastRoundEndDialogueIndexRef.current,
+        roundsUntilNextDialogue: roundsUntilNextDialogueRef.current,
+      })
+    }
+    const roundEndDialogue =
+      shouldStartRoundEndDialogue && completedRoundWinner
+        ? getRoundEndDialogue(
+            completedRoundWinner,
+            lastRoundEndDialogueIndexRef.current[completedRoundWinner]
+          )
+        : null
+    if (roundEndDialogue && completedRoundWinner) {
+      lastRoundEndDialogueIndexRef.current[completedRoundWinner] =
+        getNextRoundEndDialogueIndex(
+          ROUND_END_DIALOGUES[completedRoundWinner].length,
+          lastRoundEndDialogueIndexRef.current[completedRoundWinner]
+        )
+      saveRoundEndDialogueProgress({
+        cursors: lastRoundEndDialogueIndexRef.current,
+        roundsUntilNextDialogue: roundsUntilNextDialogueRef.current,
+      })
+    }
 
     setHandState(nextState)
     showSpeechBubble(nextSpeechBubble)
@@ -668,6 +789,13 @@ export function useGameSession() {
       }, BUBBLE_DURATION_MS + 120)
     }
 
+    const roundEndDialogueDelay = roundEndDialogue
+      ? playRoundEndDialogue(
+          roundEndDialogue,
+          nextSpeechBubble ? BUBBLE_DURATION_MS + ROUND_END_DIALOGUE_GAP_MS : 0
+        )
+      : 0
+
     if (nextEventMessage) {
       setEventMessage(nextEventMessage)
     }
@@ -676,7 +804,7 @@ export function useGameSession() {
       setTrucoMessage(nextTrucoMessage)
     }
 
-    if (!handState?.finished && nextState.finished && nextState.winner) {
+    if (completedRound && nextState.winner) {
       const nextMatchState = matchState
         ? applyCompletedHandToMatch(matchState, nextState)
         : null
@@ -773,7 +901,7 @@ export function useGameSession() {
                   : `Modo Livre: siga vencendo em ${resultVenueName}.`
             )
             matchResultRevealTimeoutRef.current = null
-          }, MATCH_RESULT_REVEAL_DELAY_MS)
+          }, MATCH_RESULT_REVEAL_DELAY_MS + roundEndDialogueDelay)
           syncLogs()
           return
         } else if (nextState.winner === "A") {
@@ -839,7 +967,7 @@ export function useGameSession() {
             setEventMessage(nextEventMessage)
             setTrucoMessage(nextTrucoMessage)
             matchResultRevealTimeoutRef.current = null
-          }, MATCH_RESULT_REVEAL_DELAY_MS)
+          }, MATCH_RESULT_REVEAL_DELAY_MS + roundEndDialogueDelay)
           syncLogs()
           return
         } else if (freePlayRun && freePlayCurrentVenue?.id === resultVenue?.id) {
@@ -866,7 +994,7 @@ export function useGameSession() {
           setMatchResultScreen(matchResultState)
           setMenuScreen("match-result")
           matchResultRevealTimeoutRef.current = null
-        }, MATCH_RESULT_REVEAL_DELAY_MS)
+        }, MATCH_RESULT_REVEAL_DELAY_MS + roundEndDialogueDelay)
       }
     }
 
@@ -880,6 +1008,7 @@ export function useGameSession() {
     playerProfile,
     sessionDebugVenue,
     sessionDebugVenueId,
+    playRoundEndDialogue,
     showSpeechBubble,
     syncLogs,
   ])
@@ -892,6 +1021,7 @@ export function useGameSession() {
     lastPartnerAdviceKeyRef.current = null
     lastPartnerConsultKeyRef.current = null
     lastDealAnimationKeyRef.current = null
+    lastRoundEndDialogueKeyRef.current = null
 
     const firstPlayerId = 1
     const { handState: state, matchState: initialMatchState } =
@@ -1275,17 +1405,19 @@ export function useGameSession() {
 
     partnerConsultResolutionTimeoutRef.current = window.setTimeout(() => {
       const ruleSet = getRuleSet(handState.variant)
-      const decision = getTeamTrucoDecisionFromPartnerAdvice(
-        ruleSet,
-        player1.hand,
-        player3.hand,
-        handState.truco.proposedBet!,
-        advice,
-        handState.vira,
-        partnerAiPersonalityId,
-        undefined,
-        partnerAdviceSkillLevel
-      )
+      const decision = isCurrentTrickGuaranteedForTeam(handState, "A")
+        ? "accept"
+        : getTeamTrucoDecisionFromPartnerAdvice(
+            ruleSet,
+            player1.hand,
+            player3.hand,
+            handState.truco.proposedBet!,
+            advice,
+            handState.vira,
+            partnerAiPersonalityId,
+            undefined,
+            partnerAdviceSkillLevel
+          )
 
       const nextState = respondToTruco(handState, decision, matchState?.score)
 
@@ -1335,7 +1467,7 @@ export function useGameSession() {
       return
     }
 
-    if (!handState || !matchState || matchState.finished) {
+    if (!handState || !matchState || matchState.finished || isRoundEndDialogueActive) {
       return
     }
 
@@ -1405,6 +1537,7 @@ export function useGameSession() {
     inGameConfirmation,
     inGameContextMenuOpen,
     isGameplayIntroActive,
+    isRoundEndDialogueActive,
     matchState,
     opponentAiPersonalityId,
     partnerAiPersonalityId,
@@ -1417,6 +1550,9 @@ export function useGameSession() {
       }
       if (followUpSpeechTimeoutRef.current) {
         window.clearTimeout(followUpSpeechTimeoutRef.current)
+      }
+      if (roundEndDialogueTimeoutRef.current) {
+        window.clearTimeout(roundEndDialogueTimeoutRef.current)
       }
       if (partnerAdviceTimeoutRef.current) {
         window.clearTimeout(partnerAdviceTimeoutRef.current)

@@ -109,6 +109,39 @@ test("stepHand permite que a IA aceite e peça aumento quando a mão for forte",
   )
 })
 
+test("stepHand não corre de seis quando o zap garante a terceira vaza", () => {
+  const state = createHandStateFixture({
+    score: { A: 1, B: 1 },
+    roundNumber: 3,
+    currentPlayerId: 1,
+    players: [
+      { id: 1, hand: [{ rank: "3", suit: "copas" }] },
+      { id: 2, hand: [{ rank: "5", suit: "espada" }] },
+      { id: 3, hand: [{ rank: "6", suit: "ouros" }] },
+      { id: 4, hand: [{ rank: "7", suit: "paus" }] },
+    ],
+    table: [
+      { playerId: 2, card: { rank: "5", suit: "espada" }, covered: false },
+      { playerId: 3, card: { rank: "6", suit: "ouros" }, covered: false },
+      { playerId: 4, card: { rank: "4", suit: "paus" }, covered: false },
+    ],
+    truco: {
+      phase: "awaiting-response",
+      requestedByPlayerId: 1,
+      requestedByTeam: "A",
+      awaitingResponseFromPlayerId: 2,
+      awaitingResponseFromTeam: "B",
+      proposedBet: 6,
+    },
+  })
+
+  const nextState = stepHand(state)
+
+  assert.equal(nextState.currentBet, 6)
+  assert.equal(nextState.truco.phase, "idle")
+  assert.equal(nextState.finished, false)
+})
+
 test("stepHand registra debug quando a IA pede truco", () => {
   clearLogs()
   const state = createHandStateFixture({

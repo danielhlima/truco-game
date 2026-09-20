@@ -126,6 +126,39 @@ export function GameTableScene({
   const animationTimeoutsRef = useRef<number[]>([])
 
   useEffect(() => {
+    const recoverTableAnimations = () => {
+      // Timers used by the card transitions can be suspended while the app is
+      // inactive. The current model remains the source of truth, so discard
+      // any stale visual transition and let the next render draw the table.
+      setAnimatingCards([])
+      setClearingCards([])
+      setDealingCards([])
+      setIsDealing(false)
+      previousCardsRef.current = model.slots.reduce<Record<number, string | null>>(
+        (cards, slot) => {
+          cards[slot.playerId] = getSlotCardKey(slot)
+          return cards
+        },
+        {}
+      )
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== "hidden") {
+        recoverTableAnimations()
+      }
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+    document.addEventListener("resume", recoverTableAnimations)
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+      document.removeEventListener("resume", recoverTableAnimations)
+    }
+  }, [model.slots])
+
+  useEffect(() => {
     const container = containerRef.current
     if (!container) return
 
@@ -750,6 +783,7 @@ export function GameTableScene({
           <SpeechBubbleOverlay
             playerId={speechBubble.playerId}
             text={speechBubble.text}
+            kind={speechBubble.kind}
           />
         ) : null}
       </div>
@@ -1119,29 +1153,47 @@ function getSpeechBubbleOverlayPosition(playerId: number): { left: string; top: 
 function SpeechBubbleOverlay({
   playerId,
   text,
+  kind,
 }: {
   playerId: number
   text: string
+  kind?: "round-end"
 }) {
   const { left, top } = getSpeechBubbleOverlayPosition(playerId)
+  const isLeftSidePlayer = playerId === 2
+  const isRightSidePlayer = playerId === 4
+  const isTopPlayer = playerId === 3
+  const isSidePlayer = isLeftSidePlayer || isRightSidePlayer
 
   return (
     <div
       style={{
         position: "absolute",
-        left,
-        top,
-        transform: "translate(-50%, -50%)",
+        left: isLeftSidePlayer ? "2%" : isRightSidePlayer ? undefined : left,
+        right: isRightSidePlayer ? "2%" : undefined,
+        top: isTopPlayer ? "3%" : top,
+        transform: isSidePlayer || isTopPlayer
+          ? isTopPlayer
+            ? "translateX(-50%)"
+            : "translateY(-50%)"
+          : "translate(-50%, -50%)",
         padding: "10px 14px",
         borderRadius: "18px",
         background: "#fffdf5",
         border: "2px solid rgba(68, 64, 60, 0.82)",
         color: "#1f2937",
-        fontSize: "18px",
+        fontSize: kind === "round-end" ? "16px" : "18px",
         fontWeight: 900,
         letterSpacing: "0.04em",
         boxShadow: "0 12px 22px rgba(0,0,0,0.22)",
-        whiteSpace: "nowrap",
+        boxSizing: "border-box",
+        maxWidth: isSidePlayer ? "38%" : "76%",
+        whiteSpace: "normal",
+        overflowWrap: "normal",
+        wordBreak: "normal",
+        hyphens: "none",
+        textAlign: "center",
+        lineHeight: 1.12,
         animation: "speech-pop 180ms ease-out",
       }}
     >
@@ -1156,7 +1208,7 @@ function SpeechBubbleOverlay({
           borderRight: "2px solid rgba(68, 64, 60, 0.82)",
           borderBottom: "2px solid rgba(68, 64, 60, 0.82)",
           transform: "translateX(-50%) rotate(45deg)",
-          left: playerId === 2 ? "24%" : playerId === 4 ? "76%" : "50%",
+          left: isLeftSidePlayer ? "30%" : isRightSidePlayer ? "70%" : "50%",
           bottom: "-8px",
           top: undefined,
           right: undefined,

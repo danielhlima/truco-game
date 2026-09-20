@@ -17,6 +17,7 @@ export const DEFAULT_TRUCO_MESSAGE = "Nenhum pedido de truco nesta mão."
 export interface SpeechBubbleState {
   playerId: number
   text: string
+  kind?: "round-end"
 }
 
 export interface VenueMatchState {
