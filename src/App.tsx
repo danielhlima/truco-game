@@ -4444,18 +4444,10 @@ const styles: Record<string, React.CSSProperties> = {
     background: "#080604",
   },
   matchResultImageFrame: {
-    position: "relative",
-    height: "100%",
-    // Result artwork is authored at 1672x941 (16:9). The surrounding game
-    // stage already preserves that ratio, so constraining this frame to
-    // 82.35% made contain() add a second set of black bars.
+    position: "absolute",
+    inset: 0,
     width: "100%",
-    maxWidth: "100%",
-    maxHeight: "100%",
-    aspectRatio: "1672 / 941",
-    alignSelf: "center",
-    justifySelf: "center",
-    flexShrink: 0,
+    height: "100%",
   },
   matchResultImage: {
     width: "100%",

@@ -1067,6 +1067,7 @@ export function TableSection({
                 playerProfile={playerProfile}
                 selectedPlayerSkin={selectedPlayerSkin}
                 onOpenCharacterSelect={onOpenCharacterSelect}
+                onBack={onCloseJourneyIntro}
                 onStart={onEnterVenueFromIntro}
                 styles={styles}
               />
@@ -1147,6 +1148,7 @@ export function TableSection({
                     playerProfile={playerProfile}
                     selectedPlayerSkin={selectedPlayerSkin}
                     onOpenCharacterSelect={onOpenCharacterSelect}
+                    onBack={onCloseJourneyIntro}
                     onStart={onEnterVenueFromIntro}
                     styles={styles}
                   />
@@ -4226,7 +4228,18 @@ function CampaignVictoryScreen({
 
   if (victoryAsset) {
     return (
-      <div style={styles.matchResultImageScreen}>
+      <div
+        style={styles.matchResultImageScreen}
+        onClick={onContinue}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault()
+            onContinue()
+          }
+        }}
+      >
         <div style={styles.matchResultImageFrame}>
           <img
             src={victoryAsset}
@@ -4236,7 +4249,6 @@ function CampaignVictoryScreen({
           <button
             aria-label="Voltar ao fluxo de bares"
             style={styles.matchResultImageCta}
-            onClick={onContinue}
           />
         </div>
       </div>
@@ -4244,7 +4256,18 @@ function CampaignVictoryScreen({
   }
 
   return (
-    <div style={styles.matchResultScreen}>
+    <div
+      style={styles.matchResultScreen}
+      onClick={onContinue}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault()
+          onContinue()
+        }
+      }}
+    >
       <div style={{ ...styles.matchResultCard, ...styles.matchResultCardWin }}>
         <div style={styles.matchResultEyebrow}>Conquista definitiva</div>
         <h2 style={styles.matchResultTitle}>{victory?.title ?? "Bar conquistado"}</h2>
@@ -4253,7 +4276,6 @@ function CampaignVictoryScreen({
         </p>
         <button
           style={{ ...styles.gameStartLaunchButton, alignSelf: "flex-start" }}
-          onClick={onContinue}
         >
           VOLTAR AO FLUXO DE BARES
         </button>
@@ -4282,7 +4304,18 @@ function MatchResultScreen({
 
   if (resultAsset) {
     return (
-      <div style={styles.matchResultImageScreen}>
+      <div
+        style={styles.matchResultImageScreen}
+        onClick={onContinue}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault()
+            onContinue()
+          }
+        }}
+      >
         <div style={styles.matchResultImageFrame}>
           <img
             src={resultAsset}
@@ -4292,7 +4325,6 @@ function MatchResultScreen({
           <button
             aria-label="Voltar ao fluxo de bares"
             style={styles.matchResultImageCta}
-            onClick={onContinue}
           />
         </div>
       </div>
@@ -4300,7 +4332,18 @@ function MatchResultScreen({
   }
 
   return (
-    <div style={styles.matchResultScreen}>
+    <div
+      style={styles.matchResultScreen}
+      onClick={onContinue}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault()
+          onContinue()
+        }
+      }}
+    >
       <div
         style={{
           ...styles.matchResultCard,
@@ -4339,7 +4382,6 @@ function MatchResultScreen({
 
         <button
           style={{ ...styles.gameStartLaunchButton, alignSelf: "flex-start" }}
-          onClick={onContinue}
         >
           VOLTAR AO FLUXO DE BARES
         </button>
@@ -4652,6 +4694,7 @@ function VenueIntroScreen({
   playerProfile,
   selectedPlayerSkin,
   onOpenCharacterSelect,
+  onBack,
   onStart,
   styles,
 }: {
@@ -4664,6 +4707,7 @@ function VenueIntroScreen({
   playerProfile: PlayerProfile
   selectedPlayerSkin: PlayerSkinProfile
   onOpenCharacterSelect: () => void
+  onBack: () => void
   onStart: () => void
   styles: StyleMap
 }) {
@@ -5335,8 +5379,8 @@ function VenueIntroScreen({
 
           <button
             type="button"
-            onClick={onOpenCharacterSelect}
-            aria-label="Voltar à seleção de parceira"
+            onClick={onBack}
+            aria-label="Voltar ao fluxo de bares"
             style={{
               ...styles.characterSelectBackButton,
               minHeight: isWideNativeLayout ? 48 : 44,
