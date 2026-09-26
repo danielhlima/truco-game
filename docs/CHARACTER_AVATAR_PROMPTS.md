@@ -23,13 +23,13 @@ Regras de exportacao:
 | --- | --- | --- | --- |
 | Salao da Sul | Aninha Passarela | Ivone Verniz | `ivone-verniz.png` |
 | Centro de Convenções da Prefeitura | Marlene Pimenta | Osmar Alfinete | `osmar-alfinete.png` |
-| Ginásio Estadual Maneco Filé | Dalva Seringa | Geraldo Medalha | `geraldo-medalha.png` |
+| Ginásio Estadual Maneco Filé | Dalva Baralho | Geraldo Medalha | `geraldo-medalha.png` |
 | Arena Nacional | Zito Parafuso | Sueli Estopim | `sueli-estopim.png` |
 | Centro Americano Truqueiro de Medelin. | Quiteria Mao-Torta | Ramiro Bolero | `ramiro-bolero.png` |
-| Centro Americano Truqueiro de Medelin. | Jura Pancada | Luna Candela | `luna-candela.png` |
+| Centro Americano Truqueiro de Medelin. | Jura Pancada | Luna Centelha | `luna-candela.png` |
 | Hotel Truco de Segóvia, Espanha | Creusa Rabugenta | Mina Compasso | `mina-compasso.png` |
-| Hotel Truco de Segóvia, Espanha | Dito Marrua | Viktor Muralha | `viktor-muralha.png` |
-| Cassino Mé Maior | Norberto Fuba | Madame Violeta | `madame-violeta.png` |
+| Hotel Truco de Segóvia, Espanha | Dito Valente | Viktor Muralha | `viktor-muralha.png` |
+| Cassino Mé Maior | Norberto Sumido | Madame Violeta | `madame-violeta.png` |
 | Cassino Mé Maior | Rosinha Catraca | Augusto Crupie | `augusto-crupie.png` |
 | Orbita da Lua | Biu Caolho | Cosme Orbita | `cosme-orbita.png` |
 
@@ -103,12 +103,12 @@ Background: simple dark muted amber and brown gradient.
 Constraints: single character only, no hands, no playing cards, no props, no scenery, no text, no border, no logo, no watermark, no cropped head.
 ```
 
-## 6. Luna Candela
+## 6. Luna Centelha
 
 ```text
 Create a polished square 1:1 game character avatar for an international truco campaign roster.
 
-Character: Luna Candela, nickname "La Chispa". Latin American woman around 36 years old, lively presence, copper-toned skin, long dark wavy hair pulled partly back, direct bright eyes, small confident grin, deep orange blouse with a simple dark jacket. She should look fearless, quick and opportunistic, as if she enjoys forcing the table to react to her rhythm.
+Character: Luna Centelha, nickname "La Chispa". Latin American woman around 36 years old, lively presence, copper-toned skin, long dark wavy hair pulled partly back, direct bright eyes, small confident grin, deep orange blouse with a simple dark jacket. She should look fearless, quick and opportunistic, as if she enjoys forcing the table to react to her rhythm.
 
 Style: semi-realistic digital painted portrait matching a polished mobile game roster, realistic facial proportions with gently stylized detail.
 Composition: square portrait, head and upper shoulders centered, facing forward, fully visible head, simple bust crop.

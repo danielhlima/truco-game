@@ -57,18 +57,18 @@ Nota visual: o caminho principal evoluiu de botecos populares para eventos ofici
 
 | Fase / circuito | Bar / fase | Tema visual | Ambiente | Variante | Dificuldade | Dupla adversaria | Vitorias | Estado visual minimo |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Botecos da Rua | Bar do Ze Catinga | Boteco raiz fotografico | Paredes gastas, piso engordurado e TV velha | Paulista | 1/5 | Tiao Casca Grossa + Cida Fumaca | 3 | Campanha, capa, background e resultado autorais |
+| Botecos da Rua | Bar do Ze Catinga | Boteco raiz fotografico | Paredes gastas, piso engordurado e TV velha | Paulista | 1/5 | Tiao Casca Grossa + Cida Brisa | 3 | Campanha, capa, background e resultado autorais |
 | Botecos da Rua | Bar Maneco Banguela | Boteco raiz claro | Metal, copos batendo e domino | Paulista | 1/5 | Tonhao Rasga-Lata + Patricia Monique | 4 | Campanha, capa, background e resultado autorais |
-| Campeonato da Vila Naná | Trem do Jaça | Madeira suja | Trem de vila com provocacao antiga | Paulista | 2/5 | Naldo Tramela + Dalva Seringa | 5 | Campanha, capa, background, mesa e resultado autorais |
+| Campeonato da Vila Naná | Trem do Jaça | Madeira suja | Trem de vila com provocacao antiga | Paulista | 2/5 | Naldo Tramela + Dalva Baralho | 5 | Campanha, capa, background, mesa e resultado autorais |
 | Campeonato da Vila Naná | Adega do Juca Bigode | Metal de patio | Luz improvisada, balcão de metal e plateia apertada | Paulista | 2/5 | Biu Caolho + Aninha Passarela | 6 | Campanha, capa, background, mesa e resultado autorais |
-| Conquista das Zonas | Garagem Norte | Industrial | Ferro, concreto e fumaca | Paulista | 3/5 | Dito Marrua + Celsinho Breque | 4 | Campanha, capa, background, mesa e resultado autorais |
-| Conquista das Zonas | Quintal da Leste | Festival de rua | Partida cheia e conversa alta | Paulista | 3/5 | Rosinha Catraca + Damiao Corote | 5 | Campanha, capa, background, mesa e resultado autorais |
+| Conquista das Zonas | Garagem Norte | Industrial | Ferro, concreto e fumaca | Paulista | 3/5 | Dito Valente + Celsinho Breque | 4 | Campanha, capa, background, mesa e resultado autorais |
+| Conquista das Zonas | Quintal da Leste | Festival de rua | Partida cheia e conversa alta | Paulista | 3/5 | Rosinha Catraca + Damiao Relicário | 5 | Campanha, capa, background, mesa e resultado autorais |
 | Conquista das Zonas | Subsolo do Centro | Underground | Bar escondido e calculista | Paulista | 3/5 | Norberto Fuba + Quiteria Mao-Torta | 6 | Campanha, capa, background, mesa e resultado autorais |
 | Conquista das Zonas | Salao da Sul | Premium de esquina | Boteco arrumado com malandragem local | Paulista | 3/5 | Ivone Verniz + Marlene Pimenta | 5 | Campanha, capa, background, mesa e resultado autorais |
 | Campeonato Municipal | Centro de Convenções da Prefeitura | Evento urbano | Publico maior e rivais conhecidos | Paulista | 4/5 | Jura Pancada + Osmar Alfinete | 6 | Campanha, capa, background, mesa e resultado autorais |
 | Campeonato Estadual | Ginásio Estadual Maneco Filé | Classico regional | Evento organizado e narrador local | Paulista | 4/5 | Geraldo Medalha + Zito Parafuso | 6 | Campanha, capa, background, mesa e resultado autorais |
 | Campeonato Nacional | Arena Nacional | Arena com transmissao | Plateia grande e pressao publica | Paulista | 4/5 | Sueli Estopim + Creusa Rabugenta | 7 | Campanha, capa, background, mesa e resultado autorais |
-| Circuito Panamericano | Centro Americano Truqueiro de Medelin. | Show continental | Producao moderna e estilos diferentes | Paulista | 4/5 | Ramiro Bolero + Luna Candela | 5 | Campanha, capa, background, mesa e resultado autorais |
+| Circuito Panamericano | Centro Americano Truqueiro de Medelin. | Show continental | Producao moderna e estilos diferentes | Paulista | 4/5 | Ramiro Bolero + Luna Centelha | 5 | Campanha, capa, background, mesa e resultado autorais |
 | Jogos Mundiais | Hotel Truco de Segóvia, Espanha | Esportivo cerimonial | Bandeiras, delegacoes e tensao maxima | Paulista | 5/5 | Mina Compasso + Viktor Muralha | 4 | Campanha, capa, background, mesa e resultado autorais |
 | Mundial | Cassino Mé Maior | Cassino de luxo | Veludo, lustres e silencio tenso | Paulista | 5/5 | Madame Violeta + Augusto Crupie | 5 | Campanha, capa, background, mesa e resultado autorais |
 | Circuito Intergaláctico | Órbita da Lua | Bonus lunar retrofuturista | Clube orbital improvisado, neon, bandeirolas e transmissao ao vivo | Paulista | 5/5 | Mané Banguela + Cosme Órbita | 7 | Campanha, capa, background, mesa, resultado e vitoria de circuito autorais |

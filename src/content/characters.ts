@@ -111,7 +111,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
   },
   {
     id: "nega-catimbo",
-    name: "Nega Catimbó",
+    name: "Nina Maré",
     nickname: "A Que Sente a Mesa",
     personalityId: "conservative",
     role: "partner",
@@ -207,7 +207,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
   },
   {
     id: "cida-fumaca",
-    name: "Cida Fumaça",
+    name: "Cida Brisa",
     nickname: "A Neblina",
     personalityId: "balanced",
     role: "npc",
@@ -223,7 +223,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
   },
   {
     id: "dito-marrua",
-    name: "Dito Marruá",
+    name: "Dito Valente",
     nickname: "O Touro de Mesa",
     personalityId: "reckless",
     role: "npc",
@@ -271,7 +271,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
   },
   {
     id: "dalva-seringa",
-    name: "Dalva Seringa",
+    name: "Dalva Baralho",
     nickname: "A Herdeira do Truco",
     personalityId: "conservative",
     role: "npc",
@@ -351,7 +351,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
   },
   {
     id: "norberto-fuba",
-    name: "Norberto Fubá",
+    name: "Norberto Sumido",
     nickname: "O Fantasma do Bairro",
     personalityId: "ultra_conservative",
     role: "npc",
@@ -383,7 +383,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
   },
   {
     id: "damiao-corote",
-    name: "Damião Corote",
+    name: "Damião Relicário",
     nickname: "O Relicário",
     personalityId: "reckless",
     role: "npc",
@@ -559,7 +559,7 @@ export const TRUCO_CHARACTER_ROSTER: TrucoCharacterProfile[] = [
   },
   {
     id: "luna-candela",
-    name: "Luna Candela",
+    name: "Luna Centelha",
     nickname: "La Chispa",
     personalityId: "opportunistic",
     role: "npc",

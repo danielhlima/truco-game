@@ -1815,6 +1815,7 @@ type TutorialDraftStep = {
     | "score-right"
     | "action-left"
     | "bottom-right"
+    | "covered-toggle"
     | "bottom-left"
   expectedAction?:
     | "play-low-card"
@@ -2017,7 +2018,7 @@ const TUTORIAL_DRAFT_STEPS: TutorialDraftStep[] = [
   {
     id: "partner-advice",
     title: "Ela chamou",
-    text: "A Nega Catimbó disse BORA!, sinal de que vê força na dupla. Toque em Aceitar para seguir com ela.",
+    text: "A Nina Maré disse BORA!, sinal de que vê força na dupla. Toque em Aceitar para seguir com ela.",
     target: "BORA!",
     anchor: "action-left",
     expectedAction: "follow-partner-advice",
@@ -2055,7 +2056,7 @@ const TUTORIAL_DRAFT_STEPS: TutorialDraftStep[] = [
     title: "Agora pode cobrir",
     text: "A partir da segunda vaza, o toggle Coberta aparece como opção. Use quando quiser descartar sem disputar a vaza.",
     target: "Coberta",
-    anchor: "bottom-right",
+    anchor: "covered-toggle",
     expectedAction: "toggle-covered-card",
   },
   {
@@ -3243,6 +3244,8 @@ function getTutorialBubblePosition(anchor: string): React.CSSProperties {
       return { left: "27%", top: "29%" }
     case "bottom-right":
       return { right: "8%", bottom: "14%" }
+    case "covered-toggle":
+      return { right: "8%", bottom: "30%" }
     case "top-left":
       return { left: "8%", top: "14%" }
     default:
