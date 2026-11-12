@@ -71,6 +71,7 @@ import {
 import {
   getRoundEndDialogue,
   getNextRoundEndDialogueIndex,
+  getNextRoundEndDialogueInterval,
   ROUND_END_DIALOGUES,
   type RoundEndDialogue,
 } from "../content/roundEndDialogues"
@@ -253,12 +254,12 @@ export function useGameSession() {
   const roundEndDialogueTimeoutRef = useRef<number | null>(null)
   const roundEndDialogueGenerationRef = useRef(0)
   const lastRoundEndDialogueKeyRef = useRef<string | null>(null)
-  const roundEndDialogueProgressRef = useRef(loadRoundEndDialogueProgress())
+  const [roundEndDialogueProgress] = useState(loadRoundEndDialogueProgress)
   const lastRoundEndDialogueIndexRef = useRef<Record<TeamId, number>>(
-    roundEndDialogueProgressRef.current.cursors
+    roundEndDialogueProgress.cursors
   )
   const roundsUntilNextDialogueRef = useRef(
-    roundEndDialogueProgressRef.current.roundsUntilNextDialogue
+    roundEndDialogueProgress.roundsUntilNextDialogue
   )
   const partnerAdviceTimeoutRef = useRef<number | null>(null)
   const partnerConsultTimeoutRef = useRef<number | null>(null)
@@ -743,9 +744,10 @@ export function useGameSession() {
     if (isNewCompletedRound) {
       lastRoundEndDialogueKeyRef.current = roundEndDialogueKey
       // After displaying one, skip exactly the next two completed rounds.
-      roundsUntilNextDialogueRef.current = shouldStartRoundEndDialogue
-        ? 2
-        : Math.max(0, roundsUntilNextDialogueRef.current - 1)
+      roundsUntilNextDialogueRef.current = getNextRoundEndDialogueInterval(
+        roundsUntilNextDialogueRef.current,
+        shouldStartRoundEndDialogue
+      )
       saveRoundEndDialogueProgress({
         cursors: lastRoundEndDialogueIndexRef.current,
         roundsUntilNextDialogue: roundsUntilNextDialogueRef.current,

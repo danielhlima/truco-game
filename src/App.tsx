@@ -557,10 +557,13 @@ function App() {
   const isTinyLayout = layoutMode === "tiny"
   const isWideNativeLayout = IS_NATIVE_SHELL && stageWidth > GAMEPLAY_STAGE_WIDTH
   const useTightSidebar = layoutMode !== "regular"
-  const minNativeCssSize = (baseSize: number, minimumCssSize: number) =>
-    IS_NATIVE_SHELL && stageScale < 0.9
-      ? `${Math.max(baseSize, minimumCssSize / stageScale)}px`
-      : `${baseSize}px`
+  const minNativeCssSize = useCallback(
+    (baseSize: number, minimumCssSize: number) =>
+      IS_NATIVE_SHELL && stageScale < 0.9
+        ? `${Math.max(baseSize, minimumCssSize / stageScale)}px`
+        : `${baseSize}px`,
+    [stageScale]
+  )
   const gameplayBackgroundAsset = currentCampaignVenue?.id
     ? GAMEPLAY_BACKGROUND_ASSET_BY_VENUE_ID[currentCampaignVenue.id] ?? botecoSceneBgAsset
     : botecoSceneBgAsset
@@ -1135,7 +1138,7 @@ function App() {
         fontSize: minNativeCssSize(13, 14),
       },
     }),
-    [gameplayBackgroundAsset, isCompactLayout, isTinyLayout, isWideNativeLayout, stageHeight, stageScale, stageWidth, useTightSidebar]
+    [gameplayBackgroundAsset, isCompactLayout, isTinyLayout, isWideNativeLayout, minNativeCssSize, stageHeight, stageScale, stageWidth, useTightSidebar]
   )
 
   const handleOpenPrivacyOptions = useCallback(() => {
