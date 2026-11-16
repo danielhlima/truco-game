@@ -1,9 +1,4 @@
-# Truco Raiz — regras locais
-
-Após sua instalação, o Harness Core v0.3.1 será responsável pelo PO, pela
-orquestração, pelos especialistas configurados e pelo QA independente. Este
-arquivo mantém somente as regras do consumidor; consulte
-`docs/harness/github.md` para o fluxo operacional de GitHub.
+# Regras específicas do Truco Raiz
 
 ## Produto e validação
 

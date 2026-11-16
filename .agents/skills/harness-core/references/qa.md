@@ -1,2 +1,0 @@
-QA independently checks each acceptance criterion against actual artifacts and targeted tests. Report reproducible evidence and precise failures. Developer fixes failures, then QA verifies corrections. Consolidate evidence and limitations through the PO.
- If required independent QA is unavailable, report the check as pending; do not substitute a self-review and call it independent.

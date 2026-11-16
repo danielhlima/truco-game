@@ -1,1 +1,0 @@
-Read directly relevant files first. Delegate only independent work whose benefit exceeds coordination cost. Give bounded context and expected output. Reuse still-valid evidence; invalidate it after related changes. Run targeted checks before broader checks. Report unavailable usage metrics as unavailable; never estimate savings without evidence.
