@@ -1,0 +1,54 @@
+name: Funcionalidade
+description: Registrar uma funcionalidade com escopo aprovado pelo PO.
+title: "[Feature]: "
+labels: ["type:feature", "status:triage"]
+body:
+  - type: markdown
+    attributes:
+      value: "Crie esta Issue somente após a aprovação do escopo pelo PO."
+  - type: textarea
+    id: contexto
+    attributes:
+      label: Contexto e história
+      description: Quem precisa de quê e por quê?
+    validations:
+      required: true
+  - type: textarea
+    id: aceite
+    attributes:
+      label: Critérios de aceite
+      description: Liste resultados observáveis e verificáveis.
+    validations:
+      required: true
+  - type: textarea
+    id: duplicidade
+    attributes:
+      label: Checagem de duplicidade
+      description: Informe a busca realizada, Issue reutilizada ou justificativa para uma nova Issue.
+    validations:
+      required: true
+  - type: dropdown
+    id: prioridade
+    attributes:
+      label: Prioridade
+      description: O PO deve aplicar `priority:<valor>` após autorização humana para a mutação remota.
+      options:
+        - p0
+        - p1
+        - p2
+        - p3
+    validations:
+      required: true
+  - type: textarea
+    id: tarefas
+    attributes:
+      label: Tarefas técnicas relacionadas
+      description: Liste como checklist as Issues-filhas, por exemplo, - [ ] #123.
+  - type: textarea
+    id: fora-de-escopo
+    attributes:
+      label: Fora de escopo
+  - type: textarea
+    id: riscos
+    attributes:
+      label: Riscos, dependências e decisão técnica
