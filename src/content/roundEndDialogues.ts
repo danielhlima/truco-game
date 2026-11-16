@@ -251,3 +251,10 @@ export function getNextRoundEndDialogueIndex(
 
   return (lastDisplayedIndex + 1 + dialogueCount) % dialogueCount
 }
+
+export function getNextRoundEndDialogueInterval(
+  roundsUntilNextDialogue: number,
+  shouldStartDialogue: boolean
+): number {
+  return shouldStartDialogue ? 2 : Math.max(0, roundsUntilNextDialogue - 1)
+}

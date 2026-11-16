@@ -3,6 +3,7 @@ import assert from "node:assert/strict"
 import {
   getRoundEndDialogue,
   getNextRoundEndDialogueIndex,
+  getNextRoundEndDialogueInterval,
   ROUND_END_DIALOGUES,
 } from "../../src/content/roundEndDialogues.ts"
 
@@ -30,6 +31,16 @@ test("a seleção sequencial avança e reinicia somente depois do último diálo
   assert.equal(getRoundEndDialogue("A", 0)?.id, "human-win-002")
   assert.equal(getRoundEndDialogue("A", 98)?.id, "human-win-100")
   assert.equal(getNextRoundEndDialogueIndex(100, -1), 0)
+})
+
+test("o diálogo exibido aguarda duas rodadas antes da próxima exibição", () => {
+  const afterShowingDialogue = getNextRoundEndDialogueInterval(0, true)
+  const afterFirstSkippedRound = getNextRoundEndDialogueInterval(afterShowingDialogue, false)
+  const afterSecondSkippedRound = getNextRoundEndDialogueInterval(afterFirstSkippedRound, false)
+
+  assert.equal(afterShowingDialogue, 2)
+  assert.equal(afterFirstSkippedRound, 1)
+  assert.equal(afterSecondSkippedRound, 0)
 })
 
 test("grupo A volta ao diálogo 001 depois do diálogo 100", () => {
