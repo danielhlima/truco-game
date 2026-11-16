@@ -55,10 +55,13 @@ no plano do distribuidor.
 O bootstrap inicial requer ausência de `AGENTS.md` local. Se já existir, não o
 sobrescreva: preserve-o e revise manualmente a origem do conteúdo antes de
 prosseguir. Em um clone novo, copie as regras específicas da versão integrada
-em `develop`:
+em `develop`. O bloco abaixo encerra o procedimento se o arquivo já existir:
 
 ```sh
-test ! -e AGENTS.md
+if [ -e AGENTS.md ]; then
+  echo 'AGENTS.md já existe; preserve e revise antes do bootstrap.' >&2
+  exit 1
+fi
 git show develop:docs/harness/project-instructions.md > AGENTS.md
 ```
 
