@@ -1,0 +1,54 @@
+name: Tarefa técnica
+description: Registrar manutenção, arquitetura ou dívida técnica.
+title: "[Tech]: "
+labels: ["type:technical", "status:triage"]
+body:
+  - type: input
+    id: parent
+    attributes:
+      label: Story/Issue-pai
+      description: Informe a história aprovada no formato #123.
+      placeholder: "#123"
+    validations:
+      required: true
+  - type: dropdown
+    id: prioridade
+    attributes:
+      label: Prioridade
+      description: O PO deve aplicar `priority:<valor>` após autorização humana para a mutação remota.
+      options:
+        - p0
+        - p1
+        - p2
+        - p3
+    validations:
+      required: true
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: Objetivo técnico
+    validations:
+      required: true
+  - type: textarea
+    id: justificativa
+    attributes:
+      label: Justificativa e impacto
+    validations:
+      required: true
+  - type: textarea
+    id: aceite
+    attributes:
+      label: Critérios de aceite e validação
+    validations:
+      required: true
+  - type: textarea
+    id: riscos
+    attributes:
+      label: Riscos, dependências e reversão
+  - type: textarea
+    id: rastreabilidade
+    attributes:
+      label: Rastreabilidade
+      description: Confirme que a Issue-pai terá o checklist/link recíproco.
+    validations:
+      required: true

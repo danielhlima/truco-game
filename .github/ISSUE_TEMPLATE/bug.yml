@@ -1,0 +1,33 @@
+name: Bug
+description: Registrar um defeito reproduzível.
+title: "[Bug]: "
+labels: ["type:bug", "status:triage"]
+body:
+  - type: textarea
+    id: problema
+    attributes:
+      label: Problema
+      description: Descreva o comportamento observado e o impacto.
+    validations:
+      required: true
+  - type: textarea
+    id: reproducao
+    attributes:
+      label: Passos para reproduzir
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: esperado
+    attributes:
+      label: Resultado esperado
+    validations:
+      required: true
+  - type: textarea
+    id: evidencias
+    attributes:
+      label: Evidências
+      description: Inclua logs, capturas, dispositivo, versão e testes relevantes.
