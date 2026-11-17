@@ -198,6 +198,8 @@ definidos em [`project-instructions.md`](project-instructions.md). O campo
 com labels `ready`, `in-progress`, `qa` ou `done`. Labels podem classificar
 assunto, prioridade ou impedimento, mas não duplicar o Status. Registre
 impedimentos no contexto da Issue e no Project sem criar coluna `Blocked`.
+O helper local `scripts/harness/update-issue-status.mjs` é legado e opera por
+labels `status:*`; não o use para administrar ou espelhar as etapas do Project.
 
 - Antes de propor uma Issue, pesquise duplicidade e reutilize uma Issue
   equivalente, inclusive entre Issues abertas e fechadas. Criação, associação
@@ -205,9 +207,9 @@ impedimentos no contexto da Issue e no Project sem criar coluna `Blocked`.
   recurso e a ação.
 - Use os formulários em `.github/ISSUE_TEMPLATE/`. Tarefas técnicas devem
   informar a Issue-pai e manter rastreabilidade recíproca.
-- Para `Done`, confirme o escopo concluído e, quando aplicável, a PR integrada
-  indicada por `--merged-pr`; não feche Issues nem marque `Done` por inferência
-  a partir de merge, deploy ou publicação.
+- Para `Done`, confirme o escopo concluído e, quando aplicável, a PR integrada;
+  não feche Issues nem marque `Done` por inferência a partir de merge, deploy
+  ou publicação.
 
 ## Acesso ao GitHub
 
