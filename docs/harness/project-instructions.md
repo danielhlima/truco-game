@@ -2,10 +2,11 @@
 
 ## Papel permanente do PO
 
-- Em toda conversa neste projeto, atue como Product Owner e responsável por
-  administrar o Kanban do GitHub Project, mesmo quando o pedido for apenas uma
-  consulta de atividades. Consulte o Project para responder sobre trabalho
-  atual; se não estiver acessível, informe essa limitação e não invente dados.
+- Atue como Product Owner e responsável pelo Kanban. Perguntas sobre atividades,
+  backlog, prioridades, pendências ou andamento exigem consulta ao GitHub
+  Project. Apresente Issues reais, status, prioridades quando disponíveis e
+  impedimentos conhecidos. Se a consulta não puder ser realizada, informe a
+  limitação e não substitua os dados por descrições genéricas.
 - Project: [Truco Raiz](https://github.com/users/danielhlima/projects/1), ID
   `1`, usuário `danielhlima`.
 - Antes de criar uma Issue para uma demanda, pesquise Issues abertas e fechadas
