@@ -3,14 +3,20 @@
 GitHub é a fonte de verdade para Issues e Pull Requests quando estiver
 acessível. O Harness Core mantém o papel de PO e os gates gerais; as regras
 específicas do consumidor ficam versionadas em
-[`project-instructions.md`](project-instructions.md) e são copiadas para o
-`AGENTS.md` local durante o bootstrap.
+[`project-instructions.md`](project-instructions.md). No modo persistent,
+essa política é sincronizada para `.harness-core/persistent/consumer-policy.md`
+pelo mecanismo oficial `distribute.py policy sync`, e o bloco gerenciado do
+`AGENTS.md` instrui o Codex a consultá-la. A política local sincronizada persiste
+entre branches compatíveis mesmo quando o arquivo fonte não existe naquela
+branch.
 
 ## Bootstrap de um clone novo com Harness Core persistent
 
 Execute este procedimento depois que a migração dos caminhos operacionais tiver
 sido integrada em `develop`. O `AGENTS.md`, `.codex/`, `.agents/skills/` e o
 estado persistent são locais a cada clone; eles não são distribuídos pelo Git.
+Em clones novos, use uma versão persistent aprovada e siga o procedimento de
+sincronização da política abaixo após a instalação inicial.
 
 ### 1. Preparar branches compatíveis
 
@@ -70,23 +76,23 @@ o bloco PO gerenciado ao final e registrará o snapshot completo para integridad
 e rollback. Por isso, não edite manualmente `AGENTS.md` depois da instalação;
 `verify`, update e rollback recusam alterações locais nesse arquivo.
 
-### 3. Preparar o pacote v0.4.0
+### 3. Preparar o pacote da versão aprovada do Core
 
-Use o distribuidor oficial de uma cópia aprovada do Harness Core v0.4.0 e um
-pacote v0.4.0 previamente verificado. Defina `CORE_ROOT` para o diretório desse
-Core. Se precisar gerar um pacote, escolha um caminho de saída novo e vazio; o
-distribuidor não sobrescreve pacotes existentes:
+Para uma nova instalação, use o distribuidor oficial da versão aprovada do
+Harness Core e um pacote persistent previamente verificado. Defina `CORE_ROOT`
+para o diretório desse Core. Se precisar gerar um pacote, escolha um caminho de
+saída novo e vazio; o distribuidor não sobrescreve pacotes existentes:
 
 ```sh
 CORE_ROOT='/caminho/para/Harness Core'
-PACKAGE="$CORE_ROOT/dist/harness-core-0.4.0-new-clone"
+PACKAGE="$CORE_ROOT/dist/harness-core-new-clone"
 python3 "$CORE_ROOT/scripts/distribute.py" package --mode persistent --package "$PACKAGE"
 python3 "$CORE_ROOT/scripts/distribute.py" package --mode persistent --package "$PACKAGE" --apply
 ```
 
-Inspecione o manifesto e use somente o pin `0.4.0`. O pacote e o distribuidor
-permanecem no repositório Harness Core; não copie regras específicas do Truco
-para o Core nem para configurações globais do Codex.
+Inspecione o manifesto e use o pin exato correspondente à versão aprovada. O
+pacote e o distribuidor permanecem no repositório Harness Core; não copie
+regras específicas do Truco para o Core nem para configurações globais do Codex.
 
 ### 4. Instalar e verificar
 
@@ -95,13 +101,13 @@ dry-run e revise `activeBranches`, `supportedRefs` e `recoveryOnlyRefs`:
 
 ```sh
 TARGET="$(pwd -P)"
-python3 "$CORE_ROOT/scripts/distribute.py" install --mode persistent --target "$TARGET" --package "$PACKAGE" --version 0.4.0 --active-branch main --active-branch develop
+python3 "$CORE_ROOT/scripts/distribute.py" install --mode persistent --target "$TARGET" --package "$PACKAGE" --version VERSION --active-branch main --active-branch develop
 ```
 
 Somente após confirmar ausência de conflitos, aplique a instalação:
 
 ```sh
-python3 "$CORE_ROOT/scripts/distribute.py" install --mode persistent --target "$TARGET" --package "$PACKAGE" --version 0.4.0 --active-branch main --active-branch develop --apply
+python3 "$CORE_ROOT/scripts/distribute.py" install --mode persistent --target "$TARGET" --package "$PACKAGE" --version VERSION --active-branch main --active-branch develop --apply
 python3 "$CORE_ROOT/scripts/distribute.py" verify --mode persistent --target "$TARGET"
 ```
 
@@ -113,7 +119,40 @@ arquivos operacionais. O instalador
 protege os caminhos com `.git/info/exclude`, apenas nesse clone. Não altere
 `.gitignore` versionado nem use `git add -f` nos arquivos locais.
 
-### 5. Confirmar carregamento no Codex Desktop
+### 5. Sincronizar a política em instalação existente v0.4.0+
+
+Não reinstale o Core para atualizar a política do consumidor. A partir do
+distribuidor oficial v0.4.1, a fonte versionada precisa estar commitada e limpa
+no HEAD da branch compatível antes de sincronizar; `policy sync` recusa fonte
+com alterações locais. Revise e integre `docs/harness/project-instructions.md`
+por PR para `develop` conforme os gates do projeto. Com a fonte aprovada e
+commitada, estando em uma base compatível, execute:
+
+```sh
+CORE_ROOT='/caminho/para/Harness Core'
+TARGET="$(pwd -P)"
+python3 "$CORE_ROOT/scripts/distribute.py" policy sync --target "$TARGET" --source docs/harness/project-instructions.md
+```
+
+Inspecione o plano (fonte, revisão, hashes e arquivos afetados). Ele deve
+alterar somente `.harness-core/persistent/consumer-policy.md`; o mecanismo
+também mantém de forma transacional os snapshots/estado e a diretiva gerenciada
+no `AGENTS.md`. Antes de executar com `--apply`, obtenha aprovação humana
+explícita para essa sincronização de arquivos protegidos:
+
+```sh
+python3 "$CORE_ROOT/scripts/distribute.py" policy sync --target "$TARGET" --source docs/harness/project-instructions.md --apply
+python3 "$CORE_ROOT/scripts/distribute.py" policy verify --target "$TARGET"
+python3 "$CORE_ROOT/scripts/distribute.py" verify --mode persistent --target "$TARGET"
+```
+
+O `AGENTS.md` operacional deve conter a diretiva gerenciada para consultar
+`.harness-core/persistent/consumer-policy.md`. Não a edite manualmente. A cópia
+sincronizada e a diretiva persistem entre `main` e `develop` compatíveis; não é
+necessário reinstalar nem sincronizar após cada troca. Confirme `supportedRefs`
+e `recoveryOnlyRefs` com `verify`; não force checkout nem altere refs históricas.
+
+### 6. Confirmar carregamento no Codex Desktop
 
 Abra uma nova conversa do Codex Desktop no projeto e confirme o PO, os três
 perfis nativos e a skill. Depois, valide cada branch ativa com troca protegida,
@@ -151,22 +190,24 @@ nunca edite `state.json`, snapshots ou journal manualmente.
   evidências. Merge em `develop`, promoção para `main`, deploy e publicação
   continuam sujeitos a aprovação humana explícita.
 
-## Issues
+## Kanban e Issues
+
+O Project e as colunas `Backlog`, `Ready`, `In Progress`, `QA` e `Done` são
+definidos em [`project-instructions.md`](project-instructions.md). O campo
+`Status` do Project é a única fonte de status do fluxo: não espelhe essas etapas
+com labels `ready`, `in-progress`, `qa` ou `done`. Labels podem classificar
+assunto, prioridade ou impedimento, mas não duplicar o Status. Registre
+impedimentos no contexto da Issue e no Project sem criar coluna `Blocked`.
 
 - Antes de propor uma Issue, pesquise duplicidade e reutilize uma Issue
-  equivalente quando existir. Criação ou edição remota exige autorização
-  humana específica.
+  equivalente, inclusive entre Issues abertas e fechadas. Criação, associação
+  ao Project ou edição remota exige autorização humana específica para o
+  recurso e a ação.
 - Use os formulários em `.github/ISSUE_TEMPLATE/`. Tarefas técnicas devem
   informar a Issue-pai e manter rastreabilidade recíproca.
-- Labels de status permitidos: `triage`, `ready`, `in-progress`, `blocked`,
-  `qa` e `done`. Transições: `triage → ready`, `ready → in-progress`,
-  `in-progress → qa`, `qa → done` e qualquer status para `blocked`.
-- Prepare mudanças com `node scripts/harness/update-issue-status.mjs --issue N
-  --from STATUS --status STATUS --dry-run`. O padrão não chama a API.
-- `--apply --approved` não substitui a autorização humana explícita para aquela
-  edição. O script confere o status remoto atual; `done` também exige uma PR
-  integrada indicada por `--merged-pr`. Não feche Issues nem marque `done` por
-  inferência a partir de um merge ou publicação.
+- Para `Done`, confirme o escopo concluído e, quando aplicável, a PR integrada
+  indicada por `--merged-pr`; não feche Issues nem marque `Done` por inferência
+  a partir de merge, deploy ou publicação.
 
 ## Acesso ao GitHub
 
